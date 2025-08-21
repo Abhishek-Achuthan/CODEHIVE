@@ -47,47 +47,46 @@ backend/
 ├── infrastructure/   # db, cache, external services
 ├── presentation/     # controllers & validators
 └── shared/           # constants, utils
-
 ```
+
 ## ⚙️ Getting Started
 1. Clone the repository  
    ```bash
    git clone https://github.com/Abhishek-Achuthan/CODEHIVE.git
    cd CODEHIVE/backend
-
-2.Install dependencies
+2. Install dependencies
    ```bash
    npm install
-   ```
-3.Run in development mode
-  ```bash
-  npm run dev
-  ```
-4.Setup environment variables (coming soon).
+4. Run in development mode
+   ```bash
+   npm run dev
+6. Setup environment variables (coming soon)
 
 ### 📌 Roadmap
- -Authentication (Register/Login)
 
- -Q&A API (CRUD, voting, save lists)
+- Authentication (Register/Login)
 
- -Session Scheduling & Management
+- Q&A API (CRUD, voting, save lists)
 
- -Realtime Code Collaboration
+- Session Scheduling & Management
 
- -Mentor Dashboard & User Dashboard
+- Realtime Code Collaboration
 
- -Push to GitHub Integration
+- Mentor Dashboard & User Dashboard
 
- -Deployment & CI/CD
-### 🤝Contributing
- CodeHive is currently in active solo development.
- If you’re interested in collaboration, mentorship, or contributing ideas — feel free to open an issue.
-📣 Status
+- Push to GitHub Integration
+
+- Deployment & CI/CD
+
+### 🤝 Contributing
+
+CodeHive is currently in active solo development.
+If you’re interested in collaboration, mentorship, or contributing ideas — feel free to open an issue.
+
+### 📣 Status
 
 🚧 Early Development Stage
 
--Authentication not implemented yet.
+- Authentication not implemented yet.
 
--Core backend setup & architecture complete.
-
-
+- Core backend setup & architecture complete.
