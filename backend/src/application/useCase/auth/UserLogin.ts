@@ -1,29 +1,29 @@
-import { inject, injectable } from "tsyringe";
-import type { IUserLoginUseCase } from "../../../domain/interfaces/useCases/user/auth/ILoginUseCase";
-import type { IUserRepository } from "../../../domain/interfaces/repository/user/userRepository";
+import { injectable } from "tsyringe";
+import type { IUserLoginUseCase } from "../../../domain/interfaces/useCases/auth/ILoginUseCase";
+import type { IUserRepository } from "../../../domain/interfaces/repository/user/IUserRepository";
 import type { IJWTservice } from "../../services/IJWTservice";
 import type { IHashService } from "../../services/IHashservice";
 
-import type { ILoginInputDTO } from "../../DTO/auth/user/ILoginInputDTO";
-import type { ILoginResponceDTO } from "../../DTO/auth/user/ILoginResponceDTO";
-import { UnauthorizedError } from "../../../core/exeptions/UnauthorizedError";
+import type { ILoginInputDTO } from "../../../domain/interfaces/DTO/auth/ILoginInputDTO";
+import type { ILoginResponceDTO } from "../../../domain/interfaces/DTO/auth/ILoginResponseDTO";
+import { UnauthorizedError } from "../../../core/exceptions/UnauthorizedError";
 
 @injectable()
 export class UserLoginUseCaseImpl implements IUserLoginUseCase {
   constructor(
-    @inject("UserRepository") private userRepository: IUserRepository,
-    @inject("JWTservice") private jwtService: IJWTservice,
-    @inject("HashService") private hashService: IHashService
+    private _userRepository: IUserRepository,
+    private _jwtService: IJWTservice,
+    private _hashService: IHashService
   ) {}
 
   async execute(data: ILoginInputDTO): Promise<ILoginResponceDTO> {
-    const user = await this.userRepository.findByEmail(data.email);
+    const user = await this._userRepository.findByEmail(data.email);
 
     if (!user) {
       throw new UnauthorizedError();
     }
 
-    const passwordMatch = await this.hashService.compare(
+    const passwordMatch = await this._hashService.compare(
       data.password,
       user.password
     );
@@ -32,7 +32,7 @@ export class UserLoginUseCaseImpl implements IUserLoginUseCase {
       throw new UnauthorizedError();
     }
 
-    const token = this.jwtService.createAccessToken({userId:user.id,role:user.first_name});
+    const token = this._jwtService.createAccessToken({userId:user.id,role:user.is_mentor?"mentor":"user"});
 
     return {
       accessToken: token,

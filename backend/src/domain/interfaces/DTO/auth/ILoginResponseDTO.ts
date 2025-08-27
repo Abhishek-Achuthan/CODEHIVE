@@ -1,4 +1,3 @@
-import { User } from "../../../../domain/entities/user/userEntity";
 
 export interface ILoginResponceDTO {
    accessToken: string;

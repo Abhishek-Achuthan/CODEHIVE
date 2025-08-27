@@ -1,25 +1,44 @@
 import "reflect-metadata";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+dotenv.config();
+import "./config/di";
 import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors"
+import { Express } from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { Auth_routes} from "./presentation/routes/user/AuthRoute";
+import { MongoDbConnect } from "./infrastructure/config/mongodbConfig";
 
-import "./config/User/auth/di"
-import authRoutes from "./presentation/routes/user/authRoute"
+class Server {
+    private app: Express;
+  constructor() {
+    MongoDbConnect.connect();
+    this.app = express();
+    this.setMiddlewares();
+    this.setAuthRouter();
+  }
 
-const app = express();
+  public listen() {
+    const PORT = process.env.PORT ?? 3111;
+    this.app.listen(PORT, (err) => {
+      if (err) {
+        console.log("Error while starting server");
+        throw err;
+      }
+      console.log(`Server running successfully on ${PORT}`);
+    });
+  }
 
-app.use(cors());
-app.use(bodyParser.json());
+  private setMiddlewares(){
+    this.app.use(cors());
+    this.app.use(express.json());
+    this.app.use(cookieParser());
+  }
 
+  private setAuthRouter(){
+    this.app.use("/api/v1/user/auth/",new Auth_routes().getRoute());
+  }
+}
 
-app.use("/auth",authRoutes);
-
-const PORT = process.env.PORT;
-
-app.listen(PORT,() => {
-    console.log("Server running on PORT : ",PORT)
-})
-
-export default app;
-
+const server = new Server();
+server.listen();
