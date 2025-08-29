@@ -1,26 +1,39 @@
-import { IUserRepository } from "../../../../domain/interfaces/repository/user/userRepository";
+import { IUserRepository } from "../../../../domain/interfaces/repository/user/IUserRepository";
 import { User } from "../../../../domain/entities/user/userEntity";
 import { UserModel } from "../models/userModel";
 
-
 export class UserRepositoryImpl implements IUserRepository {
-    async findByEmail(email: string): Promise<User | null> {
-        const userDoc = await UserModel.findOne({email})
+  async findByEmail(email: string): Promise<User | null> {
+    const userDoc = await UserModel.findOne({ email });
 
-        if(!userDoc) return null;
+    if (!userDoc) return null;
 
-        return {
-            first_name:userDoc.first_name,
-            last_name:userDoc.last_name,
-            password:userDoc.password,
-            email:userDoc.email,
-            is_blocked:userDoc.is_blocked,
-            id:userDoc.id,
-            is_admin:userDoc.is_admin,
-            is_mentor:userDoc.is_mentor,
-            phone:userDoc.phone,
-            slots_used:userDoc.slots_used,
-            points:userDoc.points
-        }
-    }
+    return {
+      first_name: userDoc.first_name,
+      last_name: userDoc.last_name,
+      password: userDoc.password,
+      email: userDoc.email,
+      is_blocked: userDoc.is_blocked,
+      id: userDoc.id,
+      is_admin: userDoc.is_admin,
+      is_mentor: userDoc.is_mentor,
+      phone: userDoc.phone,
+      slots_used: userDoc.slots_used,
+      points: userDoc.points,
+    };
+  }
+
+  async createUser(user: User): Promise<Boolean> {
+    await UserModel.create({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      password: user.password,
+      email: user.email,
+      is_blocked: user.is_blocked,
+      is_mentor: user.is_mentor,
+      points: user.points,
+      phone: user.phone,
+    });
+    return true;
+  }
 }
