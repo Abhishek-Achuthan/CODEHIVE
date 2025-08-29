@@ -1,10 +1,13 @@
 export const diTokens = {
-
   //Auth
   IUserRepository: Symbol.for("IUserRepository"),
   IUserLoginUseCase: Symbol.for("IUserLoginUseCase"),
   IJWTService: Symbol.for("IJWTService"),
   IHashService: Symbol.for("IHashService"),
-  IRegisterUserUseCase:Symbol.for("IRegisterUserUseCase")
+  IRegisterUserUseCase:Symbol.for("IRegisterUserUseCase"),
+  
+  // Infrastructure
+  ILoggerService: Symbol.for("ILoggerService"),
+  IMongoDbConnect: Symbol.for("IMongoDbConnect"),
 
 };
