@@ -1,6 +1,6 @@
 import { IEmailTemplate } from '../../../../application/ports/mail/template/IEmailTemplate';
 import { IEmailTemplateFactory } from '../../../../application/ports/mail/template/IEmailTemplateFactory';
-import { OTPMailTemplate } from './otpMailTemplate';
+import { OTPMailTemplate } from './OtpMailTemplate';
 
 export class TemplateFactoryImpl implements IEmailTemplateFactory {
   getOtpMailTemplate(): IEmailTemplate<{ otp: string }> {

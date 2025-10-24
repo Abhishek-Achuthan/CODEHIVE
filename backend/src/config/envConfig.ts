@@ -9,6 +9,8 @@ export const env = {
   smtpPass: process.env.SMTP_PASS,
   hostMail: process.env.HOST_MAIL,
   secretKey: process.env.SECRET_KEY,
-  accessTokenSKY: process.env.ACCESS_TOKEN_SECRET_KEY,
-  refreshTokenSKY: process.env.REFRESH_TOKEN_SECRET_KEY,
+  accessTokenSKY: process.env.ACCESS_TOKEN_SECRET_KEY || "secretKey",
+  refreshTokenSKY: process.env.REFRESH_TOKEN_SECRET_KEY || "refreshKey",
+  accessExp: process.env.ACCESS_TOKEN_EXPIRY || "1hr",
+  refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || "7hr",
 };

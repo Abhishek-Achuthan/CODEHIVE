@@ -10,6 +10,10 @@
     "module": "nodenext",
     "target": "esnext",
     "types": [],
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -34,7 +38,6 @@
 
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
