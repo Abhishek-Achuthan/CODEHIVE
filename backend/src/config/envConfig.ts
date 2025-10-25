@@ -1,5 +1,5 @@
 export const env = {
-  mongouri: process.env.MONGO_URI,
+  mongouri: process.env.MONGO_URI||'',
   frontendUrl: process.env.FRONTEND_URL,
   port: process.env.PORT,
   loggerlvl: process.env.LOGGER_LEVEL,
