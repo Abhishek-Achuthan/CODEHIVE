@@ -16,9 +16,7 @@ export class CacheService implements ICacheService {
   async registerListners() {
     this._client.on("connect", () => console.log("Redis Client Connected"));
 
-    this._client.on("error", (error) =>
-      console.log("Redis Client Error", error)
-    );
+    this._client.on("error", (error) => console.log("Redis Client Error", error));
 
     this._client.on("ready", () => console.log("Redis Client is Ready"));
 
