@@ -16,6 +16,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.10",
+    "redis": "^5.9.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0"
   }

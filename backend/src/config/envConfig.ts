@@ -4,7 +4,7 @@ export const env = {
   port: process.env.PORT,
   loggerlvl: process.env.LOGGER_LEVEL,
   nodeEnv: process.env.NODE_ENV,
-  redisUrl: process.env.REDIS_URL,
+  redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
   smtpUser: process.env.SMTP_USER,
   smtpPass: process.env.SMTP_PASS,
   hostMail: process.env.HOST_MAIL,
