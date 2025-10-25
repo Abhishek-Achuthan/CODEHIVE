@@ -55,6 +55,9 @@ export class CacheService implements ICacheService {
   }
 
   async deleteData(key: string): Promise<void> {
+    if(!this._client.isOpen) {
+      await this.connectRedis()
+    }
     await this._client.del(key);
   }
 }
