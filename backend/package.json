@@ -2,6 +2,7 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^24.9.1",
     "@types/nodemailer": "^7.0.2",
     "ts-node": "^10.9.2",
@@ -15,6 +16,7 @@
   "dependencies": {
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.2",
     "nodemailer": "^7.0.10",
     "redis": "^5.9.0",
     "reflect-metadata": "^0.2.2",
