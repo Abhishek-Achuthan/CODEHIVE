@@ -4,7 +4,7 @@ import { OTPMailTemplate } from './OtpMailTemplate';
 
 export class TemplateFactoryImpl implements IEmailTemplateFactory {
   getOtpMailTemplate(): IEmailTemplate<{ otp: string }> {
-    return new OTPMailTemplate()
+    return new OTPMailTemplate();
   }
 }
 

@@ -1,5 +1,5 @@
 import { IEmailService } from "../../../application/ports/mail/IEmailService";
-import { transporter } from "../../../config/nodeMailerConfig";
+import { transporter } from "../../../config/nodemaileConfig";
 
 
 export class MailService implements IEmailService {

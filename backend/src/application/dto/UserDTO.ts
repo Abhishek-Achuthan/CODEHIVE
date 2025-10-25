@@ -5,3 +5,8 @@ interface IUserRegisterInputDTO {
   phone: string;
   password: string;
 }
+
+export type {
+  IUserRegisterInputDTO
+}
+
