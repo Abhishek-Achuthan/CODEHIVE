@@ -1,0 +1,15 @@
+import { Schema } from "mongoose";
+import { UserRole } from "../../../domain/types/UserRole";
+import { UserDocument } from "../../../shared/types";
+
+export const UserSchema = new Schema<UserDocument>(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
+  },
+  { timestamps: true }
+);
