@@ -7,23 +7,29 @@ import { TemplateFactoryImpl } from "../../infrastructure/adapters/mail/template
 import { IEmailTemplateFactory } from "../../application/ports/mail/template/IEmailTemplateFactory";
 import { IJWTService } from "../../application/ports/security/IJWTService";
 import { JWTService } from "../../infrastructure/adapters/security/JWTService";
+import { IHashService } from "../../application/ports/security/IHashService";
+import { HashService } from "../../infrastructure/adapters/security/HashService";
 
 export class ServiceModule {
-    static registerModules():void {
-        container.register<ICacheService>('ICacheService', {
-            useClass:CacheService,
-        });
+  static registerModules(): void {
+    container.register<ICacheService>("ICacheService", {
+      useClass: CacheService,
+    });
 
-        container.register<IEmailService>('IEmailService',{
-            useClass:MailService,
-        });
+    container.register<IEmailService>("IEmailService", {
+      useClass: MailService,
+    });
 
-        container.register<IEmailTemplateFactory>('IEmailTemplateFactory', {
-            useClass:TemplateFactoryImpl
-        });
+    container.register<IEmailTemplateFactory>("IEmailTemplateFactory", {
+      useClass: TemplateFactoryImpl,
+    });
 
-        container.register<IJWTService>('IJWTService', {
-            useClass:JWTService,
-        });
-    };
-};
+    container.register<IJWTService>("IJWTService", {
+      useClass: JWTService,
+    });
+
+    container.register<IHashService>("IHashService", {
+      useClass: HashService,
+    });
+  }
+}
