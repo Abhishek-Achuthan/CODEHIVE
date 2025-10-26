@@ -9,6 +9,8 @@ import { IJWTService } from "../../application/ports/security/IJWTService";
 import { JWTService } from "../../infrastructure/adapters/security/JWTService";
 import { IHashService } from "../../application/ports/security/IHashService";
 import { HashService } from "../../infrastructure/adapters/security/HashService";
+import { IOTPService } from "../../application/ports/otp/IOTPService";
+import { OTPService } from "../../infrastructure/adapters/otp/OTPService";
 
 export class ServiceModule {
   static registerModules(): void {
@@ -30,6 +32,10 @@ export class ServiceModule {
 
     container.register<IHashService>("IHashService", {
       useClass: HashService,
+    });
+
+    container.register<IOTPService>("IOTPService", {
+      useClass: OTPService,
     });
   }
 }
