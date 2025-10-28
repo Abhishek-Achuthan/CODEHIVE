@@ -4,6 +4,8 @@ import express, { Express } from "express";
 dotenv.config();
 import { AuthRoute } from "./presentation/routes/AuthRoutes";
 import { MongodbConfig } from './config/MongodbConfig';
+import { env } from './config/envConfig';
+import cors from 'cors'
 
 export class App {
   private readonly _app: Express;
@@ -20,6 +22,14 @@ export class App {
   }
 
   configMiddlewares() {
+    this._app.use(
+      cors({
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
+      }),
+    );
     this._app.use(express.urlencoded());
     this._app.use(express.json());
   }
