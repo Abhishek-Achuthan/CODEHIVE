@@ -4,7 +4,6 @@ import type { ISendOTPUseCase } from "../../../application/useCase/interface/aut
 import type { IUserRegisterUseCase } from "../../../application/useCase/interface/auth/IUserRegisterUseCase";
 import { RegisterUserSchema } from "../../validation/auth";
 import { HttpStatus } from "../../../shared/httpStatusCode";
-import { success } from "zod";
 
 @injectable()
 export class AuthController {
