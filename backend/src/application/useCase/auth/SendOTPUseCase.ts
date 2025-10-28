@@ -30,10 +30,10 @@ export class SendOTPUseCase implements ISendOTPUseCase {
         if(existing) throw new ConflictError('User already exists');
 
         const otp = this._otpService.genarateOtp();
-
+        
         const hashedOtp = await this._hashService.hash(otp);
 
-        await this._cacheService.setData(hashedOtp,this._otp_expiry,hashedOtp);
+        await this._cacheService.setData(`otp:${email}`,this._otp_expiry,hashedOtp);
 
         const otpTemplate = this._templateFactory.getOtpMailTemplate();
 
