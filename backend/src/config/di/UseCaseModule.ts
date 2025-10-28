@@ -3,6 +3,8 @@ import { IUserRegisterUseCase } from "../../application/useCase/interface/auth/I
 import { ISendOTPUseCase } from "../../application/useCase/interface/auth/ISendOTPUseCase";
 import { UserRegisterUseCase } from "../../application/useCase/auth/UserRegisterUseCase";
 import { SendOTPUseCase } from "../../application/useCase/auth/SendOTPUseCase";
+import { IVerifyOTPUseCase } from "../../application/useCase/interface/auth/IVerifyOTPUseCase";
+import { VerifyOTPUseCase } from "../../application/useCase/auth/VerifyOTPUseCase";
 
 
 export class UseCaseModule {
@@ -13,6 +15,10 @@ export class UseCaseModule {
 
         container.register<ISendOTPUseCase>('ISendOTPUseCase',{
             useClass: SendOTPUseCase
+        });
+
+        container.register<IVerifyOTPUseCase>('IVerifyOTPUseCase', {
+            useClass:VerifyOTPUseCase
         });
     }
 }

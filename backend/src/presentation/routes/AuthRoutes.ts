@@ -13,13 +13,14 @@ export class AuthRoute {
 
   private _setRoutes() {
     this._router.post(
-      "/user",
-      this._authController.handleUserRegister.bind(this._authController)
+      "/users",
+      this._authController.handleUserRegisterWithVerifyOtp.bind(this._authController)
     );
     this._router.post(
-      "/otp",
+      "/otps",
       this._authController.handleSendOtp.bind(this._authController)
     );
+  
   }
 
   public getRoutes(): Router {
