@@ -1,0 +1,10 @@
+@import "tailwindcss";
+/* ensure dark theme base styles for the auth pages */
+:root {
+  color-scheme: dark;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
