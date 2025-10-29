@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { IVerifyOTPUseCase } from "../interface/auth/IVerifyOTPUseCase";
 import type { IHashService } from "../../ports/security/IHashService";
 import type { ICacheService } from "../../ports/cache/ICacheService";
-import { NotFoundError } from "../../../core/Errors/NotFoundError";
+import { NotFoundError } from "../../../core/errors/NotFoundError";
 
 @injectable()
 export class VerifyOTPUseCase implements IVerifyOTPUseCase {

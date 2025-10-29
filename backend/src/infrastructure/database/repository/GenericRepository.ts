@@ -1,8 +1,8 @@
 import { IGenericRepository } from "../../../domain/interfaces/IGenericRepository";
 import { Document, Model } from "mongoose";
 
-export abstract class GenericRepository<T extends Document>
-  implements IGenericRepository<T>
+export abstract class GenericRepository<T extends Document, E>
+  implements IGenericRepository<T, E>
 {
   protected readonly _model: Model<T>;
 
@@ -10,8 +10,9 @@ export abstract class GenericRepository<T extends Document>
     this._model = model;
   }
 
-  async create(data: Partial<T>): Promise<T> {
-    return await this._model.create(data);
+  async create(data: Partial<T>): Promise<E> {
+    const doc =  await this._model.create(data);
+    return this.toEntity(doc);
   }
 
   async update(id: string, data: Partial<T>): Promise<T | null> {
@@ -29,4 +30,6 @@ export abstract class GenericRepository<T extends Document>
   async find(id: string): Promise<T | null> {
     return await this._model.findById(id);
   }
+
+  abstract toEntity(doc: T): E;
 }

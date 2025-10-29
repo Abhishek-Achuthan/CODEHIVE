@@ -20,7 +20,10 @@ export class AuthRoute {
       "/otps",
       this._authController.handleSendOtp.bind(this._authController)
     );
-  
+    this._router.post(
+      "/sessions",
+      this._authController.handleUserLogin.bind(this._authController)
+    );
   }
 
   public getRoutes(): Router {

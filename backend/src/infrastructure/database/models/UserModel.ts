@@ -1,6 +1,7 @@
 import { UserDocument } from "../../../shared/types";
 import { UserSchema } from "../schemas/UserSchema";
-import { model } from "mongoose";
+import { Model, model } from "mongoose";
 
 
-export default model<UserDocument>('User',UserSchema);
+const UserModel: Model<UserDocument> = model<UserDocument>("User", UserSchema);
+export default UserModel

@@ -3,7 +3,7 @@ import { IUserRegisterUseCase } from "../interface/auth/IUserRegisterUseCase";
 import type { IHashService } from "../../ports/security/IHashService";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { IUserRegisterInputDTO } from "../../dto/UserDTO";
-import { ConflictError } from "../../../core/Errors/ConflictError";
+import { ConflictError } from "../../../core/errors/ConflictError";
 
 
 @injectable()

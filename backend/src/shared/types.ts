@@ -8,4 +8,4 @@ declare module "jsonwebtoken" {
   }
 }
 
-export interface UserDocument extends UserEntity,Document {}
+export interface UserDocument extends Document<UserEntity>, Omit<UserEntity, 'id'> {}

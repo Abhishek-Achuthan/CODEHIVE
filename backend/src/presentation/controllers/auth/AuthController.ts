@@ -5,13 +5,16 @@ import type { IUserRegisterUseCase } from "../../../application/useCase/interfac
 import { RegisterUserSchema } from "../../validation/auth";
 import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
+import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
+import { success } from "zod";
 
 @injectable()
 export class AuthController {
   constructor(
     @inject("IUserRegisterUseCase") private readonly _userRegisterUseCase: IUserRegisterUseCase,
     @inject("ISendOTPUseCase") private readonly _sendOTPUseCase: ISendOTPUseCase,
-    @inject('IVerifyOTPUseCase') private readonly _verifyOTPUseCase: IVerifyOTPUseCase
+    @inject('IVerifyOTPUseCase') private readonly _verifyOTPUseCase: IVerifyOTPUseCase,
+    @inject('IUserLoginUseCase') private readonly _userLoginUseCase: IUserLoginUseCase,
   ) {}
 
   async handleUserRegisterWithVerifyOtp(req: Request, res: Response, next: NextFunction) {
@@ -43,6 +46,18 @@ export class AuthController {
         .json({ success: true, message: "OTP send successfully" });
     } catch (error) {
       next(error);
+    }
+  }
+
+  async handleUserLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      
+      const data = await this._userLoginUseCase.execute(req.body);
+
+      return res.status(HttpStatus.OK).json({success:true,data});
+      
+    } catch (error) {
+      
     }
   }
 }
