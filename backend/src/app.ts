@@ -24,7 +24,7 @@ export class App {
   configMiddlewares() {
     this._app.use(
       cors({
-        origin: 'http://localhost:5173',
+        origin: env.frontendUrl,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
@@ -40,8 +40,8 @@ export class App {
   }
 
   public listen() {
-    this._app.listen(4000, () => {
-      console.log(`server started at port ${4000}`);
+    this._app.listen(env.port, () => {
+      console.log(`server started at port ${env.port}`);
     });
   }
 }
