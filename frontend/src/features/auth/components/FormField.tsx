@@ -21,7 +21,7 @@ function FormFieldBase<T extends FieldValues>({
     placeholder: field.placeholder,
     type: field.type || 'text',
     className:
-      'h-10 w-full rounded-lg border border-white10 bg-white/5 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20',
+      'h-10 w-full rounded-lg border border-white/20 bg-white/5 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20',
     ...register(field.name),
   };
 

@@ -56,7 +56,8 @@ export function LoginForm({
             {...register('email')}
             type="text"
             id="email"
-            className="w-full rounded-md border border-white/10 bg-white/5 px-3.5 py-3 text-sm font-light text-white placeholder:text-white/30 focus:border-white/30 focus:bg-white/8 focus:outline-none"
+            className="w-full rounded-md border border-white/20
+             bg-white/5 px-3.5 py-3 text-sm font-light text-white placeholder:text-white/30 focus:border-white/30 focus:bg-white/8 focus:outline-none"
           />
           {errors.email && (
             <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>
