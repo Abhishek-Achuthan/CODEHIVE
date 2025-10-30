@@ -11,6 +11,6 @@ export const env = {
   secretKey: process.env.SECRET_KEY,
   accessTokenSKY: process.env.ACCESS_TOKEN_SECRET_KEY || "secretKey",
   refreshTokenSKY: process.env.REFRESH_TOKEN_SECRET_KEY || "refreshKey",
-  accessExp: process.env.ACCESS_TOKEN_EXPIRY || "1hr",
-  refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || "7hr",
+  accessTokenExp: process.env.ACCESS_TOKEN_EXPIRY || "1h",
+  refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || "7d",
 };
