@@ -22,11 +22,13 @@ export class UserLoginUseCase implements IUserLoginUseCase {
 
     if (!user) throw new NotFoundError("User not found");
 
+    if(user.isBlocked) throw new UnauthorizedError('User is Blocked');
+    
     const validUser = await this._hashService.compare(
       data.password,
       user.password
     );
-
+    
     if (!validUser) throw new UnauthorizedError("Invalid credentials");
 
     const accessToken = this._jwtService.genarateAccessToken({

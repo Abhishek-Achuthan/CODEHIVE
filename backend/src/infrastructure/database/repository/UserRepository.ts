@@ -27,7 +27,7 @@ export class UserRepository extends GenericRepository<UserDocument, UserEntity> 
             firstName:doc.firstName,
             lastName:doc.lastName,
             id:doc._id.toString(),
-            isBlocked:doc.isBlocked,
+            isBlocked:doc.isBlocked??false,
             role:doc.role,
         }
     }
