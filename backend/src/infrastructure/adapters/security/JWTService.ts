@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export class JWTService implements IJWTService {
   genarateAccessToken(claims: JwtPayload): string {
-    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: '1hr' });
+    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: '1h' });
   }
 
   genarateRefreshToken(claims: JwtPayload): string {
