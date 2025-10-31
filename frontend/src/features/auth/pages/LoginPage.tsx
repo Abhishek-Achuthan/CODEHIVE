@@ -22,7 +22,7 @@ export default function LoginPage() {
     try {
       const response = await userLogin(data);
 
-      const {user, accessToken} = response.data.data;
+      const {user, accessToken} = response.data;
       
       dispatch(loginSuccess({user,accessToken}));
       

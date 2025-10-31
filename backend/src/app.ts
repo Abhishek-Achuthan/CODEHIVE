@@ -6,6 +6,7 @@ import { AuthRoute } from "./presentation/routes/AuthRoutes";
 import { MongodbConfig } from './config/MongodbConfig';
 import { env } from './config/envConfig';
 import cors from 'cors'
+import { errorHandler } from './presentation/middlewares/errorHanlder';
 
 export class App {
   private readonly _app: Express;
@@ -15,6 +16,7 @@ export class App {
     this.configMiddlewares();
     this.configRoutes();
     this.configDb();
+    this.configErrorHanldingMiddleWares()
   }
 
   configDb () {
@@ -37,6 +39,10 @@ export class App {
   configRoutes() {
     const authRoute = new AuthRoute();
     this._app.use('/api/auth',authRoute.getRoutes());
+  }
+
+  configErrorHanldingMiddleWares() {
+    this._app.use(errorHandler)
   }
 
   public listen() {
