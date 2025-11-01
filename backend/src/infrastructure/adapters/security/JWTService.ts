@@ -19,4 +19,8 @@ export class JWTService implements IJWTService {
   verifyRefreshToken(token: string): JwtPayload | string {
     return jwt.verify(token, env.refreshTokenSKY);
   }
+
+  decode(token: string): JwtPayload | string | null {
+    return jwt.decode(token);
+  }
 }
