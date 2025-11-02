@@ -11,10 +11,9 @@ import { UserMapper } from "../../mapper/userMapper";
 @injectable()
 export class UserLoginUseCase implements IUserLoginUseCase {
   constructor(
-    @inject("IUserRepository")
-    private readonly _userRepository: IUserRepository,
+    @inject("IUserRepository") private readonly _userRepository: IUserRepository,
     @inject("IHashService") private readonly _hashService: IHashService,
-    @inject("IJWTService") private readonly _jwtService: IJWTService
+    @inject("IJWTService") private readonly _jwtService: IJWTService,
   ) {}
 
   async execute(data: IUserLoginInputDTO): Promise<IUserLoginResponseDTO> {

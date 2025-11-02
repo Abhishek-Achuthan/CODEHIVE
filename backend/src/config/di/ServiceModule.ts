@@ -11,6 +11,8 @@ import { IHashService } from "../../application/ports/security/IHashService";
 import { HashService } from "../../infrastructure/adapters/security/HashService";
 import { IOTPService } from "../../application/ports/otp/IOTPService";
 import { OTPService } from "../../infrastructure/adapters/otp/OTPService";
+import { ITokenBlacklistService } from "../../application/ports/security/ITokenBlacklistService";
+import { TokenBlacklistService } from "../../infrastructure/adapters/security/TokenBlacklistService";
 
 export class ServiceModule {
   static registerModules(): void {
@@ -36,6 +38,10 @@ export class ServiceModule {
 
     container.register<IOTPService>("IOTPService", {
       useClass: OTPService,
+    });
+
+    container.register<ITokenBlacklistService>("ITokenBlacklistService", {
+      useClass: TokenBlacklistService,
     });
   }
 }

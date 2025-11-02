@@ -5,7 +5,7 @@ import type { ICacheService } from "../../../application/ports/cache/ICacheServi
 import type { IJWTService } from "../../../application/ports/security/IJWTService";
 import { JwtPayload } from "jsonwebtoken";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { convertUnixTimeStampToTime } from "../../../presentation/utils/timeCalculator";
+import { convertUnixTimeStampToTime } from "../../../presentation/utils/unixTimeConverter";
 
 
 @injectable()

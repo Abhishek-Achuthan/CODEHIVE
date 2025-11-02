@@ -6,7 +6,7 @@ import { LoginUserSchema, RegisterUserSchema } from "../../validation/auth";
 import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
 import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
-import { success } from "zod";
+import { setCookie } from "../../utils/cookieHelper";
 
 @injectable()
 export class AuthController {
@@ -62,16 +62,20 @@ export class AuthController {
 
   async handleUserLogin(req: Request, res: Response, next: NextFunction) {
     try {
-
-      const parsedData = LoginUserSchema.parse(req.body)
+      const parsedData = LoginUserSchema.parse(req.body);
 
       const data = await this._userLoginUseCase.execute(parsedData);
 
-      console.log(data)
+      const { accessToken, refreshToken, ...userData } = data;
+
+      if(refreshToken) setCookie(res,refreshToken,'refreshToken');
 
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, data });
+        .json({
+          success: true,
+          data: { user: userData, accessToken: accessToken },
+        });
     } catch (error) {
       next(error);
     }

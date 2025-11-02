@@ -22,7 +22,7 @@ export default function LoginPage() {
     try {
       const response = await userLogin(data);
 
-      const {user, accessToken} = response.data;
+      const {user, accessToken} = response.data.data;
       
       dispatch(loginSuccess({user,accessToken}));
       
@@ -33,6 +33,7 @@ export default function LoginPage() {
     } catch (error: unknown) {
 
       if(error instanceof AxiosError) {
+
         const axiosError = error as AxiosError<ErrorResponse>;
         toast.error(axiosError.response?.data?.message||'Login failed');
       

@@ -1,12 +1,13 @@
-import 'reflect-metadata';
-import dotenv from 'dotenv';
-import express, { Express } from "express";
+import "reflect-metadata";
+import dotenv from "dotenv";
 dotenv.config();
+import express, { Express } from "express";
 import { AuthRoute } from "./presentation/routes/AuthRoutes";
-import { MongodbConfig } from './config/MongodbConfig';
-import { env } from './config/envConfig';
-import cors from 'cors'
-import { errorHandler } from './presentation/middlewares/errorHanlder';
+import { MongodbConfig } from "./config/MongodbConfig";
+import { env } from "./config/envConfig";
+import cors from "cors";
+import { errorHandler } from "./presentation/middlewares/errorHanlder";
+import cookieParser from "cookie-parser";
 
 export class App {
   private readonly _app: Express;
@@ -16,33 +17,34 @@ export class App {
     this.configMiddlewares();
     this.configRoutes();
     this.configDb();
-    this.configErrorHanldingMiddleWares()
+    this.configErrorHanldingMiddleWares();
   }
 
-  configDb () {
+  private configDb() {
     MongodbConfig.connectDB();
   }
 
-  configMiddlewares() {
+  private configMiddlewares() {
     this._app.use(
       cors({
         origin: env.frontendUrl,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
-      }),
+      })
     );
     this._app.use(express.urlencoded());
     this._app.use(express.json());
+    this._app.use(cookieParser());
   }
 
-  configRoutes() {
+  private configRoutes() {
     const authRoute = new AuthRoute();
-    this._app.use('/api/auth',authRoute.getRoutes());
+    this._app.use("/api/auth", authRoute.getRoutes());
   }
 
-  configErrorHanldingMiddleWares() {
-    this._app.use(errorHandler)
+  private configErrorHanldingMiddleWares() {
+    this._app.use(errorHandler);
   }
 
   public listen() {
