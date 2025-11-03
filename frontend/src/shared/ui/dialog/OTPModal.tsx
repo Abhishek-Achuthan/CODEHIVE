@@ -1,15 +1,21 @@
-import * as React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './Dialog';
-import { cn } from '../utils/classNames';
+import * as React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../dialog/Dialog";
+import { cn } from "../../utils/classNames";
 
 interface OTPModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onVerify: (otp: string) => void
-  onResend?:()=>void
-  title?: string
-  description?: string
-  length?: number
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onVerify: (otp: string) => void;
+  onResend?: () => void;
+  title?: string;
+  description?: string;
+  length?: number;
 }
 
 export function OTPModal({
@@ -17,11 +23,11 @@ export function OTPModal({
   onOpenChange,
   onVerify,
   onResend,
-  title = 'Enter Verification Code',
-  description = 'We sent a verification code to your email',
+  title = "Enter Verification Code",
+  description = "We sent a verification code to your email",
   length = 6,
 }: OTPModalProps) {
-  const [otp, setOtp] = React.useState<string[]>(Array(length).fill(''));
+  const [otp, setOtp] = React.useState<string[]>(Array(length).fill(""));
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -36,19 +42,22 @@ export function OTPModal({
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').slice(0, length);
+    const pastedData = e.clipboardData.getData("text").slice(0, length);
     if (!/^\d+$/.test(pastedData)) return;
 
     const newOtp = [...otp];
-    pastedData.split('').forEach((char, i) => {
+    pastedData.split("").forEach((char, i) => {
       if (i < length) newOtp[i] = char;
     });
     setOtp(newOtp);
@@ -58,36 +67,38 @@ export function OTPModal({
   };
 
   const handleVerify = () => {
-    const otpString = otp.join('');
+    const otpString = otp.join("");
     if (otpString.length === length) {
       onVerify(otpString);
     }
   };
 
   const handleResend = () => {
-    setOtp(Array(length).fill(''));
+    setOtp(Array(length).fill(""));
     inputRefs.current[0]?.focus();
 
-    if(onResend) {
-        onResend();
+    if (onResend) {
+      onResend();
     }
   };
 
   React.useEffect(() => {
     if (open) {
-      setOtp(Array(length).fill(''));
+      setOtp(Array(length).fill(""));
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }
   }, [open, length]);
 
-  const isComplete = otp.every((digit) => digit !== '');
+  const isComplete = otp.every((digit) => digit !== "");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">{title}</DialogTitle>
-          <DialogDescription className="text-center">{description}</DialogDescription>
+          <DialogDescription className="text-center">
+            {description}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-8 py-6">
@@ -99,7 +110,9 @@ export function OTPModal({
               {otp.map((digit, index) => (
                 <input
                   key={index}
-                  ref={(el) => {(inputRefs.current[index] = el);}}
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
@@ -108,11 +121,11 @@ export function OTPModal({
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   className={cn(
-                    'size-12 rounded-lg border-2 bg-background/50 text-center text-xl font-semibold transition-all duration-200 outline-none backdrop-blur-sm sm:size-14 sm:text-2xl',
+                    "size-12 rounded-lg border-2 bg-background/50 text-center text-xl font-semibold transition-all duration-200 outline-none backdrop-blur-sm sm:size-14 sm:text-2xl",
                     digit
-                      ? 'border-primary shadow-[0_0_20px_rgba(255,255,255,0.1)] shadow-primary/50'
-                      : 'border-border/50 hover:border-border',
-                    'focus:border-primary focus:shadow-[0_0_25px_rgba(255,255,255,0.15)] focus:shadow-primary/60 focus:ring-2 focus:ring-primary/20',
+                      ? "border-primary shadow-[0_0_20px_rgba(255,255,255,0.1)] shadow-primary/50"
+                      : "border-border/50 hover:border-border",
+                    "focus:border-primary focus:shadow-[0_0_25px_rgba(255,255,255,0.15)] focus:shadow-primary/60 focus:ring-2 focus:ring-primary/20"
                   )}
                 />
               ))}
@@ -123,7 +136,9 @@ export function OTPModal({
             <button
               onClick={handleVerify}
               disabled={!isComplete}
-              className="w-full shadow-lg transition-all hover:shadow-xl hover:shadow-primary/20"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium
+               text-gray-800 shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md
+                hover:shadow-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Verify Code
             </button>
@@ -132,12 +147,14 @@ export function OTPModal({
               onClick={handleResend}
               className="text-muted-foreground hover:text-foreground text-sm transition-colors"
             >
-              Didn't receive the code?{' '}
-              <span className="text-primary font-medium underline-offset-4 hover:underline">Resend</span>
+              Didn't receive the code?{" "}
+              <span className="text-primary font-medium underline-offset-4 hover:underline">
+                Resend
+              </span>
             </button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
-};
+}

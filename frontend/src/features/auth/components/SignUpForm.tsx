@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { signUpSchema } from '../validations/authValidation';
 import { registerUser } from '../../../api/endpoints/authAPI';
 import { useOTP } from '../hooks/useOTP';
-import { OTPModal } from '../../../shared/components/OTPModal';
+import { OTPModal } from '../../../shared/ui/dialog/OTPModal';
 import { OAuthButtons } from './OAuthButtons';
 import type { RegisterData, SignUpFormProps } from '../../../shared/types/authTypes';
 import { FormField } from './FormField';
@@ -39,7 +39,6 @@ export function SignUpForm({
   } = useOTP<RegisterData>(
     async (data) => {
       if (!data.email) throw new Error('Email is required');
-      console.log(getValues());
       if (sendOTP) {
         await sendOTP({ email: data.email });
       } else {

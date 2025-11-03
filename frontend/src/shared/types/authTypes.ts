@@ -81,3 +81,9 @@ export interface FormFieldProps<T> {
     component?: React.ComponentType<FieldComponentProps>;
   };
 }
+
+export interface ForgotPasswordFormProps {
+  loginUrl?: string;
+  className?: string;
+}
+

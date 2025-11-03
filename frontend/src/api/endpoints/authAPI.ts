@@ -10,7 +10,9 @@ export const sendOTP = (data:OTPData) => apiClient.post(API_ROUTES.AUTH.USER_SEN
 
 export const resendOTP = (id: string) => apiClient.post(API_ROUTES.AUTH.USER_RESEND_OTP(id));
 
-export const forgotPassword = (data:ForgotPasswordData) => apiClient.post(API_ROUTES.AUTH.USER_FORGOT_PASSWORD,data);
+export const forgotPasswordSendOtp = (data:ForgotPasswordData) => apiClient.post(API_ROUTES.AUTH.USER_FORGOT_PASSWORD,data);
+
+export const forgotPasswordVerifyOtp = (otp:string,email:string) => apiClient.post(API_ROUTES.AUTH.USER_FORGOT_VERIFY_OTP,{otp,email})
 
 export const userLogout = () => apiClient.delete(API_ROUTES.AUTH.USER_LOGOUT);
 
