@@ -4,6 +4,7 @@ import LoginPage from '../features/auth/pages/LoginPage';
 import LandingPage from '../features/home/components/LandingPage';
 import ProtectedRoute from './ProtectedRoute';
 import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
 
 
 export default function AppRoutes() {
@@ -19,6 +20,7 @@ export default function AppRoutes() {
         }
            />
         <Route path='/forgot-password' element={<ForgotPasswordPage/>} />
+        <Route path='/reset-password' element={<ResetPasswordPage/>} />
        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
