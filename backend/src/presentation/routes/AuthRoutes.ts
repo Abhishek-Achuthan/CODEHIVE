@@ -14,7 +14,9 @@ export class AuthRoute {
   private _setRoutes() {
     this._router.post(
       "/users",
-      this._authController.handleUserRegisterWithVerifyOtp.bind(this._authController)
+      this._authController.handleUserRegisterWithVerifyOtp.bind(
+        this._authController
+      )
     );
     this._router.post(
       "/otps",
@@ -26,11 +28,19 @@ export class AuthRoute {
     );
     this._router.post(
       "/forgot-password",
-      this._authController.handleForgotPasswordSendOtp.bind(this._authController)
+      this._authController.handleForgotPasswordSendOtp.bind(
+        this._authController
+      )
     );
     this._router.post(
       "/forgot-password/verify-otp",
-      this._authController.handleForgotPasswordVerifyOtp.bind(this._authController)
+      this._authController.handleForgotPasswordVerifyOtp.bind(
+        this._authController
+      )
+    );
+    this._router.post(
+      "/reset-password",
+      this._authController.handleResetPassword.bind(this._authController)
     );
   }
 

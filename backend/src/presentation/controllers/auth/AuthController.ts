@@ -9,6 +9,7 @@ import type { IUserLoginUseCase } from "../../../application/useCase/interface/a
 import { setCookie } from "../../utils/cookieHelper";
 import type { IForgotPasswordSendOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
 import type { IForgotPasswordVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
+import type { IResetPasswordUseCase } from "../../../application/useCase/interface/auth/IResetPasswordUseCase";
 
 @injectable()
 export class AuthController {
@@ -24,7 +25,9 @@ export class AuthController {
     @inject("IForgotPasswordSendOTPUseCase")
     private readonly _forgotPasswordSendOtpUseCase: IForgotPasswordSendOTPUseCase,
     @inject("IForgotPasswordVerifyOTPUseCase")
-    private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase
+    private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase,
+    @inject("IResetPassword")
+    private readonly _resetPassword: IResetPasswordUseCase
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -95,12 +98,10 @@ export class AuthController {
 
       await this._forgotPasswordSendOtpUseCase.execute(email);
 
-      return res
-        .status(HttpStatus.OK)
-        .json({
-          success: true,
-          message: "OTP send successfully to your email!",
-        });
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: "OTP send successfully to your email!",
+      });
     } catch (error) {
       next(error);
     }
@@ -112,7 +113,6 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      console.log(req.body);
       const { otp, email } = req.body;
 
       const verified = await this._forgotPasswordVerifyOtpUseCase.execute(
@@ -120,11 +120,23 @@ export class AuthController {
         email
       );
 
-      console.log(verified)
+      console.log(verified);
+
+      return res.status(HttpStatus.OK).json({ success: true, verified });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleResetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { password, email } = req.body;
+
+      await this._resetPassword.execute(password, email);
 
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, verified});
+        .json({ success: true, message: "Password changed successfully" });
     } catch (error) {
       next(error);
     }
