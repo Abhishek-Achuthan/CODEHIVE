@@ -24,6 +24,14 @@ export class AuthRoute {
       "/sessions",
       this._authController.handleUserLogin.bind(this._authController)
     );
+    this._router.post(
+      "/forgot-password",
+      this._authController.handleForgotPasswordSendOtp.bind(this._authController)
+    );
+    this._router.post(
+      "/forgot-password/verify-otp",
+      this._authController.handleForgotPasswordVerifyOtp.bind(this._authController)
+    );
   }
 
   public getRoutes(): Router {

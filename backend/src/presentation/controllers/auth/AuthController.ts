@@ -7,6 +7,8 @@ import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
 import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
 import { setCookie } from "../../utils/cookieHelper";
+import type { IForgotPasswordSendOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
+import type { IForgotPasswordVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
 
 @injectable()
 export class AuthController {
@@ -18,7 +20,11 @@ export class AuthController {
     @inject("IVerifyOTPUseCase")
     private readonly _verifyOTPUseCase: IVerifyOTPUseCase,
     @inject("IUserLoginUseCase")
-    private readonly _userLoginUseCase: IUserLoginUseCase
+    private readonly _userLoginUseCase: IUserLoginUseCase,
+    @inject("IForgotPasswordSendOTPUseCase")
+    private readonly _forgotPasswordSendOtpUseCase: IForgotPasswordSendOTPUseCase,
+    @inject("IForgotPasswordVerifyOTPUseCase")
+    private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -68,14 +74,57 @@ export class AuthController {
 
       const { accessToken, refreshToken, ...userData } = data;
 
-      if(refreshToken) setCookie(res,refreshToken,'refreshToken');
+      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: { user: userData, accessToken: accessToken },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleForgotPasswordSendOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { email } = req.body;
+
+      await this._forgotPasswordSendOtpUseCase.execute(email);
 
       return res
         .status(HttpStatus.OK)
         .json({
           success: true,
-          data: { user: userData, accessToken: accessToken },
+          message: "OTP send successfully to your email!",
         });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleForgotPasswordVerifyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      console.log(req.body);
+      const { otp, email } = req.body;
+
+      const verified = await this._forgotPasswordVerifyOtpUseCase.execute(
+        otp,
+        email
+      );
+
+      console.log(verified)
+
+      return res
+        .status(HttpStatus.OK)
+        .json({ success: true, verified});
     } catch (error) {
       next(error);
     }

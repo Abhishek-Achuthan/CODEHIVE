@@ -4,7 +4,6 @@ import { BaseError } from "../../core/errors/BaseError";
 export function errorHandler(err: Error,req:Request,res:Response,next:NextFunction) {
     if(err instanceof BaseError) {
         console.error("Custom Error:", err.message);
-        console.error(err.stack);
 
         return res.status(err._statusCode).json({
             success:false,

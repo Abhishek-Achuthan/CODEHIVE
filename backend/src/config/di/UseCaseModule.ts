@@ -7,6 +7,10 @@ import { IVerifyOTPUseCase } from "../../application/useCase/interface/auth/IVer
 import { VerifyOTPUseCase } from "../../application/useCase/auth/VerifyOTPUseCase";
 import { IUserLoginUseCase } from "../../application/useCase/interface/auth/IUserLoginUseCase";
 import { UserLoginUseCase } from "../../application/useCase/auth/UserLoginUseCase";
+import { IForgotPasswordSendOTPUseCase } from "../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
+import { ForgotPasswordSendOTPUseCase } from "../../application/useCase/auth/ForgotPasswordSendOTPUseCase";
+import { IForgotPasswordVerifyOTPUseCase } from "../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
+import { ForgotPasswordVerifyOTPUseCase } from "../../application/useCase/auth/ForgotPasswordVerifyOTPUseCase";
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -25,5 +29,13 @@ export class UseCaseModule {
     container.register<IUserLoginUseCase>("IUserLoginUseCase", {
       useClass: UserLoginUseCase,
     });
+
+    container.register<IForgotPasswordSendOTPUseCase>('IForgotPasswordSendOTPUseCase',{
+      useClass: ForgotPasswordSendOTPUseCase,
+    });
+
+    container.register<IForgotPasswordVerifyOTPUseCase>('IForgotPasswordVerifyOTPUseCase', {
+      useClass: ForgotPasswordVerifyOTPUseCase,
+    })
   }
 }
