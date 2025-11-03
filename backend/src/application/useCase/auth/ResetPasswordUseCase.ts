@@ -4,7 +4,7 @@ import type { IUserRepository } from "../../../domain/interfaces/IUserRepository
 import type { IHashService } from "../../ports/security/IHashService";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
 
-
+@injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
         @inject('IUserRepository') private readonly _userRepository : IUserRepository,
