@@ -26,7 +26,7 @@ export class AuthController {
     private readonly _forgotPasswordSendOtpUseCase: IForgotPasswordSendOTPUseCase,
     @inject("IForgotPasswordVerifyOTPUseCase")
     private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase,
-    @inject("IResetPassword")
+    @inject("IResetPasswordUseCase")
     private readonly _resetPassword: IResetPasswordUseCase
   ) {}
 
@@ -132,7 +132,7 @@ export class AuthController {
     try {
       const { password, email } = req.body;
 
-      await this._resetPassword.execute(password, email);
+      await this._resetPassword.execute(email, password);
 
       return res
         .status(HttpStatus.OK)
