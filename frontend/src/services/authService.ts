@@ -58,9 +58,9 @@ export class AuthService {
   static async forgotPasswordVerifyOtp(otp: string, email: string) {
     try {
       const response = await AuthApi.forgotPasswordVerifyOtp(otp, email);
-      console.log(response.data)
       toast.success(response.data?.message);
       return response.data;
+
     } catch (error) {
       this.handleError(error);
     }
@@ -69,7 +69,6 @@ export class AuthService {
   static async resetPassword(data:AuthType.ResetPasswordData) {
     try {
         const response = await AuthApi.resetPassword(data);
-        console.log(response.data);
         toast.success(response.data?.message);
     } catch (error) {
         this.handleError(error);

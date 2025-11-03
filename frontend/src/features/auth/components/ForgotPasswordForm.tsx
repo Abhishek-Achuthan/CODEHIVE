@@ -10,7 +10,6 @@ import { useOTP } from "../hooks/useOTP";
 import { OTPModal } from "../../../shared/ui/dialog/OTPModal";
 import { AuthService } from "../../../services/authService";
 import { useNavigate } from "react-router-dom";
-import { forgotPasswordSendOtp } from "../../../api/endpoints/authAPI";
 
 export function ForgotPasswordForm({
   loginUrl = "/login",
@@ -39,21 +38,21 @@ export function ForgotPasswordForm({
   } = useOTP<ForgotPasswordData>(
     async (data) => {
       if (!data.email) throw new Error("Email is required");
-
-      await forgotPasswordSendOtp({ email: data.email });
+      
+      await AuthService.forgotPasswordSendOtp({email:data.email});
     },
-
-    async (otp, values) => {
-      const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
-
-      if (res) {
-        navigate("/reset-password", {
-          state: { email: values.email, verified: true },
-        });
-        return true;
-      }
-      return false;
-    },
+    
+   async (otp, values) => {
+  const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
+  
+  if (res) {
+    navigate("/reset-password", {
+      state: { email: values.email, verified: true },
+    });
+    return true;
+  }
+  return false;
+},
     "email"
   );
 
@@ -115,7 +114,7 @@ export function ForgotPasswordForm({
         onVerify={(otp) => handleVerifyOtp(otp, getValues())}
         onResend={() => handleResend(getValues())}
       />
-
+      
       <footer className="mt-12 flex justify-center gap-5">
         <Link
           to="/terms"
