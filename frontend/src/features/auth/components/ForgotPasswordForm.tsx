@@ -44,7 +44,6 @@ export function ForgotPasswordForm({
     
    async (otp, values) => {
   const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
-  
   if (res) {
     navigate("/reset-password", {
       state: { email: values.email, verified: true },
