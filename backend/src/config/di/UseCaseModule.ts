@@ -11,6 +11,8 @@ import { IForgotPasswordSendOTPUseCase } from "../../application/useCase/interfa
 import { ForgotPasswordSendOTPUseCase } from "../../application/useCase/auth/ForgotPasswordSendOTPUseCase";
 import { IForgotPasswordVerifyOTPUseCase } from "../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
 import { ForgotPasswordVerifyOTPUseCase } from "../../application/useCase/auth/ForgotPasswordVerifyOTPUseCase";
+import { IResetPasswordUseCase } from "../../application/useCase/interface/auth/IResetPasswordUseCase";
+import { ResetPasswordUseCase } from "../../application/useCase/auth/ResetPasswordUseCase";
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -36,6 +38,10 @@ export class UseCaseModule {
 
     container.register<IForgotPasswordVerifyOTPUseCase>('IForgotPasswordVerifyOTPUseCase', {
       useClass: ForgotPasswordVerifyOTPUseCase,
-    })
+    });
+
+    container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
+      useClass: ResetPasswordUseCase,
+    });
   }
 }
