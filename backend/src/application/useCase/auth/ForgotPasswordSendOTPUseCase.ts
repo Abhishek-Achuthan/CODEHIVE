@@ -25,13 +25,15 @@ export class ForgotPasswordSendOTPUseCase implements IForgotPasswordSendOTPUseCa
         
         const validUser = await this._userReposiotry.findByEmail(email);
 
-        if(!validUser) throw new NotFoundError('User not found');
+        if(!validUser) throw new NotFoundError('Invalid email address');
 
         const existingOtp = await this._cacheService.getData(`forgot_password_otp:${email}`);
 
         if(existingOtp) throw new TooManyRequestError('OTP already sent. please wait before requesting another one');
 
         const otp = this._otpService.genarateOtp();
+
+        console.log(otp)
  
         const hashedOtp = await this._hashService.hash(otp);
 
