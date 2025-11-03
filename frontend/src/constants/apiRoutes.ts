@@ -7,6 +7,7 @@ export const API_ROUTES = {
     USER_FORGOT_PASSWORD: '/auth/forgot-password',
     USER_LOGOUT: '/auth/sessions',
     REFRESH_TOKEN: '/auth/refresh',
-    USER_FORGOT_VERIFY_OTP: '/auth/forgot-password/verify-otp'
+    USER_FORGOT_VERIFY_OTP: '/auth/forgot-password/verify-otp',
+    USER_RESET_PASSWORD: '/auth/reset-password'
   }
 };

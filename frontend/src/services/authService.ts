@@ -66,6 +66,16 @@ export class AuthService {
     }
   }
 
+  static async resetPassword(data:AuthType.ResetPasswordData) {
+    try {
+        const response = await AuthApi.resetPassword(data);
+        console.log(response.data);
+        toast.success(response.data?.message);
+    } catch (error) {
+        this.handleError(error);
+    }
+  }
+
   private static handleError(error: unknown) {
     if (error instanceof AxiosError) {
       toast.error(error.response?.data?.message || "Something went wrong");
