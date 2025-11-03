@@ -1,5 +1,5 @@
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from './shared/components/ErrorBoundary';
+import { ErrorBoundary } from './shared/ui/ErrorBoundary';
 import AppRoutes from './routes/AppRoutes';
 
 
