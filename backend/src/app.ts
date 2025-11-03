@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Express } from "express";
 import { AuthRoute } from "./presentation/routes/AuthRoutes";
+import { AdminRoute } from "./presentation/routes/AdminRoutes";
 import { MongodbConfig } from "./config/MongodbConfig";
 import { env } from "./config/envConfig";
 import cors from "cors";
@@ -40,7 +41,9 @@ export class App {
 
   private configRoutes() {
     const authRoute = new AuthRoute();
+    const adminRoute = new AdminRoute();
     this._app.use("/api/auth", authRoute.getRoutes());
+    this._app.use("/api/admin/",adminRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

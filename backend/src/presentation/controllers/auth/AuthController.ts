@@ -120,9 +120,13 @@ export class AuthController {
         email
       );
 
-      console.log(verified);
-
-      return res.status(HttpStatus.OK).json({ success: true, verified });
+      return res
+        .status(HttpStatus.OK)
+        .json({
+          success: true,
+          verified,
+          message: "OTP verified successfully",
+        });
     } catch (error) {
       next(error);
     }

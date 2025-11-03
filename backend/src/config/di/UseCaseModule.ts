@@ -13,6 +13,10 @@ import { IForgotPasswordVerifyOTPUseCase } from "../../application/useCase/inter
 import { ForgotPasswordVerifyOTPUseCase } from "../../application/useCase/auth/ForgotPasswordVerifyOTPUseCase";
 import { IResetPasswordUseCase } from "../../application/useCase/interface/auth/IResetPasswordUseCase";
 import { ResetPasswordUseCase } from "../../application/useCase/auth/ResetPasswordUseCase";
+import { IListUsersUseCase } from "../../application/useCase/interface/admin/IListUsersUseCase";
+import { ListUsersUseCase } from "../../application/useCase/admin/ListUsersUseCase";
+import { IUpdateUserStatusUseCase } from "../../application/useCase/interface/admin/IUpdateUserStatusUseCase";
+import { UpdateUserStatusUseCase } from "../../application/useCase/admin/UpdateUserStatusUseCase";
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -43,5 +47,13 @@ export class UseCaseModule {
     container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
       useClass: ResetPasswordUseCase,
     });
+
+    container.register<IListUsersUseCase>('IListUsersUseCase', {
+      useClass: ListUsersUseCase,
+    });
+
+    container.register<IUpdateUserStatusUseCase>('IUpdateUserStatusUseCase' ,{
+      useClass : UpdateUserStatusUseCase,
+    })
   }
 }
