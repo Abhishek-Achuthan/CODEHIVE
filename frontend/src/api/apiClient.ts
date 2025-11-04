@@ -1,34 +1,63 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import { store } from '../store';
-import { logout } from '../store/slices/authSlice';
+import {setAccessToken,logout } from '../store/slices/authSlice';
+
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+
+interface RefreshResponse {
+  access_token: string;
+}
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    withCredentials:true,
+    headers: {'Content-Type': 'application/json'},
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = store.getState().auth.accessToken;
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+apiClient.interceptors.request.use(config =>{
+    const token = store.getState().auth.accessToken;
+
+    console.log('Interceptor: token from store:', token);
+
+    if(token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
 });
 
 apiClient.interceptors.response.use(
-  (response) => response, 
-  (error: AxiosError) => {
-    if (error.response?.status === HttpStatusCode.Unauthorized) {
-      store.dispatch(logout());
-    }
+    response =>response,
+    async (error: AxiosError) => {
+        const originalRequest = error.config as CustomAxiosRequestConfig;
+        if(error.response?.status === HttpStatusCode.Unauthorized && originalRequest && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
 
-    if (error.response?.status === HttpStatusCode.Forbidden) {
-      console.warn('Access forbidden: insufficient permissions');
-    }
+                const refreshResponse = await apiClient.post<RefreshResponse>('/refresh');
 
-    return Promise.reject(error);
-  }
+                const newToken = refreshResponse.data?.access_token;
+
+                if(!newToken) throw new Error('No new Token returned from refresh endpoint');
+
+                store.dispatch(setAccessToken(newToken));
+
+                if(originalRequest.headers) originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+                return apiClient(originalRequest);
+               
+            } catch (refreshError) {
+                if(refreshError instanceof AxiosError && refreshError.response?.status===HttpStatusCode.Forbidden){
+                    store.dispatch(logout());
+                }
+                return Promise.reject(refreshError);
+            }
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default apiClient;

@@ -1,7 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IListUsersUseCase } from "../interface/admin/IListUsersUseCase";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { UserEntity } from "../../../domain/entities/UserEntity";
 import { UserRole } from "../../../domain/types/UserRole";
 import { UserMapper } from "../../mapper/userMapper";
 import { IUserListResponseDTO } from "../../dto/UserDTO";
