@@ -42,6 +42,17 @@ export class AuthRoute {
       "/reset-password",
       this._authController.handleResetPassword.bind(this._authController)
     );
+
+    this._router.post(
+      "/refresh",
+      this._authController.handleRefreshAccessToken.bind(this._authController)
+    );
+
+    this._router.delete(
+
+      "/sessions",
+      this._authController.handleUserLogout.bind(this._authController)
+    )
   }
 
   public getRoutes(): Router {

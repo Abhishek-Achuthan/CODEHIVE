@@ -2,14 +2,16 @@ import { inject, injectable } from "tsyringe";
 import { Request, Response, NextFunction } from "express";
 import type { ISendOTPUseCase } from "../../../application/useCase/interface/auth/ISendOTPUseCase";
 import type { IUserRegisterUseCase } from "../../../application/useCase/interface/auth/IUserRegisterUseCase";
-import { LoginUserSchema, RegisterUserSchema } from "../../validation/auth";
+import { LoginUserSchema, RegisterUserSchema, EmailOnlySchema, ForgotPasswordVerifySchema, ResetPasswordSchema } from "../../validation/auth";
 import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
 import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
-import { setCookie } from "../../utils/cookieHelper";
+import { removeCookie, setCookie } from "../../utils/cookieHelper";
 import type { IForgotPasswordSendOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
 import type { IForgotPasswordVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
 import type { IResetPasswordUseCase } from "../../../application/useCase/interface/auth/IResetPasswordUseCase";
+import type { IUserLogoutUseCase } from "../../../application/useCase/interface/auth/IUserLogoutUseCase";
+import type { IRefreshAccessTokenUseCase } from "../../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
 
 @injectable()
 export class AuthController {
@@ -27,7 +29,12 @@ export class AuthController {
     @inject("IForgotPasswordVerifyOTPUseCase")
     private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase,
     @inject("IResetPasswordUseCase")
-    private readonly _resetPassword: IResetPasswordUseCase
+    private readonly _resetPassword: IResetPasswordUseCase,
+    @inject("IUserLogoutUseCase")
+    private readonly _userLogoutUseCase: IUserLogoutUseCase,
+    @inject("IRefreshAccessTokenUseCase")
+    private readonly _refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
+
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -57,7 +64,7 @@ export class AuthController {
 
   async handleSendOtp(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email } = req.body;
+      const { email } = EmailOnlySchema.parse(req.body);
 
       await this._sendOTPUseCase.execute(email);
 
@@ -82,6 +89,7 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({
         success: true,
         data: { user: userData, accessToken: accessToken },
+        message: "Login successfull",
       });
     } catch (error) {
       next(error);
@@ -94,7 +102,7 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      const { email } = req.body;
+      const { email } = EmailOnlySchema.parse(req.body);
 
       await this._forgotPasswordSendOtpUseCase.execute(email);
 
@@ -113,20 +121,18 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      const { otp, email } = req.body;
+      const { otp, email } = ForgotPasswordVerifySchema.parse(req.body);
 
       const verified = await this._forgotPasswordVerifyOtpUseCase.execute(
         otp,
         email
       );
 
-      return res
-        .status(HttpStatus.OK)
-        .json({
-          success: true,
-          verified,
-          message: "OTP verified successfully",
-        });
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        verified,
+        message: "OTP verified successfully",
+      });
     } catch (error) {
       next(error);
     }
@@ -134,13 +140,44 @@ export class AuthController {
 
   async handleResetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { password, email } = req.body;
+      const { password, email } = ResetPasswordSchema.parse(req.body);
 
       await this._resetPassword.execute(email, password);
 
       return res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Password changed successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleUserLogout(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const token  = req.cookies.refreshToken;
+
+      if(token) await this._userLogoutUseCase.execute(token);
+
+      removeCookie(res,'refreshToken');
+
+      return res.status(HttpStatus.NoContent).send()
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleRefreshAccessToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const refreshToken = req.cookies.refreshToken as string | undefined;
+      if (!refreshToken) {
+        return res.status(HttpStatus.Forbidden).json({ success: false, message: 'Missing refresh token' });
+      }
+
+      const accessToken = await this._refreshAccessTokenUseCase.execute(refreshToken);
+
+      return res.status(HttpStatus.OK).json({ access_token: accessToken });
     } catch (error) {
       next(error);
     }

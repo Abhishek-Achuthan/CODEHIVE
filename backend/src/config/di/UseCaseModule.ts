@@ -17,6 +17,11 @@ import { IListUsersUseCase } from "../../application/useCase/interface/admin/ILi
 import { ListUsersUseCase } from "../../application/useCase/admin/ListUsersUseCase";
 import { IUpdateUserStatusUseCase } from "../../application/useCase/interface/admin/IUpdateUserStatusUseCase";
 import { UpdateUserStatusUseCase } from "../../application/useCase/admin/UpdateUserStatusUseCase";
+import { IUserLogoutUseCase } from "../../application/useCase/interface/auth/IUserLogoutUseCase";
+import { UserLogoutUseCase } from "../../application/useCase/auth/UserLogoutUseCase";
+import { IRefreshAccessTokenUseCase } from "../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
+import { RefreshAccessTokenUseCase } from "../../application/useCase/auth/RefreshAccessTokenUseCase";
+
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -54,6 +59,15 @@ export class UseCaseModule {
 
     container.register<IUpdateUserStatusUseCase>('IUpdateUserStatusUseCase' ,{
       useClass : UpdateUserStatusUseCase,
+    });
+
+    container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
+      useClass: UserLogoutUseCase
     })
+
+    container.register<IRefreshAccessTokenUseCase>('IRefreshAccessTokenUseCase', {
+      useClass: RefreshAccessTokenUseCase
+    })
+
   }
 }
