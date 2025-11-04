@@ -3,6 +3,8 @@ import { IVerifyOTPUseCase } from "../interface/auth/IVerifyOTPUseCase";
 import type { IHashService } from "../../ports/security/IHashService";
 import type { ICacheService } from "../../ports/cache/ICacheService";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
+import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
+import { BadRequestError } from "../../../core/errors/BadRequestError";
 
 @injectable()
 export class VerifyOTPUseCase implements IVerifyOTPUseCase {
@@ -18,6 +20,8 @@ export class VerifyOTPUseCase implements IVerifyOTPUseCase {
     if (!cacheOtp) throw new NotFoundError("OTP not found");
 
     const verified = await this._hashService.compare(otp, cacheOtp);
+
+    if(!verified) throw new BadRequestError('Invalid or expired OTP')
 
     return verified;
   }

@@ -1,5 +1,5 @@
 import { UserEntity } from "../../domain/entities/UserEntity";
-import { IUserLoginResponseDTO } from "../dto/UserDTO";
+import { IUserListResponseDTO, IUserLoginResponseDTO } from "../dto/UserDTO";
 
 export class UserMapper {
   public static toLoginResponse(
@@ -19,4 +19,21 @@ export class UserMapper {
       accessToken: accessToken,
     };
   }
+
+    public static toUserListResponse(user: UserEntity): IUserListResponseDTO {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      isBlocked: user.isBlocked,
+    };
+  }
+
+  public static toUserListArray(users: UserEntity[]): IUserListResponseDTO[] {
+    return users.map((user) => this.toUserListResponse(user));
+  }
+
 }

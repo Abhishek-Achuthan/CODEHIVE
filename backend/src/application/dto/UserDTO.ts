@@ -17,8 +17,20 @@ interface IUserLoginResponseDTO extends Omit<UserEntity, "password"> {
   refreshToken? : string
 }
 
+interface IUserListResponseDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: string;
+  isBlocked: boolean;
+  createdAt?: Date;
+}
+
 export type {
   IUserRegisterInputDTO,
   IUserLoginInputDTO,
   IUserLoginResponseDTO,
+  IUserListResponseDTO
 };

@@ -3,6 +3,8 @@ import { IListUsersUseCase } from "../interface/admin/IListUsersUseCase";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { UserEntity } from "../../../domain/entities/UserEntity";
 import { UserRole } from "../../../domain/types/UserRole";
+import { UserMapper } from "../../mapper/userMapper";
+import { IUserListResponseDTO } from "../../dto/UserDTO";
 
 @injectable()
 export class ListUsersUseCase implements IListUsersUseCase {
@@ -16,7 +18,7 @@ export class ListUsersUseCase implements IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<UserEntity[]> {
+  ): Promise<IUserListResponseDTO[]> {
     const users = await this._userRepository.getAllUsers(
       role,
       currentPage,
@@ -25,6 +27,6 @@ export class ListUsersUseCase implements IListUsersUseCase {
       search
     );
 
-    return users;
+    return UserMapper.toUserListArray(users);
   }
 }
