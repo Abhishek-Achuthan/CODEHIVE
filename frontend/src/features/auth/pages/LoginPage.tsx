@@ -3,11 +3,11 @@ import toast from 'react-hot-toast';
 import AuthLayout from '../../../layouts/AuthLayout';
 import { LoginLeftIntro } from '../components/LoginLeftIntro';
 import { LoginForm } from '../components/LoginForm';
-import { userLogin } from '../../../api/endpoints/authAPI';
 import type { LoginData } from '../../../shared/types/authTypes';
 import { AxiosError } from 'axios';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../store/slices/authSlice';
+import { AuthService } from '../../../services/authService'
 
 
 interface ErrorResponse {
@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   const handleLogin = async (data: LoginData) => {
     try {
-      const response = await userLogin(data);
+      const response = await AuthService.login(data);
 
       const {user, accessToken} = response.data.data;
       

@@ -1,13 +1,13 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signUpSchema } from '../validations/authValidation';
-import { registerUser } from '../../../api/endpoints/authAPI';
 import { useOTP } from '../hooks/useOTP';
 import { OTPModal } from '../../../shared/ui/dialog/OTPModal';
 import { OAuthButtons } from './OAuthButtons';
 import type { RegisterData, SignUpFormProps } from '../../../shared/types/authTypes';
 import { FormField } from './FormField';
 import { Link } from 'react-router-dom';
+import { AuthService } from '../../../services/authService';
 
 export function SignUpForm({
   fields = [],
@@ -46,8 +46,9 @@ export function SignUpForm({
       }
     },
     async (otp, values) => {
-      const res = await registerUser(otp, values);
-      return res.status === 200;
+      const res = await AuthService.register(otp, values);
+      if(res?.success) return true;
+      return false;
     },
     'email'
   );

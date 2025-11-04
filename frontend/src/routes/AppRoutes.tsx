@@ -25,7 +25,7 @@ export default function AppRoutes() {
         <Route path='/forgot-password' element={<ForgotPasswordPage/>} />
         <Route path='/reset-password' element={<ResetPasswordPage/>} />
        <Route path='/admin/users' element={<UserManagementPage />} />
-       <Route path='/admin/mentors' element={<MentorManagementPage/>} />
+       <Route path='/admin/mentors' element={<ProtectedRoute><MentorManagementPage/></ProtectedRoute>} />
        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
