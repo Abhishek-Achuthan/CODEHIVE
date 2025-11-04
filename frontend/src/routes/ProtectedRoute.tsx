@@ -1,15 +1,14 @@
-import { Navigate } from 'react-router-dom';
-import { useAppSelector } from '../shared/hooks/storeHooks';
-import type { JSX } from 'react';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAppSelector } from "../shared/hooks/storeHooks";
 
+const ProtectedRoute = () => {
+  const isAuthenticated = useAppSelector((state) => state.auth.user);
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  if (!isAuthenticated ) {
+    return <Navigate to="/" replace />;
+  }
 
-  const token = localStorage.getItem('accessToken');
-  const isReallyAuthenticated = isAuthenticated || !!token;
-
-  return isReallyAuthenticated ?  <>{children}</> : <Navigate to='/' replace />;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

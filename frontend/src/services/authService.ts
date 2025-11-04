@@ -18,7 +18,7 @@ export class AuthService {
   static async login(data: AuthType.LoginData) {
     try {
       const response = await AuthApi.userLogin(data);
-      toast.success(response.data?.message);
+      toast.success("Login successfull");
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -60,18 +60,26 @@ export class AuthService {
       const response = await AuthApi.forgotPasswordVerifyOtp(otp, email);
       toast.success(response.data?.message);
       return response.data;
-
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  static async resetPassword(data:AuthType.ResetPasswordData) {
+  static async resetPassword(data: AuthType.ResetPasswordData) {
     try {
-        const response = await AuthApi.resetPassword(data);
-        toast.success(response.data?.message);
+      const response = await AuthApi.resetPassword(data);
+      toast.success(response.data?.message);
     } catch (error) {
-        this.handleError(error);
+      this.handleError(error);
+    }
+  }
+
+  static async logout() {
+    try {
+      await AuthApi.userLogout()
+      toast.success("Logout successfully")
+    } catch (error) {
+      this.handleError(error);
     }
   }
 

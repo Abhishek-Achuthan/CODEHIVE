@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../../store/slices/authSlice';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
-import { userLogout } from '../../../api/endpoints/authAPI';
+import { AuthService } from '../../../services/authService';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const LandingPage = () => {
 
   const handleLogout =async  () => {
     try {
-      await userLogout();
+      await AuthService.logout();
     } catch (error) {
       console.log('log out error',error);
     }finally{

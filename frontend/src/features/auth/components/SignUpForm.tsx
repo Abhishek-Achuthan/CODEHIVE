@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/authService';
 export function SignUpForm({
   fields = [],
   sendOTP,
-  loginUrl = '/login',
+  loginUrl = '/',
   className,
 }: SignUpFormProps) {
   const {
