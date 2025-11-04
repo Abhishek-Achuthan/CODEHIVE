@@ -10,6 +10,7 @@ export const UserSchema = new Schema<UserDocument>(
     phone: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
+    isBlocked: {type: Boolean,default: false}
   },
   { timestamps: true }
 );

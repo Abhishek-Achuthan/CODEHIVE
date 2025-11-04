@@ -11,11 +11,27 @@ export class AdminService {
     search?: string
   ) {
     try {
-      const response = await AdminApi.getAllUsers(role,page,pageSize,sort,search);
+      const response = await AdminApi.getAllUsers(
+        role,
+        page,
+        pageSize,
+        sort,
+        search
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);
-    };
+    }
+  }
+
+  static async updateUserStatus(id: string, status: boolean) {
+    try {
+      const response = await AdminApi.updateUserStatus(id, status);
+      
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   private static handleError(error: unknown) {

@@ -45,10 +45,12 @@ export const UserManagementPage: React.FC = () => {
     fetchUsers();
   }, [fetchUsers]); 
 
-  const handleBlock = async (id: string) => {
+  const handleBlock = async (id: string,status:boolean) => {
+
+    await AdminService.updateUserStatus(id,status);
     try {
       setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, isBlocked: !u.isBlocked } : u))
+        prev.map((u) => (u.id === id ? { ...u, isBlocked:status} : u))
       );
       toast.success("User status updated");
     } catch (err) {
@@ -111,7 +113,7 @@ export const UserManagementPage: React.FC = () => {
             loading={loading}
             actions={(user) => (
               <button
-                onClick={() => handleBlock(user.id)}
+                onClick={() => handleBlock(user.id,user.isBlocked)}
                 className={`px-3 py-1.5 rounded-md text-white text-xs font-semibold ${
                   user.isBlocked
                     ? "bg-green-500 hover:bg-green-600"

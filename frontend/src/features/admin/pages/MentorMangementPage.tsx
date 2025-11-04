@@ -27,7 +27,6 @@ export const MentorManagementPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await AdminService.listUsers(role, page, 10, "createdAt", search);
-      console.log("Fetched users:", data);
       
       setUsers(Array.isArray(data) ? data : data.users || []);
       
@@ -45,10 +44,11 @@ export const MentorManagementPage: React.FC = () => {
     fetchUsers();
   }, [fetchUsers]); 
 
-  const handleBlock = async (id: string) => {
+  const handleBlock = async (id: string,status:boolean) => {
     try {
+       await AdminService.updateUserStatus(id,status);
       setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, isBlocked: !u.isBlocked } : u))
+        prev.map((u) => (u.id === id ? { ...u, isBlocked: status } : u))
       );
       toast.success("User status updated");
     } catch (err) {
@@ -111,7 +111,7 @@ export const MentorManagementPage: React.FC = () => {
             loading={loading}
             actions={(user) => (
               <button
-                onClick={() => handleBlock(user.id)}
+                onClick={() => handleBlock(user.id,!user.isBlocked)}
                 className={`px-3 py-1.5 rounded-md text-white text-xs font-semibold ${
                   user.isBlocked
                     ? "bg-green-500 hover:bg-green-600"
