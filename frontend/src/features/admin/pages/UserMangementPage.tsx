@@ -113,7 +113,7 @@ export const UserManagementPage: React.FC = () => {
             loading={loading}
             actions={(user) => (
               <button
-                onClick={() => handleBlock(user.id,user.isBlocked)}
+                onClick={() => handleBlock(user.id,!user.isBlocked)}
                 className={`px-3 py-1.5 rounded-md text-white text-xs font-semibold ${
                   user.isBlocked
                     ? "bg-green-500 hover:bg-green-600"
