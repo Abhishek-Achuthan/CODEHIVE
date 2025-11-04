@@ -7,15 +7,12 @@ import type { ITokenBlacklistService } from "../../ports/security/ITokenBlacklis
 @injectable()
 export class UserLogoutUseCase implements IUserLogoutUseCase {
     constructor(
-        @inject('IUserRepository') private readonly _userRepository : IUserRepository,
         @inject('ITokenBlacklistService') private readonly _tokenBlacklistService: ITokenBlacklistService
     ) {};
 
-    async execute(token: string, email: string): Promise<void> {
-        const user = await this._userRepository.findByEmail(email);
-
-        if(!user) throw new NotFoundError('User not Found');
+    async execute(token: string): Promise<void> {
 
         await this._tokenBlacklistService.blacklistToken(token);
+        
     }
 }
