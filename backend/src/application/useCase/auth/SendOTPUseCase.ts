@@ -30,6 +30,8 @@ export class SendOTPUseCase implements ISendOTPUseCase {
         if(existing) throw new ConflictError('User already exists');
 
         const otp = this._otpService.genarateOtp();
+
+        console.log(otp)
         
         const hashedOtp = await this._hashService.hash(otp);
 

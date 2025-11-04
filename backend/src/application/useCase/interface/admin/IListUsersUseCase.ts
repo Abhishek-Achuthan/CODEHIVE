@@ -1,5 +1,6 @@
 import { UserEntity } from "../../../../domain/entities/UserEntity";
 import { UserRole } from "../../../../domain/types/UserRole";
+import { IUserListResponseDTO } from "../../../dto/UserDTO";
 
 export interface IListUsersUseCase {
   execute(
@@ -8,5 +9,5 @@ export interface IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<UserEntity[]>;
+  ): Promise<IUserListResponseDTO[]>;
 }

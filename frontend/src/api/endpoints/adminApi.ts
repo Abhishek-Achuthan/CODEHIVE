@@ -19,3 +19,6 @@ export const getAllUsers = (
   return apiClient.get(url); 
 };
 
+export const updateUserStatus = (id:string,status:boolean)  => apiClient.patch(API_ROUTES.ADMIN.UPDATE_USER_STATUS,{id,status});
+
+

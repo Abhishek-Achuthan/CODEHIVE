@@ -11,4 +11,4 @@ export class MongodbConfig {
             console.log('Something went wrong',error);
         }
     }
-}
+}           

@@ -28,5 +28,6 @@ export const API_ROUTES = {
       });
       return `/admin/users?${query.toString()}`;
     },
+    UPDATE_USER_STATUS :  `/admin/update-user-status`
   },
 };

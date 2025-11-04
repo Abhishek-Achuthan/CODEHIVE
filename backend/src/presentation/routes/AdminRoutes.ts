@@ -16,6 +16,9 @@ export class AdminRoute {
       "/users",
       this._adminController.handleListUsers.bind(this._adminController)
     );
+    this._router.patch(
+      "/update-user-status",this._adminController.handleUpdateUserStatus.bind(this._adminController)
+    )
   }
 
   public getRoutes():Router {
