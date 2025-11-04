@@ -30,7 +30,7 @@ export class CacheService implements ICacheService {
     try {
       await this._client.connect();
     } catch (error) {
-      console.log("Something went wrong Connecting to Client");
+      console.log("Something went wrong Connecting to Client",error);
     } finally {
       this._isConnecting = false;
     }

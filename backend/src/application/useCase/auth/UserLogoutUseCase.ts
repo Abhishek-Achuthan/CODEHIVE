@@ -1,7 +1,5 @@
 import { inject,injectable } from "tsyringe";
 import { IUserLogoutUseCase } from "../interface/auth/IUserLogoutUseCase";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
 import type { ITokenBlacklistService } from "../../ports/security/ITokenBlacklistService";
 
 @injectable()

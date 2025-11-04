@@ -1,4 +1,3 @@
-import { UserEntity } from "../../../../domain/entities/UserEntity";
 import { UserRole } from "../../../../domain/types/UserRole";
 import { IUserListResponseDTO } from "../../../dto/UserDTO";
 

@@ -3,7 +3,6 @@ import { IVerifyOTPUseCase } from "../interface/auth/IVerifyOTPUseCase";
 import type { IHashService } from "../../ports/security/IHashService";
 import type { ICacheService } from "../../ports/cache/ICacheService";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
 import { BadRequestError } from "../../../core/errors/BadRequestError";
 
 @injectable()
