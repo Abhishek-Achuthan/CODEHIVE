@@ -7,13 +7,15 @@ import { NotFoundError } from "../../../core/errors/NotFoundError";
 import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
 import type { IJWTService } from "../../ports/security/IJWTService";
 import { UserMapper } from "../../mapper/userMapper";
+import { BadRequestError } from "../../../core/errors/BadRequestError";
 
 @injectable()
 export class UserLoginUseCase implements IUserLoginUseCase {
   constructor(
-    @inject("IUserRepository") private readonly _userRepository: IUserRepository,
+    @inject("IUserRepository")
+    private readonly _userRepository: IUserRepository,
     @inject("IHashService") private readonly _hashService: IHashService,
-    @inject("IJWTService") private readonly _jwtService: IJWTService,
+    @inject("IJWTService") private readonly _jwtService: IJWTService
   ) {}
 
   async execute(data: IUserLoginInputDTO): Promise<IUserLoginResponseDTO> {
@@ -21,16 +23,18 @@ export class UserLoginUseCase implements IUserLoginUseCase {
 
     if (!user) throw new NotFoundError("User not found");
 
-    if(user.isBlocked) throw new UnauthorizedError('User is Blocked');
-    
-    const validUser = await this._hashService.compare(
-      data.password,
-      user.password
-    );
-    
-    if (!validUser) throw new UnauthorizedError("Invalid credentials");
+    if (user.isBlocked) throw new BadRequestError("Your account is blocked");
 
-    const accessToken = this._jwtService.genarateAccessToken({
+    if (user.password) {
+      const validUser = await this._hashService.compare(
+        data.password,
+        user.password
+      );
+
+      if (!validUser) throw new UnauthorizedError("Invalid credentials");
+    }
+
+    const accessToken = this._jwtService.genarateAccessToken({        
       userRole: user.role,
       sub: user.id,
     });
@@ -40,6 +44,6 @@ export class UserLoginUseCase implements IUserLoginUseCase {
       sub: user.id,
     });
 
-    return UserMapper.toLoginResponse(user,accessToken,refreshToken)
+    return UserMapper.toLoginResponse(user, accessToken, refreshToken);
   }
 }
