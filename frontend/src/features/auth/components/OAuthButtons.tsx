@@ -5,12 +5,8 @@ import { AuthService } from "../../../services/authService";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import toast from "react-hot-toast";
 
-type Props = {
-  onGoogle?: () => void
-  onGithub?: () => void
-}
 
-export function OAuthButtons({ onGithub }: Props) {
+export function OAuthButtons() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -57,7 +53,7 @@ const handleGoogleLogin = useGoogleLogin({
       </button>
       <button
         type="button"
-        onClick={onGithub}
+        onClick={() => AuthService.initiateGithubOAuth()}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GithubIcon />

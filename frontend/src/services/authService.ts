@@ -11,7 +11,7 @@ export class AuthService {
       toast.success(response.data.message);
       return response.data;
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error); 
     }
   }
 
@@ -94,6 +94,10 @@ export class AuthService {
     } catch (error) {
       this.handleError(error)
     }
+  }
+
+  static initiateGithubOAuth() {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
   }
 
   private static handleError(error: unknown) {

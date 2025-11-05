@@ -5,6 +5,7 @@ import LandingPage from "../features/home/components/LandingPage";
 import ProtectedRoute from "./ProtectedRoute";
 import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "../features/auth/pages/ResetPasswordPage";
+import AuthCallbackPage from "../features/auth/pages/AuthCallbackPage";
 import { UserManagementPage } from "../features/admin/pages/UserMangementPage";
 import MentorManagementPage from "../features/admin/pages/MentorMangementPage";
 import PublicRoute from "./PublicRoute";
@@ -18,6 +19,7 @@ export default function AppRoutes() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>

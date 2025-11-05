@@ -6,6 +6,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { AuthService } from "../../../services/authService";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import { PasswordInput } from "./PasswordInput";
 export function ResetPasswordForm() {
   const {
     register,
@@ -60,9 +61,8 @@ export function ResetPasswordForm() {
           >
             New Password
           </label>
-          <input
+          <PasswordInput
             {...register("password")}
-            type="password"
             id="password"
             className="w-full rounded-md border border-white/20
               bg-white/5 px-3.5 py-3 text-sm font-light text-white
@@ -83,9 +83,8 @@ export function ResetPasswordForm() {
           >
             Confirm Password
           </label>
-          <input
+          <PasswordInput
             {...register("confirmPassword")}
-            type="password"
             id="confirmPassword"
             className="w-full rounded-md border border-white/20
               bg-white/5 px-3.5 py-3 text-sm font-light text-white

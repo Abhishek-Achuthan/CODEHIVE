@@ -57,6 +57,14 @@ export class AuthRoute {
     this._router.post(
       '/google-login',this._authController.hanldGoogleLogin.bind(this._authController)
     );
+
+    this._router.get(
+      '/github',this._authController.initiateGithubOAuth.bind(this._authController)
+    );
+
+    this._router.get(
+      '/github/callback',this._authController.handleGithubCallback.bind(this._authController)
+    );
   }
 
   public getRoutes(): Router {

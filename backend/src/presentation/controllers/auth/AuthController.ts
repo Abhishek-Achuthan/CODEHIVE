@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { Request, Response, NextFunction } from "express";
-import { removeCookie, setCookie } from "../../utils/cookieHelper";
+import { removeCookie, setCookie, setAccessibleCookie } from "../../utils/cookieHelper";
 import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { ISendOTPUseCase } from "../../../application/useCase/interface/auth/ISendOTPUseCase";
 import type { IUserRegisterUseCase } from "../../../application/useCase/interface/auth/IUserRegisterUseCase";
@@ -12,6 +12,8 @@ import type { IResetPasswordUseCase } from "../../../application/useCase/interfa
 import type { IUserLogoutUseCase } from "../../../application/useCase/interface/auth/IUserLogoutUseCase";
 import type { IRefreshAccessTokenUseCase } from "../../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
 import type { IGoogleLoginUseCase } from "../../../application/useCase/interface/auth/IGoogleLoginUseCase";
+import type { IGithubLoginUseCase } from "../../../application/useCase/interface/auth/IGithubLoginUseCase";
+import type { IInitiateGithubOAuthUseCase } from "../../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase";
 import {
   LoginUserSchema,
   RegisterUserSchema,
@@ -42,7 +44,11 @@ export class AuthController {
     @inject("IRefreshAccessTokenUseCase")
     private readonly _refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
     @inject("IGoogleLoginUseCase")
-    private readonly _googleLoginUseCase: IGoogleLoginUseCase
+    private readonly _googleLoginUseCase: IGoogleLoginUseCase,
+    @inject("IGithubLoginUseCase")
+    private readonly _githubLoginUseCase: IGithubLoginUseCase,
+    @inject("IInitiateGithubOAuthUseCase")
+    private readonly _initiateGithubOAuthUseCase: IInitiateGithubOAuthUseCase
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -212,6 +218,48 @@ export class AuthController {
         data: { user, accessToken: accessToken },
         message: "Login successfull",
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async initiateGithubOAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const githubAuthUrl = this._initiateGithubOAuthUseCase.execute();
+      
+      return res.redirect(githubAuthUrl);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGithubCallback(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { code } = req.query;
+
+      if (!code || typeof code !== "string") {
+        return res.status(HttpStatus.BadRequest).json({
+          success: false,
+          message: "Missing or invalid authorization code",
+        });
+      }
+
+      const data = await this._githubLoginUseCase.execute(code);
+
+      const { accessToken, refreshToken, user } = data;
+
+      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+
+      setAccessibleCookie(res, accessToken, "accessToken");
+
+      const frontendUrl = process.env.FRONTEND_URL
+      
+      const userData = encodeURIComponent(JSON.stringify(user));
+
+      const redirectUrl = `${frontendUrl}/auth/callback?user=${userData}`;
+      
+      return res.redirect(redirectUrl);
+
     } catch (error) {
       next(error);
     }
