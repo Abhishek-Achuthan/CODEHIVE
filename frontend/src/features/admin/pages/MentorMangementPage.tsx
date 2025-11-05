@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "../../../shared/ui/DataTable";
 import type { Column } from "../../../shared/ui/DataTable";
 import { AdminService } from "../../../services/adminService";
@@ -12,8 +12,8 @@ interface User {
   email: string;
   role: string;
   isBlocked: boolean;
-  phone?: string; 
-  password?: string; 
+  phone?: string;
+  password?: string;
 }
 
 export const MentorManagementPage: React.FC = () => {
@@ -22,31 +22,46 @@ export const MentorManagementPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const fetchUsers = useCallback(async (role: string = "mentor") => {
-    setLoading(true);
-    try {
-      const data = await AdminService.listUsers(role, page, 10, "createdAt", search);
-      
-      setUsers(Array.isArray(data) ? data : data.users || []);
-      
-      setTotalPages(data.totalPages || 1);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      toast.error("Failed to load users");
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search]);
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]); 
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
 
-  const handleBlock = async (id: string,status:boolean) => {
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [search]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const data = await AdminService.listUsers(
+          "mentor",
+          page,
+          10,
+          "createdAt",
+          debouncedSearch
+        );
+        setUsers(Array.isArray(data) ? data : data.users || []);
+        setTotalPages(data.totalPages || 1);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        toast.error("Failed to load users");
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [page, debouncedSearch]);
+
+  const handleBlock = async (id: string, status: boolean) => {
     try {
-       await AdminService.updateUserStatus(id,status);
+      await AdminService.updateUserStatus(id, status);
       setUsers((prev) =>
         prev.map((u) => (u.id === id ? { ...u, isBlocked: status } : u))
       );
@@ -54,7 +69,7 @@ export const MentorManagementPage: React.FC = () => {
     } catch (err) {
       console.error("Error updating user:", err);
       toast.error("Failed to update user status");
-      fetchUsers();
+      setUsers([]);
     }
   };
 
@@ -86,65 +101,65 @@ export const MentorManagementPage: React.FC = () => {
 
   return (
     <AdminLayout>
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">Users</h1>
-        <input
-          type="text"
-          placeholder="Search users..."
-          className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-        />
-      </div>
-
-      {!loading && users.length === 0 ? (
-        <p className="text-gray-500 text-center py-6">No users found.</p>
-      ) : (
-        <>
-          <DataTable
-            columns={columns}
-            data={users}
-            loading={loading}
-            actions={(user) => (
-              <button
-                onClick={() => handleBlock(user.id,!user.isBlocked)}
-                className={`px-3 py-1.5 rounded-md text-white text-xs font-semibold ${
-                  user.isBlocked
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
-              >
-                {user.isBlocked ? "Unblock" : "Block"}
-              </button>
-            )}
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl font-semibold">Users</h1>
+          <input
+            type="text"
+            placeholder="Search users..."
+            className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
           />
+        </div>
 
-          <div className="flex justify-center items-center mt-4 gap-4">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
-            >
-              Prev
-            </button>
-            <span className="text-sm text-gray-700">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages || totalPages <= 1} 
-              className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+        {!loading && users.length === 0 ? (
+          <p className="text-gray-500 text-center py-6">No users found.</p>
+        ) : (
+          <>
+            <DataTable
+              columns={columns}
+              data={users}
+              loading={loading}
+              actions={(user) => (
+                <button
+                  onClick={() => handleBlock(user.id, !user.isBlocked)}
+                  className={`px-3 py-1.5 rounded-md text-white text-xs font-semibold ${
+                    user.isBlocked
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-red-500 hover:bg-red-600"
+                  }`}
+                >
+                  {user.isBlocked ? "Unblock" : "Block"}
+                </button>
+              )}
+            />
+
+            <div className="flex justify-center items-center mt-4 gap-4">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <span className="text-sm text-gray-700">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || totalPages <= 1}
+                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </AdminLayout>
   );
 };
