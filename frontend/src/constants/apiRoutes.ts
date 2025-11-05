@@ -8,7 +8,8 @@ export const API_ROUTES = {
     USER_LOGOUT: '/auth/sessions',
     REFRESH_TOKEN: '/auth/refresh',
     USER_FORGOT_VERIFY_OTP: '/auth/forgot-password/verify-otp',
-    USER_RESET_PASSWORD: '/auth/reset-password'
+    USER_RESET_PASSWORD: '/auth/reset-password',
+    USER_GOOGLE_LOGIN : '/auth/google-login'
   },
 
   ADMIN: {

@@ -18,4 +18,4 @@ export const resetPassword = (data:ResetPasswordData) => apiClient.post(API_ROUT
 
 export const userLogout = () => apiClient.delete(API_ROUTES.AUTH.USER_LOGOUT);
 
-    
+export const googleLogin = (code:string) => apiClient.post(API_ROUTES.AUTH.USER_GOOGLE_LOGIN,{ code });

@@ -21,21 +21,18 @@ export function useOTP<TValues extends Record<string, unknown>>(
     try {
       await onSend({ [otpVia]: recipient } as Partial<TValues>);
       setOtpActiveFor(recipient as string);
+      setOtpModalOpen(true);
     } catch (error) {
       if (error instanceof AxiosError) {
-        const msg = error?.response?.data?.message ?? "";
-        if (
-          msg.toLowerCase().includes("already") ||
-          error?.response?.status === 429
-        ) {
+        const status = error?.response?.status;
+        if (status === 429) {
           setOtpActiveFor(recipient as string);
+          setOtpModalOpen(true);
         } else {
           throw error;
         }
       }
     }
-
-    setOtpModalOpen(true);
   };
 
   const handleResend = async (values: TValues): Promise<void> => {

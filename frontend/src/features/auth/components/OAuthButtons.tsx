@@ -1,15 +1,55 @@
+import { useGoogleLogin } from "@react-oauth/google";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { AuthService } from "../../../services/authService";
+import { loginSuccess } from "../../../store/slices/authSlice";
+import toast from "react-hot-toast";
 
 type Props = {
   onGoogle?: () => void
   onGithub?: () => void
 }
 
-export function OAuthButtons({ onGoogle, onGithub }: Props) {
+export function OAuthButtons({ onGithub }: Props) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+const handleGoogleLogin = useGoogleLogin({
+    flow: "auth-code", 
+    onSuccess: async (tokenResponse) => {
+      try {
+        console.log(tokenResponse)
+        const authCode = tokenResponse.code
+        if (!authCode) {
+          toast.error("Google login failed: no token received");
+          return;
+        }
+
+        const response = await AuthService.googleLogin(authCode);
+        console.log(response)
+        if (!response) return;
+
+        const { user, accessToken } = response.data;
+        dispatch(loginSuccess({ user, accessToken }));
+        if (user.role === "admin") navigate("/admin/users");
+        else navigate("/home");
+      } catch (error) {
+        console.error("Google login failed", error);
+      }
+    },
+    onError: (error) => {
+      console.error("Google login error", error);
+      toast.error("Google login error");
+    },
+  });
+
+  
+
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
         type="button"
-        onClick={onGoogle}
+        onClick={()=> handleGoogleLogin()}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GoogleIcon />
