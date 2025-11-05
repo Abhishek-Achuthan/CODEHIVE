@@ -15,6 +15,8 @@ import { ITokenBlacklistService } from "../../application/ports/security/ITokenB
 import { TokenBlacklistService } from "../../infrastructure/adapters/security/TokenBlacklistService";
 import { IGoogleAuthService } from "../../application/ports/security/IGoogleAuthService";
 import { GoogleAuthService } from "../../infrastructure/adapters/security/GoogleAuthService";
+import { IGithubAuthService } from "../../application/ports/security/IGithubAuthService";
+import { GitHubAuthService } from "../../infrastructure/adapters/security/GithubAuthService";
 
 export class ServiceModule {
   static registerModules(): void {
@@ -49,5 +51,9 @@ export class ServiceModule {
     container.register<IGoogleAuthService>("IGoogleAuthService" , {
       useClass: GoogleAuthService,
     })
+
+    container.register<IGithubAuthService>("IGithubAuthService", {
+      useClass: GitHubAuthService,
+    });
   }
 }

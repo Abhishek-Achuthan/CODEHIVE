@@ -20,6 +20,7 @@
     "dev": "nodemon --exec ts-node src/app.ts"
   },
   "dependencies": {
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
