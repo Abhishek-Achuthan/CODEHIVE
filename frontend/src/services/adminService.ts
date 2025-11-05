@@ -27,7 +27,6 @@ export class AdminService {
   static async updateUserStatus(id: string, status: boolean) {
     try {
       const response = await AdminApi.updateUserStatus(id, status);
-      
       return response.data;
     } catch (error) {
       this.handleError(error);

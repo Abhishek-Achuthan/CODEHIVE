@@ -28,6 +28,7 @@ export class AuthService {
   static async sendOtp(data: AuthType.OTPData) {
     try {
       const response = await AuthApi.sendOTP(data);
+      console.log(response)
       toast.success(response.data?.message);
       return response.data;
     } catch (error) {
@@ -80,6 +81,17 @@ export class AuthService {
       toast.success("Logout successfully")
     } catch (error) {
       this.handleError(error);
+    }
+  }
+
+  static async googleLogin(idToken:string) {
+    try {
+      const response = await AuthApi.googleLogin(idToken);
+
+      toast.success(response.data.message);
+      return response.data;
+    } catch (error) {
+      this.handleError(error)
     }
   }
 

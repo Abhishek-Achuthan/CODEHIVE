@@ -36,7 +36,6 @@ export function ResetPasswordForm() {
         email,
         password: values.password,
       });
-      toast.success("Password reset successfully!");
       navigate("/login");
     } catch (error) {
       if (error instanceof AxiosError)
