@@ -17,7 +17,7 @@ export class UserRegisterUseCase implements IUserRegisterUseCase {
   async execute(data: IUserRegisterInputDTO): Promise<void> {
     const existingUser = await this._userRepository.findByEmail(data.email);
 
-    if (existingUser) throw new ConflictError("user already exists");
+    if (existingUser) throw new ConflictError("User already exists");
 
     const hashedPassword = await this._hashService.hash(data.password);
 

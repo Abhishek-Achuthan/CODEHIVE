@@ -21,7 +21,8 @@ import { IUserLogoutUseCase } from "../../application/useCase/interface/auth/IUs
 import { UserLogoutUseCase } from "../../application/useCase/auth/UserLogoutUseCase";
 import { IRefreshAccessTokenUseCase } from "../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
 import { RefreshAccessTokenUseCase } from "../../application/useCase/auth/RefreshAccessTokenUseCase";
-
+import { IGoogleLoginUseCase } from "../../application/useCase/interface/auth/IGoogleLoginUseCase";
+import { GoogleLoginUseCase } from "../../application/useCase/auth/GoogleLoginUseCase";
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -41,33 +42,45 @@ export class UseCaseModule {
       useClass: UserLoginUseCase,
     });
 
-    container.register<IForgotPasswordSendOTPUseCase>('IForgotPasswordSendOTPUseCase',{
-      useClass: ForgotPasswordSendOTPUseCase,
-    });
+    container.register<IForgotPasswordSendOTPUseCase>(
+      "IForgotPasswordSendOTPUseCase",
+      {
+        useClass: ForgotPasswordSendOTPUseCase,
+      }
+    );
 
-    container.register<IForgotPasswordVerifyOTPUseCase>('IForgotPasswordVerifyOTPUseCase', {
-      useClass: ForgotPasswordVerifyOTPUseCase,
-    });
+    container.register<IForgotPasswordVerifyOTPUseCase>(
+      "IForgotPasswordVerifyOTPUseCase",
+      {
+        useClass: ForgotPasswordVerifyOTPUseCase,
+      }
+    );
 
-    container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
+    container.register<IResetPasswordUseCase>("IResetPasswordUseCase", {
       useClass: ResetPasswordUseCase,
     });
 
-    container.register<IListUsersUseCase>('IListUsersUseCase', {
+    container.register<IListUsersUseCase>("IListUsersUseCase", {
       useClass: ListUsersUseCase,
     });
 
-    container.register<IUpdateUserStatusUseCase>('IUpdateUserStatusUseCase' ,{
-      useClass : UpdateUserStatusUseCase,
+    container.register<IUpdateUserStatusUseCase>("IUpdateUserStatusUseCase", {
+      useClass: UpdateUserStatusUseCase,
     });
 
-    container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
-      useClass: UserLogoutUseCase
-    })
+    container.register<IUserLogoutUseCase>("IUserLogoutUseCase", {
+      useClass: UserLogoutUseCase,
+    });
 
-    container.register<IRefreshAccessTokenUseCase>('IRefreshAccessTokenUseCase', {
-      useClass: RefreshAccessTokenUseCase
-    })
+    container.register<IRefreshAccessTokenUseCase>(
+      "IRefreshAccessTokenUseCase",
+      {
+        useClass: RefreshAccessTokenUseCase,
+      }
+    );
 
+    container.register<IGoogleLoginUseCase>("IGoogleLoginUseCase", {
+      useClass: GoogleLoginUseCase,
+    });
   }
 }

@@ -1,17 +1,24 @@
 import { inject, injectable } from "tsyringe";
 import { Request, Response, NextFunction } from "express";
+import { removeCookie, setCookie } from "../../utils/cookieHelper";
+import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { ISendOTPUseCase } from "../../../application/useCase/interface/auth/ISendOTPUseCase";
 import type { IUserRegisterUseCase } from "../../../application/useCase/interface/auth/IUserRegisterUseCase";
-import { LoginUserSchema, RegisterUserSchema, EmailOnlySchema, ForgotPasswordVerifySchema, ResetPasswordSchema } from "../../validation/auth";
-import { HttpStatus } from "../../../shared/httpStatusCode";
 import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
 import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
-import { removeCookie, setCookie } from "../../utils/cookieHelper";
 import type { IForgotPasswordSendOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
 import type { IForgotPasswordVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
 import type { IResetPasswordUseCase } from "../../../application/useCase/interface/auth/IResetPasswordUseCase";
 import type { IUserLogoutUseCase } from "../../../application/useCase/interface/auth/IUserLogoutUseCase";
 import type { IRefreshAccessTokenUseCase } from "../../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
+import type { IGoogleLoginUseCase } from "../../../application/useCase/interface/auth/IGoogleLoginUseCase";
+import {
+  LoginUserSchema,
+  RegisterUserSchema,
+  EmailOnlySchema,
+  ForgotPasswordVerifySchema,
+  ResetPasswordSchema,
+} from "../../validation/auth";
 
 @injectable()
 export class AuthController {
@@ -34,7 +41,8 @@ export class AuthController {
     private readonly _userLogoutUseCase: IUserLogoutUseCase,
     @inject("IRefreshAccessTokenUseCase")
     private readonly _refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
-
+    @inject("IGoogleLoginUseCase")
+    private readonly _googleLoginUseCase: IGoogleLoginUseCase
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -154,30 +162,56 @@ export class AuthController {
 
   async handleUserLogout(req: Request, res: Response, next: NextFunction) {
     try {
+      const token = req.cookies.refreshToken;
 
-      const token  = req.cookies.refreshToken;
+      if (token) await this._userLogoutUseCase.execute(token);
 
-      if(token) await this._userLogoutUseCase.execute(token);
+      removeCookie(res, "refreshToken");
 
-      removeCookie(res,'refreshToken');
-
-      return res.status(HttpStatus.NoContent).send()
-
+      return res.status(HttpStatus.NoContent).send();
     } catch (error) {
       next(error);
     }
   }
 
-  async handleRefreshAccessToken(req: Request, res: Response, next: NextFunction) {
+  async handleRefreshAccessToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const refreshToken = req.cookies.refreshToken as string | undefined;
       if (!refreshToken) {
-        return res.status(HttpStatus.Forbidden).json({ success: false, message: 'Missing refresh token' });
+        return res
+          .status(HttpStatus.Forbidden)
+          .json({ success: false, message: "Missing refresh token" });
       }
 
-      const accessToken = await this._refreshAccessTokenUseCase.execute(refreshToken);
+      const accessToken = await this._refreshAccessTokenUseCase.execute(
+        refreshToken
+      );
 
       return res.status(HttpStatus.OK).json({ access_token: accessToken });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async hanldGoogleLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authCode = req.body.code;
+
+      const data = await this._googleLoginUseCase.execute(authCode);
+
+      const { accessToken, refreshToken, user } = data;
+
+      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: { user, accessToken: accessToken },
+        message: "Login successfull",
+      });
     } catch (error) {
       next(error);
     }

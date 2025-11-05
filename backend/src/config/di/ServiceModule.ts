@@ -13,6 +13,8 @@ import { IOTPService } from "../../application/ports/otp/IOTPService";
 import { OTPService } from "../../infrastructure/adapters/otp/OTPService";
 import { ITokenBlacklistService } from "../../application/ports/security/ITokenBlacklistService";
 import { TokenBlacklistService } from "../../infrastructure/adapters/security/TokenBlacklistService";
+import { IGoogleAuthService } from "../../application/ports/security/IGoogleAuthService";
+import { GoogleAuthService } from "../../infrastructure/adapters/security/GoogleAuthService";
 
 export class ServiceModule {
   static registerModules(): void {
@@ -43,5 +45,9 @@ export class ServiceModule {
     container.register<ITokenBlacklistService>("ITokenBlacklistService", {
       useClass: TokenBlacklistService,
     });
+
+    container.register<IGoogleAuthService>("IGoogleAuthService" , {
+      useClass: GoogleAuthService,
+    })
   }
 }

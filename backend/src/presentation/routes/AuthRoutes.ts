@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authController } from "../../config/di/resolver";
+import { authController, authMiddleware } from "../../config/di/resolver";
 
 export class AuthRoute {
   private readonly _router: Router;
@@ -49,10 +49,14 @@ export class AuthRoute {
     );
 
     this._router.delete(
-
       "/sessions",
+      authMiddleware.check,
       this._authController.handleUserLogout.bind(this._authController)
-    )
+    );
+
+    this._router.post(
+      '/google-login',this._authController.hanldGoogleLogin.bind(this._authController)
+    );
   }
 
   public getRoutes(): Router {
