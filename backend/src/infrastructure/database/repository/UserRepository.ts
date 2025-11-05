@@ -54,13 +54,14 @@ export class UserRepository
   toEntity(doc: UserDocument): UserEntity {
     return {
       email: doc.email,
-      phone: doc.phone,
-      password: doc.password,
+      phone: doc.phone ?? '',
+      password: doc.password ?? '',
       firstName: doc.firstName,
       lastName: doc.lastName,
       id: doc._id.toString(),
       isBlocked: doc.isBlocked ?? false,
       role: doc.role,
+      googleId:doc.googleId ?? ''
     };
   }
 }

@@ -1,5 +1,5 @@
 export const env = {
-  mongouri: process.env.MONGO_URI||'',
+  mongouri: process.env.MONGO_URI || "",
   frontendUrl: process.env.FRONTEND_URL,
   port: process.env.PORT,
   loggerlvl: process.env.LOGGER_LEVEL,
@@ -13,4 +13,6 @@ export const env = {
   refreshTokenSKY: process.env.REFRESH_TOKEN_SECRET_KEY || "refreshKey",
   accessTokenExp: process.env.ACCESS_TOKEN_EXPIRY || "1h",
   refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || "7d",
+  clientId: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 };

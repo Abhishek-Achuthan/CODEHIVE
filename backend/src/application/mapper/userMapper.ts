@@ -13,7 +13,7 @@ export class UserMapper {
       firstName: user.firstName,
       lastName: user.lastName,
       isBlocked: user.isBlocked,
-      phone: user.phone,
+      phone: user.phone??'',
       role: user.role,
       refreshToken: refreshToken,
       accessToken: accessToken,
@@ -26,7 +26,7 @@ export class UserMapper {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      phone: user.phone,
+      phone: user.phone??'',
       role: user.role,
       isBlocked: user.isBlocked,
     };

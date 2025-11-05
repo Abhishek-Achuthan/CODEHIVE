@@ -5,8 +5,9 @@ export interface UserEntity {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
-  password: string;
+  phone?: string;
+  password?: string;
+  googleId?:string;
   isBlocked: boolean;
   role: UserRole;
 }

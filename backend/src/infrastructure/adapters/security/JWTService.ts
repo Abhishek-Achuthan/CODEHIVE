@@ -5,15 +5,15 @@ import jwt from "jsonwebtoken";
 
 export class JWTService implements IJWTService {
   genarateAccessToken(claims: JwtPayload): string {
-    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: '1h' });
+    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: "1h" });
   }
 
   genarateRefreshToken(claims: JwtPayload): string {
-    return jwt.sign(claims, env.refreshTokenSKY, { expiresIn: '7d' });
+    return jwt.sign(claims, env.refreshTokenSKY, { expiresIn: "7d" });
   }
 
   verifyAccessToken(token: string): JwtPayload | string {
-    return jwt.verify(token, env.accessTokenSKY) ;
+      return jwt.verify(token, env.accessTokenSKY);
   }
 
   verifyRefreshToken(token: string): JwtPayload | string {

@@ -22,7 +22,7 @@ interface IUserListResponseDTO {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phone?: string;
   role: string;
   isBlocked: boolean;
   createdAt?: Date;
