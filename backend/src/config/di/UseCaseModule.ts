@@ -23,6 +23,10 @@ import { IRefreshAccessTokenUseCase } from "../../application/useCase/interface/
 import { RefreshAccessTokenUseCase } from "../../application/useCase/auth/RefreshAccessTokenUseCase";
 import { IGoogleLoginUseCase } from "../../application/useCase/interface/auth/IGoogleLoginUseCase";
 import { GoogleLoginUseCase } from "../../application/useCase/auth/GoogleLoginUseCase";
+import { IGithubLoginUseCase } from "../../application/useCase/interface/auth/IGithubLoginUseCase";
+import { GithubLoginUseCase } from "../../application/useCase/auth/GithubLoginUseCase";
+import { IInitiateGithubOAuthUseCase } from "../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase";
+import { InitiateGithubOAuthUseCase } from "../../application/useCase/auth/InitiateGithubOAuthUseCase";
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -81,6 +85,14 @@ export class UseCaseModule {
 
     container.register<IGoogleLoginUseCase>("IGoogleLoginUseCase", {
       useClass: GoogleLoginUseCase,
+    });
+
+    container.register<IGithubLoginUseCase>("IGithubLoginUseCase", {
+      useClass: GithubLoginUseCase,
+    });
+
+    container.register<IInitiateGithubOAuthUseCase>("IInitiateGithubOAuthUseCase", {
+      useClass: InitiateGithubOAuthUseCase,
     });
   }
 }

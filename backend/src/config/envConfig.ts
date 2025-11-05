@@ -1,6 +1,7 @@
 export const env = {
   mongouri: process.env.MONGO_URI || "",
   frontendUrl: process.env.FRONTEND_URL,
+  backendUrl: process.env.BACKEND_URL,
   port: process.env.PORT,
   loggerlvl: process.env.LOGGER_LEVEL,
   nodeEnv: process.env.NODE_ENV,
@@ -15,4 +16,6 @@ export const env = {
   refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || "7d",
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  githubClientId:process.env.GITHUB_CLIENT_ID,
+  githubClientSecret:process.env.GITHUB_CLIENT_SECRET
 };
