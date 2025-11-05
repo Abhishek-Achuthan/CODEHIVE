@@ -16,6 +16,7 @@ interface OTPModalProps {
   title?: string;
   description?: string;
   length?: number;
+  expiryTime?: number;
 }
 
 export function OTPModal({
@@ -26,8 +27,10 @@ export function OTPModal({
   title = "Enter Verification Code",
   description = "We sent a verification code to your email",
   length = 6,
+  expiryTime = 300, 
 }: OTPModalProps) {
   const [otp, setOtp] = React.useState<string[]>(Array(length).fill(""));
+  const [timeLeft, setTimeLeft] = React.useState<number>(expiryTime);
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -75,6 +78,7 @@ export function OTPModal({
 
   const handleResend = () => {
     setOtp(Array(length).fill(""));
+    setTimeLeft(expiryTime); 
     inputRefs.current[0]?.focus();
 
     if (onResend) {
@@ -82,12 +86,35 @@ export function OTPModal({
     }
   };
 
+ 
   React.useEffect(() => {
     if (open) {
       setOtp(Array(length).fill(""));
+      setTimeLeft(expiryTime);
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }
-  }, [open, length]);
+  }, [open, length, expiryTime]);
+
+  React.useEffect(() => {
+    if (!open || timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [open, timeLeft]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   const isComplete = otp.every((digit) => digit !== "");
 
@@ -143,15 +170,24 @@ export function OTPModal({
               Verify Code
             </button>
 
-            <button
-              onClick={handleResend}
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              Didn't receive the code?{" "}
-              <span className="text-primary font-medium underline-offset-4 hover:underline">
-                Resend
-              </span>
-            </button>
+            <div className="flex flex-col items-center gap-2">
+              {timeLeft > 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Resend code in{" "}
+                  <span className="font-medium text-primary">{formatTime(timeLeft)}</span>
+                </p>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  Didn't receive the code?{" "}
+                  <span className="text-primary font-medium underline-offset-4 hover:underline">
+                    Resend
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>
