@@ -8,6 +8,7 @@ export interface UserEntity {
   phone?: string;
   password?: string;
   googleId?:string;
+  githubId?:string;
   isBlocked: boolean;
   role: UserRole;
 }

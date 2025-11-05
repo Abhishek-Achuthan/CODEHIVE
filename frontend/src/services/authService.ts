@@ -32,7 +32,8 @@ export class AuthService {
       toast.success(response.data?.message);
       return response.data;
     } catch (error) {
-      this.handleError(error);
+      if(error instanceof AxiosError)throw error
+      // this.handleError(error);
     }
   }
 

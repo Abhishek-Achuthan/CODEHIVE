@@ -10,6 +10,7 @@ export const UserSchema = new Schema<UserDocument>(
     phone: { type: String, required: false },
     password: { type: String, required: false },
     googleId: {type: String, required: false},
+    githubId:{type:String,required:false},
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
     isBlocked: {type: Boolean,default: false}
   },

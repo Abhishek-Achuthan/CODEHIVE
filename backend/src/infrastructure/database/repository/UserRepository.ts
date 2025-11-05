@@ -61,7 +61,8 @@ export class UserRepository
       id: doc._id.toString(),
       isBlocked: doc.isBlocked ?? false,
       role: doc.role,
-      googleId:doc.googleId ?? ''
+      googleId:doc.googleId ?? '',
+      githubId:doc.githubId??''    
     };
   }
 }

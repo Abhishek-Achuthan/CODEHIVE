@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export function useOTP<TValues extends Record<string, unknown>>(
   onSend: (data: Partial<TValues>) => Promise<void>,
@@ -23,7 +24,9 @@ export function useOTP<TValues extends Record<string, unknown>>(
       setOtpActiveFor(recipient as string);
       setOtpModalOpen(true);
     } catch (error) {
+      console.log(error)
       if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message)
         const status = error?.response?.status;
         if (status === 429) {
           setOtpActiveFor(recipient as string);
