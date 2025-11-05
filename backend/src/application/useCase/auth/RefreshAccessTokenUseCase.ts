@@ -3,26 +3,36 @@ import type { IRefreshAccessTokenUseCase } from "../interface/auth/IRefreshAcces
 import type { IJWTService } from "../../ports/security/IJWTService";
 import type { ITokenBlacklistService } from "../../ports/security/ITokenBlacklistService";
 import { ForbiddenError } from "../../../core/errors/ForbiddenError";
+import { JwtPayload } from "jsonwebtoken";
 
 @injectable()
 export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
     @inject("IJWTService") private readonly _jwtService: IJWTService,
-    @inject("ITokenBlacklistService") private readonly _tokenBlacklistService: ITokenBlacklistService
+    @inject("ITokenBlacklistService")
+    private readonly _tokenBlacklistService: ITokenBlacklistService
   ) {}
 
   async execute(refreshToken: string): Promise<string> {
     if (!refreshToken) throw new ForbiddenError("Missing refresh token");
 
-    const isBlacklisted = await this._tokenBlacklistService.isTokenBlacklisted(refreshToken);
+    const isBlacklisted = await this._tokenBlacklistService.isTokenBlacklisted(
+      refreshToken
+    );
+
     if (isBlacklisted) throw new ForbiddenError("Invalid refresh token");
 
-    const data = this._jwtService.verifyRefreshToken(refreshToken);
+      const data = this._jwtService.verifyRefreshToken(refreshToken) as JwtPayload;
 
-    const claims = typeof data === 'string' ? { sub: data } : data;
-    const newAccessToken = this._jwtService.genarateAccessToken(claims);
-    return newAccessToken;
+      if (!data || !data.sub || !data.userRole) {
+        throw new ForbiddenError("Invalid refresh token payload");
+      }
+
+      const newAccessToken = this._jwtService.genarateAccessToken({
+        userRole: data.userRole,
+        sub: data.sub,
+      });
+
+      return newAccessToken;
   }
 }
-
-
