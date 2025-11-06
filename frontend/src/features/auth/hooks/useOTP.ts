@@ -24,7 +24,6 @@ export function useOTP<TValues extends Record<string, unknown>>(
       setOtpActiveFor(recipient as string);
       setOtpModalOpen(true);
     } catch (error) {
-      console.log(error)
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.message)
         const status = error?.response?.status;

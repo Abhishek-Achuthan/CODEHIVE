@@ -22,15 +22,21 @@ export class UserRepository
     return this.toEntity(userDoc);
   }
 
+  
+  
   async getAllUsers(
     role: UserRole,
     currentPage: number = 1,
     pageSize: number = 10,
     sort: string = "createdAt",
     search: string = ""
-  ): Promise<UserEntity[]> {
+  ): Promise<{users:UserEntity[];totalItems:number;totalPages:number}> {
     const query: FilterQuery<UserDocument> = { role };
 
+    const totalItems = await this._model.countDocuments(query);
+    const totalPages = Math.ceil(totalItems/pageSize);
+    const skip = (currentPage - 1) * pageSize;
+    
     if (search) {
       query.$or = [
         { firstName: { $regex: search, $options: "i" } },
@@ -39,7 +45,6 @@ export class UserRepository
       ];
     }
 
-    const skip = (currentPage - 1) * pageSize;
 
     const userDoc = await this._model
       .find(query)
@@ -48,7 +53,8 @@ export class UserRepository
       .limit(pageSize)
       .lean<UserDocument[]>();
 
-    return userDoc.map((doc) => this.toEntity(doc as UserDocument));
+    const users = userDoc.map((doc) => this.toEntity(doc as UserDocument));
+    return {users, totalItems,totalPages};
   }
 
   toEntity(doc: UserDocument): UserEntity {

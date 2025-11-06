@@ -13,5 +13,5 @@ export interface IUserRepository
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<UserEntity[]>;
+  ): Promise<{users:UserEntity[];totalItems:number;totalPages:number}>;
 }

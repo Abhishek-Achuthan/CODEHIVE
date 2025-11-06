@@ -23,7 +23,7 @@ export class AdminController {
         search = "",
       } = req.query;
 
-      const users = await this._listUsers.execute(
+      const data = await this._listUsers.execute(
         role as UserRole,
         Number(page),
         Number(pageSize),
@@ -31,7 +31,7 @@ export class AdminController {
         search as string
       );
 
-      return res.status(HttpStatus.OK).json(users);
+      return res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }

@@ -17,8 +17,8 @@ export class ListUsersUseCase implements IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<IUserListResponseDTO[]> {
-    const users = await this._userRepository.getAllUsers(
+  ): Promise<{users :IUserListResponseDTO[];totalItems:number,totalPages:number}> {
+    const {users,totalItems,totalPages} = await this._userRepository.getAllUsers(
       role,
       currentPage,
       pageSize,
@@ -26,6 +26,12 @@ export class ListUsersUseCase implements IListUsersUseCase {
       search
     );
 
-    return UserMapper.toUserListArray(users);
+    const mappedUsers = UserMapper.toUserListArray(users);
+
+    return {
+      users: mappedUsers,
+      totalItems,
+      totalPages
+    }
   }
 }

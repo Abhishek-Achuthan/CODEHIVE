@@ -45,7 +45,7 @@ export const MentorManagementPage: React.FC = () => {
           "createdAt",
           debouncedSearch
         );
-        setUsers(Array.isArray(data) ? data : data.users || []);
+        setUsers(data.users || []);
         setTotalPages(data.totalPages || 1);
       } catch (err) {
         console.error("Error fetching users:", err);

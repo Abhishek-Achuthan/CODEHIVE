@@ -23,7 +23,6 @@ export default function AuthCallbackPage() {
           .find(row => row.startsWith('accessToken='))
           ?.split('=')[1];
 
-        console.log("Callback params:", { hasToken: !!token, hasUser: !!userParam });
 
         if (!token || !userParam) {
           console.error("Missing credentials:", { token: !!token, userParam: !!userParam });
@@ -33,7 +32,6 @@ export default function AuthCallbackPage() {
         }
 
         const userData = JSON.parse(decodeURIComponent(userParam));
-        console.log("User data parsed:", userData);
 
         localStorage.setItem("accessToken", token);
         dispatch(loginSuccess({ user: userData, accessToken: token }));

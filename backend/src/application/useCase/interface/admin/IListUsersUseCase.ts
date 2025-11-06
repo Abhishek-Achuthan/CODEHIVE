@@ -8,5 +8,5 @@ export interface IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<IUserListResponseDTO[]>;
+  ): Promise<{users :IUserListResponseDTO[];totalItems:number,totalPages:number}>;
 }
