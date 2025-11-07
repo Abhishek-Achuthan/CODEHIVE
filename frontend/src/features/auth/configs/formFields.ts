@@ -6,7 +6,7 @@ export const signUpFields: Array<{
   name: keyof RegisterData;
   label: string;
   placeholder: string;
-  type?: 'text' | 'email' | 'tel' | 'password';
+  type?: 'text' | 'tel' | 'password';
   component?: React.ComponentType<FieldComponentProps>;
 }> = [
   { 

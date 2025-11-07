@@ -49,7 +49,13 @@ export function ResetPasswordForm() {
       <header className="mb-8 text-center">
         <h1 className="mb-2 text-2xl font-normal text-white">Reset Password</h1>
         <p className="text-sm font-light text-white/50">
-          Set a new password for your account
+          Remember your password?{" "}
+          <Link
+            to={'/'} replace={true}
+            className="text-white underline decoration-1 underline-offset-2 transition-opacity hover:opacity-70"
+          >
+            Log in
+          </Link>
         </p>
       </header>
 
