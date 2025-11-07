@@ -69,7 +69,9 @@ export const MentorManagementPage: React.FC = () => {
     } catch (err) {
       console.error("Error updating user:", err);
       toast.error("Failed to update user status");
-      setUsers([]);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, isBlocked: !status } : u))
+      );
     }
   };
 
@@ -103,7 +105,7 @@ export const MentorManagementPage: React.FC = () => {
     <AdminLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-semibold">Users</h1>
+          <h1 className="text-xl font-semibold">Mentors</h1>
           <input
             type="text"
             placeholder="Search users..."

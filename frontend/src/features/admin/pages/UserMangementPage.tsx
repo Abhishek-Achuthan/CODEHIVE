@@ -69,7 +69,9 @@ export const UserManagementPage: React.FC = () => {
     } catch (err) {
       console.error("Error updating user:", err);
       toast.error("Failed to update user status");
-      fetchUsers();
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, isBlocked: !status } : u))
+      );
     }
   };
 
