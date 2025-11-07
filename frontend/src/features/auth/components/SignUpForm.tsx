@@ -33,7 +33,7 @@ export function SignUpForm({
 
   const {
     otpModalOpen,
-    setOtpModalOpen,
+    setOtpModalOpen, 
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
   } = useOTP<RegisterData>(

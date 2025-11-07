@@ -4,10 +4,10 @@ import type { IHashService } from "../../ports/security/IHashService";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { IUserLoginInputDTO, IUserLoginResponseDTO } from "../../dto/UserDTO";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
 import type { IJWTService } from "../../ports/security/IJWTService";
 import { UserMapper } from "../../mapper/userMapper";
 import { BadRequestError } from "../../../core/errors/BadRequestError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class UserLoginUseCase implements IUserLoginUseCase {
@@ -21,9 +21,9 @@ export class UserLoginUseCase implements IUserLoginUseCase {
   async execute(data: IUserLoginInputDTO): Promise<IUserLoginResponseDTO> {
     const user = await this._userRepository.findByEmail(data.email);
 
-    if (!user) throw new NotFoundError("User not found");
+    if (!user) throw new NotFoundError(ERROR_MESSAGES.USER.NOT_FOUND);
 
-    if (user.isBlocked) throw new BadRequestError("Your account is blocked");
+    if (user.isBlocked) throw new BadRequestError(ERROR_MESSAGES.AUTH.ACCOUNT_BLOCKED);
 
     if (user.password) {
       const validUser = await this._hashService.compare(
@@ -31,7 +31,7 @@ export class UserLoginUseCase implements IUserLoginUseCase {
         user.password
       );
 
-      if (!validUser) throw new UnauthorizedError("Invalid credentials");
+      if (!validUser) throw new BadRequestError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     const accessToken = this._jwtService.genarateAccessToken({        

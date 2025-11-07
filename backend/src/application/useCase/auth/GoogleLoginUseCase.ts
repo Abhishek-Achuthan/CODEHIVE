@@ -7,6 +7,7 @@ import type { IGoogleAuthService } from "../../ports/security/IGoogleAuthService
 import { UserRole } from "../../../domain/types/UserRole";
 import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
 import { BadRequestError } from "../../../core/errors/BadRequestError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class GoogleLoginUseCase implements IGoogleLoginUseCase {
@@ -25,7 +26,7 @@ export class GoogleLoginUseCase implements IGoogleLoginUseCase {
         
         const googleUser = await this._googleAuthService.verifyGoogleToken(idToken);
 
-        if(!googleUser.email) throw new UnauthorizedError("Invalid Google credentials");
+        if(!googleUser.email) throw new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_GOOGLE_CREDENTIALS);
 
         let user = await this._userRepository.findByEmail(googleUser.email);
 
@@ -40,7 +41,7 @@ export class GoogleLoginUseCase implements IGoogleLoginUseCase {
             });
         }
 
-        if(user.isBlocked) throw new BadRequestError("Your account is blocked");
+        if(user.isBlocked) throw new BadRequestError(ERROR_MESSAGES.AUTH.ACCOUNT_BLOCKED);
 
         const accessToken = this._jwtService.genarateAccessToken({userRole:user.role,sub:user.id});
         const refreshToken = this._jwtService.genarateRefreshToken({userRole:user.role,sub:user.id});

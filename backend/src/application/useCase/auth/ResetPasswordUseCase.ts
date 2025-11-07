@@ -3,6 +3,7 @@ import { IResetPasswordUseCase } from "../interface/auth/IResetPasswordUseCase";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import type { IHashService } from "../../ports/security/IHashService";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
@@ -15,7 +16,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
         
         const user = await this._userRepository.findByEmail(email);
 
-        if(!user) throw new NotFoundError('User not found');
+        if(!user) throw new NotFoundError(ERROR_MESSAGES.USER.NOT_FOUND);
 
         const hashedPassword = await this._hashService.hash(password);
 

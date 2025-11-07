@@ -8,6 +8,7 @@ import type { IOTPService } from "../../ports/otp/IOTPService";
 import type { ICacheService } from "../../ports/cache/ICacheService";
 import type { IHashService } from "../../ports/security/IHashService";
 import { TooManyRequestError } from "../../../core/errors/TooManyRequestError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 
 @injectable()
@@ -25,11 +26,11 @@ export class ForgotPasswordSendOTPUseCase implements IForgotPasswordSendOTPUseCa
         
         const validUser = await this._userReposiotry.findByEmail(email);
 
-        if(!validUser) throw new NotFoundError('Invalid email address');
+        if(!validUser) throw new NotFoundError(ERROR_MESSAGES.AUTH.INVALID_EMAIL);
 
         const existingOtp = await this._cacheService.getData(`forgot_password_otp:${email}`);
 
-        if(existingOtp) throw new TooManyRequestError('OTP already sent. please wait before requesting another one');
+        if(existingOtp) throw new TooManyRequestError(ERROR_MESSAGES.OTP.ALREADY_SENT);
 
         const otp = this._otpService.genarateOtp();
 

@@ -5,7 +5,7 @@ import { IInitiateGithubOAuthUseCase } from "../interface/auth/IInitiateGithubOA
 export class InitiateGithubOAuthUseCase implements IInitiateGithubOAuthUseCase {
     execute(): string {
         const githubClientId = process.env.GITHUB_CLIENT_ID;
-        const backendUrl = process.env.BACKEND_URL || "http://localhost:4000";
+        const backendUrl = process.env.BACKEND_URL 
         
         if (!githubClientId) {
             throw new Error("GITHUB_CLIENT_ID is not configured");

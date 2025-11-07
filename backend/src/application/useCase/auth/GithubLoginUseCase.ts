@@ -6,6 +6,7 @@ import { UserEntity } from "../../../domain/entities/UserEntity";
 import type { IGithubAuthService } from "../../ports/security/IGithubAuthService";
 import { BadRequestError } from "../../../core/errors/BadRequestError";
 import { UserRole } from "../../../domain/types/UserRole";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 
 @injectable()
@@ -39,11 +40,11 @@ export class GithubLoginUseCase implements IGithubLoginUseCase {
                 githubId: githubUser.githubId
             });
             user = await this._userRepository.findByEmail(githubUser.email);
-            if (!user) throw new BadRequestError("Failed to update user account");
+            if (!user) throw new BadRequestError(ERROR_MESSAGES.USER.UPDATE_FAILED);
         }
 
 
-        if(user.isBlocked) throw new BadRequestError("Your accound is blocked");
+        if(user.isBlocked) throw new BadRequestError(ERROR_MESSAGES.AUTH.ACCOUNT_BLOCKED);
 
 
         const accessToken = this._jwtService.genarateAccessToken({userRole:user.role,sub:user.id});

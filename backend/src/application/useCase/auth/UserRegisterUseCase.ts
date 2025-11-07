@@ -4,6 +4,7 @@ import type { IHashService } from "../../ports/security/IHashService";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { IUserRegisterInputDTO } from "../../dto/UserDTO";
 import { ConflictError } from "../../../core/errors/ConflictError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class UserRegisterUseCase implements IUserRegisterUseCase {
@@ -17,7 +18,7 @@ export class UserRegisterUseCase implements IUserRegisterUseCase {
   async execute(data: IUserRegisterInputDTO): Promise<void> {
     const existingUser = await this._userRepository.findByEmail(data.email);
 
-    if (existingUser) throw new ConflictError("User already exists");
+    if (existingUser) throw new ConflictError(ERROR_MESSAGES.USER.ALREADY_EXIST);
 
     const hashedPassword = await this._hashService.hash(data.password);
 

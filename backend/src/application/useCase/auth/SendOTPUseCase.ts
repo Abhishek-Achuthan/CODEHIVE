@@ -7,6 +7,7 @@ import { ConflictError } from "../../../core/errors/ConflictError";
 import type { IOTPService } from "../../ports/otp/IOTPService";
 import type { IEmailTemplateFactory } from "../../ports/mail/template/IEmailTemplateFactory";
 import type { ICacheService } from "../../ports/cache/ICacheService";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 
 @injectable() 
@@ -27,7 +28,7 @@ export class SendOTPUseCase implements ISendOTPUseCase {
     async execute(email: string): Promise<void> {
         const existing = await this._userRepository.findByEmail(email);
 
-        if(existing) throw new ConflictError('User already exists');
+        if(existing) throw new ConflictError(ERROR_MESSAGES.USER.ALREADY_EXIST);
 
         const otp = this._otpService.genarateOtp();
 

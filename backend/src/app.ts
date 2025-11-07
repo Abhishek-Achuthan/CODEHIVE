@@ -34,7 +34,7 @@ export class App {
         credentials: true,
       })
     );
-    this._app.use(express.urlencoded());
+    this._app.use(express.urlencoded({extended:true}));
     this._app.use(express.json());
     this._app.use(cookieParser());
   }
