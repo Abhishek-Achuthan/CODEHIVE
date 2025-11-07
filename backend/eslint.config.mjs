@@ -14,7 +14,8 @@ export default defineConfig({
     '@typescript-eslint/no-explicit-any': 'off',
     'prefer-const': 'warn',
     'no-console': 'off',
-    'eqeqeq':'error'
+    'eqeqeq':'error',
+    'quotes':['error','single']
   },
 });
 

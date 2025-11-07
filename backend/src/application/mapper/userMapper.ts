@@ -1,5 +1,5 @@
-import { UserEntity } from "../../domain/entities/UserEntity";
-import { IUserListResponseDTO, IUserLoginResponseDTO } from "../dto/UserDTO";
+import { UserEntity } from '../../domain/entities/UserEntity';
+import { IUserListResponseDTO, IUserLoginResponseDTO } from '../dto/UserDTO';
 
 export class UserMapper {
   public static toLoginResponse(

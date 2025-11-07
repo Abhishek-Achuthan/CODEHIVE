@@ -1,16 +1,16 @@
-import { inject, injectable } from "tsyringe";
-import type { IRefreshAccessTokenUseCase } from "../interface/auth/IRefreshAccessTokenUseCase";
-import type { IJWTService } from "../../ports/security/IJWTService";
-import type { ITokenBlacklistService } from "../../ports/security/ITokenBlacklistService";
-import { ForbiddenError } from "../../../core/errors/ForbiddenError";
-import { JwtPayload } from "jsonwebtoken";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject, injectable } from 'tsyringe';
+import type { IRefreshAccessTokenUseCase } from '../interface/auth/IRefreshAccessTokenUseCase';
+import type { IJWTService } from '../../ports/security/IJWTService';
+import type { ITokenBlacklistService } from '../../ports/security/ITokenBlacklistService';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
+import { JwtPayload } from 'jsonwebtoken';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
-    @inject("IJWTService") private readonly _jwtService: IJWTService,
-    @inject("ITokenBlacklistService")
+    @inject('IJWTService') private readonly _jwtService: IJWTService,
+    @inject('ITokenBlacklistService')
     private readonly _tokenBlacklistService: ITokenBlacklistService
   ) {}
 

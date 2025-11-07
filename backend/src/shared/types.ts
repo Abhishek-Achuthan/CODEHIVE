@@ -1,7 +1,7 @@
-import { Document } from "mongoose";
-import { UserEntity } from "../domain/entities/UserEntity";
+import { Document } from 'mongoose';
+import { UserEntity } from '../domain/entities/UserEntity';
 
-declare module "jsonwebtoken" {
+declare module 'jsonwebtoken' {
   export interface JwtPayload {
     userRole?: string;
     type?: string;
@@ -11,4 +11,4 @@ declare module "jsonwebtoken" {
 
 export interface UserDocument
   extends Document<UserEntity>,
-    Omit<UserEntity, "id"> {}
+    Omit<UserEntity, 'id'> {}

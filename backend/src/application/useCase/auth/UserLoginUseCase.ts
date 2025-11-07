@@ -1,21 +1,21 @@
-import { inject, injectable } from "tsyringe";
-import { IUserLoginUseCase } from "../interface/auth/IUserLoginUseCase";
-import type { IHashService } from "../../ports/security/IHashService";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { IUserLoginInputDTO, IUserLoginResponseDTO } from "../../dto/UserDTO";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import type { IJWTService } from "../../ports/security/IJWTService";
-import { UserMapper } from "../../mapper/userMapper";
-import { BadRequestError } from "../../../core/errors/BadRequestError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject, injectable } from 'tsyringe';
+import { IUserLoginUseCase } from '../interface/auth/IUserLoginUseCase';
+import type { IHashService } from '../../ports/security/IHashService';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { IUserLoginInputDTO, IUserLoginResponseDTO } from '../../dto/UserDTO';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import type { IJWTService } from '../../ports/security/IJWTService';
+import { UserMapper } from '../../mapper/userMapper';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class UserLoginUseCase implements IUserLoginUseCase {
   constructor(
-    @inject("IUserRepository")
+    @inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-    @inject("IHashService") private readonly _hashService: IHashService,
-    @inject("IJWTService") private readonly _jwtService: IJWTService
+    @inject('IHashService') private readonly _hashService: IHashService,
+    @inject('IJWTService') private readonly _jwtService: IJWTService
   ) {}
 
   async execute(data: IUserLoginInputDTO): Promise<IUserLoginResponseDTO> {

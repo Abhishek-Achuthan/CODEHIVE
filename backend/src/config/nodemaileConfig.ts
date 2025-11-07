@@ -1,5 +1,5 @@
-import { createTransport } from "nodemailer";
-import { env } from "./envConfig";
+import { createTransport } from 'nodemailer';
+import { env } from './envConfig';
 
 export const transporter = createTransport({
     service: 'gmail',

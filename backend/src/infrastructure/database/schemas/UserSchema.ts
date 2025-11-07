@@ -1,6 +1,6 @@
-import { Schema } from "mongoose";
-import { UserRole } from "../../../domain/types/UserRole";
-import { UserDocument } from "../../../shared/types";
+import { Schema } from 'mongoose';
+import { UserRole } from '../../../domain/types/UserRole';
+import { UserDocument } from '../../../shared/types';
 
 export const UserSchema = new Schema<UserDocument>(
   {

@@ -1,4 +1,4 @@
-import { IOTPService } from "../../../application/ports/otp/IOTPService";
+import { IOTPService } from '../../../application/ports/otp/IOTPService';
 
 export class OTPService implements IOTPService {
   genarateOtp(): string {

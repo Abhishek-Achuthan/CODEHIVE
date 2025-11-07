@@ -1,15 +1,15 @@
-import { IJWTService } from "../../../application/ports/security/IJWTService";
-import { env } from "../../../config/envConfig";
-import { JwtPayload } from "jsonwebtoken";
-import jwt from "jsonwebtoken";
+import { IJWTService } from '../../../application/ports/security/IJWTService';
+import { env } from '../../../config/envConfig';
+import { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export class JWTService implements IJWTService {
   genarateAccessToken(claims: JwtPayload): string {
-    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: "1h" });
+    return jwt.sign(claims, env.accessTokenSKY, { expiresIn: '1h' });
   }
 
   genarateRefreshToken(claims: JwtPayload): string {
-    return jwt.sign(claims, env.refreshTokenSKY, { expiresIn: "7d" });
+    return jwt.sign(claims, env.refreshTokenSKY, { expiresIn: '7d' });
   }
 
   verifyAccessToken(token: string): JwtPayload | string {

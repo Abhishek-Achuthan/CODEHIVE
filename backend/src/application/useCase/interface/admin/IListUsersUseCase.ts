@@ -1,5 +1,5 @@
-import { UserRole } from "../../../../domain/types/UserRole";
-import { IUserListResponseDTO } from "../../../dto/UserDTO";
+import { UserRole } from '../../../../domain/types/UserRole';
+import { IUserListResponseDTO } from '../../../dto/UserDTO';
 
 export interface IListUsersUseCase {
   execute(

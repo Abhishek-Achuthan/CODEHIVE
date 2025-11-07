@@ -1,6 +1,6 @@
-import { ICacheService } from "../../../application/ports/cache/ICacheService";
-import { createClient, RedisClientType } from "redis";
-import { env } from "../../../config/envConfig";
+import { ICacheService } from '../../../application/ports/cache/ICacheService';
+import { createClient, RedisClientType } from 'redis';
+import { env } from '../../../config/envConfig';
 export class CacheService implements ICacheService {
   private readonly _client: RedisClientType;
   private readonly _redisUrl: string;
@@ -14,13 +14,13 @@ export class CacheService implements ICacheService {
   }
 
   async registerListners() {
-    this._client.on("connect", () => console.log("Redis Client Connected"));
+    this._client.on('connect', () => console.log('Redis Client Connected'));
 
-    this._client.on("error", (error) => console.log("Redis Client Error", error));
+    this._client.on('error', (error) => console.log('Redis Client Error', error));
 
-    this._client.on("ready", () => console.log("Redis Client is Ready"));
+    this._client.on('ready', () => console.log('Redis Client is Ready'));
 
-    this._client.on("end", () => console.log("Redis client connection ended"));
+    this._client.on('end', () => console.log('Redis client connection ended'));
   }
 
   async connectRedis() {
@@ -30,7 +30,7 @@ export class CacheService implements ICacheService {
     try {
       await this._client.connect();
     } catch (error) {
-      console.log("Something went wrong Connecting to Client",error);
+      console.log('Something went wrong Connecting to Client',error);
     } finally {
       this._isConnecting = false;
     }

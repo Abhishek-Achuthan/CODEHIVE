@@ -1,14 +1,14 @@
-import { inject, injectable } from "tsyringe";
-import { IListUsersUseCase } from "../interface/admin/IListUsersUseCase";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { UserRole } from "../../../domain/types/UserRole";
-import { UserMapper } from "../../mapper/userMapper";
-import { IUserListResponseDTO } from "../../dto/UserDTO";
+import { inject, injectable } from 'tsyringe';
+import { IListUsersUseCase } from '../interface/admin/IListUsersUseCase';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { UserRole } from '../../../domain/types/UserRole';
+import { UserMapper } from '../../mapper/userMapper';
+import { IUserListResponseDTO } from '../../dto/UserDTO';
 
 @injectable()
 export class ListUsersUseCase implements IListUsersUseCase {
   constructor(
-    @inject("IUserRepository") private readonly _userRepository: IUserRepository
+    @inject('IUserRepository') private readonly _userRepository: IUserRepository
   ) {}
 
   async execute(

@@ -1,7 +1,7 @@
 import {
   IUserLoginInputDTO,
   IUserLoginResponseDTO,
-} from "../../../dto/UserDTO";
+} from '../../../dto/UserDTO';
 
 export interface IUserLoginUseCase {
   execute(data: IUserLoginInputDTO): Promise<IUserLoginResponseDTO>;

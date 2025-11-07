@@ -1,9 +1,9 @@
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 
-import { ContainerSetup } from "./container";
-import { AuthController } from "../../presentation/controllers/auth/AuthController";
-import { AdminController } from "../../presentation/controllers/auth/AdminController";
-import { AuthMiddleware } from "../../presentation/middlewares/authMIddleware";
+import { ContainerSetup } from './container';
+import { AuthController } from '../../presentation/controllers/auth/AuthController';
+import { AdminController } from '../../presentation/controllers/auth/AdminController';
+import { AuthMiddleware } from '../../presentation/middlewares/authMIddleware';
 
 ContainerSetup.registerAll();
 

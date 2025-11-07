@@ -1,6 +1,6 @@
-import { inject,injectable } from "tsyringe";
-import { IUserLogoutUseCase } from "../interface/auth/IUserLogoutUseCase";
-import type { ITokenBlacklistService } from "../../ports/security/ITokenBlacklistService";
+import { inject,injectable } from 'tsyringe';
+import { IUserLogoutUseCase } from '../interface/auth/IUserLogoutUseCase';
+import type { ITokenBlacklistService } from '../../ports/security/ITokenBlacklistService';
 
 @injectable()
 export class UserLogoutUseCase implements IUserLogoutUseCase {

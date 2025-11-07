@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { authController, authMiddleware } from "../../config/di/resolver";
+import { Router } from 'express';
+import { authController, authMiddleware } from '../../config/di/resolver';
 
 export class AuthRoute {
   private readonly _router: Router;
@@ -13,43 +13,43 @@ export class AuthRoute {
 
   private _setRoutes() {
     this._router.post(
-      "/users",
+      '/users',
       this._authController.handleUserRegisterWithVerifyOtp.bind(
         this._authController
       )
     );
     this._router.post(
-      "/otps",
+      '/otps',
       this._authController.handleSendOtp.bind(this._authController)
     );
     this._router.post(
-      "/sessions",
+      '/sessions',
       this._authController.handleUserLogin.bind(this._authController)
     );
     this._router.post(
-      "/forgot-password",
+      '/forgot-password',
       this._authController.handleForgotPasswordSendOtp.bind(
         this._authController
       )
     );
     this._router.post(
-      "/forgot-password/verify-otp",
+      '/forgot-password/verify-otp',
       this._authController.handleForgotPasswordVerifyOtp.bind(
         this._authController
       )
     );
     this._router.post(
-      "/reset-password",
+      '/reset-password',
       this._authController.handleResetPassword.bind(this._authController)
     );
 
     this._router.post(
-      "/refresh",
+      '/refresh',
       this._authController.handleRefreshAccessToken.bind(this._authController)
     );
 
     this._router.delete(
-      "/sessions",
+      '/sessions',
       authMiddleware.check,
       this._authController.handleUserLogout.bind(this._authController)
     );

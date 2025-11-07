@@ -1,12 +1,12 @@
-import { inject,injectable } from "tsyringe";
-import type { IGithubLoginUseCase } from "../interface/auth/IGithubLoginUseCase";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import type { IJWTService } from "../../ports/security/IJWTService";
-import { UserEntity } from "../../../domain/entities/UserEntity";
-import type { IGithubAuthService } from "../../ports/security/IGithubAuthService";
-import { BadRequestError } from "../../../core/errors/BadRequestError";
-import { UserRole } from "../../../domain/types/UserRole";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject,injectable } from 'tsyringe';
+import type { IGithubLoginUseCase } from '../interface/auth/IGithubLoginUseCase';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import type { IJWTService } from '../../ports/security/IJWTService';
+import { UserEntity } from '../../../domain/entities/UserEntity';
+import type { IGithubAuthService } from '../../ports/security/IGithubAuthService';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { UserRole } from '../../../domain/types/UserRole';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 
 @injectable()
@@ -22,7 +22,7 @@ export class GithubLoginUseCase implements IGithubLoginUseCase {
         
         const githubUser = await this._githubAuthService.getUserFromCode(code);
 
-        if(!githubUser.email) throw new BadRequestError("Invalid Github credentials");
+        if(!githubUser.email) throw new BadRequestError('Invalid Github credentials');
 
         let user = await this._userRepository.findByEmail(githubUser.email)
 

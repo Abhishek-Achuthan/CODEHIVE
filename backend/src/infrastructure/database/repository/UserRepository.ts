@@ -1,10 +1,10 @@
-import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { GenericRepository } from "./GenericRepository";
-import { UserEntity } from "../../../domain/entities/UserEntity";
-import UserModel from "../models/UserModel";
-import { UserDocument } from "../../../shared/types";
-import { FilterQuery, Model } from "mongoose";
-import { UserRole } from "../../../domain/types/UserRole";
+import { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { GenericRepository } from './GenericRepository';
+import { UserEntity } from '../../../domain/entities/UserEntity';
+import UserModel from '../models/UserModel';
+import { UserDocument } from '../../../shared/types';
+import { FilterQuery, Model } from 'mongoose';
+import { UserRole } from '../../../domain/types/UserRole';
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
@@ -28,8 +28,8 @@ export class UserRepository
     role: UserRole,
     currentPage: number = 1,
     pageSize: number = 10,
-    sort: string = "createdAt",
-    search: string = ""
+    sort: string = 'createdAt',
+    search: string = ''
   ): Promise<{users:UserEntity[];totalItems:number;totalPages:number}> {
     const query: FilterQuery<UserDocument> = { role };
 
@@ -39,9 +39,9 @@ export class UserRepository
     
     if (search) {
       query.$or = [
-        { firstName: { $regex: search, $options: "i" } },
-        { lastName: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
       ];
     }
 

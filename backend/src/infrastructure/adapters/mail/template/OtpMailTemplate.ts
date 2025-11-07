@@ -1,4 +1,4 @@
-import { IEmailTemplate } from "../../../../application/ports/mail/template/IEmailTemplate";
+import { IEmailTemplate } from '../../../../application/ports/mail/template/IEmailTemplate';
 
 export class OTPMailTemplate implements IEmailTemplate<{ otp: string }> {
   render(data: { otp: string }): { subject: string; html: string } {

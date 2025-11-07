@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { env } from "./envConfig";
+import mongoose from 'mongoose';
+import { env } from './envConfig';
 
 
 export class MongodbConfig {

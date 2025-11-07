@@ -1,4 +1,4 @@
-import { UserEntity } from "../../domain/entities/UserEntity";
+import { UserEntity } from '../../domain/entities/UserEntity';
 interface IUserRegisterInputDTO {
   firstName: string;
   lastName: string;
@@ -12,9 +12,9 @@ interface IUserLoginInputDTO {
   password: string;
 }
 
-interface IUserLoginResponseDTO extends Omit<UserEntity, "password"> {
-  accessToken? : string,
-  refreshToken? : string
+interface IUserLoginResponseDTO extends Omit<UserEntity, 'password'> {
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 interface IUserListResponseDTO {
@@ -32,5 +32,5 @@ export type {
   IUserRegisterInputDTO,
   IUserLoginInputDTO,
   IUserLoginResponseDTO,
-  IUserListResponseDTO
+  IUserListResponseDTO,
 };

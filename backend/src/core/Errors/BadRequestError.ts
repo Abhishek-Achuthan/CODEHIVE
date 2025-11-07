@@ -1,5 +1,5 @@
-import { HttpStatus } from "../../shared/httpStatusCode";
-import { BaseError } from "./BaseError";
+import { HttpStatus } from '../../shared/httpStatusCode';
+import { BaseError } from './BaseError';
 
 
 export class BadRequestError extends BaseError {

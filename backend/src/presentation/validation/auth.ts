@@ -12,27 +12,27 @@ export type RegisterUserInput = z.infer<typeof RegisterUserSchema>;
 
 
 export const LoginUserSchema = z.object({
-  email:z.string('Invalid email address'),
+  email:z.email('Invalid email address'),
   password: z.string().min(6,'Invalid password')
 });
 
 export type LoginUserInput = z.infer<typeof LoginUserSchema>;
 
 export const EmailOnlySchema = z.object({
-  email: z.email('Invalid email address'),
+  email: email('Invalid email address'),
 });
 
 export type EmailOnlyInput = z.infer<typeof EmailOnlySchema>;
 
 export const ForgotPasswordVerifySchema = z.object({
   otp: z.string().min(1, 'OTP is required'),
-  email: z.email('Invalid email address'),
+  email: email('Invalid email address'),
 });
 
 export type ForgotPasswordVerifyInput = z.infer<typeof ForgotPasswordVerifySchema>;
 
 export const ResetPasswordSchema = z.object({
-  email: z.email('Invalid email address'),
+  email: email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 

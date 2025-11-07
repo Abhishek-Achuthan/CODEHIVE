@@ -1,7 +1,7 @@
-import { IGenericRepository } from "./IGenericRepository";
-import { UserEntity } from "../entities/UserEntity";
-import { UserDocument } from "../../shared/types";
-import { UserRole } from "../types/UserRole";
+import { IGenericRepository } from './IGenericRepository';
+import { UserEntity } from '../entities/UserEntity';
+import { UserDocument } from '../../shared/types';
+import { UserRole } from '../types/UserRole';
 
 export interface IUserRepository
   extends IGenericRepository<UserDocument, UserEntity> {

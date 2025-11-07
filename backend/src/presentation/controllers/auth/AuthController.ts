@@ -1,53 +1,53 @@
-import { inject, injectable } from "tsyringe";
-import { Request, Response, NextFunction } from "express";
-import { removeCookie, setCookie, setAccessibleCookie } from "../../utils/cookieHelper";
-import { HttpStatus } from "../../../shared/httpStatusCode";
-import type { ISendOTPUseCase } from "../../../application/useCase/interface/auth/ISendOTPUseCase";
-import type { IUserRegisterUseCase } from "../../../application/useCase/interface/auth/IUserRegisterUseCase";
-import type { IVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IVerifyOTPUseCase";
-import type { IUserLoginUseCase } from "../../../application/useCase/interface/auth/IUserLoginUseCase";
-import type { IForgotPasswordSendOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
-import type { IForgotPasswordVerifyOTPUseCase } from "../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
-import type { IResetPasswordUseCase } from "../../../application/useCase/interface/auth/IResetPasswordUseCase";
-import type { IUserLogoutUseCase } from "../../../application/useCase/interface/auth/IUserLogoutUseCase";
-import type { IRefreshAccessTokenUseCase } from "../../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
-import type { IGoogleLoginUseCase } from "../../../application/useCase/interface/auth/IGoogleLoginUseCase";
-import type { IGithubLoginUseCase } from "../../../application/useCase/interface/auth/IGithubLoginUseCase";
-import type { IInitiateGithubOAuthUseCase } from "../../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase";
+import { inject, injectable } from 'tsyringe';
+import { Request, Response, NextFunction } from 'express';
+import { removeCookie, setCookie, setAccessibleCookie } from '../../utils/cookieHelper';
+import { HttpStatus } from '../../../shared/httpStatusCode';
+import type { ISendOTPUseCase } from '../../../application/useCase/interface/auth/ISendOTPUseCase';
+import type { IUserRegisterUseCase } from '../../../application/useCase/interface/auth/IUserRegisterUseCase';
+import type { IVerifyOTPUseCase } from '../../../application/useCase/interface/auth/IVerifyOTPUseCase';
+import type { IUserLoginUseCase } from '../../../application/useCase/interface/auth/IUserLoginUseCase';
+import type { IForgotPasswordSendOTPUseCase } from '../../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase';
+import type { IForgotPasswordVerifyOTPUseCase } from '../../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase';
+import type { IResetPasswordUseCase } from '../../../application/useCase/interface/auth/IResetPasswordUseCase';
+import type { IUserLogoutUseCase } from '../../../application/useCase/interface/auth/IUserLogoutUseCase';
+import type { IRefreshAccessTokenUseCase } from '../../../application/useCase/interface/auth/IRefreshAccessTokenUseCase';
+import type { IGoogleLoginUseCase } from '../../../application/useCase/interface/auth/IGoogleLoginUseCase';
+import type { IGithubLoginUseCase } from '../../../application/useCase/interface/auth/IGithubLoginUseCase';
+import type { IInitiateGithubOAuthUseCase } from '../../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
 import {
   LoginUserSchema,
   RegisterUserSchema,
   EmailOnlySchema,
   ForgotPasswordVerifySchema,
   ResetPasswordSchema,
-} from "../../validation/auth";
+} from '../../validation/auth';
 
 @injectable()
 export class AuthController {
   constructor(
-    @inject("IUserRegisterUseCase")
+    @inject('IUserRegisterUseCase')
     private readonly _userRegisterUseCase: IUserRegisterUseCase,
-    @inject("ISendOTPUseCase")
+    @inject('ISendOTPUseCase')
     private readonly _sendOTPUseCase: ISendOTPUseCase,
-    @inject("IVerifyOTPUseCase")
+    @inject('IVerifyOTPUseCase')
     private readonly _verifyOTPUseCase: IVerifyOTPUseCase,
-    @inject("IUserLoginUseCase")
+    @inject('IUserLoginUseCase')
     private readonly _userLoginUseCase: IUserLoginUseCase,
-    @inject("IForgotPasswordSendOTPUseCase")
+    @inject('IForgotPasswordSendOTPUseCase')
     private readonly _forgotPasswordSendOtpUseCase: IForgotPasswordSendOTPUseCase,
-    @inject("IForgotPasswordVerifyOTPUseCase")
+    @inject('IForgotPasswordVerifyOTPUseCase')
     private readonly _forgotPasswordVerifyOtpUseCase: IForgotPasswordVerifyOTPUseCase,
-    @inject("IResetPasswordUseCase")
+    @inject('IResetPasswordUseCase')
     private readonly _resetPassword: IResetPasswordUseCase,
-    @inject("IUserLogoutUseCase")
+    @inject('IUserLogoutUseCase')
     private readonly _userLogoutUseCase: IUserLogoutUseCase,
-    @inject("IRefreshAccessTokenUseCase")
+    @inject('IRefreshAccessTokenUseCase')
     private readonly _refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
-    @inject("IGoogleLoginUseCase")
+    @inject('IGoogleLoginUseCase')
     private readonly _googleLoginUseCase: IGoogleLoginUseCase,
-    @inject("IGithubLoginUseCase")
+    @inject('IGithubLoginUseCase')
     private readonly _githubLoginUseCase: IGithubLoginUseCase,
-    @inject("IInitiateGithubOAuthUseCase")
+    @inject('IInitiateGithubOAuthUseCase')
     private readonly _initiateGithubOAuthUseCase: IInitiateGithubOAuthUseCase
   ) {}
 
@@ -70,7 +70,7 @@ export class AuthController {
 
       return res
         .status(HttpStatus.Created)
-        .json({ success: true, message: "User registered successfully" });
+        .json({ success: true, message: 'User registered successfully' });
     } catch (error) {
       next(error);
     }
@@ -84,7 +84,7 @@ export class AuthController {
 
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, message: "OTP send successfully" });
+        .json({ success: true, message: 'OTP send successfully' });
     } catch (error) {
       next(error);
     }
@@ -98,12 +98,12 @@ export class AuthController {
 
       const { accessToken, refreshToken, ...userData } = data;
 
-      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+      if (refreshToken) setCookie(res, refreshToken, 'refreshToken');
 
       return res.status(HttpStatus.OK).json({
         success: true,
         data: { user: userData, accessToken: accessToken },
-        message: "Login successfull",
+        message: 'Login successfull',
       });
     } catch (error) {
       next(error);
@@ -122,7 +122,7 @@ export class AuthController {
 
       return res.status(HttpStatus.OK).json({
         success: true,
-        message: "OTP send successfully to your email!",
+        message: 'OTP send successfully to your email!',
       });
     } catch (error) {
       next(error);
@@ -145,7 +145,7 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({
         success: true,
         verified,
-        message: "OTP verified successfully",
+        message: 'OTP verified successfully',
       });
     } catch (error) {
       next(error);
@@ -160,7 +160,7 @@ export class AuthController {
 
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, message: "Password changed successfully" });
+        .json({ success: true, message: 'Password changed successfully' });
     } catch (error) {
       next(error);
     }
@@ -172,7 +172,7 @@ export class AuthController {
 
       if (token) await this._userLogoutUseCase.execute(token);
 
-      removeCookie(res, "refreshToken");
+      removeCookie(res, 'refreshToken');
 
       return res.status(HttpStatus.NoContent).send();
     } catch (error) {
@@ -190,7 +190,7 @@ export class AuthController {
       if (!refreshToken) {
         return res
           .status(HttpStatus.Forbidden)
-          .json({ success: false, message: "Missing refresh token" });
+          .json({ success: false, message: 'Missing refresh token' });
       }
 
       const accessToken = await this._refreshAccessTokenUseCase.execute(
@@ -211,12 +211,12 @@ export class AuthController {
 
       const { accessToken, refreshToken, user } = data;
 
-      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+      if (refreshToken) setCookie(res, refreshToken, 'refreshToken');
 
       return res.status(HttpStatus.OK).json({
         success: true,
         data: { user, accessToken: accessToken },
-        message: "Login successfull",
+        message: 'Login successfull',
       });
     } catch (error) {
       next(error);
@@ -237,10 +237,10 @@ export class AuthController {
     try {
       const { code } = req.query;
 
-      if (!code || typeof code !== "string") {
+      if (!code || typeof code !== 'string') {
         return res.status(HttpStatus.BadRequest).json({
           success: false,
-          message: "Missing or invalid authorization code",
+          message: 'Missing or invalid authorization code',
         });
       }
 
@@ -248,9 +248,9 @@ export class AuthController {
 
       const { accessToken, refreshToken, user } = data;
 
-      if (refreshToken) setCookie(res, refreshToken, "refreshToken");
+      if (refreshToken) setCookie(res, refreshToken, 'refreshToken');
 
-      setAccessibleCookie(res, accessToken, "accessToken");
+      setAccessibleCookie(res, accessToken, 'accessToken');
 
       const frontendUrl = process.env.FRONTEND_URL
       

@@ -1,5 +1,5 @@
-import { IGenericRepository } from "../../../domain/interfaces/IGenericRepository";
-import { Document, Model } from "mongoose";
+import { IGenericRepository } from '../../../domain/interfaces/IGenericRepository';
+import { Document, Model } from 'mongoose';
 
 export abstract class GenericRepository<T extends Document, E>
   implements IGenericRepository<T, E>

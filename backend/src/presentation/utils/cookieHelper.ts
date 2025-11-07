@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response } from 'express';
 
 export function setCookie(res:Response,value:string,item:string) {
     res.cookie(item,value,{

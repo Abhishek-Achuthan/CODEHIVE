@@ -1,4 +1,4 @@
-import { UserEntity } from "../../../../domain/entities/UserEntity";
+import { UserEntity } from '../../../../domain/entities/UserEntity';
 
 export interface IGoogleLoginUseCase {
     execute(idToken:string):Promise<{
