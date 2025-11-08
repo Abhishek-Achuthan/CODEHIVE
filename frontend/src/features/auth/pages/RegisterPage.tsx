@@ -12,7 +12,7 @@ export default function RegisterPage() {
         <section aria-label="Sign up form" className="mx-auto w-full max-w-md md:max-w-none">
           <SignUpForm 
             fields={signUpFields}
-            sendOTP={AuthService.sendOtp}
+            sendOTP={(data)=>AuthService.sendOtp(data)}
             loginUrl='/'
           />
         </section>
