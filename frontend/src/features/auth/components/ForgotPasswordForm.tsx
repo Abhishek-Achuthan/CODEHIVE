@@ -10,6 +10,8 @@ import { useOTP } from "../hooks/useOTP";
 import { OTPModal } from "../../../shared/ui/dialog/OTPModal";
 import { AuthService } from "../../../services/authService";
 import { useNavigate } from "react-router-dom";
+import { BaseError } from "../../../shared/errors/BaseError";
+import toast from "react-hot-toast";
 
 export function ForgotPasswordForm({
   loginUrl = "/login",
@@ -39,19 +41,34 @@ export function ForgotPasswordForm({
     async (data) => {
       if (!data.email) throw new Error("Email is required");
       
-      await AuthService.forgotPasswordSendOtp({email:data.email});
+      try {
+        const res = await AuthService.forgotPasswordSendOtp({email:data.email});
+        toast.success(res.message)
+      } catch (error) {
+        if(error instanceof BaseError) {
+          toast.error(error.message)
+        }
+      }
     },
     
    async (otp, values) => {
-  const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
-  if (res) {
-    navigate("/reset-password", {
-      state: { email: values.email, verified: true },
-    });
-    return true;
-  }
-  return false;
-},
+    
+    try {
+      const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
+      if (res) {
+        toast.success(res.message)
+        navigate("/reset-password", {
+          state: { email: values.email, verified: true },
+        });
+        return true;
+      }
+    } catch (error) {
+      if(error instanceof BaseError) {
+        toast.error(error.message);
+      }
+    }
+    return false;
+  },
     "email"
   );
 
