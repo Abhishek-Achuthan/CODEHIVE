@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { adminController, authMiddleware } from '../../config/di/resolver';
+import { adminController, authMiddleware, roleMiddleware } from '../../config/di/resolver';
 
 export class AdminRoute {
   private _router: Router;
@@ -15,11 +15,13 @@ export class AdminRoute {
     this._router.get(
       '/users',
       authMiddleware.check,
+      roleMiddleware.authorize(['admin']),
       this._adminController.handleListUsers.bind(this._adminController)
     );
     this._router.patch(
       '/update-user-status',
       authMiddleware.check,
+      roleMiddleware.authorize(['admin']),
       this._adminController.handleUpdateUserStatus.bind(this._adminController)
     );
   }
