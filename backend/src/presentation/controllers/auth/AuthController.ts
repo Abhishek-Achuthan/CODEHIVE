@@ -21,6 +21,8 @@ import {
   ForgotPasswordVerifySchema,
   ResetPasswordSchema,
 } from '../../validation/auth';
+import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class AuthController {
@@ -70,7 +72,7 @@ export class AuthController {
 
       return res
         .status(HttpStatus.Created)
-        .json({ success: true, message: 'User registered successfully' });
+        .json({ success: true, message: RESPONSE_MESSAGES.AUTH.REGISTER_SUCCESS });
     } catch (error) {
       next(error);
     }
@@ -81,10 +83,9 @@ export class AuthController {
       const { email } = EmailOnlySchema.parse(req.body);
 
       await this._sendOTPUseCase.execute(email);
-
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, message: 'OTP send successfully' });
+        .json({ success: true, message: RESPONSE_MESSAGES.AUTH.OTP_SENT });
     } catch (error) {
       next(error);
     }
@@ -103,7 +104,7 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({
         success: true,
         data: { user: userData, accessToken: accessToken },
-        message: 'Login successfull',
+        message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
       });
     } catch (error) {
       next(error);
@@ -122,7 +123,7 @@ export class AuthController {
 
       return res.status(HttpStatus.OK).json({
         success: true,
-        message: 'OTP send successfully to your email!',
+        message: RESPONSE_MESSAGES.AUTH.OTP_SENT,
       });
     } catch (error) {
       next(error);
@@ -145,7 +146,7 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({
         success: true,
         verified,
-        message: 'OTP verified successfully',
+        message: RESPONSE_MESSAGES.AUTH.OTP_VERIFIED,
       });
     } catch (error) {
       next(error);
@@ -160,7 +161,7 @@ export class AuthController {
 
       return res
         .status(HttpStatus.OK)
-        .json({ success: true, message: 'Password changed successfully' });
+        .json({ success: true, message: RESPONSE_MESSAGES.AUTH.PASSWORD_RESET });
     } catch (error) {
       next(error);
     }
@@ -190,7 +191,7 @@ export class AuthController {
       if (!refreshToken) {
         return res
           .status(HttpStatus.Forbidden)
-          .json({ success: false, message: 'Missing refresh token' });
+          .json({ success: false, message: ERROR_MESSAGES.AUTH.MISSING_REFRESH_TOKEN });
       }
 
       const accessToken = await this._refreshAccessTokenUseCase.execute(
@@ -216,7 +217,7 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({
         success: true,
         data: { user, accessToken: accessToken },
-        message: 'Login successfull',
+        message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
       });
     } catch (error) {
       next(error);
@@ -240,7 +241,7 @@ export class AuthController {
       if (!code || typeof code !== 'string') {
         return res.status(HttpStatus.BadRequest).json({
           success: false,
-          message: 'Missing or invalid authorization code',
+          message: ERROR_MESSAGES.AUTH.MISSING_OR_INVALID_AUTH_CODE,
         });
       }
 
