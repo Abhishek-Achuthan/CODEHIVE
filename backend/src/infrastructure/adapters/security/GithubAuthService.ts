@@ -4,6 +4,7 @@ import { env } from '../../../config/envConfig';
 import { IGithubAuthService } from '../../../application/ports/security/IGithubAuthService';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { UnauthorizedError } from '../../../core/errors/UnauthorizedError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class GitHubAuthService implements IGithubAuthService {
@@ -15,7 +16,7 @@ export class GitHubAuthService implements IGithubAuthService {
     this.clientSecret = env.githubClientSecret!;
 
     if (!this.clientId || !this.clientSecret) {
-      throw new NotFoundError('Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET in .env');
+      throw new NotFoundError(ERROR_MESSAGES.GITHUB.MISSING_ENV);
     }
   }
 
@@ -38,7 +39,7 @@ export class GitHubAuthService implements IGithubAuthService {
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new UnauthorizedError('GitHub authentication failed');
+        throw new UnauthorizedError(ERROR_MESSAGES.GITHUB.INVALID_CREDENTIALS);
       }
       throw error;
     }
@@ -57,7 +58,7 @@ export class GitHubAuthService implements IGithubAuthService {
 
     const accessToken = response.data.access_token;
     if (!accessToken) {
-      throw new UnauthorizedError('Failed to retrieve GitHub access token');
+      throw new UnauthorizedError(ERROR_MESSAGES.GITHUB.ACCESS_TOKEN_FAILED);
     }
 
     return accessToken;
@@ -82,7 +83,7 @@ export class GitHubAuthService implements IGithubAuthService {
 
     const email = response.data.find((e: any) => e.primary)?.email;
     if (!email) {
-      throw new NotFoundError('No email found for GitHub user');
+      throw new NotFoundError(ERROR_MESSAGES.GITHUB.USER_EMAIL_NOT_FOUND);
     }
 
     return email;

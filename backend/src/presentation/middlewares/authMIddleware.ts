@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IJWTService } from '../../application/ports/security/IJWTService';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
 import { JwtPayload } from 'jsonwebtoken';
+import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
 
 @injectable()
 export class AuthMiddleware {
@@ -15,19 +16,19 @@ export class AuthMiddleware {
       const header = req.header('Authorization');
 
       if (!header?.startsWith('Bearer ')) {
-        return next(new UnauthorizedError('Invalid Token'));
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
       const token = header.split(' ')[1];
 
       if (!token) {
-        return next(new UnauthorizedError('Invalid Token'));
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
       const decoded = this._jwtService.verifyAccessToken(token) as JwtPayload;
 
       if (!decoded) {
-        return next(new UnauthorizedError('Invalid Token'));
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
       (req as any).user = {
@@ -38,9 +39,9 @@ export class AuthMiddleware {
       next();
     } catch (error) {
       if (error instanceof Error) {
-        return next(new UnauthorizedError('Invalid or expired token'));
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
-      return next(new UnauthorizedError('Authentication failed'));
+      return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED));
     }
   };
 }

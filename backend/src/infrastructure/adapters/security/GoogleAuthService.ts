@@ -3,6 +3,7 @@ import { IGoogleAuthService } from '../../../application/ports/security/IGoogleA
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { injectable } from 'tsyringe';
 import { env } from '../../../config/envConfig';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class GoogleAuthService implements IGoogleAuthService {
@@ -17,7 +18,7 @@ export class GoogleAuthService implements IGoogleAuthService {
   this.redirectUri =  'postmessage';
 
   if (!this.clientId || !this.clientSecret) {
-    throw new NotFoundError('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET in .env');
+    throw new NotFoundError(ERROR_MESSAGES.GOOGLE.MISSING_ENV);
   }
 
   this.client = new OAuth2Client(this.clientId, this.clientSecret, this.redirectUri);
@@ -33,7 +34,7 @@ export class GoogleAuthService implements IGoogleAuthService {
     const { tokens } = await this.client.getToken(authCode);
     const idToken = tokens.id_token;
 
-    if (!idToken) throw new NotFoundError('Failed to retrieve Google ID token');
+    if (!idToken) throw new NotFoundError(ERROR_MESSAGES.GOOGLE.INVALID_TOKEN);
 
     const ticket = await this.client.verifyIdToken({
       idToken,
@@ -41,7 +42,7 @@ export class GoogleAuthService implements IGoogleAuthService {
     });
 
     const payload = ticket.getPayload();
-    if (!payload) throw new NotFoundError('Invalid Google Token');
+    if (!payload) throw new NotFoundError(ERROR_MESSAGES.GOOGLE.INVALID_PAYLOAD);
 
     const [firstName, ...rest] = (payload.name ?? '').split(' ');
     return {

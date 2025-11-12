@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UserRole } from '../../../domain/types/UserRole';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import type { IUpdateUserStatusUseCase } from '../../../application/useCase/interface/admin/IUpdateUserStatusUseCase';
+import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 
 @injectable()
 export class AdminController {
@@ -47,7 +48,7 @@ export class AdminController {
 
       await this._updateUserStatusUseCase.execute(id, status);
 
-      res.status(HttpStatus.OK).json({success:true});
+      res.status(HttpStatus.OK).json({success:true,message:RESPONSE_MESSAGES.ADMIN.USER_STATUS_UPDATE});
     } catch (error) {
       next(error);
     }

@@ -26,7 +26,7 @@ export class GoogleLoginUseCase implements IGoogleLoginUseCase {
         
         const googleUser = await this._googleAuthService.verifyGoogleToken(idToken);
 
-        if(!googleUser.email) throw new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_GOOGLE_CREDENTIALS);
+        if(!googleUser.email) throw new UnauthorizedError(ERROR_MESSAGES.GOOGLE.INVALID_CREDENTIALS);
 
         let user = await this._userRepository.findByEmail(googleUser.email);
 
