@@ -8,6 +8,8 @@ import type { RegisterData, SignUpFormProps } from '../../../shared/types/authTy
 import { FormField } from './FormField';
 import { Link } from 'react-router-dom';
 import { AuthService } from '../../../services/authService';
+import toast from 'react-hot-toast';
+import { BaseError } from '../../../shared/errors/BaseError';
 
 export function SignUpForm({
   fields = [],
@@ -38,17 +40,36 @@ export function SignUpForm({
     handleVerifyOtp,
   } = useOTP<RegisterData>(
     async (data) => {
-      if (!data.email) throw new Error('Email is required');
-      if (sendOTP) {
-        await sendOTP({ email: data.email });
-      } else {
-        throw new Error('Send OTP function is not available');
+      try {
+        if (!data.email) throw new Error('Email is required');
+        if(!sendOTP) {
+          throw new Error('Send OTP function is not available');
+        }
+        const res = await sendOTP({ email: data.email });
+        toast.success(res.data.message);
+        
+      } catch (error) {
+        if(error instanceof BaseError) {
+          if(error.status===409) {
+           toast.error(error.message);
+           throw error
+          }
+        }
       }
     },
     async (otp, values) => {
-      const res = await AuthService.register(otp, values);
-      if(res?.success) return true;
-      return false;
+
+      try {
+        const res = await AuthService.register(otp, values);
+        toast.success(res.message)
+        if(res?.success) return true;
+        return false
+      } catch (error) {
+        if(error instanceof BaseError) {
+          toast.error(error.message);
+        }
+        return false
+      }
     },
     'email'
   );

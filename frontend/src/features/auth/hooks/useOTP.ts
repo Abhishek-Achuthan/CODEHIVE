@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export function useOTP<TValues extends Record<string, unknown>>(
@@ -10,13 +10,19 @@ export function useOTP<TValues extends Record<string, unknown>>(
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [otpActiveFor, setOtpActiveFor] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!otpModalOpen) {
+      setOtpActiveFor(null);
+    }
+  }, [otpModalOpen]);
+
   const handleSubmit = async (values: TValues): Promise<void> => {
     const recipient = values[otpVia];
     if (!recipient) return;
 
-    if (otpActiveFor === recipient) {
-      setOtpModalOpen(true);
-      return;
+    if (otpActiveFor && otpActiveFor !== recipient) {
+      setOtpActiveFor(null);
+      setOtpModalOpen(false);
     }
 
     try {
@@ -24,15 +30,10 @@ export function useOTP<TValues extends Record<string, unknown>>(
       setOtpActiveFor(recipient as string);
       setOtpModalOpen(true);
     } catch (error) {
+      setOtpActiveFor(null);
+      setOtpModalOpen(false);
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message)
-        const status = error?.response?.status;
-        if (status === 429) {
-          setOtpActiveFor(recipient as string);
-          setOtpModalOpen(true);
-        } else {
-          throw error;
-        }
+        toast.error(error.response?.data?.message || "Failed to send OTP");
       }
     }
   };
@@ -45,7 +46,7 @@ export function useOTP<TValues extends Record<string, unknown>>(
       await onSend({ [otpVia]: recipient } as Partial<TValues>);
       setOtpActiveFor(recipient as string);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
 
     setOtpModalOpen(true);
