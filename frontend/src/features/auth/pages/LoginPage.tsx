@@ -1,32 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../../layouts/AuthLayout";
 import { LoginLeftIntro } from "../components/LoginLeftIntro";
 import { LoginForm } from "../components/LoginForm";
-import type { LoginData } from "../../../shared/types/authTypes";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../../store/slices/authSlice";
-import { AuthService } from "../../../services/authService";
+import { useLogin } from "../hooks/useLogin";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const handleLogin = async (data: LoginData) => {
-
-      const response = await AuthService.login(data);
-
-      const { user, accessToken } = response.data;
-
-      dispatch(loginSuccess({ user, accessToken }));
-
-      if (response.success === true) {
-        if (response.data.user.role === "user") {
-          navigate("/home");
-        } else if (response.data.user.role === "admin") {
-          navigate('/admin/users')
-        }
-      }
-  };
+  const { login, isLoading } = useLogin();
 
   return (
     <AuthLayout>
@@ -37,9 +15,10 @@ export default function LoginPage() {
           className="mx-auto w-full max-w-md md:max-w-none"
         >
           <LoginForm
-            onSubmit={handleLogin}
+            onSubmit={login}
             registerUrl="/register"
             forgotPasswordUrl="/forgot-password"
+            isLoading={isLoading}
           />
         </section>
       </div>
