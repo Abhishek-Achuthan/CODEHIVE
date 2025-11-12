@@ -6,8 +6,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "../features/auth/pages/ResetPasswordPage";
 import AuthCallbackPage from "../features/auth/pages/AuthCallbackPage";
-import { UserManagementPage } from "../features/admin/pages/UserMangementPage";
-import MentorManagementPage from "../features/admin/pages/MentorMangementPage";
+import { UserManagementPage } from "../features/admin/pages/UserManagementPage";
+import { MentorManagementPage } from "../features/admin/pages/MentorManagementPage";
 import PublicRoute from "./PublicRoute";
 
 export default function AppRoutes() {
