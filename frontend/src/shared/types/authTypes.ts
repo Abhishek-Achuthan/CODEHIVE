@@ -51,9 +51,10 @@ export interface FieldComponentProps {
 
 export interface LoginFormProps {
   onSubmit: (data: LoginData) => Promise<void>;
-  registerUrl?: string;
-  forgotPasswordUrl?: string;
+  registerUrl?: string | undefined;
+  forgotPasswordUrl?: string | undefined;
   className?: string;
+  isLoading?:boolean
 }
 
 export interface SignUpFormProps {

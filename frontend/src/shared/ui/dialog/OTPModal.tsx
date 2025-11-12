@@ -86,7 +86,7 @@ export function OTPModal({
     }
   };
 
- 
+  
   React.useEffect(() => {
     if (open) {
       setOtp(Array(length).fill(""));

@@ -1,31 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../../store/slices/authSlice';
-import { useAppSelector } from '../../../shared/hooks/storeHooks';
-import { AuthService } from '../../../services/authService';
+import { useLogout } from '../../auth/hooks/useLogout';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user } = useAppSelector((state) => state.auth);
 
-  const handleLogout =async  () => {
-    try {
-      await AuthService.logout();
-    } catch (error) {
-      console.log('log out error',error);
-    }finally{
-      
-      dispatch(logout());
-
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      sessionStorage.clear();
-
-      navigate('/');
-    }
-  };
-
+  const {logOut,user} = useLogout();
 
   return (
     <div className="min-h-screen bg-black">
@@ -56,7 +33,7 @@ const LandingPage = () => {
                 Welcome, {user?.firstName || user?.email}!
               </span>
               <button 
-                onClick={handleLogout}
+                onClick={logOut}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
               >
                 Logout
