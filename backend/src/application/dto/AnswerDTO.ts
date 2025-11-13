@@ -1,4 +1,4 @@
-export interface AnswerResponseDTO {
+export interface IAnswerResponseDTO {
   id: string;
   questionId: string;
   answeredBy: string;
@@ -9,13 +9,13 @@ export interface AnswerResponseDTO {
   updatedAt: Date;
 }
 
-export interface CreateAnswerInputDTO {
+export interface ICreateAnswerInputDTO {
   questionId: string;
   answeredBy: string;
   answerText: string;
 }
 
-export interface UpdateAnswerInputDTO {
+export interface IUpdateAnswerInputDTO {
   id: string; 
   answerText?: string;
 }

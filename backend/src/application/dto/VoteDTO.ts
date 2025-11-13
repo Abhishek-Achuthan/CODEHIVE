@@ -1,7 +1,7 @@
 import { VoteValue } from '../../domain/types/VoteValue';
 import { VoteType } from '../../domain/types/VoteType';
 
-export interface VoteResponseDTO {
+export interface IVoteResponseDTO {
   id: string;
   userId: string;
   targetId: string;
@@ -11,7 +11,7 @@ export interface VoteResponseDTO {
   updatedAt: Date;
 }
 
-export interface CreateVoteInputDTO {
+export interface ICreateVoteInputDTO {
   userId: string;
   targetId: string;               
   targetType: VoteType;

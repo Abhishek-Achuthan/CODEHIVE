@@ -1,4 +1,4 @@
-export interface QuestionResponseDTO {
+export interface IQuestionResponseDTO {
   id: string;
   title: string;
   description: string;
@@ -12,21 +12,21 @@ export interface QuestionResponseDTO {
   updatedAt: Date;
 }
 
-export interface CreateQuestionInputDTO {
+export interface ICreateQuestionInputDTO {
   title: string;
   description: string;
   askedBy: string;  
   tags?: string[];  
 }
 
-export interface UpdateQuestionInputDTO {
+export interface IUpdateQuestionInputDTO {
   id: string;             
   title?: string;
   description?: string;
   tags?: string[];
 }
 
-export interface QuestionListQueryDTO {
+export interface IQuestionListQueryDTO {
   page?: number;
   limit?: number;
   tag?: string;
