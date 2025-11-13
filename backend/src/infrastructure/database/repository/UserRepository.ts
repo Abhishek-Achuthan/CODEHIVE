@@ -2,9 +2,11 @@ import { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import { GenericRepository } from './GenericRepository';
 import { UserEntity } from '../../../domain/entities/UserEntity';
 import UserModel from '../models/UserModel';
-import { UserDocument } from '../../../shared/types';
+import { UserDocument } from '../schemas/UserSchema';
 import { FilterQuery, Model } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
+
+
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
