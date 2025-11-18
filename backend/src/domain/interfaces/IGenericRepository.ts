@@ -1,7 +1,7 @@
-export interface IGenericRepository<T, E> {
-  create(data: Partial<T>): Promise<E>;
-  update(id: string, data: Partial<T>): Promise<T | null>;
-  delete(id: string): Promise<T | null>;
-  getAll(): Promise<T[]>;
-  find(id: string): Promise<T | null>
+export interface IGenericRepository<E> {
+  create(data: Partial<E>): Promise<E>;
+  update(id: string, data: Partial<E>): Promise<E | null>;
+  delete(id: string): Promise<E | null>;
+  getAll(): Promise<E[]>;
+  find(id: string): Promise<E | null>
 }

@@ -1,10 +1,10 @@
 import { IGenericRepository } from './IGenericRepository';
 import { UserEntity } from '../entities/UserEntity';
-import { UserDocument } from '../../shared/types';
 import { UserRole } from '../types/UserRole';
+import { PaginationResult } from '../types/PaginationResult';
 
 export interface IUserRepository
-  extends IGenericRepository<UserDocument, UserEntity> {
+  extends IGenericRepository< UserEntity > {
   findByEmail(email: string): Promise<UserEntity | null>;
 
   getAllUsers(
@@ -13,5 +13,5 @@ export interface IUserRepository
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<{users:UserEntity[];totalItems:number;totalPages:number}>;
+  ): Promise<PaginationResult<UserEntity>>;
 }
