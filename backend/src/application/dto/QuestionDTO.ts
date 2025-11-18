@@ -1,3 +1,6 @@
+import { QuestionListFilter } from '../../domain/types/QuestionListFilter';
+import { QuestionSort } from '../../domain/types/QuestionSort';
+
 export interface IQuestionResponseDTO {
   id: string;
   title: string;
@@ -13,10 +16,10 @@ export interface IQuestionResponseDTO {
 }
 
 export interface ICreateQuestionInputDTO {
-  title: string;
+  title: string ;
   description: string;
   askedBy: string;  
-  tags?: string[];  
+  tags: string[];  
 }
 
 export interface IUpdateQuestionInputDTO {
@@ -27,9 +30,10 @@ export interface IUpdateQuestionInputDTO {
 }
 
 export interface IQuestionListQueryDTO {
+  filter?:QuestionListFilter
   page?: number;
   limit?: number;
   tag?: string;
-  askedBy?: string;
-  sortBy?: 'newest' | 'votes' | 'views';
+  sortBy?: QuestionSort
+  search?:string;
 }
