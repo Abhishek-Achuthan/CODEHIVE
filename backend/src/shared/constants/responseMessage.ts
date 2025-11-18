@@ -8,5 +8,10 @@ export const RESPONSE_MESSAGES = {
   },
   ADMIN: {
     USER_STATUS_UPDATE:'User blocked successfully.'
+  },
+  QA: {
+    QUESTION_POSTED: 'Question posted successfully.',
+    ANSWER_POSTED: 'Answer posted successfully.',
+    VOTE_REGISTERED: 'Your vote has been recorded.',
   }
 };
