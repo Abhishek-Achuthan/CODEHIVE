@@ -4,6 +4,7 @@ import type { IUserRepository } from '../../../domain/interfaces/IUserRepository
 import { UserRole } from '../../../domain/types/UserRole';
 import { UserMapper } from '../../mapper/userMapper';
 import { IUserListResponseDTO } from '../../dto/UserDTO';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
 
 @injectable()
 export class ListUsersUseCase implements IListUsersUseCase {
@@ -17,8 +18,8 @@ export class ListUsersUseCase implements IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<{users :IUserListResponseDTO[];totalItems:number,totalPages:number}> {
-    const {users,totalItems,totalPages} = await this._userRepository.getAllUsers(
+  ): Promise<PaginationResult<IUserListResponseDTO>> {
+    const {items,totalItems,totalPages} = await this._userRepository.getAllUsers(
       role,
       currentPage,
       pageSize,
@@ -26,10 +27,10 @@ export class ListUsersUseCase implements IListUsersUseCase {
       search
     );
 
-    const mappedUsers = UserMapper.toUserListArray(users);
+    const mappedUsers = UserMapper.toUserListArray(items);
 
     return {
-      users: mappedUsers,
+      items: mappedUsers,
       totalItems,
       totalPages
     }

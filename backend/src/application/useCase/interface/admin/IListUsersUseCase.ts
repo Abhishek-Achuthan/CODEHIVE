@@ -1,3 +1,4 @@
+import { PaginationResult } from '../../../../domain/types/PaginationResult';
 import { UserRole } from '../../../../domain/types/UserRole';
 import { IUserListResponseDTO } from '../../../dto/UserDTO';
 
@@ -8,5 +9,5 @@ export interface IListUsersUseCase {
     pageSize?: number,
     sort?: string,
     search?: string
-  ): Promise<{users :IUserListResponseDTO[];totalItems:number,totalPages:number}>;
+  ): Promise<PaginationResult<IUserListResponseDTO>>;
 }
