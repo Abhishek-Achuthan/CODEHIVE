@@ -1,6 +1,7 @@
-import { Schema, Types } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 
-export interface QuestionDoc {
+export interface QuestionDoc extends Document{
+  _id: Types.ObjectId,
   title:string,
   description:string,
   isAnswered:boolean,
@@ -8,7 +9,9 @@ export interface QuestionDoc {
   askedBy:Types.ObjectId,
   tags:string[],
   views:number,
-  votes:number
+  votes:number,
+  createdAt:Date,
+  updatedAt:Date
 }
 
 export const QuestionSchema = new Schema<QuestionDoc>(

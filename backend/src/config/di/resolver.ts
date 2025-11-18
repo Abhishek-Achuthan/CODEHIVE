@@ -2,9 +2,10 @@ import { container } from 'tsyringe';
 
 import { ContainerSetup } from './container';
 import { AuthController } from '../../presentation/controllers/auth/AuthController';
-import { AdminController } from '../../presentation/controllers/auth/AdminController';
+import { AdminController } from '../../presentation/controllers/admin/AdminController';
 import { AuthMiddleware } from '../../presentation/middlewares/authMIddleware';
 import { RoleMiddleware } from '../../presentation/middlewares/roleMiddleware';
+import { QuestionController } from '../../presentation/controllers/qna/QuestionController';
 
 ContainerSetup.registerAll();
 
@@ -15,6 +16,8 @@ export const adminController = container.resolve(AdminController);
 export const authMiddleware = container.resolve(AuthMiddleware);
 
 export const roleMiddleware = container.resolve(RoleMiddleware);
+
+export const questionController =  container.resolve(QuestionController);
 
 
 

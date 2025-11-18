@@ -9,6 +9,7 @@ import { env } from './config/envConfig';
 import cors from 'cors';
 import { errorHandler } from './presentation/middlewares/errorHanlder';
 import cookieParser from 'cookie-parser';
+import { QuestionRoutes } from './presentation/routes/QuestionRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -34,16 +35,18 @@ export class App {
         credentials: true,
       })
     );
-    this._app.use(express.urlencoded({extended:true}));
     this._app.use(express.json());
+    this._app.use(express.urlencoded({extended:true}));
     this._app.use(cookieParser());
   }
 
   private configRoutes() {
     const authRoute = new AuthRoute();
     const adminRoute = new AdminRoute();
+    const questionRoute = new QuestionRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
-    this._app.use('/api/admin/',adminRoute.getRoutes());
+    this._app.use('/api/admin',adminRoute.getRoutes());
+    this._app.use('/api/qna',questionRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
