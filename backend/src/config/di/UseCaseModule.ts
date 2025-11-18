@@ -27,9 +27,15 @@ import { IGithubLoginUseCase } from '../../application/useCase/interface/auth/IG
 import { GithubLoginUseCase } from '../../application/useCase/auth/GithubLoginUseCase';
 import { IInitiateGithubOAuthUseCase } from '../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
 import { InitiateGithubOAuthUseCase } from '../../application/useCase/auth/InitiateGithubOAuthUseCase';
+import { ICreateQuestionUseCase } from '../../application/useCase/interface/qna/ICreateQuestionUseCase';
+import { CreateQuestionUseCase } from '../../application/useCase/qna/createQuestionUseCase';
+import { IListQuestionUseCase } from '../../application/useCase/interface/qna/IListQuestionsUseCase';
+import { ListQuestionUseCase } from '../../application/useCase/qna/ListQuestionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
+    //----------------------------------Auth----------------------------------------//
+     
     container.register<IUserRegisterUseCase>('IUserRegisterUseCase', {
       useClass: UserRegisterUseCase,
     });
@@ -63,7 +69,33 @@ export class UseCaseModule {
     container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
       useClass: ResetPasswordUseCase,
     });
+    
+    container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
+      useClass: UserLogoutUseCase,
+    });
+    
+    container.register<IRefreshAccessTokenUseCase>(
+      'IRefreshAccessTokenUseCase',
+      {
+        useClass: RefreshAccessTokenUseCase,
+      }
+    );
+    
+    container.register<IGoogleLoginUseCase>('IGoogleLoginUseCase', {
+      useClass: GoogleLoginUseCase,
+    });
+    
+    container.register<IGithubLoginUseCase>('IGithubLoginUseCase', {
+      useClass: GithubLoginUseCase,
+    });
+    
+    container.register<IInitiateGithubOAuthUseCase>('IInitiateGithubOAuthUseCase', {
+      useClass: InitiateGithubOAuthUseCase,
+    });
 
+    //----------------------------------Admin----------------------------------------//
+
+    
     container.register<IListUsersUseCase>('IListUsersUseCase', {
       useClass: ListUsersUseCase,
     });
@@ -72,27 +104,15 @@ export class UseCaseModule {
       useClass: UpdateUserStatusUseCase,
     });
 
-    container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
-      useClass: UserLogoutUseCase,
+    //----------------------------------QnA----------------------------------------//
+
+    container.register<ICreateQuestionUseCase>('ICreateQuestionUseCase', {
+      useClass: CreateQuestionUseCase,
     });
 
-    container.register<IRefreshAccessTokenUseCase>(
-      'IRefreshAccessTokenUseCase',
-      {
-        useClass: RefreshAccessTokenUseCase,
-      }
-    );
-
-    container.register<IGoogleLoginUseCase>('IGoogleLoginUseCase', {
-      useClass: GoogleLoginUseCase,
+    container.register<IListQuestionUseCase>('IListQuestionUseCase', {
+      useClass: ListQuestionUseCase,
     });
 
-    container.register<IGithubLoginUseCase>('IGithubLoginUseCase', {
-      useClass: GithubLoginUseCase,
-    });
-
-    container.register<IInitiateGithubOAuthUseCase>('IInitiateGithubOAuthUseCase', {
-      useClass: InitiateGithubOAuthUseCase,
-    });
   }
 }

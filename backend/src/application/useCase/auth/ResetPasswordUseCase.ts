@@ -22,5 +22,5 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
         await this._userRepository.update(user.id,{password:hashedPassword });
     }
-
+    
 }
