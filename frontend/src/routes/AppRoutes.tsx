@@ -9,6 +9,7 @@ import AuthCallbackPage from "../features/auth/pages/AuthCallbackPage";
 import { UserManagementPage } from "../features/admin/pages/UserManagementPage";
 import { MentorManagementPage } from "../features/admin/pages/MentorManagementPage";
 import PublicRoute from "./PublicRoute";
+import QnaLandigPage from "../features/qna/page/QnaLandingPage";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
           <Route path="/home" element={<LandingPage />} />
           <Route path="/admin/users" element={<UserManagementPage />} />
           <Route path="/admin/mentors" element={<MentorManagementPage />} />
+          <Route path="/qna" element={<QnaLandigPage/>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

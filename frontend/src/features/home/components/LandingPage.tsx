@@ -1,48 +1,15 @@
 import { useLogout } from '../../auth/hooks/useLogout';
+import Footer from '../../qna/components/Footer';
+import Header from '../../qna/components/Header';
 
 const LandingPage = () => {
 
-  const {logOut,user} = useLogout();
+  const {user} = useLogout();
 
   return (
+    <>
+    <Header/>
     <div className="min-h-screen bg-black">
-      <header className="bg-black border-b border-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="shrink-0">
-              <span className="text-2xl font-bold text-white">CODEHIVE</span>
-            </div>
-
-            <nav className="hidden md:flex space-x-8">
-              <a href="#product" className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium">
-                Product
-              </a>
-              <a href="#features" className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium">
-                Features
-              </a>
-              <a href="#customers" className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium">
-                Customers
-              </a>
-              <a href="#pricing" className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium">
-                Pricing
-              </a>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <span className="text-white text-sm">
-                Welcome, {user?.firstName || user?.email}!
-              </span>
-              <button 
-                onClick={logOut}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <section className="py-20 bg-linear-to-br from-blue-50 to-indigo-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -142,6 +109,9 @@ const LandingPage = () => {
         </div>
       </section>
     </div>
+      <Footer/>
+
+      </>
   );
 };
 

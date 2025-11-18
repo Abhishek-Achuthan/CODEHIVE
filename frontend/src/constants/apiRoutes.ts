@@ -1,3 +1,5 @@
+import type { questionList } from "../shared/types/qnaTypes";
+
 export const API_ROUTES = {
   AUTH: {
     USER_REGISTER: '/auth/users',
@@ -31,4 +33,32 @@ export const API_ROUTES = {
     },
     UPDATE_USER_STATUS :  `/admin/update-user-status`
   },
+
+  QnA: {
+  LIST_QUESTIONS: (params?: questionList) => {
+    const qp = new URLSearchParams();
+
+    if (!params) return `/qna/questions`;
+
+    if (params.page !== undefined) qp.append('page', String(params.page));
+    if (params.limit !== undefined) qp.append('limit', String(params.limit));
+    if (params.tag) qp.append('tag', params.tag);
+    if (params.search) qp.append('search', params.search);
+    if (params.sortBy) qp.append('sortBy', params.sortBy);
+
+    if (params.filter) {
+      const f = params.filter;
+      if (f.tags && f.tags.length > 0) qp.append('filter.tags', f.tags.join(',')); 
+      if (f.status) qp.append('filter.status', f.status);
+      if (f.bookmarkedOnly !== undefined) qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
+      if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
+      if (f.dateTo) qp.append('filter.dateTo', f.dateTo);
+      if (f.minAnswers !== undefined) qp.append('filter.minAnswers', String(f.minAnswers));
+      if (f.minVotes !== undefined) qp.append('filter.minVotes', String(f.minVotes));
+    }
+
+    const query = qp.toString();
+    return query ? `/qna/questions?${query}` : `/qna/questions`;
+  }
+}
 };
