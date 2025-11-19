@@ -6,7 +6,6 @@ export const QuestionListSchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10), 
   sortBy: z.enum(['newest', 'oldest', 'most_answered','most_voted','most_viewed']).optional().default('newest'),
   search: z.string().optional(),
-  tag: z.string().optional(),
   'filter.status': z.enum(['answered', 'unanswered', 'all']).optional(), 
   'filter.tags': z.string().transform((val) => val ? val.split(',').map(t => t.trim()).filter(Boolean) : []).optional(),
   'filter.dateFrom': z.string().optional(),

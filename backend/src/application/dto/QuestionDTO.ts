@@ -33,7 +33,6 @@ export interface IQuestionListQueryDTO {
   filter?:QuestionListFilter
   page?: number;
   limit?: number;
-  tag?: string;
   sortBy?: QuestionSort
   search?:string;
 }

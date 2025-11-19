@@ -57,7 +57,6 @@ export class UserRepository
   }
   protected toDocument(data: Partial<UserEntity>): Partial<UserDocument> {
     const {
-      id,
       email,
       firstName,
       lastName,

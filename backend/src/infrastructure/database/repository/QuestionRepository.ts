@@ -36,17 +36,13 @@ async list(data: IQuestionListQueryDTO): Promise<PaginationResult<QuestionEntity
     page = 1,
     sortBy,
     search,
-    tag
   } = data || {};
-  
-  
+    
   const query:FilterQuery<QuestionDoc> = {};
   
   const tags: string[] = [];
   if(filter?.tags?.length) tags.push(...filter.tags);
-  if(tag) tags.push(tag);
   if(tags.length) query.tags = {$in:tags};
-  
   
   if(filter?.status === QuestionStatus.ANSWERED) query.isAnswered = true;
   if(filter?.status === QuestionStatus.UNANSWERED) query.isAnswered = false;
@@ -90,7 +86,6 @@ async list(data: IQuestionListQueryDTO): Promise<PaginationResult<QuestionEntity
 }
     protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {
         const {
-            id,
             title,
             description,
             askedBy,
