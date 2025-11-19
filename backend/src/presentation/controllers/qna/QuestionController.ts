@@ -31,9 +31,9 @@ export class QuestionController {
   }
 
   async handleListQuestions(req: Request, res: Response, next: NextFunction) {
-    try {
+    try {                                             
       const data = QuestionListSchema.parse(req.query);
-      console.log(data)
+
       const questions = await this._listQuestionUseCase.execute(data);
 
       res.status(HttpStatus.OK).json({
