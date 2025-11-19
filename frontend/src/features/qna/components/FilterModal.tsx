@@ -142,7 +142,7 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
           <button
             onClick={handleApply}
             className={cn(
-              "flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition"
+              "flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition border border-white"
             )}
           >
             Apply Filters
