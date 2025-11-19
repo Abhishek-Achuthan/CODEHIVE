@@ -1,10 +1,20 @@
 export type questionList = {
   filter?:QuestionListFilter
   page?: number;
+  tags?: string[];
   limit?: number;
-  tag?: string;
   sortBy?: QuestionSort
   search?:string;
+}
+
+export type QuestionListAPIResponse = {
+  id:string,
+  title:string,
+  description:string,
+  tags:string[],
+  votes:number,
+  answerCount:number,
+  views:number,
 }
 
 export interface QuestionListFilter {

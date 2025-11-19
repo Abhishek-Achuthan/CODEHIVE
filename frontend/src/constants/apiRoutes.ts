@@ -42,7 +42,6 @@ export const API_ROUTES = {
 
     if (params.page !== undefined) qp.append('page', String(params.page));
     if (params.limit !== undefined) qp.append('limit', String(params.limit));
-    if (params.tag) qp.append('tag', params.tag);
     if (params.search) qp.append('search', params.search);
     if (params.sortBy) qp.append('sortBy', params.sortBy);
 
@@ -52,9 +51,6 @@ export const API_ROUTES = {
       if (f.status) qp.append('filter.status', f.status);
       if (f.bookmarkedOnly !== undefined) qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
       if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
-      if (f.dateTo) qp.append('filter.dateTo', f.dateTo);
-      if (f.minAnswers !== undefined) qp.append('filter.minAnswers', String(f.minAnswers));
-      if (f.minVotes !== undefined) qp.append('filter.minVotes', String(f.minVotes));
     }
 
     const query = qp.toString();

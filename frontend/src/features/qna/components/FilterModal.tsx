@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from '../../../shared/ui/dialog/Dialog';
 import { cn } from "../../../shared/utils/classNames";
 import type { QuestionListFilter, QuestionStatus } from "../../../shared/types/qnaTypes"; 
@@ -23,10 +22,9 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
     status: "all",
     bookmarkedOnly: false,
     dateFrom: "",
-    minAnswers: undefined,
-    minVotes: undefined,
     tags: [],
   });
+  const [tagInput, setTagInput] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -34,10 +32,9 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
         status: "all",
         bookmarkedOnly: false,
         dateFrom: "",
-        minAnswers: undefined,
-        minVotes: undefined,
         tags: [],
       });
+      setTagInput("");
     }
   }, [open]);
 
@@ -46,11 +43,15 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
 
   const handleApply = () => {
     const cleaned: FilterState = { ...filters };
+    
+    const parsedTags = tagInput.split(",").map((t) => t.trim()).filter(Boolean);
+    if (parsedTags.length > 0) {
+      cleaned.tags = parsedTags;
+    } else {
+      delete cleaned.tags;
+    }
 
     if (!cleaned.dateFrom) delete cleaned.dateFrom;
-    if (cleaned.minAnswers === undefined || cleaned.minAnswers === 0) delete cleaned.minAnswers;
-    if (cleaned.minVotes === undefined || cleaned.minVotes === 0) delete cleaned.minVotes;
-    if (!cleaned.tags || (Array.isArray(cleaned.tags) && cleaned.tags.length === 0)) delete cleaned.tags;
     if (cleaned.status === "all") delete cleaned.status;
 
     onApply(cleaned);
@@ -63,6 +64,7 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
       dateFrom: "",
       tags: [],
     });
+    setTagInput("");
   };
 
   return (
@@ -108,8 +110,8 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
             <input
               type="text"
               placeholder="e.g., react, javascript, typescript"
-              value={(filters.tags && Array.isArray(filters.tags)) ? (filters.tags as string[]).join(", ") : ""}
-              onChange={(e) => updateFilter("tags", e.target.value.split(",").map((t) => t.trim()).filter(Boolean))}
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
               className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
             />
           </div>

@@ -15,6 +15,7 @@ import type {
   QuestionListFilter,
   QuestionStatus,
   QuestionSort,
+  QuestionListAPIResponse,
 } from "../../../shared/types/qnaTypes";
 import toast from "react-hot-toast";
 import { Pagination } from "../../../shared/ui/Pagination";
@@ -53,10 +54,11 @@ export default function QuestionsList(): JSX.Element {
 
       const payload = response?.data ?? response ?? {};
       const items = Array.isArray(payload.items) ? payload.items : [];
+      console.log(items)
       const totalItems =
         typeof payload.totalItems === "number" ? payload.totalItems : 0;
 
-      const mappedQuestions: Question[] = items.map((q: any) => ({
+      const mappedQuestions: Question[] = items.map((q: QuestionListAPIResponse) => ({
         id: q.id,
         title: q.title,
         description: q.description,
@@ -273,7 +275,7 @@ export default function QuestionsList(): JSX.Element {
             </button>
           </div>
 
-          <button className="ml-auto px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg text-sm font-medium transition">
+          <button className="ml-auto px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg text-sm font-medium transition border border-white">
             Ask question
           </button>
         </div>
