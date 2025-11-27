@@ -4,7 +4,8 @@ import { HttpStatus } from '../../../shared/httpStatusCode';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import type { ICreateQuestionUseCase } from '../../../application/useCase/interface/qna/ICreateQuestionUseCase';
 import type { IListQuestionUseCase } from '../../../application/useCase/interface/qna/IListQuestionsUseCase';
-import { QuestionListSchema } from '../../validation/qnaValidations';
+import { CreateQuestionSchema, QuestionListSchema } from '../../validation/qnaValidations';
+import sanitizeHtml from 'sanitize-html'
 
 @injectable()
 export class QuestionController {
@@ -17,13 +18,25 @@ export class QuestionController {
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = req.body;
+      const validated = CreateQuestionSchema.parse(req.body);
 
-      await this._createQuestionUseCase.execute(data);
+      const cleanHtml = sanitizeHtml(validated.descriptionHtml, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','pre','code']),
+        allowedAttributes:{
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img:['src','alt'],
+          a:['href','target','rel'],
+        }
+      });
+
+      const payload = {...validated,descriptionHtml:cleanHtml,tags:validated.tags || []};
+
+      const created = await this._createQuestionUseCase.execute(payload);
 
       res.status(HttpStatus.Created).json({
         success: true,
         messsage: RESPONSE_MESSAGES.QA.QUESTION_POSTED,
+        data:created
       });
     } catch (error) {
       next(error);

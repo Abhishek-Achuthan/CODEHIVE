@@ -3,7 +3,7 @@ import { Document, Schema, Types } from 'mongoose';
 export interface QuestionDoc extends Document{
   _id: Types.ObjectId,
   title:string,
-  description:string,
+  descriptionHtml:string,
   isAnswered:boolean,
   answerCount:number,
   askedBy:Types.ObjectId,
@@ -17,7 +17,7 @@ export interface QuestionDoc extends Document{
 export const QuestionSchema = new Schema<QuestionDoc>(
   {
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    descriptionHtml: { type: String, required: true },
     isAnswered: { type: Boolean, default: false },
     answerCount:{type:Number,default:0},
     askedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

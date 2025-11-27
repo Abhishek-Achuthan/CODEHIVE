@@ -12,7 +12,7 @@ export class CreateQuestionUseCase implements ICreateQuestionUseCase {
   async execute(input: ICreateQuestionInputDTO): Promise<void> {
     await this._questionRepository.create({
       title: input.title,
-      description: input.description,
+      descriptionHtml: input.descriptionHtml,
       askedBy: input.askedBy,
       tags: input.tags,
       answerCount: 0,

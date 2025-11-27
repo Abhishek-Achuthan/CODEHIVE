@@ -1,7 +1,7 @@
 export interface QuestionEntity {
   id: string;
   title: string;
-  description: string;
+  descriptionHtml: string;
   askedBy: string;
   answerCount: number;
   isAnswered: boolean;

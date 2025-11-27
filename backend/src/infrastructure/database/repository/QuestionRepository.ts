@@ -87,7 +87,7 @@ async list(data: IQuestionListQueryDTO): Promise<PaginationResult<QuestionEntity
     protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {
         const {
             title,
-            description,
+            descriptionHtml,
             askedBy,
             tags,
             answerCount,
@@ -97,7 +97,7 @@ async list(data: IQuestionListQueryDTO): Promise<PaginationResult<QuestionEntity
         } = data;
             const doc : Partial<QuestionDoc> = {}
              if (title !== undefined) doc.title = title;
-             if(description !==undefined) doc.description = description;
+             if(descriptionHtml !==undefined) doc.descriptionHtml = descriptionHtml;
              if(askedBy !==undefined) doc.askedBy = new Types.ObjectId(askedBy);
              if(tags !== undefined) doc.tags = tags;
              if(answerCount !== undefined) doc.answerCount = answerCount;
@@ -111,7 +111,7 @@ async list(data: IQuestionListQueryDTO): Promise<PaginationResult<QuestionEntity
     protected toEntity(doc: QuestionDoc): QuestionEntity {
         return {
             title:doc.title,
-            description:doc.description,
+            descriptionHtml:doc.descriptionHtml,
             askedBy: doc.askedBy.toString(),
             tags: doc.tags,
             answerCount: doc.answerCount,

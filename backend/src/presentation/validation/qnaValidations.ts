@@ -20,3 +20,10 @@ export const QuestionListSchema = z.object({
     filter: Object.fromEntries(Object.entries(filter).filter(([, v]) => v !== undefined)) || undefined,
   } as IQuestionListQueryDTO; 
 });
+
+export const CreateQuestionSchema = z.object({
+  title: z.string().min(10),
+  descriptionHtml: z.string().min(10),
+  askedBy: z.string(),
+  tags: z.array(z.string()).optional(),
+});

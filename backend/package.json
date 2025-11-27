@@ -9,6 +9,7 @@
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.9.1",
     "@types/nodemailer": "^7.0.2",
+    "@types/sanitize-html": "^2.16.0",
     "eslint": "^9.39.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
@@ -18,7 +19,7 @@
     "build": "tsc",
     "start": "node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
-    "fix":"eslint . --fix"
+    "fix": "eslint . --fix"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -33,6 +34,7 @@
     "nodemailer": "^7.0.10",
     "redis": "^5.9.0",
     "reflect-metadata": "^0.2.2",
+    "sanitize-html": "^2.17.0",
     "tsyringe": "^4.10.0",
     "zod": "^4.1.12"
   }

@@ -17,7 +17,7 @@ export interface IQuestionResponseDTO {
 
 export interface ICreateQuestionInputDTO {
   title: string ;
-  description: string;
+  descriptionHtml: string;
   askedBy: string;  
   tags: string[];  
 }
