@@ -55,6 +55,7 @@ export const API_ROUTES = {
 
     const query = qp.toString();
     return query ? `/qna/questions?${query}` : `/qna/questions`;
-  }
+  },
+  CREATE_QUESTION: '/qna/questions',
 }
 };

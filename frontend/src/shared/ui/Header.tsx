@@ -1,4 +1,4 @@
-import { useLogout } from "../../auth/hooks/useLogout";
+import { useLogout } from "../../features/auth/hooks/useLogout";
 import { MdPersonOutline } from "react-icons/md";
 
 export default function Header() {

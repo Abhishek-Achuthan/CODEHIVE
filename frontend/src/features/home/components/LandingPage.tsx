@@ -1,7 +1,6 @@
 import { useLogout } from '../../auth/hooks/useLogout';
-import Footer from '../../qna/components/Footer';
-import Header from '../../qna/components/Header';
-
+import Header from '../../../shared/ui/Header';
+import Footer from '../../../shared/ui/Footer';
 const LandingPage = () => {
 
   const {user} = useLogout();

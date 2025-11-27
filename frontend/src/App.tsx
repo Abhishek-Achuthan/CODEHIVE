@@ -8,14 +8,14 @@ const App = () => {
     <>
       <ErrorBoundary>
         <AppRoutes />
-      </ErrorBoundary>
       <Toaster
         position="top-center"
         toastOptions={{
           duration: 4000,
           style: { background: '#333', color: '#fff' },
         }}
-      />
+        />
+     </ErrorBoundary>
     </>
   );
 };

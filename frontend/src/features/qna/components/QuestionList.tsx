@@ -1,4 +1,6 @@
 import { useEffect, useState, type JSX } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Search,
   Clock,
@@ -36,10 +38,13 @@ export default function QuestionsList(): JSX.Element {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [totalQuestions, setTotalQuestions] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const LIMIT = 5;
 
   const fetchQuestions = async (searchValue?: string): Promise<void> => {
+
+
     setLoading(true);
     try {
       const params: questionList = {
@@ -61,7 +66,7 @@ export default function QuestionsList(): JSX.Element {
       const mappedQuestions: Question[] = items.map((q: QuestionListAPIResponse) => ({
         id: q.id,
         title: q.title,
-        description: q.description,
+        description: q.descriptionHtml,
         tags: q.tags ?? [],
         votes: q.votes ?? 0,
         answers: q.answerCount ?? 0,
@@ -123,6 +128,7 @@ export default function QuestionsList(): JSX.Element {
     setIsFilterOpen(false);
   };
 
+
   const handleApplyFilters = (newFilters: FMFilterState): void => {
     const partialFilter: Partial<QuestionListFilter> = {
       tags: newFilters.tags,
@@ -168,6 +174,10 @@ export default function QuestionsList(): JSX.Element {
         return "Questions";
     }
   };
+ 
+   const handleAskQuestion = () => {
+      navigate('/qna/ask-question')
+    }
 
   const totalPages = Math.ceil(totalQuestions / LIMIT);
 
@@ -275,7 +285,7 @@ export default function QuestionsList(): JSX.Element {
             </button>
           </div>
 
-          <button className="ml-auto px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg text-sm font-medium transition border border-white">
+          <button className="ml-auto px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg text-sm font-medium transition border border-white" onClick={handleAskQuestion}>
             Ask question
           </button>
         </div>

@@ -10,7 +10,7 @@ export type questionList = {
 export type QuestionListAPIResponse = {
   id:string,
   title:string,
-  description:string,
+  descriptionHtml:string,
   tags:string[],
   votes:number,
   answerCount:number,
@@ -33,4 +33,12 @@ export type QuestionSort =
   | 'least_answered'
   | 'most_viewed'
   | 'most_voted';
+
+
+  export type CreateQuestion = {
+    title:string,
+    descriptionHtml:string,
+    askedBy:string,
+    tags:string[],
+  }
 

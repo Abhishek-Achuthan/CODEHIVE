@@ -10,6 +10,7 @@ import { UserManagementPage } from "../features/admin/pages/UserManagementPage";
 import { MentorManagementPage } from "../features/admin/pages/MentorManagementPage";
 import PublicRoute from "./PublicRoute";
 import QnaLandigPage from "../features/qna/page/QnaLandingPage";
+import AskQuestionPage from "../features/qna/page/AskQuestionPage";
 
 export default function AppRoutes() {
   return (
@@ -24,10 +25,16 @@ export default function AppRoutes() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
+          {/*Landing page route*/}
           <Route path="/home" element={<LandingPage />} />
+
+          {/*admin routes*/}
           <Route path="/admin/users" element={<UserManagementPage />} />
           <Route path="/admin/mentors" element={<MentorManagementPage />} />
+
+          {/*qna routes*/}
           <Route path="/qna" element={<QnaLandigPage/>} />
+          <Route path="/qna/ask-question" element={<AskQuestionPage/>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

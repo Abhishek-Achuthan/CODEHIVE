@@ -1,6 +1,6 @@
 import Sidebar from '../components/SideBar'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import Header from '../../../shared/ui/Header'
+import Footer from '../../../shared/ui/Footer'
 import QuestionsList from '../components/QuestionList'
 
 export default function QnaLandigPage() {
