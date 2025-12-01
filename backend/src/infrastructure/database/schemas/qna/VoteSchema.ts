@@ -1,7 +1,7 @@
-import { Schema, Types } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 import { VoteType } from '../../../../domain/types/VoteType';
 
-export interface VoteDoc {
+export interface VoteDoc extends Document{
   userId:Types.ObjectId,
   targetId:Types.ObjectId,
   targetType:VoteType,

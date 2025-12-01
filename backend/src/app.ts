@@ -9,7 +9,7 @@ import { env } from './config/envConfig';
 import cors from 'cors';
 import { errorHandler } from './presentation/middlewares/errorHanlder';
 import cookieParser from 'cookie-parser';
-import { QuestionRoutes } from './presentation/routes/QuestionRoutes';
+import { QnARoutes } from './presentation/routes/QnARoutes';
 
 export class App {
   private readonly _app: Express;
@@ -43,21 +43,21 @@ export class App {
   private configRoutes() {
     const authRoute = new AuthRoute();
     const adminRoute = new AdminRoute();
-    const questionRoute = new QuestionRoutes();
+    const qnaRoutes = new QnARoutes;
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin',adminRoute.getRoutes());
-    this._app.use('/api/qna',questionRoute.getRoutes());
+    this._app.use('/api/qna',qnaRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
     this._app.use(errorHandler);
-  }
+  };
 
   public listen() {
     this._app.listen(env.port, () => {
       console.log(`server started at port ${env.port}`);
     });
-  }
+  };
 }
 
 const app = new App();

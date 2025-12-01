@@ -10,6 +10,7 @@ export interface QuestionDoc extends Document{
   tags:string[],
   views:number,
   votes:number,
+  acceptedAnswerId:Types.ObjectId | null
   createdAt:Date,
   updatedAt:Date
 }
@@ -24,6 +25,7 @@ export const QuestionSchema = new Schema<QuestionDoc>(
     tags: { type: [String], required: true },
     views: { type: Number, default: 0 },
     votes: { type: Number, default: 0 },
+    acceptedAnswerId:{type:Schema.Types.ObjectId,ref:'Answer',default:null}
   },
   { timestamps: true }
 );
