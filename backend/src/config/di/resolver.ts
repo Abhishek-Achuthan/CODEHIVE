@@ -6,6 +6,7 @@ import { AdminController } from '../../presentation/controllers/admin/AdminContr
 import { AuthMiddleware } from '../../presentation/middlewares/authMIddleware';
 import { RoleMiddleware } from '../../presentation/middlewares/roleMiddleware';
 import { QuestionController } from '../../presentation/controllers/qna/QuestionController';
+import { AnswerController } from '../../presentation/controllers/qna/AnswerController';
 
 ContainerSetup.registerAll();
 
@@ -18,6 +19,9 @@ export const authMiddleware = container.resolve(AuthMiddleware);
 export const roleMiddleware = container.resolve(RoleMiddleware);
 
 export const questionController =  container.resolve(QuestionController);
+
+export const answerController = container.resolve(AnswerController);
+
 
 
 

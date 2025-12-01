@@ -31,6 +31,12 @@ import { ICreateQuestionUseCase } from '../../application/useCase/interface/qna/
 import { CreateQuestionUseCase } from '../../application/useCase/qna/createQuestionUseCase';
 import { IListQuestionUseCase } from '../../application/useCase/interface/qna/IListQuestionsUseCase';
 import { ListQuestionUseCase } from '../../application/useCase/qna/ListQuestionUseCase';
+import { IPostAnswerUseCase } from '../../application/useCase/interface/qna/IPostAnswerUseCase';
+import { PostAnswerUseCase } from '../../application/useCase/qna/PostAnswerUseCase';
+import { IListAnswerUseCase } from '../../application/useCase/interface/qna/IListAnswerUseCase';
+import { ListAnswerUseCase } from '../../application/useCase/qna/ListAnswerUseCase';
+import { IGetQuestionUseCase } from '../../application/useCase/interface/qna/IGetQuestionUseCase';
+import { GetQuestionUseCase } from '../../application/useCase/qna/GetQuestionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -112,6 +118,18 @@ export class UseCaseModule {
 
     container.register<IListQuestionUseCase>('IListQuestionUseCase', {
       useClass: ListQuestionUseCase,
+    });
+
+    container.register<IPostAnswerUseCase>('IPostAnswerUseCase', {
+      useClass: PostAnswerUseCase,
+    });
+
+    container.register<IListAnswerUseCase>('IListAnswerUseCase',{
+      useClass: ListAnswerUseCase
+    });
+
+    container.register<IGetQuestionUseCase>('IGetQuestionUseCase', {
+      useClass: GetQuestionUseCase
     });
 
   }
