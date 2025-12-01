@@ -1,0 +1,50 @@
+import { Router } from 'express';
+import { questionController } from '../../config/di/resolver';
+import { answerController } from '../../config/di/resolver';
+import { authMiddleware } from '../../config/di/resolver';
+
+
+export class QnARoutes {
+    private _router: Router;
+    private _questionController
+    private _answerController
+    private _authMiddleware
+
+
+    constructor() {
+        this._router = Router();
+        this._questionController = questionController;
+        this._answerController = answerController;
+        this._authMiddleware = authMiddleware;
+        this._setRoutes();
+    }
+
+    private _setRoutes() {
+        this._router.post(
+            '/questions',this._authMiddleware.check,
+            this._questionController.handleCreateQuestion.bind(this._questionController)
+        );
+        this._router.get(
+            '/questions',
+            this._authMiddleware.check,
+            this._questionController.handleListQuestions.bind(this._questionController)
+        );
+        this._router.get(
+            '/questions/:questionId',
+            this._questionController.hanldeGetQuestion.bind(this._questionController)
+        );
+         this._router.post('/answers',
+            this._authMiddleware.check,
+            this._answerController.handlePostAnswer.bind(this._answerController)
+        );
+        this._router.get(
+            '/answers/',
+            this._authMiddleware.check,
+            this._answerController.handleListAnswers.bind(this._answerController))
+    }
+
+    public getRoutes(): Router {
+        return this._router;
+    }
+
+}

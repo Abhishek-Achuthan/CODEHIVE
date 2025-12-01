@@ -27,3 +27,8 @@ export const CreateQuestionSchema = z.object({
   askedBy: z.string(),
   tags: z.array(z.string()).optional(),
 });
+
+export const ValidIdSchema = z.object({
+  questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
+}).transform((raw) => ({ questionId: raw.questionId }) as { questionId: string });
+

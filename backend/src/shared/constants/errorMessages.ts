@@ -58,4 +58,11 @@ export const ERROR_MESSAGES = {
   SERVER: {
     INTERNAL_ERROR: 'Internal Server Error',
   },
+
+  //QnA errors
+
+  QnA: {
+    NOT_FOUND:'Question not Found',
+    ALREADY_ANSWERED:'This question alredy has an accepted answer.No further answers are allowed.'
+  }
 };
