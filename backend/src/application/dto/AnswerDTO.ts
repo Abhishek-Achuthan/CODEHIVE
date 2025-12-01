@@ -1,3 +1,5 @@
+import { AnswerSort } from '../../domain/types/AnswerSort';
+
 export interface IAnswerResponseDTO {
   id: string;
   questionId: string;
@@ -19,3 +21,11 @@ export interface IUpdateAnswerInputDTO {
   id: string; 
   answerText?: string;
 }
+
+export interface IAnswerListQueryDTO  {
+   questionId:string,
+   page?:number,
+   limit?:number,
+   sortBy?:AnswerSort
+}
+
