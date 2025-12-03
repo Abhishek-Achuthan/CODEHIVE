@@ -37,6 +37,10 @@ import { IListAnswerUseCase } from '../../application/useCase/interface/qna/ILis
 import { ListAnswerUseCase } from '../../application/useCase/qna/ListAnswerUseCase';
 import { IGetQuestionUseCase } from '../../application/useCase/interface/qna/IGetQuestionUseCase';
 import { GetQuestionUseCase } from '../../application/useCase/qna/GetQuestionUseCase';
+import { IRelatedQuestionUseCase } from '../../application/useCase/interface/qna/IRelatedQuestionUseCase';
+import { RelatedQuestionUseCase } from '../../application/useCase/qna/RelatedQuestionUseCase';
+import { ISaveQuestionUseCase } from '../../application/useCase/interface/qna/ISaveQuestionUseCase';
+import { SavedQuestionUseCase } from '../../application/useCase/qna/SaveQuestionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -131,6 +135,14 @@ export class UseCaseModule {
     container.register<IGetQuestionUseCase>('IGetQuestionUseCase', {
       useClass: GetQuestionUseCase
     });
+
+    container.register<IRelatedQuestionUseCase>('IRelatedQuestionUseCase', {
+      useClass: RelatedQuestionUseCase
+    });
+
+    container.register<ISaveQuestionUseCase>('ISaveQuestionUseCase',{
+      useClass: SavedQuestionUseCase
+    })
 
   }
 }

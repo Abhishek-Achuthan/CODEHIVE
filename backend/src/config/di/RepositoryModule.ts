@@ -6,11 +6,13 @@ import { IQuestionRepository } from '../../domain/interfaces/IQuestionRepository
 import { QuestionRepository } from '../../infrastructure/database/repository/QuestionRepository';
 import { IAnswerRepostiory } from '../../domain/interfaces/IAnswerRepository';
 import { AnswerRepository } from '../../infrastructure/database/repository/AnswerRepository';
+import { ISavedQuestionRepository } from '../../domain/interfaces/ISavedQuestionRepository';
+import { SavedQuestionRepository } from '../../infrastructure/database/repository/SavedQuestionRepository';
 
 export class RepositoryModule {
     static registerModules():void {
 
-        //-------------------------------UserRepo---------------------------------------//
+        //-------------------------------UserRepo--------------------------------------//
 
         container.register<IUserRepository>('IUserRepository',{
             useClass:UserRepository
@@ -26,6 +28,12 @@ export class RepositoryModule {
 
         container.register<IAnswerRepostiory>('IAnswerRepository',{
             useClass:AnswerRepository
+        });
+
+         //-------------------------Saved Question Repository------------------------//
+         
+        container.register<ISavedQuestionRepository>('ISavedQuestionRepository',{
+            useClass: SavedQuestionRepository
         });
     }
 }
