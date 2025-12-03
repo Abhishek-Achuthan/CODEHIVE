@@ -80,30 +80,63 @@ export class QuestionRepository
     ]);
 
     const items = docs.map((d) => this.toEntity(d as QuestionDoc));
-    const totalPages = limit ? Math.max(1, Math.ceil(totalItems / limit)) : 1;
+    const totalPages = limit
+      ? Math.max(1, Math.ceil(totalItems / pageLimit))
+      : 1;
 
     return { items, totalItems, totalPages };
   }
 
-  async setIsAnswered(questionId: string,isAnswered:boolean): Promise<void> {
+  async setIsAnswered(questionId: string, isAnswered: boolean): Promise<void> {
+    await this._model.updateOne({ _id: questionId }, { $set: { isAnswered } });
+  }
+
+  async incrementAnswerCount(
+    questionId: string,
+    amount: number
+  ): Promise<void> {
     await this._model.updateOne(
       { _id: questionId },
-      { $set: { isAnswered} }
+      { $inc: { answerCount: amount } }
     );
   }
 
-  async incrementAnswerCount(questionId: string, amount: number): Promise<void> {
-    await this._model.updateOne({_id: questionId},{$inc:{answerCount: amount}})
-  }
+  async incrementAnswerCountAndSetAnswered(
+    questionId: string,
+    amount: number,
+    setAnswered: boolean
+  ): Promise<void> {
+    const update: UpdateQuery<QuestionDoc> = { $inc: { answerCount: amount } };
 
-  async incrementAnswerCountAndSetAnswered(questionId: string, amount: number, setAnswered: boolean): Promise<void> {
-    const update : UpdateQuery<QuestionDoc> = {$inc:{answerCount:amount}};
-
-    if(setAnswered) {
-      update.$set = {isAnswered:true};
+    if (setAnswered) {
+      update.$set = { isAnswered: true };
     }
 
-    await this._model.updateOne({_id:questionId},update);
+    await this._model.updateOne({ _id: questionId }, update);
+  }
+
+  async getQuestionById(questionId: string): Promise<QuestionEntity | null> {
+    const question = await this._model.findById(questionId);
+
+    if (!question) return null;
+
+    return this.toEntity(question as QuestionDoc);
+  }
+
+  async relatedQuestions(questionId: string): Promise<QuestionEntity[]> {
+    const question = await this._model.findById(questionId);
+
+    if (!question) return [];
+
+    const tags = question.tags || [];
+
+    if(tags.length === 0) return [];
+
+    const query: FilterQuery<QuestionDoc> = { _id: {$ne:question._id}, tags: { $in: tags } };
+
+    const docs = await this._model.find(query).limit(3).lean<QuestionDoc[]>();
+
+    return docs.map((doc) => this.toEntity(doc as QuestionDoc));
   }
 
   protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {
@@ -128,7 +161,9 @@ export class QuestionRepository
     if (isAnswered !== undefined) doc.isAnswered = isAnswered;
     if (views !== undefined) doc.views = views;
     if (acceptedAnswerId !== undefined) {
-      doc.acceptedAnswerId = acceptedAnswerId ? new Types.ObjectId(acceptedAnswerId) : null
+      doc.acceptedAnswerId = acceptedAnswerId
+        ? new Types.ObjectId(acceptedAnswerId)
+        : null;
     }
     return doc;
   }
@@ -144,9 +179,11 @@ export class QuestionRepository
       votes: doc.votes,
       isAnswered: doc.isAnswered,
       views: doc.views,
-      acceptedAnswerId: doc.acceptedAnswerId ? doc.acceptedAnswerId.toString() : null,
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
+      acceptedAnswerId: doc.acceptedAnswerId
+        ? doc.acceptedAnswerId.toString()
+        : null,
+      createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
+      updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
     };
   }
 

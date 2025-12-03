@@ -20,6 +20,8 @@ export class QnARoutes {
     }
 
     private _setRoutes() {
+        //--------------------------Question Routes-----------------------------------//
+
         this._router.post(
             '/questions',this._authMiddleware.check,
             this._questionController.handleCreateQuestion.bind(this._questionController)
@@ -30,9 +32,16 @@ export class QnARoutes {
             this._questionController.handleListQuestions.bind(this._questionController)
         );
         this._router.get(
-            '/questions/:questionId',
+            '/questions/:id',
             this._questionController.hanldeGetQuestion.bind(this._questionController)
         );
+        this._router.get(
+            '/questions/:id/related',
+            this._questionController.handleRelatedQuestion.bind(this._questionController)
+        );
+
+        //--------------------------Answer Routes-----------------------------------//
+
          this._router.post('/answers',
             this._authMiddleware.check,
             this._answerController.handlePostAnswer.bind(this._answerController)
@@ -40,11 +49,13 @@ export class QnARoutes {
         this._router.get(
             '/answers/',
             this._authMiddleware.check,
-            this._answerController.handleListAnswers.bind(this._answerController))
+            this._answerController.handleListAnswers.bind(this._answerController)
+        );
+
     }
 
     public getRoutes(): Router {
         return this._router;
-    }
+    };
 
 }

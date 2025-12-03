@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
+import sanitizeHtml from 'sanitize-html'
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
+import { CreateQuestionSchema, QuestionListSchema, ValidIdSchema } from '../../validation/qnaValidations';
 import type { ICreateQuestionUseCase } from '../../../application/useCase/interface/qna/ICreateQuestionUseCase';
 import type { IListQuestionUseCase } from '../../../application/useCase/interface/qna/IListQuestionsUseCase';
-import { CreateQuestionSchema, QuestionListSchema, ValidIdSchema } from '../../validation/qnaValidations';
-import sanitizeHtml from 'sanitize-html'
 import type { IGetQuestionUseCase } from '../../../application/useCase/interface/qna/IGetQuestionUseCase';
+import type { IRelatedQuestionUseCase } from '../../../application/useCase/interface/qna/IRelatedQuestionUseCase';
 
 @injectable()
 export class QuestionController {
@@ -16,12 +17,13 @@ export class QuestionController {
     @inject('IListQuestionUseCase')
     private readonly _listQuestionUseCase: IListQuestionUseCase,
     @inject('IGetQuestionUseCase') 
-    private readonly _getQuestionUseCase: IGetQuestionUseCase
+    private readonly _getQuestionUseCase: IGetQuestionUseCase,
+    @inject('IRelatedQuestionUseCase')
+    private readonly _relatedQuestionUseCase: IRelatedQuestionUseCase,
   ) {}
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log('create-question body:', req.body);
       const validated = CreateQuestionSchema.parse(req.body);
 
       const cleanHtml = sanitizeHtml(validated.descriptionHtml, {
@@ -64,16 +66,31 @@ export class QuestionController {
 
   async hanldeGetQuestion(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = ValidIdSchema.parse(req.params.questionId);
+      const { questionId } = ValidIdSchema.parse({questionId:req.params.id});
 
-      const question = await this._getQuestionUseCase.execute(id.questionId)
+      const question = await this._getQuestionUseCase.execute(questionId)
 
       res.status(HttpStatus.OK).json({
-        success:true,
-        data:question
+        success : true,
+        data : question
       })
     } catch (error) {
       next(error)
+    }
+  }
+
+  async handleRelatedQuestion(req:Request, res: Response, next: NextFunction) {
+    try {
+      const {questionId} = ValidIdSchema.parse({questionId:req.params.id});
+
+      const questions = await this._relatedQuestionUseCase.execute(questionId);
+
+      res.status(HttpStatus.OK).json({
+        success:true,
+        data: questions
+      });
+    } catch (error) {
+      next(error);
     }
   }
 }
