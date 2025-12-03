@@ -6,6 +6,7 @@ export interface QuestionCardProps {
   votes?: number;
   answers?: number;
   views?: number;
+  onclick?:()=>void;
 }
 
 export default function QuestionCard({
@@ -15,10 +16,11 @@ export default function QuestionCard({
   votes = 0,
   answers = 0,
   views = 0,
+  onclick
 }: QuestionCardProps) {
   return (
 
-    <article className="group border border-border/30 hover:border-accent/50 bg-card/40 hover:bg-card/60 rounded-lg p-4 transition-all cursor-pointer">
+    <article className="group border border-border/30 hover:border-accent/50 bg-card/40 hover:bg-card/60 rounded-lg p-4 transition-all cursor-pointer " onClick={onclick}>
       <div className="flex gap-4">
         <div className="flex flex-col items-center gap-3 text-xs text-foreground/60 min-w-[72px]">
           <div className="text-center">
@@ -45,7 +47,7 @@ export default function QuestionCard({
             {tags.map((tag, i) => (
               <span
                 key={i}
-                className="px-2 py-1 bg-primary/15 hover:bg-primary/25 text-primary rounded text-xs font-medium transition"
+                className="px-2 py-1 bg-primary/15 hover:bg-primary/25 text-primary rounded text-xs font-medium transition border border-white/30 hover:border-white"
               >
                 {tag}
               </span>

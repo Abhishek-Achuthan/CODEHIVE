@@ -40,7 +40,6 @@ export default function AskQuestionForm(): JSX.Element {
       e.preventDefault();
       addTag();
     } else if (e.key === "Backspace" && tagInput === "" && tags.length) {
-      // remove last tag
       removeTag(tags.length - 1);
     }
   };
@@ -80,11 +79,13 @@ export default function AskQuestionForm(): JSX.Element {
         askedBy: userId,
         tags,
       };
+      console.log(payload)
 
       try {
+        console.log("submit payload:", payload);
         const created = await QnAService.createQuestion(payload);
-        const id = (created.id as string) ?? (created._id as string);
-        navigate(`/questions/${id}`);
+        console.log("created question:", created);
+        navigate(`/qna`);
       } catch (error) {
         console.log(error);
         toast.error("Failed to create question. Try again.")

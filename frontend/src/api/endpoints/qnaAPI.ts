@@ -8,3 +8,8 @@ export const listQuestion = (data?: questionList) => {
 };
 
 export const createQuestion = (data:CreateQuestion) => apiClient.post(API_ROUTES.QnA.CREATE_QUESTION,data);
+
+export const getQuestion = (questionId:string) => apiClient.get(API_ROUTES.QnA.GET_QUESTION(questionId));
+
+export const relatedQuestions = (questionId:string) => apiClient.get(API_ROUTES.QnA.RELATED_QUESTIONS(questionId));
+ 

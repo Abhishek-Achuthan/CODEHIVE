@@ -57,5 +57,7 @@ export const API_ROUTES = {
     return query ? `/qna/questions?${query}` : `/qna/questions`;
   },
   CREATE_QUESTION: '/qna/questions',
+  GET_QUESTION: (questionId:string)=> `/qna/questions/${questionId}`,
+  RELATED_QUESTIONS: (questionId:string) => `/qna/questions/${questionId}/related`,
 }
 };

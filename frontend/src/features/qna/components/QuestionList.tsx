@@ -59,7 +59,6 @@ export default function QuestionsList(): JSX.Element {
 
       const payload = response?.data ?? response ?? {};
       const items = Array.isArray(payload.items) ? payload.items : [];
-      console.log(items)
       const totalItems =
         typeof payload.totalItems === "number" ? payload.totalItems : 0;
 
@@ -127,6 +126,10 @@ export default function QuestionsList(): JSX.Element {
     setFilterState(newFilter);
     setIsFilterOpen(false);
   };
+
+  const handleGetQuestion = (questionId:string) => {
+    navigate(`/qna/question/${questionId}`);
+  }
 
 
   const handleApplyFilters = (newFilters: FMFilterState): void => {
@@ -301,7 +304,7 @@ export default function QuestionsList(): JSX.Element {
             No questions found. Try adjusting your filters.
           </p>
         ) : (
-          questions.map((q) => <QuestionCard key={q.id} {...q} />)
+          questions.map((q) => <QuestionCard key={q.id} {...q} onclick={() => handleGetQuestion(q.id.toString())}/>)
         )}
       </div>
 

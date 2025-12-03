@@ -9,7 +9,7 @@ import type { CreateQuestion, questionList } from '../shared/types/qnaTypes'
 export class QnAService {
     static async listQuestions(data:questionList) {
         try {
-            const response = await QnAApi.listQuestion(data);
+            const response = await QnAApi.listQuestion(data)
             return response.data;
         } catch (error) {
             this.handleError(error)
@@ -22,6 +22,24 @@ export class QnAService {
             return response.data;
         }catch(error) {
             this.handleError(error);
+        }
+    }
+
+    static async getQuestion(questionId:string) {
+        try {
+            const response = await QnAApi.getQuestion(questionId);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    static async relatedQuestions(questionId:string) {
+        try {
+            const response = await QnAApi.relatedQuestions(questionId);
+            return response.data;
+        } catch (error) {
+            this.handleError(error)
         }
     }
 
@@ -38,4 +56,5 @@ export class QnAService {
 
         throw new BaseError('Unexpected error');
     }
+
 }
