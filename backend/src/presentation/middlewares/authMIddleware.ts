@@ -4,11 +4,13 @@ import type { IJWTService } from '../../application/ports/security/IJWTService';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
 import { JwtPayload } from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
+import { NotFoundError } from '../../core/errors/NotFoundError';
+import { UserRole } from '../../domain/types/UserRole';
 
 @injectable()
 export class AuthMiddleware {
   constructor(
-    @inject('IJWTService') private _jwtService: IJWTService,
+    @inject('IJWTService') private _jwtService: IJWTService
   ) {}
 
   check = async (req: Request, res: Response, next: NextFunction) => {
@@ -31,9 +33,13 @@ export class AuthMiddleware {
         return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
-      (req as any).user = {
+      if (!decoded?.userRole || !decoded?.sub) {
+        return next(new NotFoundError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
+      }
+
+      req.user = {
         id: decoded.sub,
-        role: decoded.userRole,
+        role: decoded.userRole as UserRole,
       };
 
       next();
