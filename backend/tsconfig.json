@@ -9,7 +9,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    // "types": [],
 
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -23,6 +23,8 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+    "typeRoots": [ "./src/@types",
+      "./node_modules/@types",],
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
@@ -43,5 +45,6 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+  },
+  "include": ["./src/**/*"]
 }
