@@ -39,7 +39,16 @@ export class QnAService {
             const response = await QnAApi.relatedQuestions(questionId);
             return response.data;
         } catch (error) {
-            this.handleError(error)
+            this.handleError(error);
+        }
+    }
+
+    static async saveQuestion(questionId:string) {
+        try {
+            const response = await QnAApi.saveQuestion(questionId);
+            return response.data
+        } catch (error) {
+            this.handleError(error);
         }
     }
 

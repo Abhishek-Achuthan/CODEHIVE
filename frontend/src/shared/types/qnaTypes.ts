@@ -1,3 +1,25 @@
+import type { User } from "./userTypes";
+
+export interface Question {
+  id: string;
+  title: string;
+  descriptionHtml: string;
+  votes: number;
+  askedBy: string
+  answers: number;
+  views: number;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  bookmarked: boolean;
+}
+
+export interface GetQuestionData {
+  author:Partial<User>;
+  question:Question;
+  isBookmarked:boolean;
+}
+
 export type questionList = {
   filter?: QuestionListFilter;
   page?: number;
@@ -49,3 +71,7 @@ export type RelatedQuestions = {
   answerCount: number;
   views: number;
 };
+
+export interface RelatedQuestionsSectionProps {
+  relatedQuestions: Partial<Question>[];
+}

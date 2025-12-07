@@ -6,6 +6,7 @@ import QuestionEditor from "./QuestionEditor";
 import { QnAService } from "../../../services/qnaService";
 import toast from "react-hot-toast";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
+import { BaseError } from "../../../shared/errors/BaseError";
 
 export default function AskQuestionForm(): JSX.Element {
   const navigate = useNavigate();
@@ -79,22 +80,18 @@ export default function AskQuestionForm(): JSX.Element {
         askedBy: userId,
         tags,
       };
-      console.log(payload)
-
       try {
-        console.log("submit payload:", payload);
-        const created = await QnAService.createQuestion(payload);
-        console.log("created question:", created);
+        await QnAService.createQuestion(payload);
         navigate(`/qna`);
       } catch (error) {
-        console.log(error);
-        toast.error("Failed to create question. Try again.")
+        if(error instanceof BaseError)
+        toast.error(error.message)
         return 
       }
 
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to post question");
+      if(error instanceof BaseError)
+      toast.error(error.message || 'Failed to post Question');
     } finally {
       setSubmitting(false);
     }
@@ -102,7 +99,6 @@ export default function AskQuestionForm(): JSX.Element {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Title */}
       <div className="space-y-2">
         <label htmlFor="title" className="block text-base font-semibold text-white">
           Title

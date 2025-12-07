@@ -59,5 +59,6 @@ export const API_ROUTES = {
   CREATE_QUESTION: '/qna/questions',
   GET_QUESTION: (questionId:string)=> `/qna/questions/${questionId}`,
   RELATED_QUESTIONS: (questionId:string) => `/qna/questions/${questionId}/related`,
-}
+  SAVE_QUESTION:(questionId:string) =>`/qna/questions/${questionId}/save`
+  }
 };
