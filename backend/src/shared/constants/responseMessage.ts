@@ -13,5 +13,7 @@ export const RESPONSE_MESSAGES = {
     QUESTION_POSTED: 'Question posted successfully.',
     ANSWER_POSTED: 'Answer posted successfully.',
     VOTE_REGISTERED: 'Your vote has been recorded.',
+    SAVE_QUESTION: 'Bookmark added successfully.',
+    UNSAVE_QUESTION: 'Bookmark removed successfully.'
   }
 };

@@ -32,3 +32,8 @@ export const ValidIdSchema = z.object({
   questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
 }).transform((raw) => ({ questionId: raw.questionId }) as { questionId: string });
 
+export const SaveQuestionSchema = z.object({
+  questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
+  userid: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid userid' }),
+}).transform((raw) => ({ questionId: raw.questionId, userid: raw.userid }) as { questionId: string, userid: string });
+

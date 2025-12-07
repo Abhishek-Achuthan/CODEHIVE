@@ -63,6 +63,6 @@ export const ERROR_MESSAGES = {
 
   QnA: {
     NOT_FOUND:'Question not Found',
-    ALREADY_ANSWERED:'This question alredy has an accepted answer.No further answers are allowed.'
+    ALREADY_ANSWERED:'This question alredy has an accepted answer.No further answers are allowed.',
   }
 };
