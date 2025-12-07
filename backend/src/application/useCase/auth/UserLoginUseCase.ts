@@ -5,7 +5,7 @@ import type { IUserRepository } from '../../../domain/interfaces/IUserRepository
 import { IUserLoginInputDTO, IUserLoginResponseDTO } from '../../dto/UserDTO';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import type { IJWTService } from '../../ports/security/IJWTService';
-import { UserMapper } from '../../mapper/userMapper';
+import { UserMapper } from '../../mapper/UserMapper';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 

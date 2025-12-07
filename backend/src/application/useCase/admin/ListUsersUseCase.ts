@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { IListUsersUseCase } from '../interface/admin/IListUsersUseCase';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import { UserRole } from '../../../domain/types/UserRole';
-import { UserMapper } from '../../mapper/userMapper';
+import { UserMapper } from '../../mapper/UserMapper';
 import { IUserListResponseDTO } from '../../dto/UserDTO';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 
