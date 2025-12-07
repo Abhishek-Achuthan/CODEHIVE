@@ -16,6 +16,21 @@ import { UserRole } from '../../../domain/types/UserRole';
     updatedAt:Date;
   }
 
+  export type UserLeanDoc  = {
+    _id: Types.ObjectId;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    password?: string;
+    googleId?: string;
+    githubId?: string;
+    role: UserRole;
+    isBlocked: boolean;
+    createdAt:Date;
+    updatedAt:Date;
+  }
+
 export const UserSchema = new Schema<UserDocument>(
   {
     firstName: { type: String, required: true },

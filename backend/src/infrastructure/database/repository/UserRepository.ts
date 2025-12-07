@@ -2,7 +2,7 @@ import { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import { GenericRepository } from './GenericRepository';
 import { UserEntity } from '../../../domain/entities/UserEntity';
 import UserModel from '../models/UserModel';
-import { UserDocument } from '../schemas/UserSchema';
+import { UserDocument, UserLeanDoc } from '../schemas/UserSchema';
 import { FilterQuery, Model } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
@@ -49,9 +49,9 @@ export class UserRepository
       .sort({ [sort]: 1 })
       .skip(skip)
       .limit(pageSize)
-      .lean<UserDocument[]>();
+      .lean<UserLeanDoc[]>();
 
-    const users = userDoc.map((doc) => this.toEntity(doc as UserDocument));
+    const users = userDoc.map((doc) => this.leanToEntity(doc as UserLeanDoc));
 
     return { items:users, totalItems, totalPages };
   }
@@ -93,5 +93,20 @@ export class UserRepository
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
     };
+  }
+
+  leanToEntity(doc:UserLeanDoc):UserEntity {
+    return {
+      email: doc.email,
+      phone: doc.phone ?? '',
+      password: doc.password ?? '',
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      id: doc._id.toString(),
+      isBlocked: doc.isBlocked ?? false,
+      role: doc.role,
+      googleId: doc.googleId ?? '',
+      githubId: doc.githubId ?? '',
+    }
   }
 }

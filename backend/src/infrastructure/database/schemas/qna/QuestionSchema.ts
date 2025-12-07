@@ -15,6 +15,21 @@ export interface QuestionDoc extends Document{
   updatedAt:Date
 }
 
+export type QuestionLeanDoc = {
+  _id: Types.ObjectId;
+  title: string;
+  descriptionHtml: string;
+  isAnswered: boolean;
+  answerCount: number;
+  askedBy: Types.ObjectId;
+  tags: string[];
+  views: number;
+  votes: number;
+  acceptedAnswerId: Types.ObjectId | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const QuestionSchema = new Schema<QuestionDoc>(
   {
     title: { type: String, required: true },

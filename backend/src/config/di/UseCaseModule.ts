@@ -39,8 +39,8 @@ import { IGetQuestionUseCase } from '../../application/useCase/interface/qna/IGe
 import { GetQuestionUseCase } from '../../application/useCase/qna/GetQuestionUseCase';
 import { IRelatedQuestionUseCase } from '../../application/useCase/interface/qna/IRelatedQuestionUseCase';
 import { RelatedQuestionUseCase } from '../../application/useCase/qna/RelatedQuestionUseCase';
-import { ISaveQuestionUseCase } from '../../application/useCase/interface/qna/ISaveQuestionUseCase';
-import { SavedQuestionUseCase } from '../../application/useCase/qna/SaveQuestionUseCase';
+import { IToggleSaveQuestionUseCase } from '../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
+import { ToggleSaveQuestionUseCase } from '../../application/useCase/qna/ToggleSaveQuestionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -140,9 +140,9 @@ export class UseCaseModule {
       useClass: RelatedQuestionUseCase
     });
 
-    container.register<ISaveQuestionUseCase>('ISaveQuestionUseCase',{
-      useClass: SavedQuestionUseCase
-    })
+    container.register<IToggleSaveQuestionUseCase>('IToggleSaveQuestionUseCase',{
+      useClass: ToggleSaveQuestionUseCase
+    });
 
   }
 }

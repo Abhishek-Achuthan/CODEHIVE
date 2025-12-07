@@ -33,18 +33,25 @@ export class QnARoutes {
         );
         this._router.get(
             '/questions/:id',
-            this._questionController.hanldeGetQuestion.bind(this._questionController)
+            this._authMiddleware.check,
+            this._questionController.handleGetQuestion.bind(this._questionController)
         );
         this._router.get(
             '/questions/:id/related',
             this._questionController.handleRelatedQuestion.bind(this._questionController)
         );
+        this._router.post(
+            '/questions/:id/save',
+            this._authMiddleware.check,
+            this._questionController.handleSaveQuestion.bind(this._questionController)
+        );
 
         //--------------------------Answer Routes-----------------------------------//
 
-         this._router.post('/answers',
+         this._router.post(
+            '/answers',
             this._authMiddleware.check,
-            this._answerController.handlePostAnswer.bind(this._answerController)
+            this._answerController.handlePostAnswer.bind(this._answerController),
         );
         this._router.get(
             '/answers/',
