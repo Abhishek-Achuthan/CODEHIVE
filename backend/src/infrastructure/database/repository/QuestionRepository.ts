@@ -5,10 +5,17 @@ import QuestionModel from '../models/qna/QuestionModel';
 import { QuestionDoc } from '../schemas/qna/QuestionSchema';
 import { FilterQuery, Model, SortOrder, Types } from 'mongoose';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
-import { IQuestionListQueryDTO } from '../../../application/dto/QuestionDTO';
 import { QuestionStatus } from '../../../domain/types/QuestionStatus';
 import { QuestionSort } from '../../../domain/types/QuestionSort';
 import { UpdateQuery } from 'mongoose';
+import {
+  AuthorInfo,
+  QuestionWithAuthor,
+} from '../../../domain/types/QuestionWithAuthor';
+import { QuestionListQuery } from '../../../domain/types/QuestionListQuery';
+import { QuestionLeanDoc } from '../schemas/qna/QuestionSchema';
+import { UserLeanDoc } from '../schemas/UserSchema';
+import { PopulatedQuestionDoc } from '../types/PopulatedQuestionDoc';
 
 export class QuestionRepository
   extends GenericRepository<QuestionDoc, QuestionEntity>
@@ -22,16 +29,18 @@ export class QuestionRepository
     authorId: string
   ): Promise<PaginationResult<QuestionEntity>> {
     const query: FilterQuery<QuestionDoc> = { askedBy: authorId };
-    const questionDocs = await this._model.find(query).lean<QuestionDoc[]>();
+    const questionDocs = await this._model
+      .find(query)
+      .lean<QuestionLeanDoc[]>();
     const questions = questionDocs.map((doc) =>
-      this.toEntity(doc as QuestionDoc)
+      this.leanToEntity(doc as QuestionLeanDoc)
     );
 
     return { items: questions, totalItems: questions.length, totalPages: 1 };
   }
 
   async list(
-    data: IQuestionListQueryDTO
+    data: QuestionListQuery
   ): Promise<PaginationResult<QuestionEntity>> {
     const { filter, limit = 10, page = 1, sortBy, search } = data || {};
 
@@ -75,11 +84,11 @@ export class QuestionRepository
         .sort(sort)
         .skip(skip)
         .limit(pageLimit)
-        .lean<QuestionDoc[]>(),
+        .lean<QuestionLeanDoc[]>(),
       this._model.countDocuments(query),
     ]);
 
-    const items = docs.map((d) => this.toEntity(d as QuestionDoc));
+    const items = docs.map((d) => this.leanToEntity(d as QuestionLeanDoc));
     const totalPages = limit
       ? Math.max(1, Math.ceil(totalItems / pageLimit))
       : 1;
@@ -130,13 +139,57 @@ export class QuestionRepository
 
     const tags = question.tags || [];
 
-    if(tags.length === 0) return [];
+    if (tags.length === 0) return [];
 
-    const query: FilterQuery<QuestionDoc> = { _id: {$ne:question._id}, tags: { $in: tags } };
+    const query: FilterQuery<QuestionDoc> = {
+      _id: { $ne: question._id },
+      tags: { $in: tags },
+    };
 
-    const docs = await this._model.find(query).limit(3).lean<QuestionDoc[]>();
+    const docs = await this._model.find(query).limit(3).lean<QuestionLeanDoc[]>();
 
-    return docs.map((doc) => this.toEntity(doc as QuestionDoc));
+    return docs.map((doc) => this.leanToEntity(doc as QuestionLeanDoc));
+  }
+
+  async getQuestionWithAuthorData(
+    questionId: string
+  ): Promise<QuestionWithAuthor | null> {
+    const doc = await this._model
+      .findById(questionId)
+      .populate<{ askedBy: UserLeanDoc }>({
+        path: 'askedBy',
+        select: 'firstName email lastName',
+      })
+      .lean<PopulatedQuestionDoc | null>();
+
+    if (!doc) return null;
+
+    const author: AuthorInfo = {
+      id: doc.askedBy._id.toString(),
+      email: doc.askedBy.email,
+      firstName: doc.askedBy.firstName,
+      lastName: doc.askedBy.lastName,
+    };
+
+    const questionDoc: QuestionLeanDoc = {
+      _id: doc._id,
+      title: doc.title,
+      descriptionHtml: doc.descriptionHtml,
+      isAnswered: doc.isAnswered,
+      acceptedAnswerId: doc.acceptedAnswerId,
+      answerCount: doc.answerCount,
+      askedBy: doc.askedBy._id,
+      createdAt: doc.createdAt,
+      tags: doc.tags,
+      updatedAt: doc.updatedAt,
+      views: doc.views,
+      votes: doc.votes,
+    };
+
+    return {
+      question: this.leanToEntity(questionDoc),
+      author,
+    };
   }
 
   protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {
@@ -186,6 +239,25 @@ export class QuestionRepository
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
     };
   }
+  
+  private leanToEntity(doc:QuestionLeanDoc | PopulatedQuestionDoc):QuestionEntity {
+    return {
+      id: doc._id.toString(),
+      title: doc.title,
+      descriptionHtml: doc.descriptionHtml,
+      askedBy: doc.askedBy.toString(),
+      tags: doc.tags,
+      answerCount: doc.answerCount,
+      votes: doc.votes,
+      isAnswered: doc.isAnswered,
+      views: doc.views,
+      acceptedAnswerId: doc.acceptedAnswerId
+        ? doc.acceptedAnswerId.toString()
+        : null,
+      createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
+      updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
+    }
+  }
 
   private mapSort(sortBy?: QuestionSort): { [key: string]: SortOrder } {
     switch (sortBy) {
@@ -205,4 +277,5 @@ export class QuestionRepository
         return { createdAt: -1 };
     }
   }
+
 }

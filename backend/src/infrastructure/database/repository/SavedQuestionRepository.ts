@@ -11,6 +11,12 @@ export class SavedQuestionRepository extends GenericRepository<SavedQuestionDoc,
         super(SavedQuestionModel as Model<SavedQuestionDoc>)
     }
 
+    async findByUserAndQuestion(userId: string, questionId: string): Promise<SavedQuestionEntity | null> {
+        const doc = await this._model.findOne({userId,questionId});
+
+        return doc ? this.toEntity(doc):null;
+    }
+
     protected toEntity(doc: SavedQuestionDoc): SavedQuestionEntity {
         return {
             id: doc._id.toString(),

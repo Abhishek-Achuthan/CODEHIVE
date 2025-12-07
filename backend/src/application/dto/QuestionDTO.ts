@@ -1,5 +1,7 @@
+import { QuestionEntity } from '../../domain/entities/qna/QuestionEntity';
 import { QuestionListFilter } from '../../domain/types/QuestionListFilter';
 import { QuestionSort } from '../../domain/types/QuestionSort';
+import { AuthorInfo } from '../../domain/types/QuestionWithAuthor';
 
 export interface IQuestionResponseDTO {
   id: string;
@@ -36,4 +38,14 @@ export interface IQuestionListQueryDTO {
   limit?: number;
   sortBy?: QuestionSort
   search?:string;
+}
+
+export type ToggleSavedQuestionResult ={
+    isBookmarked : boolean;
+}
+
+export interface QuestionWithAuthorDTO {
+   question:QuestionEntity;
+   author:AuthorInfo;
+   isBookmarked : boolean;
 }

@@ -1,5 +1,5 @@
-import { QuestionEntity } from '../../../../domain/entities/qna/QuestionEntity';
+import { QuestionWithAuthorDTO } from '../../../dto/QuestionDTO';
 
 export interface IGetQuestionUseCase {
-    execute(questionId: string): Promise<QuestionEntity>
+    execute(questionId: string,userId:string): Promise<QuestionWithAuthorDTO>
 }
