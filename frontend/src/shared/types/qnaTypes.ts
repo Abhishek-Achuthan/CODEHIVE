@@ -1,11 +1,13 @@
 import type { User } from "./userTypes";
+import type { ListQueryParams, PaginatedResponse } from "./sharedTypes";
+
 
 export interface Question {
   id: string;
   title: string;
   descriptionHtml: string;
   votes: number;
-  askedBy: string
+  askedBy: string;
   answers: number;
   views: number;
   tags: string[];
@@ -15,9 +17,9 @@ export interface Question {
 }
 
 export interface GetQuestionData {
-  author:Partial<User>;
-  question:Question;
-  isBookmarked:boolean;
+  author: Partial<User>;
+  question: Question;
+  isBookmarked: boolean;
 }
 
 export type questionList = {
@@ -74,4 +76,47 @@ export type RelatedQuestions = {
 
 export interface RelatedQuestionsSectionProps {
   relatedQuestions: Partial<Question>[];
+}
+
+export interface CreateAnswerDTO {
+  answerText: string;
+  questionId: string;
+}
+
+export interface AnswerAuthorDTO {
+  id: string;
+  firstName: string;
+  lastName?: string;
+  email: string;
+}
+
+export interface AnswerDTO {
+  id: string;
+  answerText: string;
+  isAccepted: boolean;
+  voteCount: number; 
+  createdAt: string;
+  updatedAt: string;
+  author: string;
+}
+
+export interface AnswerWithAuthorAPI {
+  answer: {
+    id: string;
+    answerText: string;
+    isAccepted: boolean;
+    voteCount: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  author: AnswerAuthorDTO;
+}
+
+export type AnswerSort = 'newest' | 'votes' | 'oldest';
+
+
+export type PaginatedAnswerResponse = PaginatedResponse<AnswerWithAuthorAPI>;
+
+export type AnswerListParams = Omit<ListQueryParams<never,AnswerSort>,'filter'> & {
+  questionId:string;
 }

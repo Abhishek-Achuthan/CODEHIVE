@@ -1,17 +1,17 @@
-import type { questionList } from "../shared/types/qnaTypes";
+import type { AnswerListParams, questionList } from "../shared/types/qnaTypes";
 
 export const API_ROUTES = {
   AUTH: {
-    USER_REGISTER: '/auth/users',
-    USER_LOGIN: '/auth/sessions',
-    USER_SEND_OTP: '/auth/otps',
+    USER_REGISTER: "/auth/users",
+    USER_LOGIN: "/auth/sessions",
+    USER_SEND_OTP: "/auth/otps",
     USER_RESEND_OTP: (id: string) => `/auth/otps/${id}/resend`,
-    USER_FORGOT_PASSWORD: '/auth/forgot-password',
-    USER_LOGOUT: '/auth/sessions',
-    REFRESH_TOKEN: '/auth/refresh',
-    USER_FORGOT_VERIFY_OTP: '/auth/forgot-password/verify-otp',
-    USER_RESET_PASSWORD: '/auth/reset-password',
-    USER_GOOGLE_LOGIN : '/auth/google-login'
+    USER_FORGOT_PASSWORD: "/auth/forgot-password",
+    USER_LOGOUT: "/auth/sessions",
+    REFRESH_TOKEN: "/auth/refresh",
+    USER_FORGOT_VERIFY_OTP: "/auth/forgot-password/verify-otp",
+    USER_RESET_PASSWORD: "/auth/reset-password",
+    USER_GOOGLE_LOGIN: "/auth/google-login",
   },
 
   ADMIN: {
@@ -26,39 +26,63 @@ export const API_ROUTES = {
         role: params.role,
         page: (params.page ?? 1).toString(),
         pageSize: (params.pageSize ?? 10).toString(),
-        sort: params.sort ?? 'createdAt',
-        search: params.search ?? '',
+        sort: params.sort ?? "createdAt",
+        search: params.search ?? "",
       });
       return `/admin/users?${query.toString()}`;
     },
-    UPDATE_USER_STATUS :  `/admin/update-user-status`
+    UPDATE_USER_STATUS: `/admin/update-user-status`,
   },
 
   QnA: {
-  LIST_QUESTIONS: (params?: questionList) => {
-    const qp = new URLSearchParams();
+    //---------------------------Question URL----------------------------------------//
 
-    if (!params) return `/qna/questions`;
+    LIST_QUESTIONS: (params?: questionList) => {
+      const qp = new URLSearchParams();
 
-    if (params.page !== undefined) qp.append('page', String(params.page));
-    if (params.limit !== undefined) qp.append('limit', String(params.limit));
-    if (params.search) qp.append('search', params.search);
-    if (params.sortBy) qp.append('sortBy', params.sortBy);
+      if (!params) return `/qna/questions`;
 
-    if (params.filter) {
-      const f = params.filter;
-      if (f.tags && f.tags.length > 0) qp.append('filter.tags', f.tags.join(',')); 
-      if (f.status) qp.append('filter.status', f.status);
-      if (f.bookmarkedOnly !== undefined) qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
-      if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
-    }
+      if (params.page !== undefined) qp.append("page", String(params.page));
+      if (params.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params.search) qp.append("search", params.search);
+      if (params.sortBy) qp.append("sortBy", params.sortBy);
 
-    const query = qp.toString();
-    return query ? `/qna/questions?${query}` : `/qna/questions`;
+      if (params.filter) {
+        const f = params.filter;
+        if (f.tags && f.tags.length > 0)
+          qp.append("filter.tags", f.tags.join(","));
+        if (f.status) qp.append("filter.status", f.status);
+        if (f.bookmarkedOnly !== undefined)
+          qp.append("filter.bookmarkedOnly", String(f.bookmarkedOnly));
+        if (f.dateFrom) qp.append("filter.dateFrom", f.dateFrom);
+      }
+
+      const query = qp.toString();
+      return query ? `/qna/questions?${query}` : `/qna/questions`;
+    },
+
+    CREATE_QUESTION: "/qna/questions",
+    GET_QUESTION: (questionId: string) => `/qna/questions/${questionId}`,
+    RELATED_QUESTIONS: (questionId: string) =>
+      `/qna/questions/${questionId}/related`,
+    SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
+
+    //-------------------------------Answer URL-----------------------------------//
+
+    POST_ANSWER: "/qna/answers",
+    LIST_ANSWERS: (params: AnswerListParams) => {
+      const qp = new URLSearchParams();
+
+      qp.append('questionId',params.questionId);
+
+      if (params.page !== undefined) qp.append("page", String(params.page));
+      if (params.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params.sortBy) qp.append("sortBy", params.sortBy);
+      if (params.search) qp.append("search", params.search);
+
+      const query = qp.toString();
+      
+      return `/qna/answers?${query}`;
+    },
   },
-  CREATE_QUESTION: '/qna/questions',
-  GET_QUESTION: (questionId:string)=> `/qna/questions/${questionId}`,
-  RELATED_QUESTIONS: (questionId:string) => `/qna/questions/${questionId}/related`,
-  SAVE_QUESTION:(questionId:string) =>`/qna/questions/${questionId}/save`
-  }
 };

@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import * as QnAApi from '../api/endpoints/qnaAPI'
 
 import { BaseError } from '../shared/errors/BaseError'
-import type { CreateQuestion, questionList } from '../shared/types/qnaTypes'
+import type { AnswerListParams, CreateQuestion, questionList } from '../shared/types/qnaTypes'
 
 
 export class QnAService {
@@ -46,6 +46,24 @@ export class QnAService {
     static async saveQuestion(questionId:string) {
         try {
             const response = await QnAApi.saveQuestion(questionId);
+            return response.data
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    static async postAnswer(data:{questionId:string,answerText:string}) {
+        try {
+            const response = await QnAApi.postAnswer(data);
+            return response.data
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    static async listAnswers(data:AnswerListParams) {
+        try {
+            const response = await QnAApi.listAnswers(data);
             return response.data
         } catch (error) {
             this.handleError(error);
