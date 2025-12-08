@@ -2,7 +2,7 @@
 
 
 import { useCallback, useEffect, useState } from "react";
-import type { User } from "../../../shared/types/userTypes";
+import type { User } from "../../../shared/types/domain/user";
 import { AdminService } from "../../../services/adminService";
 import toast from "react-hot-toast";
 

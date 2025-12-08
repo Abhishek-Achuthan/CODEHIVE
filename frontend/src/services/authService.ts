@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 
 import * as AuthApi from "../api/endpoints/authAPI";
-import type * as AuthType from "../shared/types/authTypes";
+import type * as AuthType from "../shared/types/api/auth";
 
 import { BaseError } from "../shared/errors/BaseError";
 

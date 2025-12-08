@@ -2,7 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import type { LoginData } from "../../../shared/types/authTypes";
+import type { LoginData } from "../../../shared/types/api/auth";
 import { AuthService } from "../../../services/authService";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import { BaseError } from "../../../shared/errors/BaseError";

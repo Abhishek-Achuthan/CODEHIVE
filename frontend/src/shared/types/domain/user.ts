@@ -8,4 +8,3 @@ export interface User {
   createdAt: string;
   avatarUrl?: string;
 }
-

@@ -1,5 +1,5 @@
 import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
-import type { PaginationProps } from '../types/sharedTypes'
+import type { PaginationProps } from '../types/core/shared'
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,

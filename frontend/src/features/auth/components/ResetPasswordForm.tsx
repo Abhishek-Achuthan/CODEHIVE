@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPasswordSchema } from "../validations/authValidation";
-import type { ResetPasswordFormData } from "../../../shared/types/authTypes";
+import type { ResetPasswordFormData } from "../types";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { AuthService } from "../../../services/authService";
 import toast from "react-hot-toast";

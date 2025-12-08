@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CreateAnswerDTO } from "../../../shared/types/qnaTypes";
+import type { CreateAnswerRequest } from "../../../shared/types/api/qna";
 import { QnAService } from "../../../services/qnaService";
 import toast from "react-hot-toast";
 import { BaseError } from "../../../shared/errors/BaseError";
@@ -8,7 +8,7 @@ export function usePostAnswers() {
     
      const [isPosting,setIsPosting] = useState(false);
 
-    const postAnswer = async (data:CreateAnswerDTO) => {
+    const postAnswer = async (data: CreateAnswerRequest) => {
 
         try {
             setIsPosting(true);

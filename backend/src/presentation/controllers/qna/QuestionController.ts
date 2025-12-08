@@ -67,14 +67,11 @@ export class QuestionController {
 
   async handleListQuestions(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = QuestionListSchema.parse(req.query);
+      const parsedData = QuestionListSchema.parse(req.query);
 
-      const questions = await this._listQuestionUseCase.execute(data);
+      const data = await this._listQuestionUseCase.execute(parsedData);
 
-      res.status(HttpStatus.OK).json({
-        success: true,
-        data: questions,
-      });
+      res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }
@@ -87,10 +84,7 @@ export class QuestionController {
 
       const data = await this._getQuestionUseCase.execute(questionId,userId!);
 
-      res.status(HttpStatus.OK).json({
-        success: true,
-        data,
-      });
+      res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }

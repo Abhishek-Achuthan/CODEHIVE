@@ -1,38 +1,6 @@
 import type { Path } from "react-hook-form";
-import type { User } from "./userTypes";
 import type { AxiosResponse } from "axios";
-
-export type RegisterData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  phone: string;
-};
-
-export type LoginData = {
-  email: string;
-  password: string;
-};
-
-export type OTPData = {
-  email: string;
-};
-
-export type ForgotPasswordData = {
-  email: string;
-};
-
-export type ResetPasswordData = {
-  email: string;
-  password: string;
-};
-
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken?: string;
-}
+import type { RegisterData, LoginData, OTPData, SendOTPResponse } from "../../shared/types/api/auth";
 
 export interface FieldComponentProps {
   id: string;
@@ -54,7 +22,7 @@ export interface LoginFormProps {
   registerUrl?: string | undefined;
   forgotPasswordUrl?: string | undefined;
   className?: string;
-  isLoading?:boolean
+  isLoading?: boolean;
 }
 
 export interface SignUpFormProps {
@@ -69,11 +37,6 @@ export interface SignUpFormProps {
   showOAuth?: boolean;
   loginUrl?: string;
   className?: string;
-}
-
-export interface SendOTPResponse {
-  success: boolean;
-  message: string;
 }
 
 export interface FormFieldProps<T> {
@@ -91,7 +54,9 @@ export interface ForgotPasswordFormProps {
   className?: string;
 }
 
+// Form data types
 export interface ResetPasswordFormData {
   password: string;
   confirmPassword: string;
 }
+

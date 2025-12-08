@@ -13,12 +13,10 @@ import QuestionCard, { type QuestionCardProps } from "./QuestionCard";
 import { FilterModal, type FilterState as FMFilterState } from "./FilterModal";
 import { QnAService } from "../../../services/qnaService";
 import type {
-  questionList,
+  QuestionListParams,
   QuestionListFilter,
-  QuestionStatus,
-  QuestionSort,
-  QuestionListAPIResponse,
-} from "../../../shared/types/qnaTypes";
+} from "../../../shared/types/api/qna";
+import type { QuestionSort, QuestionStatus, QuestionListItem } from "../../../shared/types/domain/qna";
 import toast from "react-hot-toast";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useDebounce } from "../../admin/hooks/useDebounce";
@@ -43,11 +41,9 @@ export default function QuestionsList(): JSX.Element {
   const LIMIT = 5;
 
   const fetchQuestions = async (searchValue?: string): Promise<void> => {
-
-
     setLoading(true);
     try {
-      const params: questionList = {
+      const params: QuestionListParams = {
         page: currentPage,
         limit: LIMIT,
         sortBy,
@@ -56,19 +52,20 @@ export default function QuestionsList(): JSX.Element {
       };
 
       const response = await QnAService.listQuestions(params);
+      console.log(response)
 
       const payload = response?.data ?? response ?? {};
-      const items = Array.isArray(payload.items) ? payload.items : [];
+      const items: QuestionListItem[] = Array.isArray(payload.items) ? payload.items : [];
       const totalItems =
         typeof payload.totalItems === "number" ? payload.totalItems : 0;
 
-      const mappedQuestions: Question[] = items.map((q: QuestionListAPIResponse) => ({
+      const mappedQuestions: Question[] = items.map((q: QuestionListItem) => ({
         id: q.id,
         title: q.title,
         description: q.descriptionHtml,
         tags: q.tags ?? [],
         votes: q.votes ?? 0,
-        answers: q.answerCount ?? 0,
+        answers: q.answers ?? 0,
         views: q.views ?? 0,
       }));
 
@@ -142,10 +139,13 @@ export default function QuestionsList(): JSX.Element {
       dateFrom: newFilters.dateFrom ?? undefined,
     };
 
-    const cleanedFilter: QuestionListFilter = {} as QuestionListFilter;
+    const cleanedFilter: Partial<QuestionListFilter> = {};
     Object.entries(partialFilter).forEach(([key, value]) => {
       if (value !== undefined && value !== "") {
-        (cleanedFilter as any)[key] = value;
+        const filterKey = key as keyof QuestionListFilter;
+        if (filterKey in cleanedFilter || filterKey === 'tags' || filterKey === 'status' || filterKey === 'bookmarkedOnly' || filterKey === 'dateFrom') {
+          (cleanedFilter as Record<string, unknown>)[key] = value;
+        }
       }
     });
 

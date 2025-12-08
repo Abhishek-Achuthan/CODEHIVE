@@ -1,4 +1,4 @@
-import type { AnswerListParams, questionList } from "../shared/types/qnaTypes";
+import type { AnswerListParams, QuestionListParams } from "../shared/types/api/qna";
 
 export const API_ROUTES = {
   AUTH: {
@@ -37,7 +37,7 @@ export const API_ROUTES = {
   QnA: {
     //---------------------------Question URL----------------------------------------//
 
-    LIST_QUESTIONS: (params?: questionList) => {
+    LIST_QUESTIONS: (params?: QuestionListParams) => {
       const qp = new URLSearchParams();
 
       if (!params) return `/qna/questions`;

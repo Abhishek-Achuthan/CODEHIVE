@@ -7,7 +7,8 @@ import {
   DialogDescription,
 } from '../../../shared/ui/dialog/Dialog';
 import { cn } from "../../../shared/utils/classNames";
-import type { QuestionListFilter, QuestionStatus } from "../../../shared/types/qnaTypes"; 
+import type { QuestionListFilter } from "../../../shared/types/api/qna";
+import type { QuestionStatus } from "../../../shared/types/domain/qna"; 
 
 export type FilterState = Partial<QuestionListFilter>;
 
@@ -38,7 +39,7 @@ export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
     }
   }, [open]);
 
-  const updateFilter = (key: keyof FilterState, value: any) =>
+  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
 
   const handleApply = () => {

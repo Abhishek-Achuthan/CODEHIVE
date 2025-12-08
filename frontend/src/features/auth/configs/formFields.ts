@@ -1,5 +1,5 @@
-import type { RegisterData } from '../../../shared/types/authTypes';
-import type { FieldComponentProps } from '../../../shared/types/authTypes';
+import type { RegisterData } from '../../../shared/types/api/auth';
+import type { FieldComponentProps } from '../types';
 import { PasswordInput } from '../components/PasswordInput';
 
 export const signUpFields: Array<{

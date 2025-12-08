@@ -1,10 +1,8 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { forgotPasswordSchema } from "../validations/authValidation";
-import type {
-  ForgotPasswordData,
-  ForgotPasswordFormProps,
-} from "../../../shared/types/authTypes";
+import type { ForgotPasswordData } from "../../../shared/types/api/auth";
+import type { ForgotPasswordFormProps } from "../types";
 import { Link } from "react-router-dom";
 import { useOTP } from "../hooks/useOTP";
 import { OTPModal } from "../../../shared/ui/dialog/OTPModal";

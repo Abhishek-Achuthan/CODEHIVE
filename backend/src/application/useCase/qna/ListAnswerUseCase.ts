@@ -1,7 +1,6 @@
 import { inject,injectable } from 'tsyringe';
 import { IListAnswerUseCase } from '../interface/qna/IListAnswerUseCase';
 import type { IAnswerRepostiory } from '../../../domain/interfaces/IAnswerRepository';
-import { AnswerEntity } from '../../../domain/entities/qna/AnswerEntity';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { IAnswerListQueryDTO } from '../../dto/AnswerDTO';
 import type { IQuestionRepository } from '../../../domain/interfaces/IQuestionRepository';

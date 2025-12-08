@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { FieldValues, FieldErrors, UseFormRegister } from 'react-hook-form';
-import type { FieldComponentProps, FormFieldProps } from '../../../shared/types/authTypes';
+import type { FieldComponentProps, FormFieldProps } from '../types';
 
 interface RHFFormFieldProps<T extends FieldValues> {
   field: FormFieldProps<T>['field'];

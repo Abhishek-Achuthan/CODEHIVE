@@ -1,4 +1,3 @@
-// src/pages/qna/QuestionDetailsPage.tsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
@@ -11,11 +10,7 @@ import { QuesDetailPageSkelton } from "../components/QuesDetailPageSkelton";
 import { QuestionHeaderSection } from "../components/QuestionDetailsHeaderSection";
 import { RelatedQuestionsSection } from "../components/RelatetdQuestionSection";
 import AnswerEditorSection from "../components/AnswerEditorSection";
-import type {
-  AnswerDTO,
-  GetQuestionData,
-  RelatedQuestions,
-} from "../../../shared/types/qnaTypes";
+import type { GetQuestionData, Answer } from "../../../shared/types/domain/qna";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import { usePostAnswers } from "../hooks/usePostAnswers";
@@ -24,11 +19,7 @@ import { useFetchAnswers } from "../hooks/useFetchAnswers";
 const QuestionDetailsPage: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
 
-  const { data, loading, relatedQuestions } = useFetchQuestion(questionId) as {
-    data?: GetQuestionData;
-    loading: boolean;
-    relatedQuestions: RelatedQuestions[];
-  };
+  const { data, loading, relatedQuestions } = useFetchQuestion(questionId);
 
   const {fetchAnswers,data:answers, loading : answersLoading} = useFetchAnswers();
 
@@ -37,49 +28,42 @@ const QuestionDetailsPage: React.FC = () => {
     data?.isBookmarked
   );
 
-  const [localAnswers, setLocalAnswers] = useState<AnswerDTO[]>([]);
-  const {postAnswer,isPosting} = usePostAnswers()
+  const [localAnswers, setLocalAnswers] = useState<Answer[]>([]);
+  const { postAnswer, isPosting } = usePostAnswers();
 
-  useEffect(()=>{
-    if(!questionId) return;
+  useEffect(() => {
+    if (!questionId) return;
 
-    void(fetchAnswers({
+    void fetchAnswers({
       questionId,
-      page:1,
-      limit:10,
-      sortBy:'newest'
-    }));
-  },[questionId,fetchAnswers]);
+      page: 1,
+      limit: 10,
+      sortBy: 'newest',
+    });
+  }, [questionId, fetchAnswers]);
 
-  const mappedServerAnswers: AnswerDTO[] = (answers??[]).map((a) => ({
-    id: a.answer.id,
-    answerText: a.answer.answerText,
-    isAccepted: a.answer.isAccepted,
-    voteCount: a.answer.voteCount,
-    createdAt: a.answer.createdAt,
-    updatedAt: a.answer.updatedAt,
-    author: a.author.firstName,
-  }));
-
-  const allAnswers: AnswerDTO[] = [
-  ...localAnswers,
-  ...mappedServerAnswers,
-];
-
+  const allAnswers: Answer[] = [
+    ...localAnswers,
+    ...(answers ?? []),
+  ];
 
   const handleSubmitHtml = async (html: string): Promise<void> => {
     if (!questionId) return;
 
     const now = new Date().toISOString();
 
-    const tempAnswer: AnswerDTO = {
+    const tempAnswer: Answer = {
       id: `temp-${Date.now()}`,
       answerText: html,
       isAccepted: false,
       voteCount: 0,
       createdAt: now,
       updatedAt: now,
-      author: 'you'
+      author: {
+        id: 'temp',
+        firstName: 'you',
+        email: '',
+      },
     };
 
     setLocalAnswers((prev) => [tempAnswer, ...prev]);
@@ -156,7 +140,7 @@ const QuestionDetailsPage: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-white font-semibold">
-                          {a.author} 
+                          {a.author.firstName} {a.author.lastName}
                         </p>
                       </div>
                     </div>

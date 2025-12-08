@@ -1,5 +1,5 @@
 import apiClient from '../apiClient';
-import type { ForgotPasswordData, LoginData, OTPData, RegisterData, ResetPasswordData } from '../../shared/types/authTypes';
+import type { ForgotPasswordData, LoginData, OTPData, RegisterData, ResetPasswordData } from '../../shared/types/api/auth';
 import { API_ROUTES } from '../../constants/apiRoutes';
 
 export const registerUser = (otp:string,data:RegisterData) => apiClient.post(API_ROUTES.AUTH.USER_REGISTER,{data,otp});

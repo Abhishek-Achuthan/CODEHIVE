@@ -1,7 +1,7 @@
 import type React from "react";
 import { MdShare, MdRemoveRedEye as MdEye, MdBookmark } from "react-icons/md";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
-import type { GetQuestionData } from "../../../shared/types/qnaTypes";
+import type { GetQuestionData } from "../../../shared/types/domain/qna";
 
 interface QuestionHeaderSectionProps {
   data: GetQuestionData;

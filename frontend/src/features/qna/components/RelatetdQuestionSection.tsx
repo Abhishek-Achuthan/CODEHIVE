@@ -1,5 +1,9 @@
 import type React from "react";
-import type { RelatedQuestionsSectionProps } from "../../../shared/types/qnaTypes";
+import type { RelatedQuestion } from "../../../shared/types/domain/qna";
+
+export interface RelatedQuestionsSectionProps {
+  relatedQuestions: RelatedQuestion[];
+}
 
 export const RelatedQuestionsSection: React.FC<RelatedQuestionsSectionProps> = ({
   relatedQuestions,

@@ -1,8 +1,6 @@
 import { useForm } from "react-hook-form";
-import type {
-  LoginData,
-  LoginFormProps,
-} from "../../../shared/types/authTypes";
+import type { LoginData } from "../../../shared/types/api/auth";
+import type { LoginFormProps } from "../types";
 import { loginSchema } from "../validations/authValidation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";

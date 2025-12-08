@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import type { GetQuestionData, Question } from "../../../shared/types/qnaTypes";
+import type { GetQuestionData, RelatedQuestion } from "../../../shared/types/domain/qna";
 import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 
 export function useFetchQuestion(questionId: string | undefined) {
   const [data, setData] = useState<GetQuestionData | undefined>();
-  const [relatedQuestions, setRelatedQuestions] = useState<Partial<Question>[]>([]);
+  const [relatedQuestions, setRelatedQuestions] = useState<RelatedQuestion[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(() => {
@@ -26,7 +26,7 @@ export function useFetchQuestion(questionId: string | undefined) {
         if (cancelled) return;
 
         setData(questionRes.data);
-        setRelatedQuestions(relatedRes.data);
+        setRelatedQuestions(relatedRes.items ?? []);
 
       } catch (error) {
         if (error instanceof BaseError) {

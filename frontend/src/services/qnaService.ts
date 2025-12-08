@@ -3,20 +3,25 @@ import { AxiosError } from 'axios';
 import * as QnAApi from '../api/endpoints/qnaAPI'
 
 import { BaseError } from '../shared/errors/BaseError'
-import type { AnswerListParams, CreateQuestion, questionList } from '../shared/types/qnaTypes'
+import type { AnswerListParams, CreateQuestionRequest, QuestionListParams } from '../shared/types/api/qna';
+import { mapQuestionListItemFromApi, mapRelatedQuestionFromApi, mapAnswerFromApi } from '../shared/types/domain/qna';
 
 
 export class QnAService {
-    static async listQuestions(data:questionList) {
+    static async listQuestions(data: QuestionListParams) {
         try {
-            const response = await QnAApi.listQuestion(data)
-            return response.data;
+            const response = await QnAApi.listQuestion(data);
+            console.log(response)
+            return {
+                ...response.data,
+                items: response.data.data.items.map(mapQuestionListItemFromApi),
+            };
         } catch (error) {
-            this.handleError(error)
+            this.handleError(error);
         }
     }
 
-    static async createQuestion(data:CreateQuestion) {
+    static async createQuestion(data: CreateQuestionRequest) {
         try {
             const response = await QnAApi.createQuestion(data);
             return response.data;
@@ -34,10 +39,13 @@ export class QnAService {
         }
     }
 
-    static async relatedQuestions(questionId:string) {
+    static async relatedQuestions(questionId: string) {
         try {
             const response = await QnAApi.relatedQuestions(questionId);
-            return response.data;
+            return {
+                ...response.data,
+                items: response.data.items.map(mapRelatedQuestionFromApi),
+            };
         } catch (error) {
             this.handleError(error);
         }
@@ -61,10 +69,13 @@ export class QnAService {
         }
     }
 
-    static async listAnswers(data:AnswerListParams) {
+    static async listAnswers(data: AnswerListParams) {
         try {
             const response = await QnAApi.listAnswers(data);
-            return response.data
+            return {
+                ...response.data,
+                items: response.data.items.map(mapAnswerFromApi),
+            };
         } catch (error) {
             this.handleError(error);
         }
