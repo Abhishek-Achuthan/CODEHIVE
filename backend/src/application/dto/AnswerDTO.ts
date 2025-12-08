@@ -18,14 +18,13 @@ export interface ICreateAnswerInputDTO {
 }
 
 export interface IUpdateAnswerInputDTO {
-  id: string; 
+  id: string;
   answerText?: string;
 }
 
-export interface IAnswerListQueryDTO  {
-   questionId:string,
-   page?:number,
-   limit?:number,
-   sortBy?:AnswerSort
+export interface IAnswerListQueryDTO {
+  questionId: string;
+  page?: number;
+  limit?: number;
+  sortBy?: AnswerSort;
 }
-

@@ -1,10 +1,5 @@
+import { ListQuery } from './ListQuery';
 import { QuestionListFilter } from './QuestionListFilter';
 import { QuestionSort } from './QuestionSort';
 
-export interface QuestionListQuery {
-    filter?: QuestionListFilter;
-    page?:number;
-    limit?:number;
-    sortBy?:QuestionSort;
-    search?:string;
-}
+export type QuestionListQuery = ListQuery<QuestionListFilter,QuestionSort>;
