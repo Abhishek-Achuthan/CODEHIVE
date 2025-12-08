@@ -15,7 +15,6 @@ export class GetQuestionUseCase implements IGetQuestionUseCase {
     ) {}
 
     async execute(questionId: string ,userId:string): Promise<QuestionWithAuthorDTO> {
-        console.log(userId)
         
         const question = await this._questionRepository.getQuestionWithAuthorData(questionId);
 
@@ -23,7 +22,7 @@ export class GetQuestionUseCase implements IGetQuestionUseCase {
 
         const savedQuestion = await this._saveQuestionRepository.findByUserAndQuestion(userId,questionId);
 
-        const isBookmarked = !!savedQuestion
+        const isBookmarked = !!savedQuestion;
 
         const mappedQuestion  =  QuestionMapper.toQuestionWithAuthor(question,isBookmarked);
 
