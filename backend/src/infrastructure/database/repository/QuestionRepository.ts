@@ -8,14 +8,12 @@ import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { QuestionStatus } from '../../../domain/types/QuestionStatus';
 import { QuestionSort } from '../../../domain/types/QuestionSort';
 import { UpdateQuery } from 'mongoose';
-import {
-  AuthorInfo,
-  QuestionWithAuthor,
-} from '../../../domain/types/QuestionWithAuthor';
+import { QuestionWithAuthor } from '../../../domain/types/QuestionWithAuthor';
 import { QuestionListQuery } from '../../../domain/types/QuestionListQuery';
 import { QuestionLeanDoc } from '../schemas/qna/QuestionSchema';
 import { UserLeanDoc } from '../schemas/UserSchema';
 import { PopulatedQuestionDoc } from '../types/PopulatedQuestionDoc';
+import { AuthorInfo } from '../../../domain/types/AuthorInfo';
 
 export class QuestionRepository
   extends GenericRepository<QuestionDoc, QuestionEntity>

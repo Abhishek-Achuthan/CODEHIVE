@@ -1,7 +1,7 @@
-import { AnswerEntity } from '../../../../domain/entities/qna/AnswerEntity';
+import { AnswerWithAuthor } from '../../../../domain/types/AnswerWithAuthor';
 import { PaginationResult } from '../../../../domain/types/PaginationResult';
 import { IAnswerListQueryDTO } from '../../../dto/AnswerDTO';
 
 export interface IListAnswerUseCase {
-    execute(data:IAnswerListQueryDTO):Promise<PaginationResult<AnswerEntity>>
+    execute(data:IAnswerListQueryDTO):Promise<PaginationResult<AnswerWithAuthor>>
 }
