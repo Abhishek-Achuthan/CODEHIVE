@@ -48,6 +48,6 @@ export class AuthMiddleware {
         return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
       return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED));
-    }
+    };
   };
 }

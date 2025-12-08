@@ -18,7 +18,9 @@ export class AnswerController {
   async handlePostAnswer(req: Request, res: Response, next: NextFunction) {
 
     try {
-        const { questionId, answerText, answeredBy } = req.body;
+        const { questionId, answerText } = req.body;
+
+        const answeredBy = req.user?.id?? '';
     
         const data = await this._postAnswerUseCase.execute({
           answeredBy,
@@ -47,7 +49,9 @@ export class AnswerController {
             page:page?Number(page):1,
             limit:limit?Number(limit):10,
             sortBy:sortBy?sortBy as AnswerSort:AnswerSort.Newest,
-        })
+        });
+
+        console.log(data)
 
         return res.status(HttpStatus.OK).json({success:true,data});
     } catch (error) {
