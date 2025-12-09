@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { Answer } from "../../../shared/types/domain/qna";
 import type { AnswerListParams } from "../../../shared/types/api/qna";
 import { QnAService } from "../../../services/qnaService";
@@ -9,7 +9,7 @@ export function useFetchAnswers() {
     const [data, setData] = useState<Answer[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const fetchAnswers = async (params: AnswerListParams) => {
+    const fetchAnswers = useCallback(async (params: AnswerListParams) => {
         try {
             setLoading(true);
             const response = await QnAService.listAnswers(params);
@@ -23,6 +23,6 @@ export function useFetchAnswers() {
         }finally{
             setLoading(false);
         }
-    };
+    },[]);
     return {fetchAnswers,data,loading};
 };
