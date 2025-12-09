@@ -94,12 +94,9 @@ export class QuestionController {
     try {
       const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
 
-      const questions = await this._relatedQuestionUseCase.execute(questionId);
+      const data = await this._relatedQuestionUseCase.execute(questionId);
 
-      res.status(HttpStatus.OK).json({
-        success: true,
-        data: questions,
-      });
+      res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }

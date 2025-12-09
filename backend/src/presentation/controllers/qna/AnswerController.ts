@@ -43,6 +43,7 @@ export class AnswerController {
   async handleListAnswers(req: Request,res: Response, next: NextFunction) {
     try {
         const {questionId,page,limit,sortBy} = req.query;
+        console.log(req.query)
 
         const data = await this._listAnswerUseCase.execute({
             questionId:String(questionId),
@@ -53,7 +54,7 @@ export class AnswerController {
 
         console.log(data)
 
-        return res.status(HttpStatus.OK).json({success:true,data});
+        return res.status(HttpStatus.OK).json(data);
     } catch (error) {
         next(error);
     }

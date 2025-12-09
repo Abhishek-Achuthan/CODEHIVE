@@ -20,8 +20,6 @@ export class ListAnswerUseCase implements IListAnswerUseCase {
     async execute(data: IAnswerListQueryDTO): Promise<PaginationResult<AnswerWithAuthor>> {
 
         const {questionId,page,limit,sortBy} = data;
-
-        console.log(data)
         
         const question = await this._questionRepository.find(data.questionId);
 
