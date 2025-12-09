@@ -25,8 +25,9 @@ export function useFetchQuestion(questionId: string | undefined) {
 
         if (cancelled) return;
 
-        setData(questionRes.data);
-        setRelatedQuestions(relatedRes.items ?? []);
+        setData(questionRes);
+        setRelatedQuestions(relatedRes ?? []);
+        console.log(questionRes,'question responce form y')
 
       } catch (error) {
         if (error instanceof BaseError) {
