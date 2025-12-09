@@ -90,13 +90,13 @@ export class AnswerRepository
 
     const doc = await this._model
       .find(answerQuery)
-      .populate<{ userId: UserLeanDoc }>({
-        path: 'userId',
+      .populate<{ answeredBy: UserLeanDoc }>({
+        path: 'answeredBy',
         select: 'email firstName lastName',
       }).sort(sort).skip(skip).limit(pageLimit)
-      .lean<PopulatedAnswerDoc[] | null>();
+      .lean<PopulatedAnswerDoc[]>();
 
-    if (!doc || doc.length === 0) {
+    if (doc.length === 0) {
       return {
         items : [],
         totalItems: 0,
@@ -110,10 +110,10 @@ export class AnswerRepository
 
     const items: AnswerWithAuthor[] = doc?.map((doc) => {
       const author: AuthorInfo = {
-        id: doc.userId._id.toString(),
-        email: doc.userId.email,
-        firstName: doc.userId.firstName,
-        lastName: doc.userId.lastName,
+        id: doc.answeredBy._id.toString(),
+        email: doc.answeredBy.email,
+        firstName: doc.answeredBy.firstName,
+        lastName: doc.answeredBy.lastName,
       };
 
       const answerEntity: AnswerEntity = this.leanToEntity(doc);
