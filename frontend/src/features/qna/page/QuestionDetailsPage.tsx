@@ -47,6 +47,7 @@ const QuestionDetailsPage: React.FC = () => {
     ...(answers ?? []),
   ];
 
+
   const handleSubmitHtml = async (html: string): Promise<void> => {
     if (!questionId) return;
 
@@ -140,7 +141,7 @@ const QuestionDetailsPage: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-white font-semibold">
-                          {a.author.firstName} {a.author.lastName}
+                          {a.author?.firstName ?? 'you'} 
                         </p>
                       </div>
                     </div>

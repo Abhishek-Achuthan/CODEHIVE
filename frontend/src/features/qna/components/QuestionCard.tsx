@@ -1,7 +1,7 @@
 
 export interface QuestionCardProps {
   title: string;
-  description: string;
+  descriptionHtml: string;
   tags: string[];
   votes?: number;
   answers?: number;
@@ -11,7 +11,7 @@ export interface QuestionCardProps {
 
 export default function QuestionCard({
   title,
-  description,
+  descriptionHtml,
   tags = [],
   votes = 0,
   answers = 0,
@@ -41,7 +41,7 @@ export default function QuestionCard({
           <h3 className="text-base font-semibold text-accent group-hover:text-accent/90 mb-2 line-clamp-1 transition">
             {title}
           </h3>
-          <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{description}</p>
+          <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{descriptionHtml}</p>
 
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, i) => (

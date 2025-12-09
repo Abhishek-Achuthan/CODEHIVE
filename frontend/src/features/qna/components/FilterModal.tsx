@@ -1,155 +1,166 @@
-import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '../../../shared/ui/dialog/Dialog';
-import { cn } from "../../../shared/utils/classNames";
-import type { QuestionListFilter } from "../../../shared/types/api/qna";
-import type { QuestionStatus } from "../../../shared/types/domain/qna"; 
+import { useState, type JSX } from "react";
 
-export type FilterState = Partial<QuestionListFilter>;
+export type FilterState = {
+  status: "all" | "answered" | "unanswered";
+  tags: string[];
+  dateFrom: string;
+};
 
-interface FilterModalProps {
+type FilterModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onApply: (filters: FilterState) => void;
-}
+};
 
-export function FilterModal({ open, onOpenChange, onApply }: FilterModalProps) {
-  const [filters, setFilters] = useState<FilterState>({
-    status: "all",
-    bookmarkedOnly: false,
-    dateFrom: "",
-    tags: [],
-  });
-  const [tagInput, setTagInput] = useState("");
+const defaultState: FilterState = {
+  status: "all",
+  tags: [],
+  dateFrom: "",
+};
 
-  useEffect(() => {
-    if (open) {
-      setFilters({
-        status: "all",
-        bookmarkedOnly: false,
-        dateFrom: "",
-        tags: [],
-      });
-      setTagInput("");
-    }
-  }, [open]);
+export function FilterModal({
+  open,
+  onOpenChange,
+  onApply,
+}: FilterModalProps): JSX.Element | null {
+  const [form, setForm] = useState<FilterState>(defaultState);
 
-  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) =>
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  if (!open) return null;
 
-  const handleApply = () => {
-    const cleaned: FilterState = { ...filters };
-    
-    const parsedTags = tagInput.split(",").map((t) => t.trim()).filter(Boolean);
-    if (parsedTags.length > 0) {
-      cleaned.tags = parsedTags;
-    } else {
-      delete cleaned.tags;
-    }
-
-    if (!cleaned.dateFrom) delete cleaned.dateFrom;
-    if (cleaned.status === "all") delete cleaned.status;
-
-    onApply(cleaned);
+  const handleReset = (): void => {
+    setForm(defaultState);
+    onApply(defaultState);
     onOpenChange(false);
   };
 
-  const handleReset = () => {
-    setFilters({
-      status: "all",
-      dateFrom: "",
-      tags: [],
-    });
-    setTagInput("");
+  const handleApply = (): void => {
+    onApply(form);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg border-border/50 bg-background/95 backdrop-blur-xl">
-        <div className="flex items-start justify-between gap-4">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">Filter Questions</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Narrow down the list of questions using the filters below.
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+    <div className="mt-4 rounded-xl border border-border bg-card/90 px-6 py-5 shadow-lg mb-4" >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-foreground">
+          Filter Questions
+        </h2>
+        <button
+          type="button"
+          onClick={() => onOpenChange(false)}
+          className="text-foreground/60 hover:text-foreground text-sm"
+        >
+          ✕
+        </button>
+      </div>
 
-        <div className="mt-6 space-y-6">
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3">Status</h3>
-            <div className="space-y-2">
-              {[
-                { value: "all" as QuestionStatus, label: "All Questions" },
-                { value: "answered" as QuestionStatus, label: "Answered" },
-                { value: "unanswered" as QuestionStatus, label: "Unanswered" },
-              ].map((option) => (
-                <label key={option.value} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="radio"
-                    name="status"
-                    value={option.value}
-                    checked={filters.status === option.value}
-                    onChange={(e) => updateFilter("status", e.target.value as QuestionStatus)}
-                    className="w-4 h-4 rounded border-border bg-background checked:bg-primary accent-primary"
-                  />
-                  <span className="text-sm text-foreground/70 group-hover:text-foreground transition">
-                    {option.label}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
+      <p className="text-sm text-foreground/60 mb-4">
+        Narrow down the list of questions using the filters below.
+      </p>
 
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3">Tags (comma-separated)</h3>
-            <input
-              type="text"
-              placeholder="e.g., react, javascript, typescript"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
-            />
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3">Date</h3>
-            <div className="grid grid-cols-1 gap-2">
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Status */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Status</h3>
+          <div className="space-y-2 text-sm text-foreground/80">
+            <label className="flex items-center gap-2">
               <input
-                type="date"
-                placeholder="From"
-                value={filters.dateFrom || ""}
-                onChange={(e) => updateFilter("dateFrom", e.target.value)}
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+                type="radio"
+                name="status"
+                value="all"
+                checked={form.status === "all"}
+                onChange={() =>
+                  setForm((prev) => ({ ...prev, status: "all" }))
+                }
               />
-            </div>
+              <span>All Questions</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="status"
+                value="answered"
+                checked={form.status === "answered"}
+                onChange={() =>
+                  setForm((prev) => ({ ...prev, status: "answered" }))
+                }
+              />
+              <span>Answered</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="status"
+                value="unanswered"
+                checked={form.status === "unanswered"}
+                onChange={() =>
+                  setForm((prev) => ({ ...prev, status: "unanswered" }))
+                }
+              />
+              <span>Unanswered</span>
+            </label>
           </div>
         </div>
 
-        <div className="mt-6 flex gap-3">
+        <div>
+          <h3 className="text-sm font-semibold mb-3">
+            Tags (comma-separated)
+          </h3>
+          <input
+            type="text"
+            placeholder="e.g., react, javascript, typescript"
+            value={form.tags.join(",")}
+            onChange={(e) => {
+              const tagString = e.target.value;
+              const tagArray = tagString
+              .split(',')
+              .map(tag => tag.trim())
+              .filter(tag => tag.length >0);
+              setForm((prev) => ({ ...prev, tags: tagArray }));
+            }}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+          />
+        </div>
+
+        {/* Date */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Date</h3>
+          <input
+            type="date"
+            value={form.dateFrom}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, dateFrom: e.target.value }))
+            }
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-between items-center">
+        <button
+          type="button"
+          onClick={handleReset}
+          className="px-4 py-2 rounded-lg border border-border text-sm text-foreground/80 hover:bg-card/80"
+        >
+          Reset
+        </button>
+
+        <div className="flex gap-3">
           <button
-            onClick={handleReset}
-            className={cn(
-              "flex-1 px-4 py-2 rounded-lg text-sm font-medium border border-border bg-background hover:bg-background/80 transition"
-            )}
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="px-4 py-2 rounded-lg border border-border text-sm text-foreground/80 hover:bg-card/80"
           >
-            Reset
+            Cancel
           </button>
           <button
+            type="button"
             onClick={handleApply}
-            className={cn(
-              "flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition border border-white"
-            )}
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 border border-white"
           >
             Apply Filters
           </button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

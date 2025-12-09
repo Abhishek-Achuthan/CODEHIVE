@@ -11,10 +11,9 @@ export class QnAService {
     static async listQuestions(data: QuestionListParams) {
         try {
             const response = await QnAApi.listQuestion(data);
-            console.log(response)
             return {
                 ...response.data,
-                items: response.data.data.items.map(mapQuestionListItemFromApi),
+                items: response.data.items.map(mapQuestionListItemFromApi),
             };
         } catch (error) {
             this.handleError(error);
@@ -42,10 +41,9 @@ export class QnAService {
     static async relatedQuestions(questionId: string) {
         try {
             const response = await QnAApi.relatedQuestions(questionId);
-            return {
-                ...response.data,
-                items: response.data.items.map(mapRelatedQuestionFromApi),
-            };
+            const items = Array.isArray(response.data)?
+            response.data.map(mapRelatedQuestionFromApi) : [];
+            return items
         } catch (error) {
             this.handleError(error);
         }
@@ -72,9 +70,11 @@ export class QnAService {
     static async listAnswers(data: AnswerListParams) {
         try {
             const response = await QnAApi.listAnswers(data);
+            const items = Array.isArray(response.data.items)?
+            response.data.items.map(mapAnswerFromApi):[];
             return {
                 ...response.data,
-                items: response.data.items.map(mapAnswerFromApi),
+                items
             };
         } catch (error) {
             this.handleError(error);

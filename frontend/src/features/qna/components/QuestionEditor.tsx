@@ -26,7 +26,6 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
 
   useEffect(() => {
     if (!editor) return;
-    // Keep editor content in sync when value changes externally
     if (value === "" && editor.getHTML() !== "") {
       editor.commands.setContent("");
     }
