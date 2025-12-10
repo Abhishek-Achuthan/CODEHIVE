@@ -111,13 +111,8 @@ export class QuestionRepository
   async incrementAnswerCountAndSetAnswered(
     questionId: string,
     amount: number,
-    setAnswered: boolean
   ): Promise<void> {
-    const update: UpdateQuery<QuestionDoc> = { $inc: { answerCount: amount } };
-
-    if (setAnswered) {
-      update.$set = { isAnswered: true };
-    }
+    const update: UpdateQuery<QuestionDoc> = { $inc: { answerCount: amount },$set:{isAnswered:true} };
 
     await this._model.updateOne({ _id: questionId }, update);
   }

@@ -2,7 +2,8 @@ import type { PaginatedResponse } from "../core/api";
 import type { ListQueryParams } from "../core/api";
 import type { QuestionSort, AnswerSort, QuestionStatus } from "../domain/qna";
 
-// Request DTOs
+//-------------------------------- Request DTOs-----------------------------------------//
+
 export type CreateQuestionRequest = {
   title: string;
   descriptionHtml: string;
@@ -31,7 +32,7 @@ export type AnswerListParams = Omit<ListQueryParams<never, AnswerSort>, "filter"
   questionId: string;
 };
 
-// Response DTOs
+//-------------------------------- Response DTOs----------------------------------------//
 export interface AnswerAuthorDTO {
   id: string;
   firstName: string;

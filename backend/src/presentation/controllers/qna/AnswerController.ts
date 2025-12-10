@@ -43,7 +43,6 @@ export class AnswerController {
   async handleListAnswers(req: Request,res: Response, next: NextFunction) {
     try {
         const {questionId,page,limit,sortBy} = req.query;
-        console.log(req.query)
 
         const data = await this._listAnswerUseCase.execute({
             questionId:String(questionId),

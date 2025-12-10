@@ -24,11 +24,9 @@ export class PostAnswerUseCase implements IPostAnswerUseCase {
     
     if (question.acceptedAnswerId) throw new ForbiddenError(ERROR_MESSAGES.QnA.ALREADY_ANSWERED);
     
-    const answer = await this._answerRepository.create({ questionId, answeredBy, answerText, });
+    const answer = await this._answerRepository.create({ questionId, answeredBy, answerText });
 
-    const isAnswered = question.isAnswered;
-
-    await this._questionRepository.incrementAnswerCountAndSetAnswered(questionId,1,isAnswered);
+    await this._questionRepository.incrementAnswerCountAndSetAnswered(questionId,1);
 
     return answer;
   }

@@ -9,7 +9,7 @@ export interface IQuestionRepository extends IGenericRepository<QuestionEntity> 
     list(data:QuestionListQuery):Promise<PaginationResult<QuestionEntity>>;
     incrementAnswerCount(questionId:string,amount:number):Promise<void>;
     setIsAnswered(questionId:string,isAnswered:boolean):Promise<void>;
-    incrementAnswerCountAndSetAnswered(questionId:string,amount:number,setAnswered:boolean):Promise<void>;
+    incrementAnswerCountAndSetAnswered(questionId:string,amount:number):Promise<void>;
     getQuestionById(questionId:string):Promise<QuestionEntity | null>;
     relatedQuestions(questionId:string):Promise<QuestionEntity[]>;
     getQuestionWithAuthorData(questionId:string):Promise<QuestionWithAuthor | null>
