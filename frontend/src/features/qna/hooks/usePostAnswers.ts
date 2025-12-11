@@ -16,8 +16,9 @@ export function usePostAnswers() {
             const response = await QnAService.postAnswer(data);
 
             toast.success('Answer posted successfully');
+            console.log(response)
 
-            return response;
+            return response.data;
             
         } catch (error) {
             if(error instanceof BaseError) {

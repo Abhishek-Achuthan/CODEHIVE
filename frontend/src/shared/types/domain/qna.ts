@@ -49,10 +49,10 @@ export interface RelatedQuestion {
 }
 
 export interface AnswerAuthor {
-  id: string;
-  firstName: string;
+  id?: string;
+  firstName?: string;
   lastName?: string;
-  email: string;
+  email?: string;
 }
 
 export interface Answer {

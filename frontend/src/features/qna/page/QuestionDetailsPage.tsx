@@ -15,6 +15,9 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import { usePostAnswers } from "../hooks/usePostAnswers";
 import { useFetchAnswers } from "../hooks/useFetchAnswers";
+import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
+
 
 const QuestionDetailsPage: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
@@ -22,6 +25,9 @@ const QuestionDetailsPage: React.FC = () => {
   const { data, loading, relatedQuestions } = useFetchQuestion(questionId);
 
   const {fetchAnswers,data:answers, loading : answersLoading} = useFetchAnswers();
+
+  const currentUser = useAppSelector((state) => state.auth.user);
+  console.log(currentUser)
 
   const { isBookmarked, toggleBookmark } = useBookmarkQuestion(
     questionId,
@@ -61,9 +67,9 @@ const QuestionDetailsPage: React.FC = () => {
       createdAt: now,
       updatedAt: now,
       author: {
-        id: 'temp',
-        firstName: 'you',
-        email: '',
+        id: currentUser?.id,
+        firstName: currentUser?.firstName,
+        email: currentUser?.email,
       },
     };
 
@@ -137,7 +143,7 @@ const QuestionDetailsPage: React.FC = () => {
                         </span>
                         <span>votes</span>
                         <span>•</span>
-                        <span>{new Date(a.createdAt).toLocaleString()}</span>
+                        <span>{timeAgo(parseDate(a.createdAt))}</span>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-white font-semibold">

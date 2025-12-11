@@ -1,4 +1,3 @@
-// src/pages/qna/components/AnswerEditorSection.tsx
 import React, { useEffect } from "react";
 import type { Editor } from "@tiptap/react";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -93,9 +92,15 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
           })}
         </div>
 
-        <div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
-          <EditorContent editor={editor} />
-        </div>
+// ...inside AnswerEditorSection component return
+
+<div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
+  {/* constrain editor height and allow scroll when content grows */}
+  <div className="max-h-[40vh] min-h-40 overflow-auto">
+    <EditorContent editor={editor} />
+  </div>
+</div>
+
 
         <div className="flex justify-end">
           <button
