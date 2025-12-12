@@ -9,17 +9,15 @@ type Props = {
 
 export function QuestionHeader({ title, total, onAsk, filters }: Props) {
   return (
-    <div className="mb-6">
-      <h1 className="text-3xl font-bold text-foreground mb-4">
-        {title}
-      </h1>
+    <div className="mb-6 space-y-3">
+      <h1 className="text-3xl font-bold text-foreground">{title}</h1>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm text-foreground/60">
+        <span className="text-large text-foreground/60">
           {total.toLocaleString()} questions
         </span>
 
-        <div className="flex gap-2">
+        <div className="flex-1 flex justify-center">
           {filters}
         </div>
 

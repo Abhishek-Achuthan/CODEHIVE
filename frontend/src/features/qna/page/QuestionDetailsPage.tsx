@@ -128,31 +128,30 @@ const QuestionDetailsPage: React.FC = () => {
                 allAnswers.map((a) => (
                   <article
                     key={a.id}
-                    className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50"
+                    className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50 max-h-[24vh] overflow-auto"
                   >
                     <div
-                      className="prose prose-invert max-w-none text-sm mb-3"
+                      // make prose full-width, preserve newlines, and wrap very long tokens
+                      className="prose prose-invert max-w-none text-sm mb-3 whitespace-pre-wrap wrap-break-words"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(a.answerText),
                       }}
                     />
                     <div className="flex justify-between items-center text-xs text-zinc-400">
                       <div className="flex items-center gap-3">
-                        <span className="text-white font-semibold">
-                          {a.voteCount}
-                        </span>
+                        <span className="text-white font-semibold">{a.voteCount}</span>
                         <span>votes</span>
                         <span>•</span>
                         <span>{timeAgo(parseDate(a.createdAt))}</span>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-white font-semibold">
-                          {a.author?.firstName ?? 'you'} 
+                          {a.author?.firstName ?? "you"}
                         </p>
                       </div>
                     </div>
                   </article>
-                ))
+                ))             
               )}
             </div>
           </div>

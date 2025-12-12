@@ -85,7 +85,7 @@ export default function QuestionsList(props: QuestionsListProps): JSX.Element {
         onSelect={onQuestionClick}
       />
 
-      <div className="mt-8">
+      <div className="mt-8 h-10 flex items-center justify-center">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

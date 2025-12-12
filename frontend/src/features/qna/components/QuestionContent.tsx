@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import QuestionCard, { type QuestionCardProps } from "./QuestionCard";
 
 type Question = QuestionCardProps & { id: string | number };
@@ -31,13 +32,23 @@ export function QuestionContent({
 
   return (
     <div className="space-y-4">
-      {questions.map((q) => (
-        <QuestionCard
-          key={q.id}
-          {...q}
-          onclick={() => onSelect(q.id.toString())}
-        />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {questions.map((q, idx) => (
+          <motion.div
+            key={q.id}
+            layout
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, delay: idx * 0.04 }}
+          >
+            <QuestionCard
+              {...q}
+              onclick={() => onSelect(q.id.toString())}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
