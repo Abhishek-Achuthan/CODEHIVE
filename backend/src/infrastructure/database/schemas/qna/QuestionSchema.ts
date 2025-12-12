@@ -10,6 +10,10 @@ export interface QuestionDoc extends Document {
   tags: string[];
   views: number;
   votes: number;
+  lastEditedAt:Date | null;
+  lastEditedBy:Types.ObjectId | null;
+  editCount:number,
+  version:number,
   acceptedAnswerId: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
@@ -22,6 +26,10 @@ export type QuestionLeanDoc = {
   isAnswered: boolean;
   answerCount: number;
   askedBy: Types.ObjectId;
+  lastEditedAt:Date | null;
+  lastEditedBy:Types.ObjectId | null;
+  editCount:number,
+  version:number,
   tags: string[];
   views: number;
   votes: number;
@@ -40,6 +48,10 @@ export const QuestionSchema = new Schema<QuestionDoc>(
     tags: { type: [String], required: true },
     views: { type: Number, default: 0 },
     votes: { type: Number, default: 0 },
+    lastEditedBy: {type: Schema.Types.ObjectId,ref:'User',required:false},
+    lastEditedAt: {type:Date,required:false},
+    editCount:{type:Number,default:0,required:true},
+    version:{type:Number,default:1,required:true},
     acceptedAnswerId: {
       type: Schema.Types.ObjectId,
       ref: 'Answer',

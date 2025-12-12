@@ -8,7 +8,11 @@ export interface QuestionEntity {
   tags: string[];
   views: number;
   votes: number;
-  acceptedAnswerId?:string | null;
-  createdAt: string | null;
+  lastEditedAt?:string
+  lastEditedBy?:string |  null;
+  editCount:number;
+  version:number;
+  acceptedAnswerId:string | null;
+  createdAt: string 
   updatedAt: string | null;
 }

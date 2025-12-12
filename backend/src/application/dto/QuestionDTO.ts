@@ -1,7 +1,7 @@
 import { QuestionEntity } from '../../domain/entities/qna/QuestionEntity';
 import { QuestionListFilter } from '../../domain/types/QuestionListFilter';
 import { QuestionSort } from '../../domain/types/QuestionSort';
-import { AuthorInfo } from '../../domain/types/QuestionWithAuthor';
+import { AuthorInfo } from '../../domain/types/AuthorInfo';
 
 export interface IQuestionResponseDTO {
   id: string;
@@ -48,4 +48,11 @@ export interface QuestionWithAuthorDTO {
    question:QuestionEntity;
    author:AuthorInfo;
    isBookmarked : boolean;
+}
+
+export interface EditQuestionInputDTO {
+  title?: string ;
+  descriptionHtml?: string;
+  tags?: string[]; 
+  version:number
 }

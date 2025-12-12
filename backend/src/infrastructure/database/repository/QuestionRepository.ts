@@ -177,6 +177,10 @@ export class QuestionRepository
       updatedAt: doc.updatedAt,
       views: doc.views,
       votes: doc.votes,
+      editCount:doc.editCount,
+      lastEditedAt:doc.lastEditedAt,
+      lastEditedBy:doc.lastEditedBy,
+      version:doc.version
     };
 
     return {
@@ -224,12 +228,16 @@ export class QuestionRepository
       answerCount: doc.answerCount,
       votes: doc.votes,
       isAnswered: doc.isAnswered,
+      editCount:doc.editCount,
+      version:doc.version,
       views: doc.views,
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
-      createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
+      createdAt: doc.createdAt.toISOString(),
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
+      ...(doc.lastEditedAt? {lastEditedAt:doc.lastEditedAt.toISOString()} : {}),
+      ...(doc.lastEditedBy? {lastEditedBy:doc.lastEditedBy.toString()}:{})
     };
   }
   
@@ -244,11 +252,15 @@ export class QuestionRepository
       votes: doc.votes,
       isAnswered: doc.isAnswered,
       views: doc.views,
+      editCount:doc.editCount,
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
-      createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
+      createdAt:doc.createdAt.toISOString(),
+      version:doc.version,
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
+      ...(doc.lastEditedAt ? {lastEditedAt:doc.lastEditedAt.toISOString()}: {}),
+      ...(doc.lastEditedBy ? {lastEditedBy: doc.lastEditedBy.toString() }: {})
     }
   }
 
