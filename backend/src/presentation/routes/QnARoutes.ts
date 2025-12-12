@@ -40,11 +40,17 @@ export class QnARoutes {
             '/questions/:id/related',
             this._questionController.handleRelatedQuestion.bind(this._questionController)
         );
+        this._router.patch(
+            '/questions/:id',
+            authMiddleware.check,
+            this._questionController.hanldeEditQuestion.bind(this._questionController)
+        );
         this._router.post(
             '/questions/:id/save',
             this._authMiddleware.check,
             this._questionController.handleSaveQuestion.bind(this._questionController)
         );
+
 
         //--------------------------Answer Routes-----------------------------------//
 

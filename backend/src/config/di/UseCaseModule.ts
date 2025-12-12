@@ -41,6 +41,8 @@ import { IRelatedQuestionUseCase } from '../../application/useCase/interface/qna
 import { RelatedQuestionUseCase } from '../../application/useCase/qna/RelatedQuestionUseCase';
 import { IToggleSaveQuestionUseCase } from '../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
 import { ToggleSaveQuestionUseCase } from '../../application/useCase/qna/ToggleSaveQuestionUseCase';
+import { IEditQuestionUseCase } from '../../application/useCase/interface/qna/IEditQuestionUseCase';
+import { EditQuestionUseCase } from '../../application/useCase/qna/EditQuestionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -129,20 +131,24 @@ export class UseCaseModule {
     });
 
     container.register<IListAnswerUseCase>('IListAnswerUseCase',{
-      useClass: ListAnswerUseCase
+      useClass: ListAnswerUseCase,
     });
 
     container.register<IGetQuestionUseCase>('IGetQuestionUseCase', {
-      useClass: GetQuestionUseCase
+      useClass: GetQuestionUseCase,
     });
 
     container.register<IRelatedQuestionUseCase>('IRelatedQuestionUseCase', {
-      useClass: RelatedQuestionUseCase
+      useClass: RelatedQuestionUseCase,
     });
 
     container.register<IToggleSaveQuestionUseCase>('IToggleSaveQuestionUseCase',{
-      useClass: ToggleSaveQuestionUseCase
+      useClass: ToggleSaveQuestionUseCase,
     });
+
+    container.register<IEditQuestionUseCase>('IEditQuestionUseCase', {
+      useClass:EditQuestionUseCase,
+    })
 
   }
 }

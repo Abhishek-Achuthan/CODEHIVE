@@ -14,6 +14,7 @@ import type { IListQuestionUseCase } from '../../../application/useCase/interfac
 import type { IGetQuestionUseCase } from '../../../application/useCase/interface/qna/IGetQuestionUseCase';
 import type { IRelatedQuestionUseCase } from '../../../application/useCase/interface/qna/IRelatedQuestionUseCase';
 import type { IToggleSaveQuestionUseCase } from '../../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
+import type { IEditQuestionUseCase } from '../../../application/useCase/interface/qna/IEditQuestionUseCase';
 
 @injectable()
 export class QuestionController {
@@ -28,6 +29,8 @@ export class QuestionController {
     private readonly _relatedQuestionUseCase: IRelatedQuestionUseCase,
     @inject('IToggleSaveQuestionUseCase')
     private readonly _toggleSaveQuestionUseCase: IToggleSaveQuestionUseCase,
+    @inject('IEditQuestionUseCase')
+    private readonly _editQuestionUseCase: IEditQuestionUseCase
   ) {}
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
@@ -67,9 +70,9 @@ export class QuestionController {
 
   async handleListQuestions(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.query)
+      console.log(req.query);
       const parsedData = QuestionListSchema.parse(req.query);
-      console.log(parsedData)
+      console.log(parsedData);
 
       const data = await this._listQuestionUseCase.execute(parsedData);
 
@@ -82,9 +85,9 @@ export class QuestionController {
   async handleGetQuestion(req: Request, res: Response, next: NextFunction) {
     try {
       const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
-      const userId = req.user?.id
+      const userId = req.user?.id;
 
-      const data = await this._getQuestionUseCase.execute(questionId,userId!);
+      const data = await this._getQuestionUseCase.execute(questionId, userId!);
 
       res.status(HttpStatus.OK).json(data);
     } catch (error) {
@@ -123,6 +126,24 @@ export class QuestionController {
           ? RESPONSE_MESSAGES.QA.SAVE_QUESTION
           : RESPONSE_MESSAGES.QA.UNSAVE_QUESTION,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async hanldeEditQuestion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const questionId = req.params.questionId;
+      const data = req.body;
+      const userId = req.user?.id;
+
+      const updated = await this._editQuestionUseCase.execute(
+        data,
+        questionId!,
+        userId!
+      );
+
+      res.status(HttpStatus.OK).json(updated);
     } catch (error) {
       next(error);
     }
