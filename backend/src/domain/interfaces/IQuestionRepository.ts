@@ -1,5 +1,6 @@
 import { QuestionEntity } from '../entities/qna/QuestionEntity';
 import { PaginationResult } from '../types/PaginationResult';
+import { QuestionEditableFields } from '../types/QuestionEditableFields';
 import { QuestionListQuery } from '../types/QuestionListQuery';
 import { QuestionWithAuthor } from '../types/QuestionWithAuthor';
 import { IGenericRepository } from './IGenericRepository';
@@ -12,5 +13,6 @@ export interface IQuestionRepository extends IGenericRepository<QuestionEntity> 
     incrementAnswerCountAndSetAnswered(questionId:string,amount:number):Promise<void>;
     getQuestionById(questionId:string):Promise<QuestionEntity | null>;
     relatedQuestions(questionId:string):Promise<QuestionEntity[]>;
-    getQuestionWithAuthorData(questionId:string):Promise<QuestionWithAuthor | null>
+    getQuestionWithAuthorData(questionId:string):Promise<QuestionWithAuthor | null>;
+    updateWithVersion(questionId:string,expectedVersion:number,payload:QuestionEditableFields) : Promise<QuestionEntity | null>
 }

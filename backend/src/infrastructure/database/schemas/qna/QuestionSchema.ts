@@ -48,8 +48,8 @@ export const QuestionSchema = new Schema<QuestionDoc>(
     tags: { type: [String], required: true },
     views: { type: Number, default: 0 },
     votes: { type: Number, default: 0 },
-    lastEditedBy: {type: Schema.Types.ObjectId,ref:'User',required:false},
-    lastEditedAt: {type:Date,required:false},
+    lastEditedBy: {type: Schema.Types.ObjectId,ref:'User',default:null},
+    lastEditedAt: {type:Date,default:null},
     editCount:{type:Number,default:0,required:true},
     version:{type:Number,default:1,required:true},
     acceptedAnswerId: {

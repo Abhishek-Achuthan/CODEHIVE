@@ -14,6 +14,7 @@ import { QuestionLeanDoc } from '../schemas/qna/QuestionSchema';
 import { UserLeanDoc } from '../schemas/UserSchema';
 import { PopulatedQuestionDoc } from '../types/PopulatedQuestionDoc';
 import { AuthorInfo } from '../../../domain/types/AuthorInfo';
+import { QuestionEditableFields } from '../../../domain/types/QuestionEditableFields';
 
 export class QuestionRepository
   extends GenericRepository<QuestionDoc, QuestionEntity>
@@ -110,9 +111,12 @@ export class QuestionRepository
 
   async incrementAnswerCountAndSetAnswered(
     questionId: string,
-    amount: number,
+    amount: number
   ): Promise<void> {
-    const update: UpdateQuery<QuestionDoc> = { $inc: { answerCount: amount },$set:{isAnswered:true} };
+    const update: UpdateQuery<QuestionDoc> = {
+      $inc: { answerCount: amount },
+      $set: { isAnswered: true },
+    };
 
     await this._model.updateOne({ _id: questionId }, update);
   }
@@ -139,7 +143,10 @@ export class QuestionRepository
       tags: { $in: tags },
     };
 
-    const docs = await this._model.find(query).limit(3).lean<QuestionLeanDoc[]>();
+    const docs = await this._model
+      .find(query)
+      .limit(3)
+      .lean<QuestionLeanDoc[]>();
 
     return docs.map((doc) => this.leanToEntity(doc as QuestionLeanDoc));
   }
@@ -177,16 +184,50 @@ export class QuestionRepository
       updatedAt: doc.updatedAt,
       views: doc.views,
       votes: doc.votes,
-      editCount:doc.editCount,
-      lastEditedAt:doc.lastEditedAt,
-      lastEditedBy:doc.lastEditedBy,
-      version:doc.version
+      editCount: doc.editCount,
+      lastEditedAt: doc.lastEditedAt,
+      lastEditedBy: doc.lastEditedBy,
+      version: doc.version,
     };
 
     return {
       question: this.leanToEntity(questionDoc),
       author,
     };
+  }
+
+  async updateWithVersion(
+    questionId: string,
+    expectedVersion: number,
+    payload: QuestionEditableFields
+  ): Promise<QuestionEntity | null> {
+    const p = payload;
+
+    const updateQuery: UpdateQuery<QuestionDoc> = {
+      ...(p.title !== undefined && { title: p.title }),
+      ...(p.descriptionHtml !== undefined && {
+        descriptionHtml: p.descriptionHtml,
+      }),
+      ...(p.tags !== undefined && { tags: p.tags }),
+      lastEditedAt: new Date(),
+      lastEditedBy: p.lastEditedBy
+        ? new Types.ObjectId(p.lastEditedBy)
+        : undefined,
+
+      $inc: {
+        editCount: 1,
+        version: 1,
+      },
+    };
+    const updatedQues = await this._model
+      .findOneAndUpdate(
+        { id: questionId, verison: expectedVersion },
+        updateQuery,
+        { new: true }
+      )
+      .lean<QuestionLeanDoc | null>() ;
+
+      return updatedQues ? this.leanToEntity(updatedQues): null
   }
 
   protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {
@@ -228,20 +269,26 @@ export class QuestionRepository
       answerCount: doc.answerCount,
       votes: doc.votes,
       isAnswered: doc.isAnswered,
-      editCount:doc.editCount,
-      version:doc.version,
+      editCount: doc.editCount,
+      version: doc.version,
       views: doc.views,
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
       createdAt: doc.createdAt.toISOString(),
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
-      ...(doc.lastEditedAt? {lastEditedAt:doc.lastEditedAt.toISOString()} : {}),
-      ...(doc.lastEditedBy? {lastEditedBy:doc.lastEditedBy.toString()}:{})
+      ...(doc.lastEditedAt
+        ? { lastEditedAt: doc.lastEditedAt.toISOString() }
+        : {}),
+      ...(doc.lastEditedBy
+        ? { lastEditedBy: doc.lastEditedBy.toString() }
+        : {}),
     };
   }
-  
-  private leanToEntity(doc:QuestionLeanDoc | PopulatedQuestionDoc):QuestionEntity {
+
+  private leanToEntity(
+    doc: QuestionLeanDoc | PopulatedQuestionDoc
+  ): QuestionEntity {
     return {
       id: doc._id.toString(),
       title: doc.title,
@@ -252,16 +299,20 @@ export class QuestionRepository
       votes: doc.votes,
       isAnswered: doc.isAnswered,
       views: doc.views,
-      editCount:doc.editCount,
+      editCount: doc.editCount,
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
-      createdAt:doc.createdAt.toISOString(),
-      version:doc.version,
+      createdAt: doc.createdAt.toISOString(),
+      version: doc.version,
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
-      ...(doc.lastEditedAt ? {lastEditedAt:doc.lastEditedAt.toISOString()}: {}),
-      ...(doc.lastEditedBy ? {lastEditedBy: doc.lastEditedBy.toString() }: {})
-    }
+      ...(doc.lastEditedAt
+        ? { lastEditedAt: doc.lastEditedAt.toISOString() }
+        : {}),
+      ...(doc.lastEditedBy
+        ? { lastEditedBy: doc.lastEditedBy.toString() }
+        : {}),
+    };
   }
 
   private mapSort(sortBy?: QuestionSort): { [key: string]: SortOrder } {
@@ -282,5 +333,4 @@ export class QuestionRepository
         return { createdAt: -1 };
     }
   }
-
 }
