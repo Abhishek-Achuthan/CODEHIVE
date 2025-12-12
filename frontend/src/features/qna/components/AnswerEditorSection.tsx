@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import type { IconType } from "react-icons";
 import { MdFormatBold, MdFormatItalic, MdCode } from "react-icons/md";
+import toast from "react-hot-toast";
 
 interface AnswerEditorSectionProps {
   initialHtml?: string;
@@ -28,8 +29,10 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
     content: initialHtml ?? "",
     editorProps: {
       attributes: {
+        // add whitespace/word-break utilities so long single words wrap,
+        // but keep prose styles for formatting
         class:
-          "prose prose-invert max-w-full focus:outline-none min-h-[160px] p-4 text-sm",
+          "prose prose-invert max-w-full focus:outline-none min-h-[160px] p-4 text-sm whitespace-pre-wrap break-words",
       },
     },
   });
@@ -61,10 +64,31 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
     },
   ];
 
+  const plainTextLength = (html: string): number => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html || "";
+    const text = tmp.textContent || tmp.innerText || "";
+    return text.trim().length;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editor) return;
+    
     const html = editor.getHTML();
+    const textLength = plainTextLength(html);
+    
+    // Validate answer content
+    if (textLength < 10) {
+      toast.error("Answer must contain at least 10 characters of text.");
+      return;
+    }
+    
+    if (textLength > 50000) {
+      toast.error("Answer must not exceed 50,000 characters.");
+      return;
+    }
+    
     await onSubmitHtml(html);
     editor.commands.clearContent();
   };
@@ -92,15 +116,17 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
           })}
         </div>
 
-// ...inside AnswerEditorSection component return
-
-<div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
-  {/* constrain editor height and allow scroll when content grows */}
-  <div className="max-h-[40vh] min-h-40 overflow-auto">
-    <EditorContent editor={editor} />
-  </div>
-</div>
-
+        {/* Constrain editor height and allow scrolling for long content.
+            'max-h-[40vh]' keeps it reasonable; adjust to taste. */}
+        <div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
+          <div className="max-h-[40vh] min-h-[160px] overflow-auto">
+            {/* EditorContent inherits the editorProps.class above.
+                Additional wrapper classes force wrapping of long words. */}
+            <div className="px-4 py-2 whitespace-pre-wrap break-all">
+              <EditorContent editor={editor} />
+            </div>
+          </div>
+        </div>
 
         <div className="flex justify-end">
           <button

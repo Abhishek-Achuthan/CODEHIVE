@@ -70,8 +70,10 @@ export default function AskQuestionForm(): JSX.Element {
 
     setSubmitting(true);
     try {
+      // Sanitize HTML but allow formatting tags (TipTap uses these)
       const safeHtml = DOMPurify.sanitize(description, {
-        ALLOWED_TAGS: [], 
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        ALLOWED_ATTR: ['href', 'target', 'rel'],
       });
 
       const payload = {
