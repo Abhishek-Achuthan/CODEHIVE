@@ -1,10 +1,12 @@
 import { injectable, inject } from 'tsyringe';
 import { Request, Response, NextFunction } from 'express';
+import sanitizeHtml from 'sanitize-html';
 import type { IPostAnswerUseCase } from '../../../application/useCase/interface/qna/IPostAnswerUseCase';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import type { IListAnswerUseCase } from '../../../application/useCase/interface/qna/IListAnswerUseCase';
 import { AnswerSort } from '../../../domain/types/AnswerSort';
 import { HttpStatus } from '../../../shared/httpStatusCode';
+import { PostAnswerSchema } from '../../validation/qnaValidations';
 
 @injectable()
 export class AnswerController {
@@ -16,27 +18,44 @@ export class AnswerController {
   ) {}
 
   async handlePostAnswer(req: Request, res: Response, next: NextFunction) {
-
     try {
-        const { questionId, answerText } = req.body;
+      // Validate input with Zod schema
+      const validated = PostAnswerSchema.parse({
+        questionId: req.body.questionId,
+        answerText: req.body.answerText,
+      });
 
-        const answeredBy = req.user?.id?? '';
+      // Sanitize HTML content
+      const cleanHtml = sanitizeHtml(validated.answerText, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+          'img',
+          'pre',
+          'code',
+        ]),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img: ['src', 'alt'],
+          a: ['href', 'target', 'rel'],
+        },
+      });
+
+      const answeredBy = req.user?.id ?? '';
     
-        const data = await this._postAnswerUseCase.execute({
-          answeredBy,
-          questionId,
-          answerText,
+      const data = await this._postAnswerUseCase.execute({
+        answeredBy,
+        questionId: validated.questionId,
+        answerText: cleanHtml,
+      });
+    
+      return res
+        .status(HttpStatus.Created)
+        .json({
+          success: true,
+          message: RESPONSE_MESSAGES.QA.ANSWER_POSTED,
+          data,
         });
-    
-        return res
-          .status(HttpStatus.Created)
-          .json({
-            success: true,
-            message: RESPONSE_MESSAGES.QA.ANSWER_POSTED,
-            data,
-          });
     } catch (error) {
-        next(error)
+      next(error);
     }
   }
   
