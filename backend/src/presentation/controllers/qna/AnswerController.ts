@@ -6,7 +6,9 @@ import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import type { IListAnswerUseCase } from '../../../application/useCase/interface/qna/IListAnswerUseCase';
 import { AnswerSort } from '../../../domain/types/AnswerSort';
 import { HttpStatus } from '../../../shared/httpStatusCode';
-import { PostAnswerSchema } from '../../validation/qnaValidations';
+import { PostAnswerSchema, EditAnswerSchema } from '../../validation/qnaValidations';
+import type { IEditAnswerUseCase } from '../../../application/useCase/interface/qna/IEditAnswerUseCase';
+import { IEditAnswerInputDTO } from '../../../application/dto/AnswerDTO';
 
 @injectable()
 export class AnswerController {
@@ -15,17 +17,17 @@ export class AnswerController {
     private readonly _postAnswerUseCase: IPostAnswerUseCase,
     @inject('IListAnswerUseCase') 
     private readonly _listAnswerUseCase: IListAnswerUseCase,
+    @inject('IEditAnswerUseCase')
+    private readonly _editAnswerUseCase: IEditAnswerUseCase,
   ) {}
 
   async handlePostAnswer(req: Request, res: Response, next: NextFunction) {
     try {
-      // Validate input with Zod schema
       const validated = PostAnswerSchema.parse({
         questionId: req.body.questionId,
         answerText: req.body.answerText,
       });
 
-      // Sanitize HTML content
       const cleanHtml = sanitizeHtml(validated.answerText, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat([
           'img',
@@ -75,6 +77,51 @@ export class AnswerController {
         return res.status(HttpStatus.OK).json(data);
     } catch (error) {
         next(error);
+    }
+  }
+
+  async handleEditAnswer(req:Request,res:Response,next:NextFunction) {
+    try {
+      const answerId = req.params.id;
+      const userId = req.user.id;
+
+      const validated = EditAnswerSchema.parse({
+        answerText: req.body.answerText,
+        version: req.body.version,
+        answerId,
+      });
+
+      const cleanHtml = sanitizeHtml(validated.answerText, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+          'img',
+          'pre',
+          'code',
+        ]),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img: ['src', 'alt'],
+          a: ['href', 'target', 'rel'],
+        },
+      });
+
+      const finalAnswerId = validated.answerId || answerId;
+
+      const data : IEditAnswerInputDTO = {
+        answerText: cleanHtml,
+        version: validated.version,
+        userId,
+        ...(finalAnswerId && { answerId: finalAnswerId })
+      }
+      
+      const updatedAns = await this._editAnswerUseCase.execute(data)
+
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: RESPONSE_MESSAGES.QA.ANSWER_UPDATED,
+        data: updatedAns
+      })
+    } catch (error) {
+      next(error)
     }
   }
 }

@@ -1,4 +1,4 @@
 export type AnswerEditableFields = {
-    answerText?:string;
+    answerText:string | undefined;
     lastEditedBy?:string;
 }

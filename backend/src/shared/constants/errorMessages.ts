@@ -64,6 +64,9 @@ export const ERROR_MESSAGES = {
   QnA: {
     NOT_FOUND:'Question not Found',
     ALREADY_ANSWERED:'This question alredy has an accepted answer.No further answers are allowed.',
-    NOT_ALLOWED_TO_EDIT_QUESTION:'Not allowed to edit this question'
+    NOT_ALLOWED_TO_EDIT_QUESTION:'Not allowed to edit this question',
+    ANSWER_NOT_FOUND: 'Answer not found',
+    ANSWER_VERSION_CONFLICT: 'Answer has been modified. Please refresh and try again.',
+    NOT_ALLOWED_TO_EDIT_ANSWER: 'You are not allowed to edit this answer'
   }
 };

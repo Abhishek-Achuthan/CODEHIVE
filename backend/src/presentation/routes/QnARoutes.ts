@@ -65,6 +65,12 @@ export class QnARoutes {
             this._answerController.handleListAnswers.bind(this._answerController)
         );
 
+        this._router.patch(
+            '/answers/:id',
+            authMiddleware.check,
+            this._answerController.handleEditAnswer.bind(this._answerController)
+        )
+
     }
 
     public getRoutes(): Router {

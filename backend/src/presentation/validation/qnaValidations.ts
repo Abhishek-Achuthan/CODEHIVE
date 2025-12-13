@@ -127,3 +127,23 @@ export const EditQuestionSchema = z.object({
     .int('Version must be an integer')
     .min(1, 'Version must be at least 1'),
 });
+
+export const EditAnswerSchema = z.object({
+  answerText: z.string()
+    .min(1, 'Answer text is required')
+    .superRefine((html: string, ctx) => {
+      const result = validateHtmlContent(html, 10, 50000);
+      if (!result.valid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: result.message || 'Invalid answer content',
+        });
+      }
+    }),
+  version: z.number()
+    .int('Version must be an integer')
+    .min(1, 'Version must be at least 1'),
+  answerId: z.string()
+    .refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid answer ID' })
+    .optional(),
+});

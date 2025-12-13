@@ -43,6 +43,8 @@ import { IToggleSaveQuestionUseCase } from '../../application/useCase/interface/
 import { ToggleSaveQuestionUseCase } from '../../application/useCase/qna/ToggleSaveQuestionUseCase';
 import { IEditQuestionUseCase } from '../../application/useCase/interface/qna/IEditQuestionUseCase';
 import { EditQuestionUseCase } from '../../application/useCase/qna/EditQuestionUseCase';
+import { IEditAnswerUseCase } from '../../application/useCase/interface/qna/IEditAnswerUseCase';
+import { EditAnswerUseCase } from '../../application/useCase/qna/EditAnswerUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -148,6 +150,10 @@ export class UseCaseModule {
 
     container.register<IEditQuestionUseCase>('IEditQuestionUseCase', {
       useClass:EditQuestionUseCase,
+    });
+
+    container.register<IEditAnswerUseCase>('IEditAnswerUseCase',{
+      useClass: EditAnswerUseCase,
     })
 
   }
