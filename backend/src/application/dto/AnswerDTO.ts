@@ -28,3 +28,10 @@ export interface IAnswerListQueryDTO {
   limit?: number;
   sortBy?: AnswerSort;
 }
+
+export interface IEditAnswerInputDTO {
+  userId:string ;
+  answerText?:string;
+  answerId?:string;
+  version:number;
+}

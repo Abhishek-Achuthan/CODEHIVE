@@ -3,7 +3,7 @@ type UserRole = import('../../domain/types/UserRole').UserRole;
 declare global {
   namespace Express {
     interface Request {
-      user?: {
+      user: {
         id: string;
         role: UserRole;
       };

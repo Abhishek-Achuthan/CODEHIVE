@@ -72,9 +72,7 @@ export class QuestionController {
 
   async handleListQuestions(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.query);
       const parsedData = QuestionListSchema.parse(req.query);
-      console.log(parsedData);
 
       const data = await this._listQuestionUseCase.execute(parsedData);
 
@@ -87,9 +85,9 @@ export class QuestionController {
   async handleGetQuestion(req: Request, res: Response, next: NextFunction) {
     try {
       const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
-      const userId = req.user?.id;
+      const userId = req.user.id;
 
-      const data = await this._getQuestionUseCase.execute(questionId, userId!);
+      const data = await this._getQuestionUseCase.execute(questionId, userId);
 
       res.status(HttpStatus.OK).json(data);
     } catch (error) {
@@ -113,7 +111,7 @@ export class QuestionController {
     try {
       const { questionId, userid } = SaveQuestionSchema.parse({
         questionId: req.params.id,
-        userid: req.user?.id,
+        userid: req.user.id,
       });
 
       const { isBookmarked } = await this._toggleSaveQuestionUseCase.execute(
@@ -137,7 +135,7 @@ export class QuestionController {
     try {
       const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
       const validated = EditQuestionSchema.parse(req.body);
-      const userId = req.user?.id;
+      const userId = req.user.id;
 
       const cleanHtml = validated.descriptionHtml
         ? sanitizeHtml(validated.descriptionHtml, {
@@ -164,7 +162,7 @@ export class QuestionController {
       const updated = await this._editQuestionUseCase.execute(
         payload,
         questionId,
-        userId!
+        userId
       );
 
       res.status(HttpStatus.OK).json({
