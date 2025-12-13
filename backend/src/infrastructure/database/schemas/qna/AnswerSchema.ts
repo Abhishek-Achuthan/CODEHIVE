@@ -7,6 +7,10 @@ export interface AnswerDoc extends Document {
   answerText: string;
   isAccepted: boolean;
   voteCount: number;
+  editCount: number;
+  version:number;
+  lastEditedBy:Types.ObjectId | null;
+  lastEditedAt:Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,6 +22,10 @@ export interface AnswerLeanDoc {
   answerText: string;
   isAccepted: boolean;
   voteCount: number;
+  editCount: number;
+  version:number;
+  lastEditedBy:Types.ObjectId | null;
+  lastEditedAt:Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +41,10 @@ export const AnswerSchema = new Schema<AnswerDoc>(
     answerText: { type: String, required: true },
     isAccepted: { type: Boolean, default: false },
     voteCount: { type: Number, default: 0 },
+    lastEditedAt:{type:Date,default:null},
+    lastEditedBy:{type:Schema.Types.ObjectId,ref:'User',default:null},
+    editCount:{type:Number,default:0},
+    version:{type:Number,default:1},
   },
   { timestamps: true }
 );

@@ -221,7 +221,7 @@ export class QuestionRepository
     };
     const updatedQues = await this._model
       .findOneAndUpdate(
-        { id: questionId, verison: expectedVersion },
+        { _id: new Types.ObjectId(questionId), version: expectedVersion },
         updateQuery,
         { new: true }
       )

@@ -8,6 +8,7 @@ import {
   QuestionListSchema,
   SaveQuestionSchema,
   ValidIdSchema,
+  EditQuestionSchema,
 } from '../../validation/qnaValidations';
 import type { ICreateQuestionUseCase } from '../../../application/useCase/interface/qna/ICreateQuestionUseCase';
 import type { IListQuestionUseCase } from '../../../application/useCase/interface/qna/IListQuestionsUseCase';
@@ -15,6 +16,7 @@ import type { IGetQuestionUseCase } from '../../../application/useCase/interface
 import type { IRelatedQuestionUseCase } from '../../../application/useCase/interface/qna/IRelatedQuestionUseCase';
 import type { IToggleSaveQuestionUseCase } from '../../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
 import type { IEditQuestionUseCase } from '../../../application/useCase/interface/qna/IEditQuestionUseCase';
+import type { EditQuestionInputDTO } from '../../../application/dto/QuestionDTO';
 
 @injectable()
 export class QuestionController {
@@ -133,17 +135,43 @@ export class QuestionController {
 
   async hanldeEditQuestion(req: Request, res: Response, next: NextFunction) {
     try {
-      const questionId = req.params.questionId;
-      const data = req.body;
+      const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
+      const validated = EditQuestionSchema.parse(req.body);
       const userId = req.user?.id;
 
+      const cleanHtml = validated.descriptionHtml
+        ? sanitizeHtml(validated.descriptionHtml, {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+              'img',
+              'pre',
+              'code',
+            ]),
+            allowedAttributes: {
+              ...sanitizeHtml.defaults.allowedAttributes,
+              img: ['src', 'alt'],
+              a: ['href', 'target', 'rel'],
+            },
+          })
+        : undefined;
+
+      const payload: EditQuestionInputDTO = {
+        version: validated.version,
+        ...(validated.title !== undefined && { title: validated.title }),
+        ...(cleanHtml !== undefined && { descriptionHtml: cleanHtml }),
+        ...(validated.tags !== undefined && { tags: validated.tags }),
+      };
+
       const updated = await this._editQuestionUseCase.execute(
-        data,
-        questionId!,
+        payload,
+        questionId,
         userId!
       );
 
-      res.status(HttpStatus.OK).json(updated);
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: RESPONSE_MESSAGES.QA.QUESTION_UPDATED,
+        data: updated,
+      });
     } catch (error) {
       next(error);
     }

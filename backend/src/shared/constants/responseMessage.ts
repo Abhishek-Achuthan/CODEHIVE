@@ -11,6 +11,7 @@ export const RESPONSE_MESSAGES = {
   },
   QA: {
     QUESTION_POSTED: 'Question posted successfully.',
+    QUESTION_UPDATED: 'Question updated successfully.',
     ANSWER_POSTED: 'Answer posted successfully.',
     VOTE_REGISTERED: 'Your vote has been recorded.',
     SAVE_QUESTION: 'Bookmark added successfully.',

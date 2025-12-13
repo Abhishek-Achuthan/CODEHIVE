@@ -101,3 +101,29 @@ export const SaveQuestionSchema = z.object({
   questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
   userid: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid userid' }),
 }).transform((raw) => ({ questionId: raw.questionId, userid: raw.userid } as { questionId: string, userid: string }));
+
+export const EditQuestionSchema = z.object({
+  title: z.string()
+    .min(10, 'Title must be at least 10 characters')
+    .max(200, 'Title must not exceed 200 characters')
+    .trim()
+    .optional(),
+  descriptionHtml: z.string()
+    .min(1, 'Description cannot be empty')
+    .superRefine((html: string, ctx) => {
+      const result = validateHtmlContent(html, 20, 50000);
+      if (!result.valid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: result.message || 'Invalid description content',
+        });
+      }
+    })
+    .optional(),
+  tags: z.array(z.string().min(1).max(30))
+    .max(5, 'Maximum 5 tags allowed')
+    .optional(),
+  version: z.number()
+    .int('Version must be an integer')
+    .min(1, 'Version must be at least 1'),
+});
