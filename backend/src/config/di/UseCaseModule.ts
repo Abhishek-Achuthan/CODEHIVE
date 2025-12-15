@@ -45,6 +45,8 @@ import { IEditQuestionUseCase } from '../../application/useCase/interface/qna/IE
 import { EditQuestionUseCase } from '../../application/useCase/qna/EditQuestionUseCase';
 import { IEditAnswerUseCase } from '../../application/useCase/interface/qna/IEditAnswerUseCase';
 import { EditAnswerUseCase } from '../../application/useCase/qna/EditAnswerUseCase';
+import { IGetAnswerUseCase } from '../../application/useCase/interface/qna/IGetAnswerUseCase';
+import { GetAnswerUseCase } from '../../application/useCase/qna/GetAnswerUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -154,7 +156,11 @@ export class UseCaseModule {
 
     container.register<IEditAnswerUseCase>('IEditAnswerUseCase',{
       useClass: EditAnswerUseCase,
-    })
+    });
+
+    container.register<IGetAnswerUseCase>('IGetAnswerUseCase',{
+      useClass:GetAnswerUseCase,
+    });
 
   }
 }
