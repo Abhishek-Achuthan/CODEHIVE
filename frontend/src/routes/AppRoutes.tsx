@@ -12,6 +12,8 @@ import PublicRoute from "./PublicRoute";
 import QnaLandigPage from "../features/qna/page/QnaLandingPage";
 import AskQuestionPage from "../features/qna/page/AskQuestionPage";
 import QuestionDetailsPage from "../features/qna/page/QuestionDetailsPage";
+import EditQuestionPage from "../features/qna/page/EditQuestionPage";
+import EditAnswerPage from "../features/qna/page/EditAnswerPage";
 
 export default function AppRoutes() {
   return (
@@ -36,9 +38,11 @@ export default function AppRoutes() {
           {/*qna routes*/}
           <Route path="/qna" element={<QnaLandigPage/>} />
           <Route path="/qna/ask-question" element={<AskQuestionPage/>} />
-          <Route path='/qna/question/:questionId' element={<QuestionDetailsPage/>}/>
+          <Route path="/qna/question/:questionId" element={<QuestionDetailsPage/>}/>
+          <Route path="/qna/question/:questionId/edit" element={<EditQuestionPage/>} />
+          <Route path="/qna/answers/:answerId/edit" element={<EditAnswerPage/>}/>
         </Route>
-
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

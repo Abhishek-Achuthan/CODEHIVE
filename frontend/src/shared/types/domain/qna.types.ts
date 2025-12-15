@@ -56,6 +56,7 @@ export interface AnswerBase extends BaseEntity, WithTimestamps {
   answerText: string;
   isAccepted: boolean;
   voteCount: number;
+  version: number;
 }
 
 export interface Answer extends AnswerBase {

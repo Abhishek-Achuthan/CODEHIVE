@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { MdPersonOutline } from "react-icons/md";
 
@@ -25,6 +26,12 @@ export default function Header() {
             >
               Features
             </a>
+            <Link
+              to="/qna"
+              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+            >
+              Q&A
+            </Link>
             <a
               href="#customers"
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"

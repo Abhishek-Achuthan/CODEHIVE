@@ -52,22 +52,29 @@ export class QnARoutes {
         );
 
 
-        //--------------------------Answer Routes-----------------------------------//
+        //--------------------------Answer Routes (Nested under Questions)--------------------------//
 
-         this._router.post(
-            '/answers',
-            this._authMiddleware.check,
-            this._answerController.handlePostAnswer.bind(this._answerController),
-        );
         this._router.get(
-            '/answers/',
+            '/questions/:questionId/answers',
             this._authMiddleware.check,
             this._answerController.handleListAnswers.bind(this._answerController)
         );
 
+        this._router.post(
+            '/questions/:questionId/answers',
+            this._authMiddleware.check,
+            this._answerController.handlePostAnswer.bind(this._answerController)
+        );
+
+        this._router.get(
+            '/answers/:answerId',
+            this._authMiddleware.check,
+            this._answerController.handleGetAnswer.bind(this._answerController)
+        );
+
         this._router.patch(
-            '/answers/:id',
-            authMiddleware.check,
+            '/answers/:answerId',
+            this._authMiddleware.check,
             this._answerController.handleEditAnswer.bind(this._answerController)
         )
 

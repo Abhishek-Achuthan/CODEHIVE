@@ -21,7 +21,7 @@ export interface CreateAnswerRequest {
 }
 
 export interface EditQuestionRequest {
-  questionId:string
+  questionId: string
   title: string;
   descriptionHtml: string;
   askedBy: string;
@@ -30,9 +30,9 @@ export interface EditQuestionRequest {
 }
 
 export interface EditAnswerRequest {
-  answerId:string;
-  version:number,
-  answerText:string;
+  answerId: string;
+  version: number,
+  answerText: string;
 }
 // Request params
 export interface QuestionListFilter {
@@ -72,6 +72,7 @@ export interface AnswerWithAuthorAPI {
     answerText: string;
     isAccepted: boolean;
     voteCount: number;
+    version: number;
     createdAt: string;
     updatedAt: string;
   };

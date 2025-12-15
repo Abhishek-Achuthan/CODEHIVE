@@ -26,8 +26,8 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
 
   useEffect(() => {
     if (!editor) return;
-    if (value === "" && editor.getHTML() !== "") {
-      editor.commands.setContent("");
+    if (value !== editor.getHTML()) {
+      editor.commands.setContent(value || '');
     }
   }, [editor, value]);
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { MdEdit } from "react-icons/md";
 import DOMPurify from "dompurify";
 
 import { useBookmarkQuestion } from "../hooks/useBookmarkQuestion";
@@ -10,7 +11,8 @@ import { QuesDetailPageSkelton } from "../components/QuesDetailPageSkelton";
 import { QuestionHeaderSection } from "../components/QuestionDetailsHeaderSection";
 import { RelatedQuestionsSection } from "../components/RelatetdQuestionSection";
 import AnswerEditorSection from "../components/AnswerEditorSection";
-import type { GetQuestionData, Answer } from "../../../shared/types/domain/qna.types";
+import type { GetQuestionData } from "../../../shared/types/domain/qna.types";
+import type { Answer } from "../../../shared/types/domain/qna.types";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import { usePostAnswers } from "../hooks/usePostAnswers";
@@ -24,7 +26,7 @@ const QuestionDetailsPage: React.FC = () => {
 
   const { data, loading, relatedQuestions } = useFetchQuestion(questionId);
 
-  const {fetchAnswers,data:answers, loading : answersLoading} = useFetchAnswers();
+  const { fetchAnswers, data: answers, loading: answersLoading } = useFetchAnswers();
 
   const currentUser = useAppSelector((state) => state.auth.user);
   console.log(currentUser)
@@ -59,17 +61,18 @@ const QuestionDetailsPage: React.FC = () => {
 
     const now = new Date().toISOString();
 
-    const tempAnswer: Answer = {
+    const tempAnswer: Answer= {
       id: `temp-${Date.now()}`,
       answerText: html,
       isAccepted: false,
       voteCount: 0,
       createdAt: now,
       updatedAt: now,
+      version:0,
       author: {
-        id: currentUser?.id??'',
-        firstName: currentUser?.firstName??'',
-        email: currentUser?.email??'',
+        id: currentUser?.id ?? '',
+        firstName: currentUser?.firstName ?? '',
+        email: currentUser?.email ?? '',
       },
     };
 
@@ -148,10 +151,19 @@ const QuestionDetailsPage: React.FC = () => {
                         <p className="text-sm text-white font-semibold">
                           {a.author?.firstName ?? "you"}
                         </p>
+                        {currentUser?.id === a.author.id && (
+                          <Link
+                            to={`/qna/answers/${a.id}/edit`}
+                            className="inline-flex items-center gap-1 mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                          >
+                            <MdEdit size={12} />
+                            <span>Edit</span>
+                          </Link>
+                        )}
                       </div>
                     </div>
                   </article>
-                ))             
+                ))
               )}
             </div>
           </div>

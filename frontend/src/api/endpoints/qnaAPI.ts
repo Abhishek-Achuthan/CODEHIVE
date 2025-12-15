@@ -27,7 +27,7 @@ export const saveQuestion = (questionId: string) =>
   apiClient.post(API_ROUTES.QnA.SAVE_QUESTION(questionId));
 
 export const postAnswer = (data: CreateAnswerRequest) =>
-  apiClient.post(API_ROUTES.QnA.POST_ANSWER, data);
+  apiClient.post(API_ROUTES.QnA.POST_ANSWER(data.questionId), data);
 
 export const listAnswers = (data: AnswerListParams) => {
   const url = API_ROUTES.QnA.LIST_ANSWERS(data);
@@ -40,5 +40,5 @@ export const editQuestion = (data: EditQuestionRequest) =>
 export const editAnswer = (data:EditAnswerRequest) => 
   apiClient.patch(API_ROUTES.QnA.EDIT_ANSWER(data.answerId),data);
 
-
-
+export const getAnswer = (answerId: string) =>
+  apiClient.get(API_ROUTES.QnA.GET_ANSWER(answerId));

@@ -39,6 +39,7 @@ export function mapAnswerFromApi(api: AnswerWithAuthorAPI): Answer {
     answerText: api.answer.answerText,
     isAccepted: api.answer.isAccepted,
     voteCount: api.answer.voteCount,
+    version: api.answer.version,
     createdAt: api.answer.createdAt,
     updatedAt: api.answer.updatedAt,
     author: {

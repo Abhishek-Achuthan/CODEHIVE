@@ -1,7 +1,9 @@
 import type React from "react";
-import { MdShare, MdRemoveRedEye as MdEye, MdBookmark } from "react-icons/md";
+import { MdShare, MdRemoveRedEye as MdEye, MdBookmark, MdEdit } from "react-icons/md";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import type { GetQuestionData } from "../../../shared/types/domain/qna.types";
+import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 
 interface QuestionHeaderSectionProps {
   data: GetQuestionData;
@@ -14,11 +16,14 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
   isBookmarked,
   onToggleBookmark,
 }) => {
+  const currentUser = useAppSelector((state) => state.auth.user);
   const created = parseDate(data.question.createdAt);
   const updated = parseDate(data.question.updatedAt);
+  const isAuthor = currentUser?.id === data.question.askedBy;
 
   return (
     <div className="flex gap-6 mb-4">
+      {/* Voting controls */}
       <div className="flex flex-col items-center gap-4 py-2">
         <button className="flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 text-zinc-400 hover:text-purple-400 transition-all group">
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -57,25 +62,40 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
 
       {/* Main question content */}
       <div className="flex-1">
-        <h1 className="text-3xl font-bold text-white mb-6 leading-tight">
-          {data.question.title}
-        </h1>
+        <div className="flex justify-between items-start mb-6">
+          <h1 className="text-3xl font-bold text-white leading-tight">
+            {data.question.title}
+          </h1>
+          
+          {isAuthor && (
+            <Link
+              to={`/qna/question/${data.question.id}/edit`}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <MdEdit size={16} className="shrink-0" />
+              <span>Edit Question</span>
+            </Link>
+          )}
+        </div>
 
         <div className="flex items-center gap-4 text-sm text-zinc-400 mb-6 pb-6 border-b border-zinc-800/50">
-          <span className="flex items-center gap-1">
-            asked {timeAgo(created)}
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/50 text-zinc-300">
+            <span className="text-purple-400">Asked:</span> {timeAgo(created)}
           </span>
-          <span>modified {timeAgo(updated)}</span>
-          <span className="flex items-center gap-1">
-            <MdEye size={16} />
-            {data.question.views} views
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/50 text-zinc-300">
+            <span className="text-blue-400">Modified:</span> {timeAgo(updated)}
+          </span>
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/50 text-zinc-300">
+            <MdEye size={16} className="text-blue-400" />
+            <span>{data.question.views} views</span>
           </span>
         </div>
 
         <div className="mb-6 p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50">
-          <p className="text-zinc-200 whitespace-pre-wrap text-base leading-relaxed">
-            {data.question.descriptionHtml}
-          </p>
+          <div 
+            className="prose prose-invert max-w-none text-zinc-200 text-base leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: data.question.descriptionHtml }}
+          />
         </div>
 
         {/* Tags */}
@@ -95,12 +115,12 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
           <div className="flex flex-col items-center text-right">
             <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center mb-2">
               <span className="text-white font-semibold text-sm">
-                {data.author.firstName!.charAt(0)}
+                {data.author.firstName?.charAt(0) || "U"}
               </span>
             </div>
 
             <p className="text-sm text-white font-semibold leading-tight">
-              {`${data.author.firstName} ${data.author.lastName}`}
+              {data.author.firstName} {data.author.lastName}
             </p>
 
             <p className="text-xs text-zinc-400">

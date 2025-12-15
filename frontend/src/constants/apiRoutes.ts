@@ -70,11 +70,8 @@ export const API_ROUTES = {
 
     //-------------------------------Answer URL-----------------------------------//
 
-    POST_ANSWER: "/qna/answers",
     LIST_ANSWERS: (params: AnswerListParams) => {
       const qp = new URLSearchParams();
-
-      qp.append('questionId',params.questionId);
 
       if (params.page !== undefined) qp.append("page", String(params.page));
       if (params.limit !== undefined) qp.append("limit", String(params.limit));
@@ -83,8 +80,11 @@ export const API_ROUTES = {
 
       const query = qp.toString();
       
-      return `/qna/answers?${query}`;
+      return `/qna/questions/${params.questionId}/answers${query ? `?${query}` : ''}`;
     },
-    EDIT_ANSWER:(answerId:string) => `/qna/answers/${answerId}`,
+    
+    POST_ANSWER: (questionId: string) => `/qna/questions/${questionId}/answers`,
+    EDIT_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
+    GET_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
   },
 };
