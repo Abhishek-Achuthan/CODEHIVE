@@ -66,6 +66,7 @@ export const API_ROUTES = {
     RELATED_QUESTIONS: (questionId: string) =>
       `/qna/questions/${questionId}/related`,
     SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
+    EDIT_QUESTION: (questionId:string) =>`qna/questions/${questionId}`,
 
     //-------------------------------Answer URL-----------------------------------//
 
@@ -84,5 +85,6 @@ export const API_ROUTES = {
       
       return `/qna/answers?${query}`;
     },
+    EDIT_ANSWER:(answerId:string) => `/qna/answers/${answerId}`,
   },
 };

@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import * as QnAApi from '../api/endpoints/qnaAPI'
 
 import { BaseError } from '../shared/errors/BaseError'
-import type { AnswerListParams, CreateQuestionRequest, QuestionListParams } from '../shared/types/api/qna';
+import type { AnswerListParams, CreateQuestionRequest, EditQuestionRequest, QuestionListParams } from '../shared/types/api/qna';
 import { mapQuestionListItemFromApi, mapRelatedQuestionFromApi, mapAnswerFromApi } from '../shared/mappers/qna.mappers';
 
 
@@ -79,6 +79,17 @@ export class QnAService {
         } catch (error) {
             this.handleError(error);
         }
+    }
+
+    static async editQuestion(data:EditQuestionRequest) {
+
+        try {
+            const response =await QnAApi.editQuestion(data);
+            return response.data
+        } catch (error) {
+            this.handleError(error)
+        }
+
     }
 
 

@@ -88,7 +88,6 @@ export class AnswerController {
       const validated = EditAnswerSchema.parse({
         answerText: req.body.answerText,
         version: req.body.version,
-        answerId,
       });
 
       const cleanHtml = sanitizeHtml(validated.answerText, {
@@ -104,16 +103,14 @@ export class AnswerController {
         },
       });
 
-      const finalAnswerId = validated.answerId || answerId;
-
       const data : IEditAnswerInputDTO = {
         answerText: cleanHtml,
         version: validated.version,
         userId,
-        ...(finalAnswerId && { answerId: finalAnswerId })
+        ...(answerId && { answerId })
       }
       
-      const updatedAns = await this._editAnswerUseCase.execute(data)
+      const updatedAns = await this._editAnswerUseCase.execute(data);
 
       return res.status(HttpStatus.OK).json({
         success: true,

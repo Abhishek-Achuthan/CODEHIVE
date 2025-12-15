@@ -3,6 +3,8 @@ import type {
   AnswerListParams,
   CreateAnswerRequest,
   CreateQuestionRequest,
+  EditAnswerRequest,
+  EditQuestionRequest,
   QuestionListParams,
 } from "../../shared/types/api/qna";
 import apiClient from "../apiClient";
@@ -31,3 +33,12 @@ export const listAnswers = (data: AnswerListParams) => {
   const url = API_ROUTES.QnA.LIST_ANSWERS(data);
   return apiClient.get(url);
 };
+
+export const editQuestion = (data: EditQuestionRequest) =>
+  apiClient.patch(API_ROUTES.QnA.EDIT_QUESTION(data.questionId), data);
+
+export const editAnswer = (data:EditAnswerRequest) => 
+  apiClient.patch(API_ROUTES.QnA.EDIT_ANSWER(data.answerId),data);
+
+
+

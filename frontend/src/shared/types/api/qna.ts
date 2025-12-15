@@ -1,6 +1,10 @@
 import type { PaginatedResponse } from "../core/api";
 import type { ListQueryParams } from "../core/api";
-import type { QuestionSort, AnswerSort, QuestionStatus } from "../domain/qna.types";
+import type {
+  QuestionSort,
+  AnswerSort,
+  QuestionStatus,
+} from "../domain/qna.types";
 
 //-------------------------------- Request DTOs-----------------------------------------//
 
@@ -16,6 +20,20 @@ export interface CreateAnswerRequest {
   questionId: string;
 }
 
+export interface EditQuestionRequest {
+  questionId:string
+  title: string;
+  descriptionHtml: string;
+  askedBy: string;
+  tags: string[];
+  version: number;
+}
+
+export interface EditAnswerRequest {
+  answerId:string;
+  version:number,
+  answerText:string;
+}
 // Request params
 export interface QuestionListFilter {
   tags?: string[];
@@ -24,13 +42,21 @@ export interface QuestionListFilter {
   dateFrom?: string;
 }
 
-export type QuestionListParams = ListQueryParams<QuestionListFilter, QuestionSort> & {
+
+export type QuestionListParams = ListQueryParams<
+  QuestionListFilter,
+  QuestionSort
+> & {
   tags?: string[];
 };
 
-export type AnswerListParams = Omit<ListQueryParams<never, AnswerSort>, "filter"> & {
+export type AnswerListParams = Omit<
+  ListQueryParams<never, AnswerSort>,
+  "filter"
+> & {
   questionId: string;
 };
+
 
 //-------------------------------- Response DTOs----------------------------------------//
 export interface AnswerAuthorDTO {
@@ -62,6 +88,7 @@ export type QuestionListAPIResponse = {
   views: number;
 };
 
-export type QuestionListPaginatedResponse = PaginatedResponse<QuestionListAPIResponse>;
+export type QuestionListPaginatedResponse =
+  PaginatedResponse<QuestionListAPIResponse>;
 
 export type PaginatedAnswerResponse = PaginatedResponse<AnswerWithAuthorAPI>;
