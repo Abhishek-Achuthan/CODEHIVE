@@ -9,7 +9,7 @@ import type {
   QuestionSort,
   QuestionStatus,
   QuestionListItem,
-} from "../../../shared/types/domain/qna";
+} from "../../../shared/types/domain/qna.types";
 import { useDebounce } from "../../admin/hooks/useDebounce";
 
 const LIMIT = 5;

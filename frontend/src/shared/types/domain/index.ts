@@ -1,3 +1,4 @@
 export * from "./user";
-export * from "./qna";
+export * from "./base.types";
+export * from "./qna.types";
 

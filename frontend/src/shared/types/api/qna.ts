@@ -1,6 +1,6 @@
 import type { PaginatedResponse } from "../core/api";
 import type { ListQueryParams } from "../core/api";
-import type { QuestionSort, AnswerSort, QuestionStatus } from "../domain/qna";
+import type { QuestionSort, AnswerSort, QuestionStatus } from "../domain/qna.types";
 
 //-------------------------------- Request DTOs-----------------------------------------//
 

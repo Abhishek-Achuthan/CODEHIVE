@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { Answer } from "../../../shared/types/domain/qna";
+import type { Answer } from "../../../shared/types/domain/qna.types";
 import type { AnswerListParams } from "../../../shared/types/api/qna";
 import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";

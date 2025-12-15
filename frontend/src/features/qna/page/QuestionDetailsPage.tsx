@@ -10,7 +10,7 @@ import { QuesDetailPageSkelton } from "../components/QuesDetailPageSkelton";
 import { QuestionHeaderSection } from "../components/QuestionDetailsHeaderSection";
 import { RelatedQuestionsSection } from "../components/RelatetdQuestionSection";
 import AnswerEditorSection from "../components/AnswerEditorSection";
-import type { GetQuestionData, Answer } from "../../../shared/types/domain/qna";
+import type { GetQuestionData, Answer } from "../../../shared/types/domain/qna.types";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import { usePostAnswers } from "../hooks/usePostAnswers";
@@ -67,9 +67,9 @@ const QuestionDetailsPage: React.FC = () => {
       createdAt: now,
       updatedAt: now,
       author: {
-        id: currentUser?.id,
-        firstName: currentUser?.firstName,
-        email: currentUser?.email,
+        id: currentUser?.id??'',
+        firstName: currentUser?.firstName??'',
+        email: currentUser?.email??'',
       },
     };
 

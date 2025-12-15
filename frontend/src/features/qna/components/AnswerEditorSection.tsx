@@ -29,8 +29,6 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
     content: initialHtml ?? "",
     editorProps: {
       attributes: {
-        // add whitespace/word-break utilities so long single words wrap,
-        // but keep prose styles for formatting
         class:
           "prose prose-invert max-w-full focus:outline-none min-h-[160px] p-4 text-sm whitespace-pre-wrap break-words",
       },
@@ -116,12 +114,10 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
           })}
         </div>
 
-        {/* Constrain editor height and allow scrolling for long content.
-            'max-h-[40vh]' keeps it reasonable; adjust to taste. */}
+
         <div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
-          <div className="max-h-[40vh] min-h-[160px] overflow-auto">
-            {/* EditorContent inherits the editorProps.class above.
-                Additional wrapper classes force wrapping of long words. */}
+          <div className="max-h-[40vh] min-h-40 overflow-auto">
+
             <div className="px-4 py-2 whitespace-pre-wrap break-all">
               <EditorContent editor={editor} />
             </div>

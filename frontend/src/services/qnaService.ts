@@ -4,7 +4,7 @@ import * as QnAApi from '../api/endpoints/qnaAPI'
 
 import { BaseError } from '../shared/errors/BaseError'
 import type { AnswerListParams, CreateQuestionRequest, QuestionListParams } from '../shared/types/api/qna';
-import { mapQuestionListItemFromApi, mapRelatedQuestionFromApi, mapAnswerFromApi } from '../shared/types/domain/qna';
+import { mapQuestionListItemFromApi, mapRelatedQuestionFromApi, mapAnswerFromApi } from '../shared/mappers/qna.mappers';
 
 
 export class QnAService {

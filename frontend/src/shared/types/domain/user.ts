@@ -1,10 +1,10 @@
-export interface User {
-  id: string;
+import type { BaseEntity } from './base.types';
+
+export interface User extends BaseEntity {
   firstName: string;
   lastName: string;
   email: string;
   role: string;
   isBlocked: boolean;
-  createdAt: string;
   avatarUrl?: string;
 }

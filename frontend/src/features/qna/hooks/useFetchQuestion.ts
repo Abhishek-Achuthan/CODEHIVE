@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GetQuestionData, RelatedQuestion } from "../../../shared/types/domain/qna";
+import type { GetQuestionData, RelatedQuestion } from "../../../shared/types/domain/qna.types";
 import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
