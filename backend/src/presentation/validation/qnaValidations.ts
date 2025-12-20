@@ -14,6 +14,13 @@ const validateHtmlContent = (html: string, minPlainText: number, maxPlainText: n
   return { valid: true };
 };
 
+export const UserIdParamSchema = z.object({
+  userId: z.string().refine(
+    val => /^[0-9a-fA-F]{24}$/.test(val),
+    { message: 'Invalid user ID format' }
+  )
+});
+
 export const QuestionListSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
@@ -22,12 +29,11 @@ export const QuestionListSchema = z.object({
     .max(200, 'Search query must not exceed 200 characters')
     .transform(val => val?.trim())
     .optional(),
-  // keep raw query keys to parse incoming querystrings, but treat them as optional strings
   'filter.status': z.enum(['answered', 'unanswered', 'all']).optional(),
-  'filter.tags': z.string().optional(),        // keep as raw CSV string here
+  'filter.tags': z.string().optional(),        
   'filter.dateFrom': z.string().optional(),
+  'filter.askedBy':z.string().optional(),
 }).transform((raw) => {
-  // build typed filter object, only including provided fields
   const filter: Record<string, unknown> = {};
 
   if (raw['filter.status'] !== undefined) filter.status = raw['filter.status'];
@@ -36,14 +42,13 @@ export const QuestionListSchema = z.object({
       .split(',')
       .map(t => t.trim())
       .filter(Boolean)
-      .filter(tag => tag.length <= 30); // Additional safety: max tag length
+      .filter(tag => tag.length <= 30); 
     if (tags.length) filter.tags = tags;
   }
   if (raw['filter.dateFrom'] !== undefined && raw['filter.dateFrom'].trim()) {
     filter.dateFrom = raw['filter.dateFrom'].trim();
   }
 
-  // Return only the intended fields (avoid leaving dotted keys in result)
   return {
     page: raw.page,
     limit: raw.limit,
@@ -80,6 +85,18 @@ export const CreateQuestionSchema = z.object({
 export const ValidIdSchema = z.object({
   questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
 }).transform((raw) => ({ questionId: raw.questionId } as { questionId: string }));
+
+export const ValidAnswerIdSchema = z.object({
+  answerId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
+}).transform((raw) => ({ answerId: raw.answerId } as { answerId: string }));
+
+export const ValidListIdSchema = z.object({
+  listId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
+}).transform((raw) => ({ listId: raw.listId } as { listId: string }));
+
+export const CreateSavedListSchema = z.object({
+  name: z.string().min(1).max(60).transform(v => v.trim()),
+});
 
 export const PostAnswerSchema = z.object({
   questionId: z.string()
@@ -146,4 +163,12 @@ export const EditAnswerSchema = z.object({
   answerId: z.string()
     .refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid answer ID' })
     .optional(),
+});
+
+export const VoteQuestionSchema = z.object({
+  value: z.union([z.literal(1), z.literal(-1)]),
+});
+
+export const VoteAnswerSchema = z.object({
+  value: z.union([z.literal(1), z.literal(-1)]),
 });

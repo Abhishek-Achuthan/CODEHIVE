@@ -24,20 +24,6 @@ export class QuestionRepository
     super(QuestionModel as Model<QuestionDoc>);
   }
 
-  async findByAuthorId(
-    authorId: string
-  ): Promise<PaginationResult<QuestionEntity>> {
-    const query: FilterQuery<QuestionDoc> = { askedBy: authorId };
-    const questionDocs = await this._model
-      .find(query)
-      .lean<QuestionLeanDoc[]>();
-    const questions = questionDocs.map((doc) =>
-      this.leanToEntity(doc as QuestionLeanDoc)
-    );
-
-    return { items: questions, totalItems: questions.length, totalPages: 1 };
-  }
-
   async list(
     data: QuestionListQuery
   ): Promise<PaginationResult<QuestionEntity>> {
@@ -62,12 +48,16 @@ export class QuestionRepository
     if (filter?.minVotes !== undefined)
       query.votes = { $gte: filter?.minVotes };
 
+    if (filter?.askedBy) {
+      query.askedBy = filter.askedBy;
+    }
+
     if (search) {
       const raw = search.trim();
       if (raw.length > 0) {
         const escaped = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const re = new RegExp(escaped, 'i');
-        query.$or = [{ title: re }, { description: re }];
+        query.$or = [{ title: re }, { descriptionHtml: re }];
       }
     }
 
@@ -87,10 +77,68 @@ export class QuestionRepository
       this._model.countDocuments(query),
     ]);
 
+
     const items = docs.map((d) => this.leanToEntity(d as QuestionLeanDoc));
-    const totalPages = limit
+    const totalPages = limit 
       ? Math.max(1, Math.ceil(totalItems / pageLimit))
       : 1;
+
+    return { items, totalItems, totalPages };
+  }
+
+  async listByIds(
+    questionIds: string[],
+    data: QuestionListQuery
+  ): Promise<PaginationResult<QuestionEntity>> {
+    if (questionIds.length === 0) {
+      return { items: [], totalItems: 0, totalPages: 0 };
+    }
+
+    const { filter, search, sortBy, page = 1, limit = 10 } = data || {};
+
+    const query: FilterQuery<QuestionDoc> = {
+      _id: { $in: questionIds.map((id) => new Types.ObjectId(id)) },
+    };
+
+    const tags: string[] = [];
+    if (filter?.tags?.length) tags.push(...filter.tags);
+    if (tags.length) query.tags = { $in: tags };
+
+    if (filter?.status === QuestionStatus.ANSWERED) query.isAnswered = true;
+    if (filter?.status === QuestionStatus.UNANSWERED) query.isAnswered = false;
+
+    if (filter?.dateFrom) {
+      query.createdAt = {};
+      query.createdAt.$gte = new Date(filter.dateFrom);
+    }
+
+    if (search) {
+      const raw = search.trim();
+      if (raw.length > 0) {
+        const escaped = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(escaped, 'i');
+        query.$or = [{ title: re }, { descriptionHtml: re }];
+      }
+    }
+
+    const sort = this.mapSort(sortBy);
+
+    const currentPage = Math.max(1, page);
+    const pageLimit = Math.min(100, Math.max(1, limit));
+    const skip = (currentPage - 1) * pageLimit;
+
+    const [docs, totalItems] = await Promise.all([
+      this._model
+        .find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(pageLimit)
+        .lean<QuestionLeanDoc[]>(),
+      this._model.countDocuments(query),
+    ]);
+
+    const items = docs.map((d) => this.leanToEntity(d as QuestionLeanDoc));
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageLimit));
 
     return { items, totalItems, totalPages };
   }
@@ -107,6 +155,80 @@ export class QuestionRepository
       { _id: questionId },
       { $inc: { answerCount: amount } }
     );
+  }
+
+  async incrementViews(questionId: string, amount: number): Promise<void> {
+    await this._model.updateOne(
+      { _id: questionId },
+      { $inc: { views: amount } }
+    );
+  }
+
+  async incrementVotes(questionId: string, amount: number): Promise<number> {
+    const updated = await this._model
+      .findByIdAndUpdate(
+        questionId,
+        { $inc: { votes: amount } },
+        { new: true, select: 'votes' }
+      )
+      .lean<QuestionDoc | null>();
+
+    return updated ? (updated.votes as number) : 0;
+  }
+
+  async listAnsweredByUser(
+    questionIds: string[],
+    data: QuestionListQuery
+  ): Promise<PaginationResult<QuestionEntity>> {
+
+    if (questionIds.length === 0) {
+      return { items: [], totalItems: 0, totalPages: 0 };
+    }
+
+    const { filter, search, sortBy, page = 1, limit = 10 } = data;
+
+    const query: FilterQuery<QuestionDoc> = {
+      _id: { $in: questionIds.map((id) => new Types.ObjectId(id)) },
+    };
+
+    if (filter?.tags?.length) query.tags = { $in: filter.tags };
+
+    if (search) {
+      const raw = search.trim();
+      if (raw.length > 0) {
+        const escaped = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(escaped, 'i');
+        query.$or = [{ title: re }, { descriptionHtml: re }];
+      }
+    }
+
+    const sort = this.mapSort(sortBy);
+
+    const currentPage = Math.max(1, page);
+
+    const pageLimit = Math.min(100, limit);
+
+    const skip = (currentPage - 1) * pageLimit;
+
+   const [doc,totalItems] = await Promise.all([
+    this._model.find(query)
+    .sort(sort)
+    .skip(skip)
+    .limit(pageLimit)
+    .lean<QuestionLeanDoc[]>(),
+
+    this._model.countDocuments(query)
+   ]);
+
+   const items = doc.map(doc => this.leanToEntity(doc));
+
+   const totalPages = Math.max(1,Math.ceil(totalItems/pageLimit));
+
+   return {
+    items,
+    totalItems,
+    totalPages
+   }
   }
 
   async incrementAnswerCountAndSetAnswered(
@@ -225,9 +347,9 @@ export class QuestionRepository
         updateQuery,
         { new: true }
       )
-      .lean<QuestionLeanDoc | null>() ;
+      .lean<QuestionLeanDoc | null>();
 
-      return updatedQues ? this.leanToEntity(updatedQues): null
+    return updatedQues ? this.leanToEntity(updatedQues) : null;
   }
 
   protected toDocument(data: Partial<QuestionEntity>): Partial<QuestionDoc> {

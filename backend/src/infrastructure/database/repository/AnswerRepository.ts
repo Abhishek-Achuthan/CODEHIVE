@@ -2,7 +2,7 @@ import { GenericRepository } from './GenericRepository';
 import { AnswerDoc, AnswerLeanDoc } from '../schemas/qna/AnswerSchema';
 import { AnswerEntity } from '../../../domain/entities/qna/AnswerEntity';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
-import { IAnswerRepostiory } from '../../../domain/interfaces/IAnswerRepository';
+import { IAnswerRepository } from '../../../domain/interfaces/IAnswerRepository';
 import AnswerModel from '../models/qna/AnswerModel';
 import { FilterQuery, Model, SortOrder, Types, UpdateQuery } from 'mongoose';
 import { AnswerSort } from '../../../domain/types/AnswerSort';
@@ -13,12 +13,24 @@ import { PopulatedAnswerDoc } from '../types/PopulatedAnswerDoc';
 import { AnswerListQuery } from '../../../domain/types/AnswerListQuery';
 import { AnswerEditableFields } from '../../../domain/types/AnswerEditableFields';
 
+
 export class AnswerRepository
   extends GenericRepository<AnswerDoc, AnswerEntity>
-  implements IAnswerRepostiory
+  implements IAnswerRepository
 {
   constructor() {
     super(AnswerModel as Model<AnswerDoc>);
+  }
+
+  async findIdsByQuestion(questionId: string): Promise<string[]> {
+    const ids = (await this._model.distinct('_id', {
+      questionId: new Types.ObjectId(questionId),
+    })) as Types.ObjectId[];
+    return ids.map((id) => id.toString());
+  }
+
+  async deleteByQuestion(questionId: string): Promise<void> {
+    await this._model.deleteMany({ questionId: new Types.ObjectId(questionId) });
   }
 
   protected toDocument(data: Partial<AnswerEntity>): Partial<AnswerDoc> {
@@ -155,11 +167,11 @@ export class AnswerRepository
       totalPages,
     };
   }
-  async incrementVoteCount(answerId: string): Promise<number> {
+  async incrementVoteCount(answerId: string, delta: number): Promise<number> {
     const updated = await this._model
       .findByIdAndUpdate(
         answerId,
-        { $inc: { voteCount: 1 } },
+        { $inc: { voteCount: delta } },
         { new: true, select: 'voteCount' }
       )
       .lean<AnswerDoc | null>();
@@ -172,6 +184,15 @@ export class AnswerRepository
       .lean<AnswerDoc | null>();
     return doc ? this.toEntity(doc as AnswerDoc) : null;
   }
+
+  async findAnsweredQuestionIdsByUser(userId: string): Promise<string[]> {
+
+    const ids = await this._model.distinct('questionId',{answeredBy:new Types.ObjectId(userId)});
+
+    return ids.map(id => id.toString());
+     
+  }
+
 
   async updateWithVersion(
     answerId: string,

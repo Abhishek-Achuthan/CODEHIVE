@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { questionController } from '../../config/di/resolver';
 import { answerController } from '../../config/di/resolver';
+import { savedController } from '../../config/di/resolver';
 import { authMiddleware } from '../../config/di/resolver';
 
 
@@ -8,6 +9,7 @@ export class QnARoutes {
     private _router: Router;
     private _questionController
     private _answerController
+    private _savedController
     private _authMiddleware
 
 
@@ -15,9 +17,11 @@ export class QnARoutes {
         this._router = Router();
         this._questionController = questionController;
         this._answerController = answerController;
+        this._savedController = savedController;
         this._authMiddleware = authMiddleware;
         this._setRoutes();
     }
+
 
     private _setRoutes() {
         //--------------------------Question Routes-----------------------------------//
@@ -50,9 +54,61 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._questionController.handleSaveQuestion.bind(this._questionController)
         );
+        this._router.post(
+            '/questions/:id/vote',
+            this._authMiddleware.check,
+            this._questionController.handleVoteQuestion.bind(this._questionController)
+        );
+        //--------------------------Saved Routes-----------------------------------//
 
+        this._router.get(
+            '/saved/lists',
+            this._authMiddleware.check,
+            this._savedController.handleListLists.bind(this._savedController)
+        );
 
-        //--------------------------Answer Routes (Nested under Questions)--------------------------//
+        this._router.post(
+            '/saved/lists',
+            this._authMiddleware.check,
+            this._savedController.handleCreateList.bind(this._savedController)
+        );
+
+        this._router.delete(
+            '/saved/lists/:listId',
+            this._authMiddleware.check,
+            this._savedController.handleDeleteList.bind(this._savedController)
+        );
+
+        this._router.get(
+            '/saved/questions',
+            this._authMiddleware.check,
+            this._savedController.handleListAllSaved.bind(this._savedController)
+        );
+
+        this._router.get(
+            '/saved/questions/:questionId/lists',
+            this._authMiddleware.check,
+            this._savedController.handleGetListIdsForQuestion.bind(this._savedController)
+        );
+
+        this._router.get(
+            '/saved/lists/:listId/questions',
+            this._authMiddleware.check,
+            this._savedController.handleListSavedListQuestions.bind(this._savedController)
+        );
+
+        this._router.post(
+            '/saved/lists/:listId/questions/:questionId',
+            this._authMiddleware.check,
+            this._savedController.handleAddToList.bind(this._savedController)
+        );
+
+        this._router.delete(
+            '/saved/lists/:listId/questions/:questionId',
+            this._authMiddleware.check,
+            this._savedController.handleRemoveFromList.bind(this._savedController)
+        );
+        //--------------------------Answer Routes---------------------------------------//
 
         this._router.get(
             '/questions/:questionId/answers',
@@ -76,7 +132,13 @@ export class QnARoutes {
             '/answers/:answerId',
             this._authMiddleware.check,
             this._answerController.handleEditAnswer.bind(this._answerController)
-        )
+        );
+
+        this._router.post(
+            '/answers/:answerId/vote',
+            this._authMiddleware.check,
+            this._answerController.handleVoteAnswer.bind(this._answerController)
+        );
 
     }
 

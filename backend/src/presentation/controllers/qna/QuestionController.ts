@@ -9,6 +9,8 @@ import {
   SaveQuestionSchema,
   ValidIdSchema,
   EditQuestionSchema,
+  UserIdParamSchema,
+  VoteQuestionSchema,
 } from '../../validation/qnaValidations';
 import type { ICreateQuestionUseCase } from '../../../application/useCase/interface/qna/ICreateQuestionUseCase';
 import type { IListQuestionUseCase } from '../../../application/useCase/interface/qna/IListQuestionsUseCase';
@@ -17,6 +19,9 @@ import type { IRelatedQuestionUseCase } from '../../../application/useCase/inter
 import type { IToggleSaveQuestionUseCase } from '../../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
 import type { IEditQuestionUseCase } from '../../../application/useCase/interface/qna/IEditQuestionUseCase';
 import type { EditQuestionInputDTO } from '../../../application/dto/QuestionDTO';
+import type { IListUserQuestionsUseCase } from '../../../application/useCase/interface/qna/IListUserQuestionsUseCase';
+import type { IListAnsweredQuestionUseCase } from '../../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase';
+import type { IVoteQuestionUseCase } from '../../../application/useCase/interface/qna/IVoteQuestionUseCase';
 
 @injectable()
 export class QuestionController {
@@ -32,7 +37,13 @@ export class QuestionController {
     @inject('IToggleSaveQuestionUseCase')
     private readonly _toggleSaveQuestionUseCase: IToggleSaveQuestionUseCase,
     @inject('IEditQuestionUseCase')
-    private readonly _editQuestionUseCase: IEditQuestionUseCase
+    private readonly _editQuestionUseCase: IEditQuestionUseCase,
+    @inject('IListUserQuestionsUseCase')
+    private readonly _listUserQuestionsUseCase: IListUserQuestionsUseCase,
+    @inject('IListAnsweredQuestionUseCase')
+    private readonly _listAnsweredQuestionsUseCase : IListAnsweredQuestionUseCase,
+    @inject('IVoteQuestionUseCase')
+    private readonly _voteQuestionUseCase: IVoteQuestionUseCase
   ) {}
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
@@ -65,6 +76,21 @@ export class QuestionController {
         messsage: RESPONSE_MESSAGES.QA.QUESTION_POSTED,
         data: created,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleVoteQuestion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
+      const { value } = VoteQuestionSchema.parse(req.body);
+
+      const userId = req.user.id;
+
+      const result = await this._voteQuestionUseCase.execute(questionId, userId, value);
+
+      return res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -174,4 +200,36 @@ export class QuestionController {
       next(error);
     }
   }
+
+  async handleListUserQuestions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId } = UserIdParamSchema.parse({userId: req.params.userId});
+
+      const parsedData = QuestionListSchema.parse({...req.query,'filter.askedBy':userId})
+
+      const data = await this._listUserQuestionsUseCase.execute(userId!,parsedData);
+
+      return res.status(HttpStatus.OK).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleListAnsweredQuestions(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.user.id;
+        
+        const queryParams = QuestionListSchema.parse(req.query);
+        
+        const result = await this._listAnsweredQuestionsUseCase.execute(userId, queryParams);
+        
+        return res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+        next(error);
+    }
+}
 }

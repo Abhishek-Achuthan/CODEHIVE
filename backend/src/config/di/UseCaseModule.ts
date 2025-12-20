@@ -47,6 +47,32 @@ import { IEditAnswerUseCase } from '../../application/useCase/interface/qna/IEdi
 import { EditAnswerUseCase } from '../../application/useCase/qna/EditAnswerUseCase';
 import { IGetAnswerUseCase } from '../../application/useCase/interface/qna/IGetAnswerUseCase';
 import { GetAnswerUseCase } from '../../application/useCase/qna/GetAnswerUseCase';
+import { IListUserQuestionsUseCase } from '../../application/useCase/interface/qna/IListUserQuestionsUseCase';
+import { ListUserQuestionsUseCase } from '../../application/useCase/qna/ListUserQuestionsUseCase';
+import { IListAnsweredQuestionUseCase } from '../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase';
+import { listAnsweredQuestionUseCase } from '../../application/useCase/qna/ListAnsweredQuestionUseCase';
+import { IRecordQuestionViewUseCase } from '../../application/useCase/interface/qna/IRecordQuestionViewUseCase';
+import { RecordQuestionViewUseCase } from '../../application/useCase/qna/RecordQuestionViewUseCase';
+import { IVoteQuestionUseCase } from '../../application/useCase/interface/qna/IVoteQuestionUseCase';
+import { VoteQuestionUseCase } from '../../application/useCase/qna/VoteQuestionUseCase';
+import { IVoteAnswerUseCase } from '../../application/useCase/interface/qna/IVoteAnswerUseCase';
+import { VoteAnswerUseCase } from '../../application/useCase/qna/VoteAnswerUseCase';
+import { ICreateSavedListUseCase } from '../../application/useCase/interface/qna/ICreateSavedListUseCase';
+import { CreateSavedListUseCase } from '../../application/useCase/qna/CreateSavedListUseCase';
+import { IListSavedListsUseCase } from '../../application/useCase/interface/qna/IListSavedListsUseCase';
+import { ListSavedListsUseCase } from '../../application/useCase/qna/ListSavedListsUseCase';
+import { IAddQuestionToSavedListUseCase } from '../../application/useCase/interface/qna/IAddQuestionToSavedListUseCase';
+import { AddQuestionToSavedListUseCase } from '../../application/useCase/qna/AddQuestionToSavedListUseCase';
+import { IRemoveQuestionFromSavedListUseCase } from '../../application/useCase/interface/qna/IRemoveQuestionFromSavedListUseCase';
+import { RemoveQuestionFromSavedListUseCase } from '../../application/useCase/qna/RemoveQuestionFromSavedListUseCase';
+import { IListSavedQuestionsUseCase } from '../../application/useCase/interface/qna/IListSavedQuestionsUseCase';
+import { ListSavedQuestionsUseCase } from '../../application/useCase/qna/ListSavedQuestionsUseCase';
+import { IListSavedListQuestionsUseCase } from '../../application/useCase/interface/qna/IListSavedListQuestionsUseCase';
+import { ListSavedListQuestionsUseCase } from '../../application/useCase/qna/ListSavedListQuestionsUseCase';
+import { IGetSavedListIdsForQuestionUseCase } from '../../application/useCase/interface/qna/IGetSavedListIdsForQuestionUseCase';
+import { GetSavedListIdsForQuestionUseCase } from '../../application/useCase/qna/GetSavedListIdsForQuestionUseCase';
+import { IDeleteSavedListUseCase } from '../../application/useCase/interface/qna/IDeleteSavedListUseCase';
+import { DeleteSavedListUseCase } from '../../application/useCase/qna/DeleteSavedListUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -160,6 +186,61 @@ export class UseCaseModule {
 
     container.register<IGetAnswerUseCase>('IGetAnswerUseCase',{
       useClass:GetAnswerUseCase,
+    });
+
+    container.register<IListUserQuestionsUseCase>('IListUserQuestionsUseCase',{
+      useClass:ListUserQuestionsUseCase
+    });
+
+    container.register<IListAnsweredQuestionUseCase>('IListAnsweredQuestionUseCase', {
+      useClass:listAnsweredQuestionUseCase
+    });
+
+    container.register<IRecordQuestionViewUseCase>('IRecordQuestionViewUseCase', {
+      useClass: RecordQuestionViewUseCase,
+    });
+
+    container.register<IVoteQuestionUseCase>('IVoteQuestionUseCase', {
+      useClass: VoteQuestionUseCase,
+    });
+
+    container.register<IVoteAnswerUseCase>('IVoteAnswerUseCase', {
+      useClass: VoteAnswerUseCase,
+    });
+
+    container.register<ICreateSavedListUseCase>('ICreateSavedListUseCase', {
+      useClass: CreateSavedListUseCase,
+    });
+
+    container.register<IListSavedListsUseCase>('IListSavedListsUseCase', {
+      useClass: ListSavedListsUseCase,
+    });
+
+    container.register<IAddQuestionToSavedListUseCase>('IAddQuestionToSavedListUseCase', {
+      useClass: AddQuestionToSavedListUseCase,
+    });
+
+    container.register<IRemoveQuestionFromSavedListUseCase>('IRemoveQuestionFromSavedListUseCase', {
+      useClass: RemoveQuestionFromSavedListUseCase,
+    });
+
+    container.register<IListSavedQuestionsUseCase>('IListSavedQuestionsUseCase', {
+      useClass: ListSavedQuestionsUseCase,
+    });
+
+    container.register<IListSavedListQuestionsUseCase>('IListSavedListQuestionsUseCase', {
+      useClass: ListSavedListQuestionsUseCase,
+    });
+
+    container.register<IGetSavedListIdsForQuestionUseCase>(
+      'IGetSavedListIdsForQuestionUseCase',
+      {
+        useClass: GetSavedListIdsForQuestionUseCase,
+      }
+    );
+
+    container.register<IDeleteSavedListUseCase>('IDeleteSavedListUseCase', {
+      useClass: DeleteSavedListUseCase,
     });
 
   }

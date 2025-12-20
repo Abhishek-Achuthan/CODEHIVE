@@ -7,6 +7,7 @@ import { AuthMiddleware } from '../../presentation/middlewares/authMIddleware';
 import { RoleMiddleware } from '../../presentation/middlewares/roleMiddleware';
 import { QuestionController } from '../../presentation/controllers/qna/QuestionController';
 import { AnswerController } from '../../presentation/controllers/qna/AnswerController';
+import { SavedController } from '../../presentation/controllers/qna/SavedController';
 
 ContainerSetup.registerAll();
 
@@ -21,6 +22,8 @@ export const roleMiddleware = container.resolve(RoleMiddleware);
 export const questionController =  container.resolve(QuestionController);
 
 export const answerController = container.resolve(AnswerController);
+
+export const savedController = container.resolve(SavedController);
 
 
 
