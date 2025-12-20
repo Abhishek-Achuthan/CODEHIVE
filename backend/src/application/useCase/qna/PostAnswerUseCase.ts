@@ -2,7 +2,7 @@ import { IPostAnswerUseCase } from '../interface/qna/IPostAnswerUseCase';
 import type { IQuestionRepository } from '../../../domain/interfaces/IQuestionRepository';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { inject, injectable } from 'tsyringe';
-import type { IAnswerRepostiory } from '../../../domain/interfaces/IAnswerRepository';
+import type { IAnswerRepository } from '../../../domain/interfaces/IAnswerRepository';
 import { ICreateAnswerInputDTO } from '../../dto/AnswerDTO';
 import { AnswerEntity } from '../../../domain/entities/qna/AnswerEntity';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
@@ -12,7 +12,7 @@ import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 export class PostAnswerUseCase implements IPostAnswerUseCase {
   constructor(
     @inject('IQuestionRepository') private readonly _questionRepository: IQuestionRepository,
-    @inject('IAnswerRepository') private readonly _answerRepository: IAnswerRepostiory
+    @inject('IAnswerRepository') private readonly _answerRepository: IAnswerRepository,
   ) {}
 
   async execute(data: ICreateAnswerInputDTO): Promise<AnswerEntity> {

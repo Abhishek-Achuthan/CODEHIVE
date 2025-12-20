@@ -6,13 +6,17 @@ import { QuestionWithAuthor } from '../types/QuestionWithAuthor';
 import { IGenericRepository } from './IGenericRepository';
 
 export interface IQuestionRepository extends IGenericRepository<QuestionEntity> {
-    findByAuthorId(authorId:string): Promise<PaginationResult<QuestionEntity>>;
     list(data:QuestionListQuery):Promise<PaginationResult<QuestionEntity>>;
+    listByIds(questionIds: string[], data: QuestionListQuery): Promise<PaginationResult<QuestionEntity>>;
     incrementAnswerCount(questionId:string,amount:number):Promise<void>;
+    incrementViews(questionId: string, amount: number): Promise<void>;
+    incrementVotes(questionId: string, amount: number): Promise<number>;
     setIsAnswered(questionId:string,isAnswered:boolean):Promise<void>;
     incrementAnswerCountAndSetAnswered(questionId:string,amount:number):Promise<void>;
+
     getQuestionById(questionId:string):Promise<QuestionEntity | null>;
     relatedQuestions(questionId:string):Promise<QuestionEntity[]>;
     getQuestionWithAuthorData(questionId:string):Promise<QuestionWithAuthor | null>;
-    updateWithVersion(questionId:string,expectedVersion:number,payload:QuestionEditableFields) : Promise<QuestionEntity | null>
+    updateWithVersion(questionId:string,expectedVersion:number,payload:QuestionEditableFields) : Promise<QuestionEntity | null>;
+    listAnsweredByUser(questionIds:string[],data:QuestionListQuery):Promise<PaginationResult<QuestionEntity>>
 }
