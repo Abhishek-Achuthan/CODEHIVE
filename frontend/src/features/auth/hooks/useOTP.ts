@@ -2,10 +2,13 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function useOTP<TValues extends Record<string, unknown>>(
-  onSend: (data: Partial<TValues>) => Promise<void>,
+export function useOTP<
+  TOtpVia extends string,
+  TValues extends Record<TOtpVia, string> & Record<string, unknown>
+>(
+  onSend: (data: Pick<TValues, TOtpVia>) => Promise<void>,
   onVerify: (otp: string, values: TValues) => Promise<boolean>,
-  otpVia: keyof TValues
+  otpVia: TOtpVia
 ) {
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [otpActiveFor, setOtpActiveFor] = useState<string | null>(null);
@@ -26,8 +29,9 @@ export function useOTP<TValues extends Record<string, unknown>>(
     }
 
     try {
-      await onSend({ [otpVia]: recipient } as Partial<TValues>);
-      setOtpActiveFor(recipient as string);
+      const payload = { [otpVia]: recipient } as Pick<TValues, TOtpVia>;
+      await onSend(payload);
+      setOtpActiveFor(recipient);
       setOtpModalOpen(true);
     } catch (error) {
       setOtpActiveFor(null);
@@ -43,8 +47,9 @@ export function useOTP<TValues extends Record<string, unknown>>(
     if (!recipient) return;
 
     try {
-      await onSend({ [otpVia]: recipient } as Partial<TValues>);
-      setOtpActiveFor(recipient as string);
+      const payload = { [otpVia]: recipient } as Pick<TValues, TOtpVia>;
+      await onSend(payload);
+      setOtpActiveFor(recipient);
     } catch (error) {
       console.log(error);
     }

@@ -1,9 +1,8 @@
-import type { RegisterData } from '../../../shared/types/api/auth';
-import type { FieldComponentProps } from '../types';
+import type { FieldComponentProps, RegisterFormValues } from '../types';
 import { PasswordInput } from '../components/PasswordInput';
 
 export const signUpFields: Array<{
-  name: keyof RegisterData;
+  name: keyof RegisterFormValues;
   label: string;
   placeholder: string;
   type?: 'text' | 'tel' | 'password';

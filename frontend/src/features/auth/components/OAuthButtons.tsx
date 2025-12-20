@@ -4,6 +4,24 @@ import { useNavigate } from "react-router-dom";
 import { AuthService } from "../../../services/authService";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import toast from "react-hot-toast";
+import type { CurrentUserView } from "../../../shared/types/view/CurrentUserView";
+
+function toCurrentUserView(raw: unknown): CurrentUserView {
+  const obj = (raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {}) as Record<
+    string,
+    unknown
+  >;
+
+  return {
+    id: String(obj.id ?? ""),
+    firstName: String(obj.firstName ?? ""),
+    lastName: String(obj.lastName ?? ""),
+    email: String(obj.email ?? ""),
+    role: String(obj.role ?? ""),
+    isBlocked: Boolean(obj.isBlocked),
+    avatarUrl: typeof obj.avatarUrl === "string" ? obj.avatarUrl : undefined,
+  };
+}
 
 export function OAuthButtons() {
   const dispatch = useDispatch();
@@ -26,10 +44,12 @@ export function OAuthButtons() {
         );
         const {user,accessToken} = data;
 
-        toast.success(message);
-        dispatch(loginSuccess({ user, accessToken }));
+        const userView = toCurrentUserView(user);
 
-        navigate(user.role === "admin" ? "/admin/users" : "/home");
+        toast.success(message);
+        dispatch(loginSuccess({ user: userView, accessToken }));
+
+        navigate(userView.role === "admin" ? "/admin/users" : "/home");
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);

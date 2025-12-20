@@ -66,7 +66,111 @@ export const API_ROUTES = {
     RELATED_QUESTIONS: (questionId: string) =>
       `/qna/questions/${questionId}/related`,
     SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
-    EDIT_QUESTION: (questionId:string) =>`qna/questions/${questionId}`,
+    VOTE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/vote`,
+    EDIT_QUESTION: (questionId: string) => `qna/questions/${questionId}`,
+    ANSWERED_QUESTIONS: (params?: QuestionListParams) => {
+
+      const qp = new URLSearchParams();
+
+      if (!params) return `/users/me/answers/questions`;
+
+      if (params.page !== undefined) qp.append('page', String(params.page));
+      if (params.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params.search !== undefined) qp.append('search', params.search);
+      if (params.sortBy !== undefined) qp.append('sortBy', params.sortBy);
+
+      if (params.filter) {
+        const f = params.filter;
+        if (f.tags && f.tags.length > 0) {
+          qp.append('filter.tags', f.tags.join(','))
+        }
+      }
+
+      const query = qp.toString();
+      return query ? `/users/me/answers/questions?${query}` : `/users/me/answers/questions`;
+
+    },
+
+    MY_QUESTIONS: (userId: string, params?: QuestionListParams) => {
+      const qp = new URLSearchParams();
+
+      if (!params) return `/users/${userId}/questions`;
+
+      if (params.page !== undefined) qp.append('page', String(params.page));
+      if (params.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params.search !== undefined) qp.append('search', params.search);
+      if (params.sortBy !== undefined) qp.append('sortBy', params.sortBy);
+
+      if (params.filter) {
+        const f = params.filter;
+        if (f.tags && f.tags.length > 0) qp.append('filter.tags', f.tags.join(','));
+        if (f.status) qp.append('filter.status', f.status);
+        if (f.bookmarkedOnly !== undefined)
+          qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
+        if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
+      }
+
+      const query = qp.toString();
+      return query ? `/users/${userId}/questions?${query}` : `/users/${userId}/questions`;
+    },
+
+    SAVED_LISTS: `/qna/saved/lists`,
+
+    DELETE_SAVED_LIST: (listId: string) => `/qna/saved/lists/${listId}`,
+
+    SAVED_QUESTIONS: (params?: QuestionListParams) => {
+      const qp = new URLSearchParams();
+
+      if (!params) return `/qna/saved/questions`;
+
+      if (params.page !== undefined) qp.append('page', String(params.page));
+      if (params.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params.search !== undefined) qp.append('search', params.search);
+      if (params.sortBy !== undefined) qp.append('sortBy', params.sortBy);
+
+      if (params.filter) {
+        const f = params.filter;
+        if (f.tags && f.tags.length > 0) qp.append('filter.tags', f.tags.join(','));
+        if (f.status) qp.append('filter.status', f.status);
+        if (f.bookmarkedOnly !== undefined)
+          qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
+        if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
+      }
+
+      const query = qp.toString();
+      return query ? `/qna/saved/questions?${query}` : `/qna/saved/questions`;
+    },
+
+    SAVED_QUESTION_LIST_IDS: (questionId: string) =>
+      `/qna/saved/questions/${questionId}/lists`,
+
+    SAVED_LIST_QUESTIONS: (listId: string, params?: QuestionListParams) => {
+      const qp = new URLSearchParams();
+
+      if (!params) return `/qna/saved/lists/${listId}/questions`;
+
+      if (params.page !== undefined) qp.append('page', String(params.page));
+      if (params.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params.search !== undefined) qp.append('search', params.search);
+      if (params.sortBy !== undefined) qp.append('sortBy', params.sortBy);
+
+      if (params.filter) {
+        const f = params.filter;
+        if (f.tags && f.tags.length > 0) qp.append('filter.tags', f.tags.join(','));
+        if (f.status) qp.append('filter.status', f.status);
+        if (f.bookmarkedOnly !== undefined)
+          qp.append('filter.bookmarkedOnly', String(f.bookmarkedOnly));
+        if (f.dateFrom) qp.append('filter.dateFrom', f.dateFrom);
+      }
+
+      const query = qp.toString();
+      return query
+        ? `/qna/saved/lists/${listId}/questions?${query}`
+        : `/qna/saved/lists/${listId}/questions`;
+    },
+
+    SAVED_LIST_ITEM: (listId: string, questionId: string) =>
+      `/qna/saved/lists/${listId}/questions/${questionId}`,
 
     //-------------------------------Answer URL-----------------------------------//
 
@@ -79,12 +183,13 @@ export const API_ROUTES = {
       if (params.search) qp.append("search", params.search);
 
       const query = qp.toString();
-      
+
       return `/qna/questions/${params.questionId}/answers${query ? `?${query}` : ''}`;
     },
-    
+
     POST_ANSWER: (questionId: string) => `/qna/questions/${questionId}/answers`,
     EDIT_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     GET_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
+    VOTE_ANSWER: (answerId: string) => `/qna/answers/${answerId}/vote`,
   },
 };

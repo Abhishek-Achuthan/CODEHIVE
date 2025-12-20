@@ -1,8 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { forgotPasswordSchema } from "../validations/authValidation";
-import type { ForgotPasswordData } from "../../../shared/types/api/auth";
-import type { ForgotPasswordFormProps } from "../types";
+import type { ForgotPasswordFormProps, OtpRequestValues } from "../types";
 import { Link } from "react-router-dom";
 import { useOTP } from "../hooks/useOTP";
 import { OTPModal } from "../../../shared/ui/dialog/OTPModal";
@@ -15,12 +14,13 @@ export function ForgotPasswordForm({
   loginUrl = "/login",
   className,
 }: ForgotPasswordFormProps) {
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
-  } = useForm<ForgotPasswordData>({
+  } = useForm<OtpRequestValues>({
     resolver: yupResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
@@ -35,7 +35,7 @@ export function ForgotPasswordForm({
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
     handleResend,
-  } = useOTP<ForgotPasswordData>(
+  } = useOTP<"email", OtpRequestValues>(
     async (data) => {
       if (!data.email) throw new Error("Email is required");
       
@@ -70,7 +70,7 @@ export function ForgotPasswordForm({
     "email"
   );
 
-  const onSubmit = async (values: ForgotPasswordData) => {
+  const onSubmit = async (values: OtpRequestValues) => {
     await handleOtpSubmit(values);
   };
 

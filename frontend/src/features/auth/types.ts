@@ -1,6 +1,27 @@
 import type { Path } from "react-hook-form";
 import type { AxiosResponse } from "axios";
-import type { RegisterData, LoginData, OTPData, SendOTPResponse } from "../../shared/types/api/auth";
+
+export type LoginFormValues = {
+  email: string;
+  password: string;
+};
+
+export type RegisterFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+};
+
+export type OtpRequestValues = {
+  email: string;
+};
+
+export interface SendOtpResponse {
+  success: boolean;
+  message: string;
+}
 
 export interface FieldComponentProps {
   id: string;
@@ -18,7 +39,7 @@ export interface FieldComponentProps {
 }
 
 export interface LoginFormProps {
-  onSubmit: (data: LoginData) => Promise<void>;
+  onSubmit: (data: LoginFormValues) => Promise<void>;
   registerUrl?: string | undefined;
   forgotPasswordUrl?: string | undefined;
   className?: string;
@@ -27,13 +48,13 @@ export interface LoginFormProps {
 
 export interface SignUpFormProps {
   fields?: Array<{
-    name: keyof RegisterData;
+    name: keyof RegisterFormValues;
     label: string;
     placeholder: string;
     type?: "text" | "email" | "tel" | "password";
     component?: React.ComponentType<FieldComponentProps>;
   }>;
-  sendOTP?: (data: OTPData) => Promise<AxiosResponse<SendOTPResponse>>;
+  sendOTP?: (data: OtpRequestValues) => Promise<AxiosResponse<SendOtpResponse>>;
   showOAuth?: boolean;
   loginUrl?: string;
   className?: string;

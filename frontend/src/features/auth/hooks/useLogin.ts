@@ -2,10 +2,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import type { LoginData } from "../../../shared/types/api/auth";
+import type { LoginFormValues } from "../types";
 import { AuthService } from "../../../services/authService";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import { BaseError } from "../../../shared/errors/BaseError";
+import type { UserApi } from "../../../shared/types/api/auth";
+import { mapCurrentUserToView } from "../../../shared/mappers/user.mapper";
 
 export function useLogin() {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export function useLogin() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = async (data: LoginData) => {
+  const login = async (data: LoginFormValues) => {
     try {
       setIsLoading(true);
 
@@ -23,11 +25,12 @@ export function useLogin() {
 
       const { user, accessToken } = response.data;
 
-      dispatch(loginSuccess({ user, accessToken }));
+      const userView = mapCurrentUserToView(user as UserApi);
+      dispatch(loginSuccess({ user: userView, accessToken }));
 
       if (response.success === true) {
-        if (user.role === "user") navigate("/home");
-        else if (user.role === "admin") navigate("/admin/users");
+        if (userView.role === "user") navigate("/home");
+        else if (userView.role === "admin") navigate("/admin/users");
       }
     } catch (error) {
       if (error instanceof BaseError) {

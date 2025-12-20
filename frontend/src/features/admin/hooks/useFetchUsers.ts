@@ -1,13 +1,11 @@
-
-
-
 import { useCallback, useEffect, useState } from "react";
-import type { User } from "../../../shared/types/domain/user";
 import { AdminService } from "../../../services/adminService";
 import toast from "react-hot-toast";
+import type { AdminUserListItemView } from "../../../shared/types/view/AdminUserListItemView";
+import { mapAdminUserListItemToView } from "../../../shared/mappers/user.mapper";
 
 export function useFetchUsers(role:'user' | 'mentor', search:string,page:number) {
-    const [users,setUsers] =useState<User[]>([]);
+    const [users,setUsers] =useState<AdminUserListItemView[]>([]);
     const [loading,setLoading] = useState(false);
     const [totalPages,setTotalPages] = useState(1);
 
@@ -16,8 +14,9 @@ export function useFetchUsers(role:'user' | 'mentor', search:string,page:number)
 
         try {
             const data = await AdminService.listUsers(role,page,10,'createdAt',search);
-             setUsers(data.users || []);
-             setTotalPages(data.totalPages || 1);
+             const items = Array.isArray(data?.items) ? data.items.map(mapAdminUserListItemToView) : [];
+             setUsers(items);
+             setTotalPages(typeof data?.totalPages === "number" ? data.totalPages : 1);
         } catch (error) {
             console.log(`Error fetching ${role}s :`,error);
             toast.error(`Failed to load ${role}s`);
@@ -25,6 +24,7 @@ export function useFetchUsers(role:'user' | 'mentor', search:string,page:number)
         }finally{
             setLoading(false);
         }
+
     },[role,page,search]);
 
     useEffect(() => {

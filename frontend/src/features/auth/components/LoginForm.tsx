@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
-import type { LoginData } from "../../../shared/types/api/auth";
-import type { LoginFormProps } from "../types";
+import type { LoginFormProps, LoginFormValues } from "../types";
 import { loginSchema } from "../validations/authValidation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
@@ -19,7 +18,7 @@ export function LoginForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginData>({
+  } = useForm<LoginFormValues>({
     resolver: yupResolver(loginSchema),
     defaultValues: {
       email: "",

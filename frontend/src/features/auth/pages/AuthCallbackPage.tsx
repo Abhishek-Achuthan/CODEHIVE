@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import toast from "react-hot-toast";
+import type { CurrentUserView } from "../../../shared/types/view/CurrentUserView";
 
 export default function AuthCallbackPage() {
   const dispatch = useDispatch();
@@ -31,7 +32,21 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        const userData = JSON.parse(decodeURIComponent(userParam));
+        const raw: unknown = JSON.parse(decodeURIComponent(userParam));
+        const obj = (raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {}) as Record<
+          string,
+          unknown
+        >;
+
+        const userData: CurrentUserView = {
+          id: String(obj.id ?? ""),
+          firstName: String(obj.firstName ?? ""),
+          lastName: String(obj.lastName ?? ""),
+          email: String(obj.email ?? ""),
+          role: String(obj.role ?? ""),
+          isBlocked: Boolean(obj.isBlocked),
+          avatarUrl: typeof obj.avatarUrl === "string" ? obj.avatarUrl : undefined,
+        };
 
         localStorage.setItem("accessToken", token);
         dispatch(loginSuccess({ user: userData, accessToken: token }));

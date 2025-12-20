@@ -4,8 +4,7 @@ import { signUpSchema } from '../validations/authValidation';
 import { useOTP } from '../hooks/useOTP';
 import { OTPModal } from '../../../shared/ui/dialog/OTPModal';
 import { OAuthButtons } from './OAuthButtons';
-import type { RegisterData } from '../../../shared/types/api/auth';
-import type { SignUpFormProps } from '../types';
+import type { RegisterFormValues, SignUpFormProps } from '../types';
 import { FormField } from './FormField';
 import { Link } from 'react-router-dom';
 import { AuthService } from '../../../services/authService';
@@ -23,7 +22,7 @@ export function SignUpForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
-  } = useForm<RegisterData>({
+  } = useForm<RegisterFormValues>({
     resolver: yupResolver(signUpSchema),
     defaultValues: {
       firstName: '',
@@ -39,7 +38,7 @@ export function SignUpForm({
     setOtpModalOpen, 
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
-  } = useOTP<RegisterData>(
+  } = useOTP<"email", RegisterFormValues>(
     async (data) => {
       try {
         if (!data.email) throw new Error('Email is required');
@@ -75,7 +74,7 @@ export function SignUpForm({
     'email'
   );
 
-  const onSubmit = async (values: RegisterData) => {
+  const onSubmit = async (values: RegisterFormValues) => {
     try {
       await handleOtpSubmit(values);
     } catch (error) {
