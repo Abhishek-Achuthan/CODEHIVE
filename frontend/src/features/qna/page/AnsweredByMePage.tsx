@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 import QnaLayout from "../../../layouts/QnaLayout";
 import QuestionsList from "../components/QuestionList";
-import { useQuestionsList } from "../hooks/useListQuestions";
+import { useAnsweredQuestions } from "../hooks/useAnsweredQuestions";
 import type { FilterState } from "../components/FilterModal";
 
-export default function QnaLandingPage() {
+export default function AnsweredByMePage() {
   const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -22,9 +22,14 @@ export default function QnaLandingPage() {
     setFilterState,
     setActiveFilter,
     applyQuickFilter,
-  } = useQuestionsList();
+  } = useAnsweredQuestions();
 
   const totalPages = Math.ceil(totalQuestions / 5);
+
+  const emptyMessage =
+    !loading && totalQuestions === 0 && searchTerm.trim() === ""
+      ? "You haven't answered any questions yet."
+      : undefined;
 
   const handleApplyFilters = (filters: FilterState): void => {
     setFilterState(filters);
@@ -43,6 +48,7 @@ export default function QnaLandingPage() {
         searchTerm={searchTerm}
         activeFilter={activeFilter}
         isFilterOpen={isFilterOpen}
+        emptyMessage={emptyMessage}
         onSearchChange={setSearchTerm}
         onPageChange={setCurrentPage}
         onAskQuestion={() => navigate("/qna/ask-question")}

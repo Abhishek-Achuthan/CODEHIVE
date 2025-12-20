@@ -1,10 +1,17 @@
 import type { PaginatedResponse } from "../core/api";
 import type { ListQueryParams } from "../core/api";
-import type {
-  QuestionSort,
-  AnswerSort,
-  QuestionStatus,
-} from "../domain/qna.types";
+
+export type QuestionStatusApi = "all" | "answered" | "unanswered";
+
+export type QuestionSortApi =
+  | "newest"
+  | "oldest"
+  | "most_answered"
+  | "least_answered"
+  | "most_viewed"
+  | "most_voted";
+
+export type AnswerSortApi = "newest" | "votes" | "oldest";
 
 //-------------------------------- Request DTOs-----------------------------------------//
 
@@ -21,23 +28,42 @@ export interface CreateAnswerRequest {
 }
 
 export interface EditQuestionRequest {
-  questionId: string
-  title: string;
-  descriptionHtml: string;
-  askedBy: string;
-  tags: string[];
+  questionId: string;
+  title?: string;
+  descriptionHtml?: string;
+  tags?: string[];
   version: number;
 }
 
 export interface EditAnswerRequest {
   answerId: string;
-  version: number,
+  version: number;
   answerText: string;
 }
+
+export type SimpleSuccessResponse = {
+  success: boolean;
+};
+
+export type CreateSavedListRequest = {
+  name: string;
+};
+
+export type SavedListAPIResponse = {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SavedQuestionListIdsResponse = {
+  listIds: string[];
+};
 // Request params
 export interface QuestionListFilter {
   tags?: string[];
-  status?: QuestionStatus;
+  status?: QuestionStatusApi;
   bookmarkedOnly?: boolean;
   dateFrom?: string;
 }
@@ -45,13 +71,13 @@ export interface QuestionListFilter {
 
 export type QuestionListParams = ListQueryParams<
   QuestionListFilter,
-  QuestionSort
+  QuestionSortApi
 > & {
   tags?: string[];
 };
 
 export type AnswerListParams = Omit<
-  ListQueryParams<never, AnswerSort>,
+  ListQueryParams<never, AnswerSortApi>,
   "filter"
 > & {
   questionId: string;
@@ -59,6 +85,21 @@ export type AnswerListParams = Omit<
 
 
 //-------------------------------- Response DTOs----------------------------------------//
+export interface AnswerEntityApi {
+  id: string;
+  questionId: string;
+  answeredBy: string;
+  answerText: string;
+  voteCount: number;
+  isAccepted: boolean;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+  lastEditedAt?: string;
+  lastEditedBy?: string | null;
+  editCount?: number;
+}
+
 export interface AnswerAuthorDTO {
   id: string;
   firstName: string;
@@ -78,6 +119,66 @@ export interface AnswerWithAuthorAPI {
   };
   author: AnswerAuthorDTO;
 }
+
+export type GetQuestionAPIResponse = {
+  author: {
+    id: string;
+    firstName: string;
+    avatarUrl?: string;
+  };
+  question: {
+    id: string;
+    title: string;
+    descriptionHtml: string;
+    tags: string[];
+    votes: number;
+    views: number;
+    answerCount: number;
+    createdAt: string;
+    updatedAt?: string;
+    version: number;
+  };
+  isBookmarked: boolean;
+};
+
+export type GetAnswerAPIResponse = {
+  id: string;
+  answerText: string;
+  authorId: string;
+  questionId: string;
+  version: number;
+};
+
+export type CreateQuestionApiResponse = {
+  success: boolean;
+  message?: string;
+  messsage?: string;
+  data?: unknown;
+};
+
+export type EditQuestionApiResponse = {
+  success: boolean;
+  message: string;
+  data: unknown;
+};
+
+export type PostAnswerApiResponse = {
+  success: boolean;
+  message: string;
+  data: AnswerEntityApi;
+};
+
+export type EditAnswerApiResponse = {
+  success: boolean;
+  message: string;
+  data: AnswerEntityApi | null;
+};
+
+export type SaveQuestionApiResponse = {
+  success: boolean;
+  data: boolean;
+  message: string;
+};
 
 export type QuestionListAPIResponse = {
   id: string;

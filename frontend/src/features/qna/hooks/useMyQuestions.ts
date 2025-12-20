@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import { QnAService } from "../../../services/qnaService";
-import type {
-  QuestionListParams,
-  QuestionListFilter,
-  QuestionSortApi,
-} from "../../../shared/types/api/qna";
+import type { QuestionListFilter, QuestionListParams, QuestionSortApi } from "../../../shared/types/api/qna";
 import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
 
@@ -18,7 +16,10 @@ type FilterInput = {
   dateFrom: string;
 };
 
-export function useQuestionsList() {
+export function useMyQuestions() {
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const userId = currentUser?.id;
+
   const [activeFilter, setActiveFilter] = useState<string>("newest");
   const [sortBy, setSortBy] = useState<QuestionSortApi>("newest");
   const [filterStateApi, setFilterStateApi] = useState<QuestionListFilter | null>(null);
@@ -32,6 +33,12 @@ export function useQuestionsList() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchQuestions = async (): Promise<void> => {
+    if (!userId) {
+      setQuestions([]);
+      setTotalQuestions(0);
+      return;
+    }
+
     setLoading(true);
     try {
       const params: QuestionListParams = {
@@ -42,13 +49,13 @@ export function useQuestionsList() {
         search: debouncedSearch || undefined,
       };
 
-      const res = await QnAService.listQuestions(params);
+      const res = await QnAService.listMyQuestions(userId, params);
 
       const items = Array.isArray(res?.items) ? res.items.map(mapQuestionListItemToView) : [];
       setQuestions(items);
       setTotalQuestions(typeof res?.totalItems === "number" ? res.totalItems : 0);
     } catch {
-      toast.error("Error fetching questions");
+      toast.error("Error fetching your questions");
       setQuestions([]);
       setTotalQuestions(0);
     } finally {
@@ -59,7 +66,7 @@ export function useQuestionsList() {
   useEffect(() => {
     fetchQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, sortBy, filterStateApi, debouncedSearch]);
+  }, [userId, currentPage, sortBy, filterStateApi, debouncedSearch]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -69,10 +76,7 @@ export function useQuestionsList() {
     setActiveFilter(type);
     setCurrentPage(1);
 
-    const map: Record<
-      string,
-      { sort: QuestionSortApi; filter: QuestionListFilter | null }
-    > = {
+    const map: Record<string, { sort: QuestionSortApi; filter: QuestionListFilter | null }> = {
       newest: { sort: "newest", filter: null },
       "most-answered": { sort: "most_answered", filter: null },
       "most-viewed": { sort: "most_viewed", filter: null },

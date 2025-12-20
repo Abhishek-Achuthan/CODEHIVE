@@ -1,34 +1,47 @@
+import type * as React from "react";
+import { useMemo } from "react";
+import { htmlToPlainText } from "../util/htmlToPlainText";
 
 export interface QuestionCardProps {
   title: string;
-  descriptionHtml: string;
+  contentHtml: string;
   tags: string[];
-  votes?: number;
-  answers?: number;
+  voteCount?: number;
+  answerCount?: number;
   views?: number;
   onclick?:()=>void;
+  actions?: React.ReactNode;
 }
+
 
 export default function QuestionCard({
   title,
-  descriptionHtml,
+  contentHtml,
   tags = [],
-  votes = 0,
-  answers = 0,
+  voteCount = 0,
+  answerCount = 0,
   views = 0,
-  onclick
+  onclick,
+  actions,
 }: QuestionCardProps) {
+
+  const previousText =  useMemo(() => htmlToPlainText(contentHtml),[contentHtml]);
   return (
 
-    <article className="group border border-border/30 hover:border-accent/50 bg-card/40 hover:bg-card/60 rounded-lg p-4 transition-all cursor-pointer " onClick={onclick}>
+    <article className="group relative border border-border/30 hover:border-accent/50 bg-card/40 hover:bg-card/60 rounded-lg p-4 transition-all cursor-pointer " onClick={onclick}>
+      {actions ? (
+        <div className="absolute top-3 right-3 z-10" onClick={(e) => e.stopPropagation()}>
+          {actions}
+        </div>
+      ) : null}
       <div className="flex gap-4">
         <div className="flex flex-col items-center gap-3 text-xs text-foreground/60 min-w-[72px]">
           <div className="text-center">
-            <div className="font-semibold text-foreground">{votes}</div>
+            <div className="font-semibold text-foreground">{voteCount}</div>
             <div>votes</div>
           </div>
-          <div className={`text-center ${answers > 0 ? "text-accent" : "text-foreground/60"}`}>
-            <div className="font-semibold text-foreground">{answers}</div>
+          <div className={`text-center ${answerCount > 0 ? "text-accent" : "text-foreground/60"}`}>
+            <div className="font-semibold text-foreground">{answerCount}</div>
             <div>answers</div>
           </div>
           <div className="text-center">
@@ -41,7 +54,7 @@ export default function QuestionCard({
           <h3 className="text-base font-semibold text-accent group-hover:text-accent/90 mb-2 line-clamp-1 transition">
             {title}
           </h3>
-          <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{descriptionHtml}</p>
+          <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{previousText}</p>
 
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, i) => (

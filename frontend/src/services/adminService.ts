@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import * as AdminApi from "../api/endpoints/adminApi";
 import { AxiosError } from "axios";
+import type { ListUsersApiResponse } from "../shared/types/api/admin";
 
 export class AdminService {
   static async listUsers(
@@ -9,7 +10,7 @@ export class AdminService {
     pageSize?: number,
     sort?: string,
     search?: string
-  ) {
+  ): Promise<ListUsersApiResponse> {
     try {
       const response = await AdminApi.getAllUsers(
         role,
@@ -18,9 +19,10 @@ export class AdminService {
         sort,
         search
       );
-      return response.data;
+      return response.data as ListUsersApiResponse;
     } catch (error) {
       this.handleError(error);
+      throw error;
     }
   }
 

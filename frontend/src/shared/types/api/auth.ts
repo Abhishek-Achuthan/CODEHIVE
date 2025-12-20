@@ -1,5 +1,3 @@
-import type { User } from "../domain/user";
-
 // Request DTOs
 export type RegisterData = {
   firstName: string;
@@ -28,8 +26,20 @@ export type ResetPasswordData = {
 };
 
 // Response DTOs
+export interface UserApi {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  isBlocked: boolean;
+  avatarUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
-  user: User;
+  user: UserApi;
   accessToken: string;
   refreshToken?: string;
 }

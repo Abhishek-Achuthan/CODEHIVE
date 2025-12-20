@@ -7,12 +7,14 @@ type Props = {
   loading: boolean;
   questions: Question[];
   onSelect: (id: string) => void;
+  emptyMessage?: string;
 };
 
 export function QuestionContent({
   loading,
   questions,
   onSelect,
+  emptyMessage,
 }: Props) {
   if (loading) {
     return (
@@ -25,7 +27,7 @@ export function QuestionContent({
   if (questions.length === 0) {
     return (
       <p className="text-foreground/60 text-center py-8">
-        No questions found. Try adjusting your filters.
+        {emptyMessage ?? "No questions found. Try adjusting your filters."}
       </p>
     );
   }

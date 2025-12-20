@@ -14,6 +14,9 @@ import AskQuestionPage from "../features/qna/page/AskQuestionPage";
 import QuestionDetailsPage from "../features/qna/page/QuestionDetailsPage";
 import EditQuestionPage from "../features/qna/page/EditQuestionPage";
 import EditAnswerPage from "../features/qna/page/EditAnswerPage";
+import AnsweredByMePage from "../features/qna/page/AnsweredByMePage";
+import MyQuestionsPage from "../features/qna/page/MyQuestionsPage";
+import SavedQuestionsPage from "../features/qna/page/SavedQuestionsPage";
 
 export default function AppRoutes() {
   return (
@@ -36,13 +39,15 @@ export default function AppRoutes() {
           <Route path="/admin/mentors" element={<MentorManagementPage />} />
 
           {/*qna routes*/}
-          <Route path="/qna" element={<QnaLandigPage/>} />
-          <Route path="/qna/ask-question" element={<AskQuestionPage/>} />
-          <Route path="/qna/question/:questionId" element={<QuestionDetailsPage/>}/>
-          <Route path="/qna/question/:questionId/edit" element={<EditQuestionPage/>} />
-          <Route path="/qna/answers/:answerId/edit" element={<EditAnswerPage/>}/>
+          <Route path="/qna" element={<QnaLandigPage />} />
+          <Route path="/qna/ask-question" element={<AskQuestionPage />} />
+          <Route path="/qna/question/:questionId" element={<QuestionDetailsPage />} />
+          <Route path="/qna/question/:questionId/edit" element={<EditQuestionPage />} />
+          <Route path="/qna/answers/:answerId/edit" element={<EditAnswerPage />} />
+          <Route path="/qna/answered-by-me" element={<AnsweredByMePage />} />
+          <Route path="/qna/my-questions" element={<MyQuestionsPage />} />
+          <Route path="/qna/saved" element={<SavedQuestionsPage />} />
         </Route>
-        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -10,4 +10,66 @@ body,
   height: 100%;
 }
 
+ .qna-content {
+   word-break: break-word;
+ }
+
+ .qna-content :where(p, ul, ol, pre, blockquote, hr, h1, h2, h3, h4, h5, h6) {
+   margin: 0;
+ }
+
+ .qna-content :where(p, ul, ol, pre, blockquote, hr, h1, h2, h3, h4, h5, h6)
+   + :where(p, ul, ol, pre, blockquote, hr, h1, h2, h3, h4, h5, h6) {
+   margin-top: 0.9rem;
+ }
+
+ .qna-content :where(h1, h2, h3, h4) {
+   font-weight: 700;
+   line-height: 1.25;
+ }
+
+ .qna-content h1 {
+   font-size: 1.5rem;
+ }
+
+ .qna-content h2 {
+   font-size: 1.25rem;
+ }
+
+ .qna-content h3 {
+   font-size: 1.1rem;
+ }
+
+ .qna-content pre {
+   background: rgba(24, 24, 27, 0.8);
+   border: 1px solid rgba(63, 63, 70, 0.7);
+   border-radius: 0.5rem;
+   padding: 0.85rem 1rem;
+   overflow-x: auto;
+ }
+
+ .qna-content pre code {
+   background: transparent;
+   padding: 0;
+ }
+
+ .qna-content code {
+   background: rgba(63, 63, 70, 0.35);
+   border-radius: 0.25rem;
+   padding: 0.1rem 0.25rem;
+ }
+
+ .qna-content hr {
+   border: 0;
+   border-top: 1px solid rgba(63, 63, 70, 0.7);
+ }
+
+ .qna-content blockquote {
+   border-left: 3px solid rgba(99, 102, 241, 0.5);
+   padding-left: 0.9rem;
+   color: rgba(228, 228, 231, 0.95);
+   background: rgba(24, 24, 27, 0.35);
+   border-radius: 0.25rem;
+ }
+
 

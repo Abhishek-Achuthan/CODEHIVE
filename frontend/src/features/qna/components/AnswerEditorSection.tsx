@@ -1,22 +1,12 @@
 import React, { useEffect } from "react";
-import type { Editor } from "@tiptap/react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import type { IconType } from "react-icons";
-import { MdFormatBold, MdFormatItalic, MdCode } from "react-icons/md";
 import toast from "react-hot-toast";
+import { createQnaEditorExtensions, getQnaEditorAttributes } from "./qnaEditorBase";
 
 interface AnswerEditorSectionProps {
   initialHtml?: string;
   onSubmitHtml: (html: string) => Promise<void>;
   isPosting?: boolean;
-}
-
-interface EditorTool {
-  icon: IconType;
-  label: string;
-  command: (editor: Editor | null) => void;
-  shortcut?: string;
 }
 
 const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
@@ -25,12 +15,17 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
   isPosting = false,
 }) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      ...createQnaEditorExtensions({
+        placeholder: "Write your answer...",
+      }),
+    ],
     content: initialHtml ?? "",
     editorProps: {
       attributes: {
-        class:
-          "prose prose-invert max-w-full focus:outline-none min-h-[160px] p-4 text-sm whitespace-pre-wrap break-words",
+        ...getQnaEditorAttributes({
+          ariaLabel: "Answer editor",
+        }),
       },
     },
   });
@@ -40,27 +35,6 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
       editor.commands.setContent(initialHtml, { emitUpdate: false });
     }
   }, [editor, initialHtml]);
-
-  const tools: EditorTool[] = [
-    {
-      icon: MdFormatBold,
-      label: "Bold",
-      command: (ed) => ed?.chain().focus().toggleBold().run(),
-      shortcut: "Ctrl+B",
-    },
-    {
-      icon: MdFormatItalic,
-      label: "Italic",
-      command: (ed) => ed?.chain().focus().toggleItalic().run(),
-      shortcut: "Ctrl+I",
-    },
-    {
-      icon: MdCode,
-      label: "Inline Code",
-      command: (ed) => ed?.chain().focus().toggleCode().run(),
-      shortcut: "Ctrl+`",
-    },
-  ];
 
   const plainTextLength = (html: string): number => {
     const tmp = document.createElement("div");
@@ -96,32 +70,61 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
       <h2 className="text-2xl font-bold text-white mb-6">Your Answer</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-wrap gap-1 p-3 bg-zinc-900/30 border border-zinc-800 rounded-t-lg">
-          {tools.map((tool) => {
-            const Icon = tool.icon;
-            return (
+        <div className="border rounded-b-lg bg-zinc-900/50 border-zinc-800">
+          <div className="p-2 border-b border-zinc-800/40">
+            <div className="flex gap-2">
               <button
-                key={tool.label}
                 type="button"
-                title={`${tool.label}${tool.shortcut ? ` (${tool.shortcut})` : ""}`}
-                className="p-2 rounded hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
-                onClick={() => tool.command(editor)}
-                aria-label={tool.label}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                aria-label="Bold"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
               >
-                <Icon size={18} />
+                <strong>B</strong>
               </button>
-            );
-          })}
-        </div>
-
-
-        <div className="border border-t-0 border-zinc-800 rounded-b-lg bg-zinc-900/50">
-          <div className="max-h-[40vh] min-h-40 overflow-auto">
-
-            <div className="px-4 py-2 whitespace-pre-wrap break-all">
-              <EditorContent editor={editor} />
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                aria-label="Italic"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+              >
+                <em>I</em>
+              </button>
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                aria-label="Heading"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                aria-label="Bullet list"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+              >
+                •
+              </button>
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+                aria-label="Code block"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+              >
+                {"</>"}
+              </button>
+              <button
+                type="button"
+                onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+                aria-label="Section separator"
+                className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+              >
+                ---
+              </button>
             </div>
           </div>
+
+          <EditorContent editor={editor} className="p-4 min-h-48 text-sm" />
         </div>
 
         <div className="flex justify-end">

@@ -1,16 +1,13 @@
 import React, { useState, type JSX } from "react";
 import { useNavigate } from "react-router-dom";
-import DOMPurify from "dompurify";
 import { MdAdd, MdClose } from "react-icons/md";
 import QuestionEditor from "./QuestionEditor";
-import { QnAService } from "../../../services/qnaService";
 import toast from "react-hot-toast";
-import { useAppSelector } from "../../../shared/hooks/storeHooks";
-import { BaseError } from "../../../shared/errors/BaseError";
+import { useCreateQuestion } from "../hooks/useCreateQuestion";
 
 export default function AskQuestionForm(): JSX.Element {
   const navigate = useNavigate();
-  const userId = useAppSelector((state) => state.auth?.user?.id);
+  const { createQuestion } = useCreateQuestion();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState(""); 
   const [tagInput, setTagInput] = useState("");
@@ -63,37 +60,18 @@ export default function AskQuestionForm(): JSX.Element {
     e.preventDefault();
     const v = validate();
     if (v) return toast.error(v);
-    if (!userId) {
-      toast.error("You must be signed in to post a question.");
-      return;
-    }
 
     setSubmitting(true);
     try {
-      // Sanitize HTML but allow formatting tags (TipTap uses these)
-      const safeHtml = DOMPurify.sanitize(description, {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-        ALLOWED_ATTR: ['href', 'target', 'rel'],
+      const ok = await createQuestion({
+        title,
+        contentHtml: description,
+        tags,
       });
 
-      const payload = {
-        title: title.trim(),
-        descriptionHtml: safeHtml,
-        askedBy: userId,
-        tags,
-      };
-      try {
-        await QnAService.createQuestion(payload);
-        navigate(`/qna`);
-      } catch (error) {
-        if(error instanceof BaseError)
-        toast.error(error.message)
-        return 
-      }
-
+      if (ok) navigate(`/qna`);
     } catch (error) {
-      if(error instanceof BaseError)
-      toast.error(error.message || 'Failed to post Question');
+      toast.error("Failed to post Question");
     } finally {
       setSubmitting(false);
     }

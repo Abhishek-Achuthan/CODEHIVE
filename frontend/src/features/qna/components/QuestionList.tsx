@@ -20,6 +20,7 @@ type QuestionsListProps = {
   searchTerm: string;
   activeFilter: string;
   isFilterOpen: boolean;
+  emptyMessage?: string;
   onSearchChange: (value: string) => void;
   onPageChange: (page: number) => void;
   onAskQuestion: () => void;
@@ -40,6 +41,7 @@ export default function QuestionsList(props: QuestionsListProps): JSX.Element {
     searchTerm,
     activeFilter,
     isFilterOpen,
+    emptyMessage,
     onSearchChange,
     onPageChange,
     onAskQuestion,
@@ -51,6 +53,7 @@ export default function QuestionsList(props: QuestionsListProps): JSX.Element {
   } = props;
 
   const title = getTitle(activeFilter);
+
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -83,6 +86,7 @@ export default function QuestionsList(props: QuestionsListProps): JSX.Element {
         loading={loading}
         questions={questions}
         onSelect={onQuestionClick}
+        emptyMessage={emptyMessage}
       />
 
       <div className="mt-8 h-10 flex items-center justify-center">

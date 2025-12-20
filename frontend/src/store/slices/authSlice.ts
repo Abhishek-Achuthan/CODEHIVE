@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { User } from "../../shared/types/domain/user";
+import type { CurrentUserView } from "../../shared/types/view/CurrentUserView";
 
 interface AuthState {
-  user: User | null;
+  user: CurrentUserView | null;
   accessToken: string | null;
   isAuthenticated: boolean;
   loading: boolean;
@@ -48,7 +48,7 @@ const authSlice = createSlice({
     },
     loginSuccess: (
       state,
-      action: PayloadAction<{ user: User; accessToken: string }>
+      action: PayloadAction<{ user: CurrentUserView; accessToken: string }>
     ) => {
       state.loading = false;
       state.isAuthenticated = true;

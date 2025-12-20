@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { createQnaEditorExtensions, getQnaEditorAttributes } from "./qnaEditorBase";
 
 type Props = {
   value: string;
@@ -8,18 +8,29 @@ type Props = {
   placeholder?: string;
 };
 
+const DEFAULT_TEMPLATE =
+  "Problem description\n\n" +
+  "What I tried\n\n" +
+  "Expected vs actual behavior\n\n" +
+  "---\n\n" +
+  "Code / error output (paste here)\n";
+
 export default function QuestionEditor({ value, onChange, placeholder }: Props) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      ...createQnaEditorExtensions({
+        placeholder: placeholder ?? DEFAULT_TEMPLATE,
+      }),
+    ],
     content: value || "",
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
-        class: "prose max-w-full focus:outline-none text-sm",
-        spellCheck: "true",
-        "aria-label": placeholder ?? "Question description editor",
+        ...getQnaEditorAttributes({
+          ariaLabel: placeholder ?? "Question description editor",
+        }),
       },
     },
   });
@@ -53,6 +64,14 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
           </button>
           <button
             type="button"
+            onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+            aria-label="Heading"
+            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+          >
+            H2
+          </button>
+          <button
+            type="button"
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
             aria-label="Bullet list"
             className="p-2 rounded hover:bg-zinc-800 text-gray-300"
@@ -67,10 +86,18 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
           >
             {"</>"}
           </button>
+          <button
+            type="button"
+            onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+            aria-label="Section separator"
+            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+          >
+            ---
+          </button>
         </div>
       </div>
 
       <EditorContent editor={editor} className="p-4 min-h-48 text-sm" />
     </div>
   );
-}
+ }

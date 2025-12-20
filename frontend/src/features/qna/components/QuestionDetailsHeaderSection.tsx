@@ -1,41 +1,66 @@
 import type React from "react";
 import { MdShare, MdRemoveRedEye as MdEye, MdBookmark, MdEdit } from "react-icons/md";
+import { QnaRichContent } from "./QnaRichContent";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
-import type { GetQuestionData } from "../../../shared/types/domain/qna.types";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
+import type { QuestionDetailsView } from "../../../shared/types/view/QuestionDetailsView";
 
 interface QuestionHeaderSectionProps {
-  data: GetQuestionData;
+  data: QuestionDetailsView;
   isBookmarked: boolean;
   onToggleBookmark: () => void;
+  votes?: number;
+  userVote?: 1 | -1 | 0;
+  onUpvote?: () => void;
+  onDownvote?: () => void;
 }
 
 export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
   data,
   isBookmarked,
   onToggleBookmark,
+  votes,
+  userVote = 0,
+  onUpvote,
+  onDownvote,
 }) => {
   const currentUser = useAppSelector((state) => state.auth.user);
-  const created = parseDate(data.question.createdAt);
-  const updated = parseDate(data.question.updatedAt);
-  const isAuthor = currentUser?.id === data.question.askedBy;
+  const created = parseDate(data.createdAt);
+  const updated = parseDate(data.updatedAt);
+  const isAuthor = currentUser?.id === data.author.id;
+
+  console.log('data from question details',data)
 
   return (
     <div className="flex gap-6 mb-4">
       {/* Voting controls */}
       <div className="flex flex-col items-center gap-4 py-2">
-        <button className="flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 text-zinc-400 hover:text-purple-400 transition-all group">
+        <button
+          onClick={onUpvote}
+          className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${
+            userVote === 1
+              ? "text-purple-400 border-purple-500/50"
+              : "text-zinc-400 hover:text-purple-400"
+          }`}
+        >
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M7 14l5-5 5 5z" />
           </svg>
         </button>
 
         <span className="text-lg font-semibold text-white w-8 text-center">
-          {data.question.votes}
+          {votes ?? data.voteCount}
         </span>
 
-        <button className="flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 text-zinc-400 hover:text-purple-400 transition-all group">
+        <button
+          onClick={onDownvote}
+          className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${
+            userVote === -1
+              ? "text-purple-400 border-purple-500/50"
+              : "text-zinc-400 hover:text-purple-400"
+          }`}
+        >
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M17 10l-5 5-5-5z" />
           </svg>
@@ -64,12 +89,12 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
       <div className="flex-1">
         <div className="flex justify-between items-start mb-6">
           <h1 className="text-3xl font-bold text-white leading-tight">
-            {data.question.title}
+            {data.title}
           </h1>
           
           {isAuthor && (
             <Link
-              to={`/qna/question/${data.question.id}/edit`}
+              to={`/qna/question/${data.id}/edit`}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <MdEdit size={16} className="shrink-0" />
@@ -87,20 +112,20 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/50 text-zinc-300">
             <MdEye size={16} className="text-blue-400" />
-            <span>{data.question.views} views</span>
+            <span>{data.views} views</span>
           </span>
         </div>
 
         <div className="mb-6 p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50">
-          <div 
-            className="prose prose-invert max-w-none text-zinc-200 text-base leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: data.question.descriptionHtml }}
+          <QnaRichContent
+            html={data.contentHtml}
+            className="qna-content qna-renderer text-zinc-200 text-base leading-relaxed"
           />
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {data.question.tags.map((tag) => (
+          {data.tags?.map((tag) => (
             <span
               key={tag}
               className="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-medium hover:bg-blue-500/20 transition-all cursor-pointer"
@@ -120,11 +145,11 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
             </div>
 
             <p className="text-sm text-white font-semibold leading-tight">
-              {data.author.firstName} {data.author.lastName}
+              {data.author.firstName}
             </p>
 
             <p className="text-xs text-zinc-400">
-              {data.question.votes} reputation
+              {(votes ?? data.voteCount)} reputation
             </p>
 
             <p className="text-xs text-zinc-400 mb-1">

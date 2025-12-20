@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 import QnaLayout from "../../../layouts/QnaLayout";
 import QuestionsList from "../components/QuestionList";
-import { useQuestionsList } from "../hooks/useListQuestions";
+import { useMyQuestions } from "../hooks/useMyQuestions";
 import type { FilterState } from "../components/FilterModal";
 
-export default function QnaLandingPage() {
+export default function MyQuestionsPage() {
   const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -22,7 +22,7 @@ export default function QnaLandingPage() {
     setFilterState,
     setActiveFilter,
     applyQuickFilter,
-  } = useQuestionsList();
+  } = useMyQuestions();
 
   const totalPages = Math.ceil(totalQuestions / 5);
 
