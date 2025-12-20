@@ -17,6 +17,17 @@ export class SavedQuestionRepository extends GenericRepository<SavedQuestionDoc,
         return doc ? this.toEntity(doc):null;
     }
 
+    async findQuestionIdsByUser(userId: string): Promise<string[]> {
+        const ids = (await this._model.distinct('questionId', {
+            userId: new Types.ObjectId(userId),
+        })) as Types.ObjectId[];
+        return ids.map((id) => id.toString());
+    }
+
+    async deleteByQuestion(questionId: string): Promise<void> {
+        await this._model.deleteMany({ questionId: new Types.ObjectId(questionId) });
+    }
+
     protected toEntity(doc: SavedQuestionDoc): SavedQuestionEntity {
         return {
             id: doc._id.toString(),
