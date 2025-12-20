@@ -1,11 +1,11 @@
 import { VoteValue } from '../../domain/types/VoteValue';
-import { VoteType } from '../../domain/types/VoteType';
+import { VoteTargetType } from '../../domain/types/VoteTargetType';
 
 export interface IVoteResponseDTO {
   id: string;
   userId: string;
   targetId: string;
-  targetType: VoteType;
+  targetType: VoteTargetType;
   value: VoteValue;
   createdAt: Date;
   updatedAt: Date;
@@ -14,6 +14,6 @@ export interface IVoteResponseDTO {
 export interface ICreateVoteInputDTO {
   userId: string;
   targetId: string;               
-  targetType: VoteType;
+  targetType: VoteTargetType;
   value: VoteValue;
 }
