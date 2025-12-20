@@ -7,4 +7,5 @@ export interface QuestionListFilter {
   dateFrom?: string;              
   minAnswers?: number;
   minVotes?: number;
+  askedBy?: string; 
 }

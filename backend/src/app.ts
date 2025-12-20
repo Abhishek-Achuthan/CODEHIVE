@@ -10,6 +10,7 @@ import cors from 'cors';
 import { errorHandler } from './presentation/middlewares/errorHanlder';
 import cookieParser from 'cookie-parser';
 import { QnARoutes } from './presentation/routes/QnARoutes';
+import { UserRoute } from './presentation/routes/UserRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -44,9 +45,11 @@ export class App {
     const authRoute = new AuthRoute();
     const adminRoute = new AdminRoute();
     const qnaRoutes = new QnARoutes;
+    const userRoute = new UserRoute;
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin',adminRoute.getRoutes());
     this._app.use('/api/qna',qnaRoutes.getRoutes());
+    this._app.use('/api/users',userRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
