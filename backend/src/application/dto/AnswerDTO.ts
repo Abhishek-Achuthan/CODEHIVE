@@ -27,6 +27,7 @@ export interface IAnswerListQueryDTO {
   page?: number;
   limit?: number;
   sortBy?: AnswerSort;
+  search?: string;
 }
 
 export interface IEditAnswerInputDTO {
