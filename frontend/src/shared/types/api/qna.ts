@@ -27,6 +27,11 @@ export interface CreateAnswerRequest {
   questionId: string;
 }
 
+export interface CreateAcceptedAnswerRequest {
+  questionId : string,
+  answerId : string,
+}
+
 export interface EditQuestionRequest {
   questionId: string;
   title?: string;
@@ -190,7 +195,14 @@ export type QuestionListAPIResponse = {
   views: number;
 };
 
+export type AcceptAnswerAPIResponse = {
+  success: boolean;
+  message: string;
+  data: AnswerEntityApi | null;
+}
+
 export type QuestionListPaginatedResponse =
   PaginatedResponse<QuestionListAPIResponse>;
 
 export type PaginatedAnswerResponse = PaginatedResponse<AnswerWithAuthorAPI>;
+

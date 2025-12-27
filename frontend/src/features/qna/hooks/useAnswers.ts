@@ -32,8 +32,14 @@ export function useAnswers(
       if (seen.has(a.id)) return false;
       seen.add(a.id);
       return true;
+    }).map(a => {
+      if (actions.newlyAcceptedId) {
+        // If we have a local accepted action, override isAccepted
+        return { ...a, isAccepted: a.id === actions.newlyAcceptedId };
+      }
+      return a;
     });
-  }, [list.answers, actions.localAnswers, shouldShowLocal]);
+  }, [list.answers, actions.localAnswers, shouldShowLocal, actions.newlyAcceptedId]);
 
   return {
     /* ---------- data ---------- */

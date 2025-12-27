@@ -172,6 +172,8 @@ export const API_ROUTES = {
     SAVED_LIST_ITEM: (listId: string, questionId: string) =>
       `/qna/saved/lists/${listId}/questions/${questionId}`,
 
+    ACCEPT_ANSWER: (questionId: string) => `/qna/questions/${questionId}/accept-answer`,
+
     //-------------------------------Answer URL-----------------------------------//
 
     LIST_ANSWERS: (params: AnswerListParams) => {

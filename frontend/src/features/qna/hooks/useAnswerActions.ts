@@ -48,6 +48,9 @@ export function useAnswerActions({
   const [userVotes, setUserVotes] = useState<Record<string, VoteValue>>({});
   const [votingById, setVotingById] = useState<Record<string, boolean>>({});
 
+  /* ---------- accepted state ---------- */
+  const [newlyAcceptedId, setNewlyAcceptedId] = useState<string | null>(null);
+
   /* ---------- submit answer ---------- */
   const submitAnswer = async (html: string) => {
     if (!questionId || !currentUser || isPosting) return;
@@ -113,6 +116,7 @@ export function useAnswerActions({
   return {
     localAnswers,
     isPosting,
+    newlyAcceptedId,
 
     votes: {
       getCount: (id: string, fallback = 0) =>
@@ -123,6 +127,21 @@ export function useAnswerActions({
 
     actions: {
       submitAnswer,
+      acceptAnswer: async (answerId: string) => {
+        if (!questionId) return;
+        try {
+          // Optimistic update
+          setNewlyAcceptedId(answerId);
+          await QnAService.acceptAnswer({ questionId, answerId });
+          toast.success("Answer accepted");
+          return true;
+        } catch (error) {
+          if (error instanceof BaseError) toast.error(error.message);
+          // Revert if failed
+          setNewlyAcceptedId(null);
+          return false;
+        }
+      }
     },
   };
 }

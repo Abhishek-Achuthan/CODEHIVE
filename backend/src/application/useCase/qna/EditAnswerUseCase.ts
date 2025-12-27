@@ -1,13 +1,13 @@
 import { inject, injectable } from 'tsyringe';
 import { IEditAnswerUseCase } from '../interface/qna/IEditAnswerUseCase';
 import type { IAnswerRepository } from '../../../domain/interfaces/IAnswerRepository';
-import { AnswerEntity } from '../../../domain/entities/qna/AnswerEntity';
-import { IEditAnswerInputDTO } from '../../dto/AnswerDTO';
+import { IAnswerResponseDTO, IEditAnswerInputDTO } from '../../dto/AnswerDTO';
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { AnswerEditableFields } from '../../../domain/types/AnswerEditableFields';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { AnswerMapper } from '../../mapper/AnswerMapper';
 
 @injectable()
 export class EditAnswerUseCase implements IEditAnswerUseCase {
@@ -16,7 +16,7 @@ export class EditAnswerUseCase implements IEditAnswerUseCase {
     private readonly _answerRepository: IAnswerRepository
   ) {}
 
-  async execute(data: IEditAnswerInputDTO): Promise<AnswerEntity | null> {
+  async execute(data: IEditAnswerInputDTO): Promise<IAnswerResponseDTO | null> {
     const { answerId, answerText, userId, version } = data;
 
     if (!answerId) throw new NotFoundError(ERROR_MESSAGES.QnA.ANSWER_NOT_FOUND);
@@ -42,6 +42,6 @@ export class EditAnswerUseCase implements IEditAnswerUseCase {
 
     if (!updateAns) throw new ConflictError(ERROR_MESSAGES.QnA.ANSWER_VERSION_CONFLICT);
 
-    return updateAns;
+    return AnswerMapper.toAnswerResponse(updateAns);
   }
 }

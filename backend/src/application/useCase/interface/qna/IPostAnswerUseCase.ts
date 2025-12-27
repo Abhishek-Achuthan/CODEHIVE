@@ -1,6 +1,5 @@
-import { AnswerEntity } from '../../../../domain/entities/qna/AnswerEntity';
-import { ICreateAnswerInputDTO } from '../../../dto/AnswerDTO';
+import { IAnswerResponseDTO, ICreateAnswerInputDTO } from '../../../dto/AnswerDTO';
 
 export interface IPostAnswerUseCase {
-    execute(data:ICreateAnswerInputDTO) : Promise<AnswerEntity>
+    execute(data:ICreateAnswerInputDTO) : Promise<IAnswerResponseDTO>
 }

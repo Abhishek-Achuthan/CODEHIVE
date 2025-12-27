@@ -6,9 +6,11 @@ import { RelatedQuestionsSection } from "../components/RelatetdQuestionSection";
 import AnswerEditorSection from "../components/AnswerEditorSection";
 import { QuestionAnswersSection } from "../components/QuestionAnswersSection";
 import { useQuestionDetails } from "../hooks/useQuestionDetails";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 
 const QuestionDetailsPage: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
+  const currentUser = useAppSelector((state) => state.auth.user);
 
   const controller = useQuestionDetails(questionId);
 
@@ -54,7 +56,7 @@ const QuestionDetailsPage: React.FC = () => {
               onToggleBookmark={actions.toggleBookmark}
               votes={questionVote.count}
               userVote={questionVote.userVote}
-              onUpvote={ () => questionVote.vote(1)}
+              onUpvote={() => questionVote.vote(1)}
               onDownvote={() => questionVote.vote(-1)}
             />
 
@@ -69,11 +71,14 @@ const QuestionDetailsPage: React.FC = () => {
               sortBy={sortBy}
               getVoteCount={answerVotes.getCount}
               getUserVote={answerVotes.getUserVote}
-              onUpvoteAnswer={(id) => answerVotes.vote(id,1)}
-              onDownvoteAnswer={(id) => answerVotes.vote(id,-1)} 
+              onUpvoteAnswer={(id) => answerVotes.vote(id, 1)}
+              onDownvoteAnswer={(id) => answerVotes.vote(id, -1)}
               onSearchChange={actions.changeSearch}
               onSortChange={actions.changeSort}
               onPageChange={actions.changePage}
+              onAcceptAnswer={actions.acceptAnswer}
+              questionAskedBy={question.author.id}
+              currentUserId={currentUser?.id}
             />
 
             <AnswerEditorSection

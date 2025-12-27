@@ -1,6 +1,5 @@
-import { AnswerEntity } from '../../../../domain/entities/qna/AnswerEntity';
-import { IEditAnswerInputDTO } from '../../../dto/AnswerDTO';
+import { IAnswerResponseDTO, IEditAnswerInputDTO } from '../../../dto/AnswerDTO';
 
 export interface IEditAnswerUseCase {
-    execute(data:IEditAnswerInputDTO):Promise<AnswerEntity | null>
+    execute(data:IEditAnswerInputDTO):Promise<IAnswerResponseDTO | null>
 }

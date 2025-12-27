@@ -1,5 +1,5 @@
-import { AnswerEntity } from '../../../../domain/entities/qna/AnswerEntity';
+import { IGetAnswerResponseDTO } from '../../../dto/AnswerDTO';
 
 export interface IGetAnswerUseCase {
-    execute(answerId:string):Promise<AnswerEntity>;
+    execute(answerId:string):Promise<IGetAnswerResponseDTO>;
 }

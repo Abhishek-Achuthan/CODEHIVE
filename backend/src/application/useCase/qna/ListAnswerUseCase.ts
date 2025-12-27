@@ -2,12 +2,12 @@ import { inject,injectable } from 'tsyringe';
 import { IListAnswerUseCase } from '../interface/qna/IListAnswerUseCase';
 import { type IAnswerRepository } from '../../../domain/interfaces/IAnswerRepository';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
-import { IAnswerListQueryDTO } from '../../dto/AnswerDTO';
+import { AnswerWithAuthorDTO, IAnswerListQueryDTO } from '../../dto/AnswerDTO';
 import { type IQuestionRepository } from '../../../domain/interfaces/IQuestionRepository';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
-import { AnswerWithAuthor } from '../../../domain/types/AnswerWithAuthor';
 import { AnswerListQuery } from '../../../domain/types/AnswerListQuery';
+import { AnswerMapper } from '../../mapper/AnswerMapper';
 
 @injectable()
 export class ListAnswerUseCase implements IListAnswerUseCase {
@@ -17,7 +17,7 @@ export class ListAnswerUseCase implements IListAnswerUseCase {
         @inject('IQuestionRepository') private readonly _questionRepository : IQuestionRepository
     ){}
 
-    async execute(data: IAnswerListQueryDTO): Promise<PaginationResult<AnswerWithAuthor>> {
+    async execute(data: IAnswerListQueryDTO): Promise<PaginationResult<AnswerWithAuthorDTO>> {
 
         const {questionId,page,limit,sortBy,search} = data;
         
@@ -35,7 +35,13 @@ export class ListAnswerUseCase implements IListAnswerUseCase {
 
         if(search !== undefined) query.search = search;
 
-        return await this._answerRepository.listByQuestion(questionId,query);
+        const result = await this._answerRepository.listByQuestion(questionId,query);
+
+        return {
+            items: result.items.map((i) => AnswerMapper.toAnswerWithAuthor(i)),
+            totalItems: result.totalItems,
+            totalPages: result.totalPages,
+        };
         
     }
 }

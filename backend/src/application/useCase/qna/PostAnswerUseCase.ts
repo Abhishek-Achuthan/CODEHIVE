@@ -3,10 +3,10 @@ import type { IQuestionRepository } from '../../../domain/interfaces/IQuestionRe
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { inject, injectable } from 'tsyringe';
 import type { IAnswerRepository } from '../../../domain/interfaces/IAnswerRepository';
-import { ICreateAnswerInputDTO } from '../../dto/AnswerDTO';
-import { AnswerEntity } from '../../../domain/entities/qna/AnswerEntity';
+import { IAnswerResponseDTO, ICreateAnswerInputDTO } from '../../dto/AnswerDTO';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { AnswerMapper } from '../../mapper/AnswerMapper';
 
 @injectable()
 export class PostAnswerUseCase implements IPostAnswerUseCase {
@@ -15,7 +15,7 @@ export class PostAnswerUseCase implements IPostAnswerUseCase {
     @inject('IAnswerRepository') private readonly _answerRepository: IAnswerRepository,
   ) {}
 
-  async execute(data: ICreateAnswerInputDTO): Promise<AnswerEntity> {
+  async execute(data: ICreateAnswerInputDTO): Promise<IAnswerResponseDTO> {
     const { answerText, questionId, answeredBy } = data;
 
     const question = await this._questionRepository.find(data.questionId);
@@ -28,6 +28,6 @@ export class PostAnswerUseCase implements IPostAnswerUseCase {
 
     await this._questionRepository.incrementAnswerCountAndSetAnswered(questionId,1);
 
-    return answer;
+    return AnswerMapper.toAnswerResponse(answer);
   }
 }

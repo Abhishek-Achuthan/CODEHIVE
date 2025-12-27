@@ -23,6 +23,8 @@ import type {
     SavedQuestionListIdsResponse,
     SaveQuestionApiResponse,
     SimpleSuccessResponse,
+    CreateAcceptedAnswerRequest,
+    AcceptAnswerAPIResponse,
 } from '../shared/types/api/qna';
 
 export class QnAService {
@@ -222,6 +224,15 @@ export class QnAService {
             return response.data as SimpleSuccessResponse;
         } catch (error) {
             throw this.handleError(error);
+        }
+    }
+
+    static async acceptAnswer(data:CreateAcceptedAnswerRequest): Promise<AcceptAnswerAPIResponse> {
+        try {
+            const response = await QnAApi.acceptAnswer(data);
+            return response.data as AcceptAnswerAPIResponse
+        } catch (error) {
+            throw this.handleError(error)
         }
     }
 

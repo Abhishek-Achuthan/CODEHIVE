@@ -1,4 +1,5 @@
 import { MdEdit } from "react-icons/md";
+import { GiCheckMark } from "react-icons/gi";
 import { QnaRichContent } from "./QnaRichContent";
 
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
@@ -25,6 +26,8 @@ type Props = {
   onSearchChange: (value: string) => void;
   onSortChange: (value: AnswerSort) => void;
   onPageChange: (page: number) => void;
+  onAcceptAnswer?: (answerId: string) => void;
+  questionAskedBy?: string;
 };
 
 export function QuestionAnswersSection(props: Props) {
@@ -37,7 +40,7 @@ export function QuestionAnswersSection(props: Props) {
     searchTerm,
     isSearching,
     sortBy,
-    currentUserId,
+    currentUserId, 
     getVoteCount,
     getUserVote,
     onUpvoteAnswer,
@@ -45,6 +48,8 @@ export function QuestionAnswersSection(props: Props) {
     onSearchChange,
     onSortChange,
     onPageChange,
+    onAcceptAnswer,
+    questionAskedBy,
   } = props;
 
   return (
@@ -86,11 +91,10 @@ export function QuestionAnswersSection(props: Props) {
                 <div className="flex flex-col items-center gap-2 py-1">
                   <button
                     onClick={() => onUpvoteAnswer?.(a.id)}
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${
-                      getUserVote?.(a.id) === 1
+                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${getUserVote?.(a.id) === 1
                         ? "text-purple-400 border-purple-500/50"
                         : "text-zinc-400 hover:text-purple-400"
-                    }`}
+                      }`}
                   >
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                       <path d="M7 14l5-5 5 5z" />
@@ -103,16 +107,35 @@ export function QuestionAnswersSection(props: Props) {
 
                   <button
                     onClick={() => onDownvoteAnswer?.(a.id)}
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${
-                      getUserVote?.(a.id) === -1
+                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${getUserVote?.(a.id) === -1
                         ? "text-purple-400 border-purple-500/50"
                         : "text-zinc-400 hover:text-purple-400"
-                    }`}
+                      }`}
                   >
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                       <path d="M17 10l-5 5-5-5z" />
                     </svg>
                   </button>
+
+                  {/* Accept Answer Checkmark */}
+                  {(a.isAccepted || (currentUserId && currentUserId === questionAskedBy)) && (
+                    <button
+                      onClick={() => {
+                         if (currentUserId === questionAskedBy) {
+                            onAcceptAnswer?.(a.id);
+                         }
+                      }}
+                       className={`mt-2 flex items-center justify-center w-8 h-8 transition-all ${
+                        a.isAccepted
+                          ? "text-green-500"
+                          : "text-zinc-600 hover:text-green-500 cursor-pointer"
+                      } ${currentUserId !== questionAskedBy && !a.isAccepted ? "cursor-default opacity-50 hidden" : ""}`}
+                      title={a.isAccepted ? "Accepted Answer" : "Accept this answer"}
+                      disabled={currentUserId !== questionAskedBy && !a.isAccepted}
+                    >
+                      <GiCheckMark size={28} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex-1">
