@@ -59,6 +59,12 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._questionController.handleVoteQuestion.bind(this._questionController)
         );
+
+        this._router.post(
+            '/questions/:id/accept-answer',
+            this._authMiddleware.check,
+            this._questionController.handleAcceptAnswer.bind(this._questionController)
+        );
         //--------------------------Saved Routes-----------------------------------//
 
         this._router.get(
@@ -139,7 +145,7 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._answerController.handleVoteAnswer.bind(this._answerController)
         );
-
+       
     }
 
     public getRoutes(): Router {

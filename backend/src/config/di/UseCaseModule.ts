@@ -73,6 +73,8 @@ import { IGetSavedListIdsForQuestionUseCase } from '../../application/useCase/in
 import { GetSavedListIdsForQuestionUseCase } from '../../application/useCase/qna/GetSavedListIdsForQuestionUseCase';
 import { IDeleteSavedListUseCase } from '../../application/useCase/interface/qna/IDeleteSavedListUseCase';
 import { DeleteSavedListUseCase } from '../../application/useCase/qna/DeleteSavedListUseCase';
+import { IAcceptAnswerUseCase } from '../../application/useCase/interface/qna/IAcceptAnswerUseCase';
+import { AcceptAnswerUseCase } from '../../application/useCase/qna/AcceptAnswerUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -241,6 +243,10 @@ export class UseCaseModule {
 
     container.register<IDeleteSavedListUseCase>('IDeleteSavedListUseCase', {
       useClass: DeleteSavedListUseCase,
+    });
+
+    container.register<IAcceptAnswerUseCase>('IAcceptAnswerUseCase',{
+      useClass: AcceptAnswerUseCase,
     });
 
   }

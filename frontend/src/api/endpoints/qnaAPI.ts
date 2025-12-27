@@ -7,6 +7,7 @@ import type {
   EditAnswerRequest,
   EditQuestionRequest,
   QuestionListParams,
+  CreateAcceptedAnswerRequest,
 } from "../../shared/types/api/qna";
 import apiClient from "../apiClient";
 
@@ -87,3 +88,6 @@ export const addQuestionToSavedList = (listId: string, questionId: string) =>
 
 export const removeQuestionFromSavedList = (listId: string, questionId: string) =>
   apiClient.delete(API_ROUTES.QnA.SAVED_LIST_ITEM(listId, questionId));
+
+export const acceptAnswer = (data: CreateAcceptedAnswerRequest) =>
+  apiClient.post(API_ROUTES.QnA.ACCEPT_ANSWER(data.questionId), data);

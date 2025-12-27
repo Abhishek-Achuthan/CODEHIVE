@@ -22,6 +22,7 @@ import type { EditQuestionInputDTO } from '../../../application/dto/QuestionDTO'
 import type { IListUserQuestionsUseCase } from '../../../application/useCase/interface/qna/IListUserQuestionsUseCase';
 import type { IListAnsweredQuestionUseCase } from '../../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase';
 import type { IVoteQuestionUseCase } from '../../../application/useCase/interface/qna/IVoteQuestionUseCase';
+import type { IAcceptAnswerUseCase } from '../../../application/useCase/interface/qna/IAcceptAnswerUseCase';
 
 @injectable()
 export class QuestionController {
@@ -41,10 +42,12 @@ export class QuestionController {
     @inject('IListUserQuestionsUseCase')
     private readonly _listUserQuestionsUseCase: IListUserQuestionsUseCase,
     @inject('IListAnsweredQuestionUseCase')
-    private readonly _listAnsweredQuestionsUseCase : IListAnsweredQuestionUseCase,
+    private readonly _listAnsweredQuestionsUseCase: IListAnsweredQuestionUseCase,
     @inject('IVoteQuestionUseCase')
-    private readonly _voteQuestionUseCase: IVoteQuestionUseCase
-  ) {}
+    private readonly _voteQuestionUseCase: IVoteQuestionUseCase,
+    @inject('IAcceptAnswerUseCase')
+    private readonly _acceptAnswerUseCase: IAcceptAnswerUseCase
+  ) { }
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
     try {
@@ -88,7 +91,11 @@ export class QuestionController {
 
       const userId = req.user.id;
 
-      const result = await this._voteQuestionUseCase.execute(questionId, userId, value);
+      const result = await this._voteQuestionUseCase.execute(
+        questionId,
+        userId,
+        value
+      );
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error) {
@@ -165,17 +172,17 @@ export class QuestionController {
 
       const cleanHtml = validated.descriptionHtml
         ? sanitizeHtml(validated.descriptionHtml, {
-            allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-              'img',
-              'pre',
-              'code',
-            ]),
-            allowedAttributes: {
-              ...sanitizeHtml.defaults.allowedAttributes,
-              img: ['src', 'alt'],
-              a: ['href', 'target', 'rel'],
-            },
-          })
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+            'img',
+            'pre',
+            'code',
+          ]),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt'],
+            a: ['href', 'target', 'rel'],
+          },
+        })
         : undefined;
 
       const payload: EditQuestionInputDTO = {
@@ -207,11 +214,17 @@ export class QuestionController {
     next: NextFunction
   ) {
     try {
-      const { userId } = UserIdParamSchema.parse({userId: req.params.userId});
+      const { userId } = UserIdParamSchema.parse({ userId: req.params.userId });
 
-      const parsedData = QuestionListSchema.parse({...req.query,'filter.askedBy':userId})
+      const parsedData = QuestionListSchema.parse({
+        ...req.query,
+        'filter.askedBy': userId,
+      });
 
-      const data = await this._listUserQuestionsUseCase.execute(userId!,parsedData);
+      const data = await this._listUserQuestionsUseCase.execute(
+        userId!,
+        parsedData
+      );
 
       return res.status(HttpStatus.OK).json(data);
     } catch (error) {
@@ -219,17 +232,46 @@ export class QuestionController {
     }
   }
 
-  async handleListAnsweredQuestions(req: Request, res: Response, next: NextFunction) {
+  async handleListAnsweredQuestions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-        const userId = req.user.id;
-        
-        const queryParams = QuestionListSchema.parse(req.query);
-        
-        const result = await this._listAnsweredQuestionsUseCase.execute(userId, queryParams);
-        
-        return res.status(HttpStatus.OK).json(result);
+      const userId = req.user.id;
+
+      const queryParams = QuestionListSchema.parse(req.query);
+
+      const result = await this._listAnsweredQuestionsUseCase.execute(
+        userId,
+        queryParams
+      );
+
+      return res.status(HttpStatus.OK).json(result);
     } catch (error) {
-        next(error);
+      next(error);
     }
-}
+  }
+
+  async handleAcceptAnswer(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+      const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
+      const { answerId } = req.body;
+
+      const inputData = { userId, questionId, answerId };
+
+      const acceptedAnswer = await this._acceptAnswerUseCase.execute(
+        inputData
+      );
+
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: RESPONSE_MESSAGES.QA.ANSWER_ACCEPTED,
+        data: acceptedAnswer,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

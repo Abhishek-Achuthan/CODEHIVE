@@ -14,6 +14,7 @@ export const RESPONSE_MESSAGES = {
     QUESTION_UPDATED: 'Question updated successfully.',
     ANSWER_POSTED: 'Answer posted successfully.',
     ANSWER_UPDATED: 'Answer updated successfully.',
+    ANSWER_ACCEPTED: 'Answer accepted successfully.',
     VOTE_REGISTERED: 'Your vote has been recorded.',
     SAVE_QUESTION: 'Bookmark added successfully.',
     UNSAVE_QUESTION: 'Bookmark removed successfully.'
