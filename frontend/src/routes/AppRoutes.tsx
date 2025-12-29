@@ -18,6 +18,7 @@ import AnsweredByMePage from "../features/qna/page/AnsweredByMePage";
 import MyQuestionsPage from "../features/qna/page/MyQuestionsPage";
 import SavedQuestionsPage from "../features/qna/page/SavedQuestionsPage";
 import AiAssistPage from "../features/qna/page/AiAssistPage";
+import ProfilePage from "../features/profile/pages/ProfilePage";
 
 export default function AppRoutes() {
   return (
@@ -34,6 +35,8 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           {/*Landing page route*/}
           <Route path="/home" element={<LandingPage />} />
+
+          <Route path="/profile" element={<ProfilePage />} />
 
           {/*admin routes*/}
           <Route path="/admin/users" element={<UserManagementPage />} />
