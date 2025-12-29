@@ -35,6 +35,31 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._questionController.handleListQuestions.bind(this._questionController)
         );
+
+        this._router.post(
+            '/questions/ai-assist',
+            this._authMiddleware.check,
+            this._questionController.handleAiAssist.bind(this._questionController)
+        );
+
+        this._router.post(
+            '/questions/ai-sessions',
+            this._authMiddleware.check,
+            this._questionController.handleCreateAiChatSession.bind(this._questionController)
+        );
+
+        this._router.get(
+            '/questions/ai-sessions',
+            this._authMiddleware.check,
+            this._questionController.handleListAiChatSessions.bind(this._questionController)
+        );
+
+        this._router.get(
+            '/questions/ai-sessions/:sessionId/messages',
+            this._authMiddleware.check,
+            this._questionController.handleGetAiChatMessages.bind(this._questionController)
+        );
+
         this._router.get(
             '/questions/:id',
             this._authMiddleware.check,
@@ -44,6 +69,7 @@ export class QnARoutes {
             '/questions/:id/related',
             this._questionController.handleRelatedQuestion.bind(this._questionController)
         );
+
         this._router.patch(
             '/questions/:id',
             authMiddleware.check,
@@ -65,6 +91,7 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._questionController.handleAcceptAnswer.bind(this._questionController)
         );
+
         //--------------------------Saved Routes-----------------------------------//
 
         this._router.get(

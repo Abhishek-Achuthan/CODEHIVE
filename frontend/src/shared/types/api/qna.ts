@@ -201,6 +201,26 @@ export type AcceptAnswerAPIResponse = {
   data: AnswerEntityApi | null;
 }
 
+export type AiChatSessionAPI = {
+  id: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AiChatMessageAPI = {
+  id: string;
+  sessionId: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+};
+
+export type AiAssistResponse = {
+  sessionId: string;
+  response: string;
+};
+
 export type QuestionListPaginatedResponse =
   PaginatedResponse<QuestionListAPIResponse>;
 

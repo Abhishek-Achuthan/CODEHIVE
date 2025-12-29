@@ -17,6 +17,7 @@ import EditAnswerPage from "../features/qna/page/EditAnswerPage";
 import AnsweredByMePage from "../features/qna/page/AnsweredByMePage";
 import MyQuestionsPage from "../features/qna/page/MyQuestionsPage";
 import SavedQuestionsPage from "../features/qna/page/SavedQuestionsPage";
+import AiAssistPage from "../features/qna/page/AiAssistPage";
 
 export default function AppRoutes() {
   return (
@@ -47,6 +48,7 @@ export default function AppRoutes() {
           <Route path="/qna/answered-by-me" element={<AnsweredByMePage />} />
           <Route path="/qna/my-questions" element={<MyQuestionsPage />} />
           <Route path="/qna/saved" element={<SavedQuestionsPage />} />
+          <Route path="/qna/ai-assist" element={<AiAssistPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

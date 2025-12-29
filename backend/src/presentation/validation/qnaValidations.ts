@@ -98,6 +98,23 @@ export const CreateSavedListSchema = z.object({
   name: z.string().min(1).max(60).transform(v => v.trim()),
 });
 
+export const AiAssistSchema = z.object({
+  prompt: z.string().min(1).max(5000).transform(v => v.trim()),
+  sessionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }).optional(),
+});
+
+export const AiChatSessionIdParamSchema = z.object({
+  sessionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
+}).transform((raw) => ({ sessionId: raw.sessionId } as { sessionId: string }));
+
+export const AiChatSessionListQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(100).default(10),
+}).transform((raw) => ({ limit: raw.limit } as { limit: number }));
+
+export const AiChatMessageListQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(100).default(50),
+}).transform((raw) => ({ limit: raw.limit } as { limit: number }));
+
 export const PostAnswerSchema = z.object({
   questionId: z.string()
     .refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid question ID' }),

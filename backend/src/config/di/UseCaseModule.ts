@@ -75,6 +75,14 @@ import { IDeleteSavedListUseCase } from '../../application/useCase/interface/qna
 import { DeleteSavedListUseCase } from '../../application/useCase/qna/DeleteSavedListUseCase';
 import { IAcceptAnswerUseCase } from '../../application/useCase/interface/qna/IAcceptAnswerUseCase';
 import { AcceptAnswerUseCase } from '../../application/useCase/qna/AcceptAnswerUseCase';
+import { IAiAssistantUseCase } from '../../application/useCase/interface/qna/IAiAssistantUseCase';
+import { AiAssistantUseCase } from '../../application/useCase/qna/AiAssistantUseCase';
+import { ICreateAiChatSessionUseCase } from '../../application/useCase/interface/qna/ICreateAiChatSessionUseCase';
+import { CreateAiChatSessionUseCase } from '../../application/useCase/qna/CreateAiChatSessionUseCase';
+import { IListAiChatSessionsUseCase } from '../../application/useCase/interface/qna/IListAiChatSessionsUseCase';
+import { ListAiChatSessionsUseCase } from '../../application/useCase/qna/ListAiChatSessionsUseCase';
+import { IGetAiChatMessagesUseCase } from '../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
+import { GetAiChatMessagesUseCase } from '../../application/useCase/qna/GetAiChatMessagesUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -247,6 +255,22 @@ export class UseCaseModule {
 
     container.register<IAcceptAnswerUseCase>('IAcceptAnswerUseCase',{
       useClass: AcceptAnswerUseCase,
+    });
+
+    container.register('IAiAssistantUseCase' , {
+      useClass : AiAssistantUseCase
+    })
+
+    container.register('ICreateAiChatSessionUseCase', {
+      useClass: CreateAiChatSessionUseCase,
+    });
+
+    container.register('IListAiChatSessionsUseCase', {
+      useClass: ListAiChatSessionsUseCase,
+    });
+
+    container.register('IGetAiChatMessagesUseCase', {
+      useClass: GetAiChatMessagesUseCase,
     });
 
   }

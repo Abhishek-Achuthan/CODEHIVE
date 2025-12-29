@@ -16,6 +16,10 @@ import { ISavedListRepository } from '../../domain/interfaces/ISavedListReposito
 import { SavedListRepository } from '../../infrastructure/database/repository/SavedListRepository';
 import { ISavedListItemRepository } from '../../domain/interfaces/ISavedListItemRepository';
 import { SavedListItemRepository } from '../../infrastructure/database/repository/SavedListItemRepository';
+import { IAiChatSessionRepository } from '../../domain/interfaces/IAiChatSessionRepository';
+import { AiChatSessionRepository } from '../../infrastructure/database/repository/AiChatSessionRepository';
+import { IAiChatMessageRepository } from '../../domain/interfaces/IAiChatMessageRepository';
+import { AiChatMessageRepository } from '../../infrastructure/database/repository/AiChatMessageRepository';
 
 export class RepositoryModule {
     static registerModules():void {
@@ -60,6 +64,14 @@ export class RepositoryModule {
 
         container.register<IVoteRepository>('IVoteRepository', {
             useClass: VoteRepository
+        });
+
+        container.register('IAiChatSessionRepository', {
+            useClass: AiChatSessionRepository
+        });
+
+        container.register('IAiChatMessageRepository', {
+            useClass: AiChatMessageRepository
         });
     }
 }

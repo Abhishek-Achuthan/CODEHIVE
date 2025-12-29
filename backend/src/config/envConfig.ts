@@ -17,5 +17,7 @@ export const env = {
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   githubClientId:process.env.GITHUB_CLIENT_ID,
-  githubClientSecret:process.env.GITHUB_CLIENT_SECRET
+  githubClientSecret:process.env.GITHUB_CLIENT_SECRET,
+  aiApiKey:process.env.GEMINI_API_KEY,
+  aiModel:process.env.GEMINI_MODEL||'gemini-2.5-flash'
 };

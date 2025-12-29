@@ -17,6 +17,8 @@ import { IGoogleAuthService } from '../../application/ports/security/IGoogleAuth
 import { GoogleAuthService } from '../../infrastructure/adapters/security/GoogleAuthService';
 import { IGithubAuthService } from '../../application/ports/security/IGithubAuthService';
 import { GitHubAuthService } from '../../infrastructure/adapters/security/GithubAuthService';
+import { IAIService } from '../../application/ports/ai/IAIService';
+import { AIService } from '../../infrastructure/adapters/ai/AIService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -55,5 +57,9 @@ export class ServiceModule {
     container.register<IGithubAuthService>('IGithubAuthService', {
       useClass: GitHubAuthService,
     });
+
+    container.register<IAIService>('IAIService', {
+      useClass : AIService
+    })
   }
 }

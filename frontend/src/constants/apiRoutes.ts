@@ -174,6 +174,24 @@ export const API_ROUTES = {
 
     ACCEPT_ANSWER: (questionId: string) => `/qna/questions/${questionId}/accept-answer`,
 
+    AI_ASSIST: `/qna/questions/ai-assist`,
+
+    AI_SESSIONS: (params?: { limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.limit !== undefined) qp.append('limit', String(params.limit));
+      const query = qp.toString();
+      return query ? `/qna/questions/ai-sessions?${query}` : `/qna/questions/ai-sessions`;
+    },
+
+    AI_MESSAGES: (sessionId: string, params?: { limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.limit !== undefined) qp.append('limit', String(params.limit));
+      const query = qp.toString();
+      return query
+        ? `/qna/questions/ai-sessions/${sessionId}/messages?${query}`
+        : `/qna/questions/ai-sessions/${sessionId}/messages`;
+    },
+
     //-------------------------------Answer URL-----------------------------------//
 
     LIST_ANSWERS: (params: AnswerListParams) => {

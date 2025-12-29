@@ -11,6 +11,10 @@ import {
   EditQuestionSchema,
   UserIdParamSchema,
   VoteQuestionSchema,
+  AiAssistSchema,
+  AiChatSessionIdParamSchema,
+  AiChatSessionListQuerySchema,
+  AiChatMessageListQuerySchema,
 } from '../../validation/qnaValidations';
 import type { ICreateQuestionUseCase } from '../../../application/useCase/interface/qna/ICreateQuestionUseCase';
 import type { IListQuestionUseCase } from '../../../application/useCase/interface/qna/IListQuestionsUseCase';
@@ -23,6 +27,11 @@ import type { IListUserQuestionsUseCase } from '../../../application/useCase/int
 import type { IListAnsweredQuestionUseCase } from '../../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase';
 import type { IVoteQuestionUseCase } from '../../../application/useCase/interface/qna/IVoteQuestionUseCase';
 import type { IAcceptAnswerUseCase } from '../../../application/useCase/interface/qna/IAcceptAnswerUseCase';
+import type { IAiAssistantUseCase } from '../../../application/useCase/interface/qna/IAiAssistantUseCase';
+import type { ICreateAiChatSessionUseCase } from '../../../application/useCase/interface/qna/ICreateAiChatSessionUseCase';
+import type { IListAiChatSessionsUseCase } from '../../../application/useCase/interface/qna/IListAiChatSessionsUseCase';
+import type { IGetAiChatMessagesUseCase } from '../../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
+
 
 @injectable()
 export class QuestionController {
@@ -46,7 +55,15 @@ export class QuestionController {
     @inject('IVoteQuestionUseCase')
     private readonly _voteQuestionUseCase: IVoteQuestionUseCase,
     @inject('IAcceptAnswerUseCase')
-    private readonly _acceptAnswerUseCase: IAcceptAnswerUseCase
+    private readonly _acceptAnswerUseCase: IAcceptAnswerUseCase,
+    @inject('IAiAssistantUseCase')
+    private readonly _aiAssistantUseCase: IAiAssistantUseCase,
+    @inject('ICreateAiChatSessionUseCase')
+    private readonly _createAiChatSessionUseCase: ICreateAiChatSessionUseCase,
+    @inject('IListAiChatSessionsUseCase')
+    private readonly _listAiChatSessionsUseCase: IListAiChatSessionsUseCase,
+    @inject('IGetAiChatMessagesUseCase')
+    private readonly _getAiChatMessagesUseCase: IGetAiChatMessagesUseCase
   ) { }
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
@@ -270,6 +287,64 @@ export class QuestionController {
         message: RESPONSE_MESSAGES.QA.ANSWER_ACCEPTED,
         data: acceptedAnswer,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleAiAssist(req:Request,res:Response,next:NextFunction) {
+    try {
+
+      const userId = req.user.id;
+      const { prompt, sessionId } = AiAssistSchema.parse(req.body);
+
+      const input = sessionId ? { userId, prompt, sessionId } : { userId, prompt };
+
+      const result = await this._aiAssistantUseCase.execute(input);
+
+      res.status(HttpStatus.OK).json(result);
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleCreateAiChatSession(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+
+      const created = await this._createAiChatSessionUseCase.execute(userId);
+
+      return res.status(HttpStatus.Created).json(created);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleListAiChatSessions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+
+      const { limit } = AiChatSessionListQuerySchema.parse(req.query);
+
+      const sessions = await this._listAiChatSessionsUseCase.execute(userId, limit);
+
+      return res.status(HttpStatus.OK).json(sessions);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetAiChatMessages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.id;
+
+      const { sessionId } = AiChatSessionIdParamSchema.parse({ sessionId: req.params.sessionId });
+      const { limit } = AiChatMessageListQuerySchema.parse(req.query);
+
+      const messages = await this._getAiChatMessagesUseCase.execute(userId, sessionId, limit);
+
+      return res.status(HttpStatus.OK).json(messages);
     } catch (error) {
       next(error);
     }

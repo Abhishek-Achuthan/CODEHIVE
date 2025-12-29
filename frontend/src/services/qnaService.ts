@@ -25,6 +25,9 @@ import type {
     SimpleSuccessResponse,
     CreateAcceptedAnswerRequest,
     AcceptAnswerAPIResponse,
+    AiAssistResponse,
+    AiChatMessageAPI,
+    AiChatSessionAPI,
 } from '../shared/types/api/qna';
 
 export class QnAService {
@@ -231,6 +234,42 @@ export class QnAService {
         try {
             const response = await QnAApi.acceptAnswer(data);
             return response.data as AcceptAnswerAPIResponse
+        } catch (error) {
+            throw this.handleError(error)
+        }
+    }
+
+    static async aiAssist(prompt: string, sessionId?: string): Promise<AiAssistResponse> {
+        try {
+            const response = await QnAApi.aiAssist(prompt, sessionId);
+            return response.data as AiAssistResponse;
+        } catch (error) {
+            throw this.handleError(error)
+        }
+    }
+
+    static async createAiChatSession(): Promise<AiChatSessionAPI> {
+        try {
+            const response = await QnAApi.createAiChatSession();
+            return response.data as AiChatSessionAPI;
+        } catch (error) {
+            throw this.handleError(error)
+        }
+    }
+
+    static async listAiChatSessions(limit: number = 20): Promise<AiChatSessionAPI[]> {
+        try {
+            const response = await QnAApi.listAiChatSessions(limit);
+            return response.data as AiChatSessionAPI[];
+        } catch (error) {
+            throw this.handleError(error)
+        }
+    }
+
+    static async getAiChatMessages(sessionId: string, limit: number = 50): Promise<AiChatMessageAPI[]> {
+        try {
+            const response = await QnAApi.getAiChatMessages(sessionId, limit);
+            return response.data as AiChatMessageAPI[];
         } catch (error) {
             throw this.handleError(error)
         }

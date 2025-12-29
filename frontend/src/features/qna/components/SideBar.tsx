@@ -22,6 +22,9 @@ export default function Sidebar() {
     if (location.pathname.includes('/qna/saved')) {
       return 'Saved';
     }
+    if (location.pathname.includes('/qna/ai-assist')) {
+      return 'AI Assist';
+    }
     return 'Questions';
   };
 

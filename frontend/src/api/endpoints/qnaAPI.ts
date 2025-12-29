@@ -91,3 +91,15 @@ export const removeQuestionFromSavedList = (listId: string, questionId: string) 
 
 export const acceptAnswer = (data: CreateAcceptedAnswerRequest) =>
   apiClient.post(API_ROUTES.QnA.ACCEPT_ANSWER(data.questionId), data);
+
+export const aiAssist = (prompt: string, sessionId?: string) =>
+  apiClient.post(API_ROUTES.QnA.AI_ASSIST, sessionId ? { prompt, sessionId } : { prompt });
+
+export const createAiChatSession = () =>
+  apiClient.post(API_ROUTES.QnA.AI_SESSIONS());
+
+export const listAiChatSessions = (limit: number = 20) =>
+  apiClient.get(API_ROUTES.QnA.AI_SESSIONS({ limit }));
+
+export const getAiChatMessages = (sessionId: string, limit: number = 50) =>
+  apiClient.get(API_ROUTES.QnA.AI_MESSAGES(sessionId, { limit }));
