@@ -38,3 +38,10 @@ export const ResetPasswordSchema = z.object({
 
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
 
+export const ChangePasswordSchema = z.object({
+  previousPass: z.string().min(6,'Invalid password'),
+  newPass: z.string().min(6,'Invalid password'),
+});
+
+export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
+

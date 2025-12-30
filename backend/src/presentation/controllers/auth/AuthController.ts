@@ -14,12 +14,14 @@ import type { IRefreshAccessTokenUseCase } from '../../../application/useCase/in
 import type { IGoogleLoginUseCase } from '../../../application/useCase/interface/auth/IGoogleLoginUseCase';
 import type { IGithubLoginUseCase } from '../../../application/useCase/interface/auth/IGithubLoginUseCase';
 import type { IInitiateGithubOAuthUseCase } from '../../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
+import type { IChangePasswordUseCase } from '../../../application/useCase/interface/auth/IChangePasswordUseCase';
 import {
   LoginUserSchema,
   RegisterUserSchema,
   EmailOnlySchema,
   ForgotPasswordVerifySchema,
   ResetPasswordSchema,
+  ChangePasswordSchema,
 } from '../../validation/auth';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
@@ -50,7 +52,9 @@ export class AuthController {
     @inject('IGithubLoginUseCase')
     private readonly _githubLoginUseCase: IGithubLoginUseCase,
     @inject('IInitiateGithubOAuthUseCase')
-    private readonly _initiateGithubOAuthUseCase: IInitiateGithubOAuthUseCase
+    private readonly _initiateGithubOAuthUseCase: IInitiateGithubOAuthUseCase,
+    @inject('IChangePasswordUseCase') 
+    private readonly _changePasswordUseCase: IChangePasswordUseCase
   ) {}
 
   async handleUserRegisterWithVerifyOtp(
@@ -162,6 +166,22 @@ export class AuthController {
       return res
         .status(HttpStatus.OK)
         .json({ success: true, message: RESPONSE_MESSAGES.AUTH.PASSWORD_RESET });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleChangePassword(req: Request,res: Response,next: NextFunction) {
+    try {
+      const parsedData = ChangePasswordSchema.parse(req.body);
+
+      const {previousPass,newPass} = parsedData;
+
+      const userId = req.user.id;
+      
+      await this._changePasswordUseCase.execute(previousPass,newPass,userId);
+
+      return res.status(HttpStatus.OK).json({message: RESPONSE_MESSAGES.AUTH.PASSWORD_CHANGED});
     } catch (error) {
       next(error);
     }

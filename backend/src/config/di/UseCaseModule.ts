@@ -23,6 +23,8 @@ import { IRefreshAccessTokenUseCase } from '../../application/useCase/interface/
 import { RefreshAccessTokenUseCase } from '../../application/useCase/auth/RefreshAccessTokenUseCase';
 import { IGoogleLoginUseCase } from '../../application/useCase/interface/auth/IGoogleLoginUseCase';
 import { GoogleLoginUseCase } from '../../application/useCase/auth/GoogleLoginUseCase';
+import { IChangePasswordUseCase } from '../../application/useCase/interface/auth/IChangePasswordUseCase';
+import { ChangePasswordUseCase } from '../../application/useCase/auth/ChangePasswordUseCase';
 import { IGithubLoginUseCase } from '../../application/useCase/interface/auth/IGithubLoginUseCase';
 import { GithubLoginUseCase } from '../../application/useCase/auth/GithubLoginUseCase';
 import { IInitiateGithubOAuthUseCase } from '../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
@@ -122,6 +124,10 @@ export class UseCaseModule {
 
     container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
       useClass: ResetPasswordUseCase,
+    });
+
+    container.register<IChangePasswordUseCase>('IChangePasswordUseCase', {
+      useClass: ChangePasswordUseCase,
     });
     
     container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {

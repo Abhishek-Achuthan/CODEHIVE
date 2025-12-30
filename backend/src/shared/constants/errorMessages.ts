@@ -5,6 +5,7 @@ export const ERROR_MESSAGES = {
     INVALID_EMAIL: 'Invalid email address',
     USER_NOT_FOUND: 'User not found',
     ACCOUNT_BLOCKED: 'Your account is blocked',
+    PASSWORD_NOT_SET: 'This account does not have a password. Please sign in using Google or set a password first.',
 
     // Token errors
     MISSING_REFRESH_TOKEN: 'Missing refresh token',

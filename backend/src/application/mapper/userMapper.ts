@@ -50,6 +50,7 @@ export class UserMapper {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
+      ...(user.phone !== undefined ? { phone: user.phone } : {}),
       ...(user.about !== undefined ? { about: user.about } : {}),
       skills: user.skills,
       experience: user.experience,

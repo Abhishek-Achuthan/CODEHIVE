@@ -30,6 +30,9 @@ interface IUserListResponseDTO {
 }
 
 interface UpdateUserProfileDTO {
+  firstName?: string | undefined;
+  lastName?: string | undefined;
+  phone?: string | undefined;
   about?: string | undefined;
   skills?: string[] | undefined;
   experience?: Experience[] | undefined;
@@ -43,6 +46,7 @@ interface IUserProfileResponseDTO {
   id: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   about?: string;
   skills: string[];
   experience: Experience[];
