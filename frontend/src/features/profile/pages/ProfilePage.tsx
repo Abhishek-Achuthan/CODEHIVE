@@ -15,38 +15,18 @@ import toast from "react-hot-toast";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../shared/ui/dialog/Dialog";
-
-import { useAppDispatch, useAppSelector } from "../../../shared/hooks/storeHooks";
-import { UserService } from "../../../services/userService";
-import { BaseError } from "../../../shared/errors/BaseError";
-import { setCurrentUser } from "../../../store/slices/authSlice";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
 
-import type {
-  MentorChecklist,
-  ProfileUser,
-} from "../types";
-
+import type { MentorChecklist, ProfileUser } from "../types";
+import ProfileLinksDialog from "../components/ProfileLinkDialoge";
 
 export default function ProfilePage() {
-  const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.auth.user);
+  const { updateProfile } = useProfileUpdater();
+  const [linksOpen, setLinksOpen] = useState(false);
 
-  const [linksDialogOpen, setLinksDialogOpen] = useState(false);
-  const [githubUrlDraft, setGithubUrlDraft] = useState(authUser?.githubUrl ?? "");
-  const [linkedInUrlDraft, setLinkedInUrlDraft] = useState(authUser?.linkedInUrl ?? "");
-  const [websiteUrlDraft, setWebsiteUrlDraft] = useState(authUser?.websiteUrl ?? "");
-
-  const {updateProfile} = useProfileUpdater();
-
-  const [saving, setSaving] = useState(false);
+  /* ------------------------ Derived Data ------------------------ */
 
   const profileUser: ProfileUser = useMemo(() => {
     const displayName = authUser
@@ -64,10 +44,7 @@ export default function ProfilePage() {
       githubUrl: authUser?.githubUrl,
       websiteUrl: authUser?.websiteUrl,
     };
-
   }, [authUser]);
-
-
 
   const mentorChecklist: MentorChecklist = useMemo(
     () => ({
@@ -78,6 +55,8 @@ export default function ProfilePage() {
     [authUser]
   );
 
+  /* ------------------------- Helpers ---------------------------- */
+
   const openUrl = (url?: string) => {
     if (!url) {
       toast.error("Link not set");
@@ -86,107 +65,33 @@ export default function ProfilePage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const startEditLinks = () => {
-    setGithubUrlDraft(authUser?.githubUrl ?? "");
-    setLinkedInUrlDraft(authUser?.linkedInUrl ?? "");
-    setWebsiteUrlDraft(authUser?.websiteUrl ?? "");
-    setLinksDialogOpen(true);
-  };
-
-  const saveLinks = async () => {
-    try {
-      if (saving) return;
-      if (!authUser) {
-        toast.error("You must be signed in.");
-        return;
-      }
-
-      setSaving(true);
-
-      const updated = await UserService.updateMyProfile({
-        githubUrl: githubUrlDraft.trim() || undefined,
-        linkedInUrl: linkedInUrlDraft.trim() || undefined,
-        websiteUrl: websiteUrlDraft.trim() || undefined,
-      });
-
-      dispatch(setCurrentUser({ ...authUser, ...updated }));
-      toast.success("Profile updated");
-      setLinksDialogOpen(false);
-    } catch (error) {
-      if (error instanceof BaseError) toast.error(error.message);
-      else toast.error("Failed to update profile");
-    } finally {
-      setSaving(false);
-    }
-  };
-
+  /* -------------------------- Render ---------------------------- */
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
 
-      <Dialog open={linksDialogOpen} onOpenChange={setLinksDialogOpen}>
-        <DialogContent className="border border-gray-800 bg-black text-white">
-          <DialogHeader>
-            <DialogTitle>Edit profile links</DialogTitle>
-          </DialogHeader>
-
-          <div className="grid gap-3">
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">GitHub</span>
-              <input
-                value={githubUrlDraft}
-                onChange={(e) => setGithubUrlDraft(e.target.value)}
-                placeholder="https://github.com/username"
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">LinkedIn</span>
-              <input
-                value={linkedInUrlDraft}
-                onChange={(e) => setLinkedInUrlDraft(e.target.value)}
-                placeholder="https://linkedin.com/in/username"
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">Website</span>
-              <input
-                value={websiteUrlDraft}
-                onChange={(e) => setWebsiteUrlDraft(e.target.value)}
-                placeholder="https://your-site.com"
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
-              />
-            </label>
-          </div>
-
-          <DialogFooter>
-            <button
-              type="button"
-              onClick={() => setLinksDialogOpen(false)}
-              className="rounded-md border border-gray-600 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={saveLinks}
-              className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-            >
-              Save
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
+      <ProfileLinksDialog
+        open={linksOpen}
+        initialValues={{
+          githubUrl: authUser?.githubUrl,
+          linkedInUrl: authUser?.linkedInUrl,
+          websiteUrl: authUser?.websiteUrl,
+        }}
+        onCancel={() => setLinksOpen(false)}
+        onSave={(values) => {
+          updateProfile(values);
+          setLinksOpen(false);
+        }}
+      />
 
       <main>
         <div className="mx-auto max-w-6xl px-4 py-4">
+          {/* Header row */}
           <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
             <ProfileHeader
               user={profileUser}
-              avatarMode={activeEditSection === "avatar" ? "cropping" : "view"}
+              avatarMode="view"
               avatarImageSrc={null}
               avatarValues={{ crop: { x: 0, y: 0 }, zoom: 1 }}
               onAvatarSelectFile={() => {}}
@@ -195,7 +100,7 @@ export default function ProfilePage() {
               onAvatarCropComplete={() => {}}
               onAvatarCancel={() => {}}
               onAvatarConfirm={() => {}}
-              onEditProfile={startEditLinks}
+              onEditProfile={() => setLinksOpen(true)}
               onClickMentor={() => {}}
               onClickDashboard={() => {}}
               onClickSessions={() => {}}
@@ -211,21 +116,24 @@ export default function ProfilePage() {
             />
           </div>
 
+          {/* Main content */}
           <div className="mt-3">
             <MainContent
               left={
                 <LeftColumn>
                   <AboutSection
-                    initialText={authUser?.about??""}
-                    onSave={(text) => updateProfile({about:text})}
+                    initialText={authUser?.about ?? ""}
+                    onSave={(text) => updateProfile({ about: text })}
                   />
+
                   <ExperienceSection
-                   initialItems = {authUser?.experience ??[]}
-                   onSave = {(items) => updateProfile({experience:items})}
+                    initialItems={authUser?.experience ?? []}
+                    onSave={(items) => updateProfile({ experience: items })}
                   />
+
                   <SkillsSection
-                    initialSkills ={authUser?.skills ??[]}
-                    onSave = {(skills) => updateProfile({skills})}
+                    initialSkills={authUser?.skills ?? []}
+                    onSave={(skills) => updateProfile({ skills })}
                   />
                 </LeftColumn>
               }
@@ -236,6 +144,7 @@ export default function ProfilePage() {
                     renewalDateLabel="11/10/2025"
                     badgeLabel="PRO"
                   />
+
                   <MentorCard
                     checked={false}
                     disabled={false}

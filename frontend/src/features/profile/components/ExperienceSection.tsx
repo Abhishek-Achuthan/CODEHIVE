@@ -11,27 +11,9 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 
 import SectionCard from "./SectionCard";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../shared/ui/dialog/Dialog";
+import ExperienceFormDialog from "./ExperienceFormDialog";
 
-import type { ExperienceType } from "../types";
-
-/* ----------------------------- Types ----------------------------- */
-
-export interface ExperienceDraftItem {
-  id: string;
-  type: ExperienceType;
-  title: string;
-  organization?: string;
-  startDate?: string;
-  endDate?: string;
-  isCurrent?: boolean;
-}
+import type { ExperienceDraftItem, ExperienceType } from "../types";
 
 export interface ExperienceSectionProps {
   initialItems: ExperienceDraftItem[];
@@ -263,32 +245,14 @@ export default function ExperienceSection({
         </div>
       )}
 
-      {/* Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-black text-white border border-gray-800">
-          <DialogHeader>
-            <DialogTitle>Experience</DialogTitle>
-          </DialogHeader>
-
-          {/* form fields — SAME AS BEFORE */}
-          {/* keep exactly what you had */}
-
-          <DialogFooter>
-            <button
-              onClick={() => setDialogOpen(false)}
-              className="rounded-md border px-4 py-2 text-xs"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={upsert}
-              className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
-            >
-              Save
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ExperienceFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        value={form}
+        onChange={setForm}
+        onCancel={() => setDialogOpen(false)}
+        onSave={upsert}
+      />
     </SectionCard>
   );
 }

@@ -31,6 +31,16 @@ export interface ExperienceItem {
   dateRangeLabel: string;
 }
 
+export interface ExperienceDraftItem {
+  id: string;
+  type: ExperienceType;
+  title: string;
+  organization?: string;
+  startDate?: string;
+  endDate?: string;
+  isCurrent?: boolean;
+}
+
 export interface SkillsData {
   skills: string[];
   inputValue: string;
