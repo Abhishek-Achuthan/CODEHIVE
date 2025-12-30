@@ -8,6 +8,8 @@ import PlanBillingCard from "../components/PlanBillingCard";
 import ProfileHeader from "../components/ProfileHeader";
 import RightColumn from "../components/RightColumn";
 import SkillsSection from "../components/SkillsSection";
+import AccountSecurityCard from "../components/AccountSecurityCard";
+import ChangePasswordDialog from "../components/ChangePasswordDialog";
 
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -19,12 +21,12 @@ import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
 
 import type { MentorChecklist, ProfileUser } from "../types";
-import ProfileLinksDialog from "../components/ProfileLinkDialoge";
+import { BaseError } from "../../../shared/errors/BaseError";
 
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { updateProfile } = useProfileUpdater();
-  const [linksOpen, setLinksOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   /* ------------------------ Derived Data ------------------------ */
 
@@ -35,7 +37,10 @@ export default function ProfilePage() {
 
     return {
       displayName,
+      firstName: authUser?.firstName ?? "",
+      lastName: authUser?.lastName ?? "",
       email: authUser?.email ?? "",
+      phone: authUser?.phone,
       roleTitle: authUser?.role ?? "",
       company: "",
       location: "",
@@ -65,24 +70,93 @@ export default function ProfilePage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const handleAvatarUpload = async (imageFile: File) => {
+    try {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+      const maxBytes = 5 * 1024 * 1024;
+
+      if (!allowedTypes.includes(imageFile.type)) {
+        throw new BaseError("Please select a JPG, PNG, or WEBP image");
+      }
+      if (imageFile.size > maxBytes) {
+        throw new BaseError("Image must be 5MB or less");
+      }
+
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as
+        | string
+        | undefined;
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as
+        | string
+        | undefined;
+
+      if (!cloudName || !uploadPreset) {
+        throw new BaseError(
+          "Cloudinary is not configured. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET"
+        );
+      }
+
+      const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("upload_preset", uploadPreset);
+
+      const folder = import.meta.env.VITE_CLOUDINARY_FOLDER as string | undefined;
+      if (folder && folder.trim().length) {
+        formData.append("folder", folder.trim());
+      }
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = (await res.json()) as unknown;
+      if (!res.ok) {
+        const message =
+          json &&
+          typeof json === "object" &&
+          json !== null &&
+          "error" in json &&
+          (json as { error?: unknown }).error &&
+          typeof (json as { error?: { message?: unknown } }).error?.message === "string"
+            ? ((json as { error: { message: string } }).error.message as string)
+            : "Failed to upload image";
+
+        throw new BaseError(message);
+      }
+
+      const secureUrl =
+        json &&
+        typeof json === "object" &&
+        json !== null &&
+        "secure_url" in json &&
+        typeof (json as { secure_url?: unknown }).secure_url === "string"
+          ? ((json as { secure_url: string }).secure_url as string)
+          : "";
+
+      if (!secureUrl) {
+        throw new BaseError("Cloudinary upload did not return a secure URL");
+      }
+
+      await updateProfile({ avatarUrl: secureUrl });
+      toast.success("Avatar updated");
+    } catch (error) {
+      if (error instanceof BaseError) toast.error(error.message);
+      else if (error instanceof Error) toast.error(error.message);
+      else toast.error("Failed to update avatar");
+      throw error;
+    }
+  };
+
   /* -------------------------- Render ---------------------------- */
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
 
-      <ProfileLinksDialog
-        open={linksOpen}
-        initialValues={{
-          githubUrl: authUser?.githubUrl,
-          linkedInUrl: authUser?.linkedInUrl,
-          websiteUrl: authUser?.websiteUrl,
-        }}
-        onCancel={() => setLinksOpen(false)}
-        onSave={(values) => {
-          updateProfile(values);
-          setLinksOpen(false);
-        }}
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
       />
 
       <main>
@@ -91,16 +165,17 @@ export default function ProfilePage() {
           <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
             <ProfileHeader
               user={profileUser}
-              avatarMode="view"
-              avatarImageSrc={null}
-              avatarValues={{ crop: { x: 0, y: 0 }, zoom: 1 }}
-              onAvatarSelectFile={() => {}}
-              onAvatarCropChange={() => {}}
-              onAvatarZoomChange={() => {}}
-              onAvatarCropComplete={() => {}}
-              onAvatarCancel={() => {}}
-              onAvatarConfirm={() => {}}
-              onEditProfile={() => setLinksOpen(true)}
+              // avatarMode="view"
+              // avatarImageSrc={null}
+              // avatarValues={{ crop: { x: 0, y: 0 }, zoom: 1 }}
+              // onAvatarSelectFile={() => {}}
+              // onAvatarCropChange={() => {}}
+              // onAvatarZoomChange={() => {}}
+              // onAvatarCropComplete={() => {}}
+              // onAvatarCancel={() => {}}
+              // onAvatarConfirm={() => {}}
+              onSaveAvatar={handleAvatarUpload}
+              onSaveProfileHeader={(values) => updateProfile(values)}
               onClickMentor={() => {}}
               onClickDashboard={() => {}}
               onClickSessions={() => {}}
@@ -143,6 +218,10 @@ export default function ProfilePage() {
                     currentPlanLabel="PRO"
                     renewalDateLabel="11/10/2025"
                     badgeLabel="PRO"
+                  />
+
+                  <AccountSecurityCard
+                    onChangePassword={() => setChangePasswordOpen(true)}
                   />
 
                   <MentorCard

@@ -1,6 +1,9 @@
 import type { ExperienceApi } from "./auth";
 
 export type UpdateMyProfileRequest = {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
   about?: string;
   skills?: string[];
   experience?: ExperienceApi[];
@@ -14,6 +17,7 @@ export type UserProfileApi = {
   id: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   about?: string;
   skills: string[];
   experience: ExperienceApi[];

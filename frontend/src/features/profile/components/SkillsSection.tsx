@@ -80,22 +80,39 @@ export default function SkillsSection({
       }
     >
       <div className="flex flex-wrap gap-2">
-        {skills.map((s) => (
-          <span
-            key={s}
-            className="inline-flex items-center gap-2 rounded-md border border-gray-700 bg-gray-950/60 px-3 py-1 text-xs text-gray-200"
-          >
-            {s}
-            {isEditing && (
-              <button
-                onClick={() => removeSkill(s)}
-                className="text-gray-400 hover:text-white"
-              >
-                ×
-              </button>
-            )}
-          </span>
-        ))}
+        {skills.length === 0 ? (
+          <div className="w-full rounded-lg border border-dashed border-gray-700 bg-gray-950/30 px-4 py-4">
+            <div className="text-sm font-semibold text-gray-200">
+              No skills added yet
+            </div>
+            <div className="mt-1 text-xs text-gray-400">
+              Add technologies you work with — e.g. React, Node.js, MongoDB, Docker.
+            </div>
+            {!isEditing ? (
+              <div className="mt-3 text-xs text-gray-400">
+                Click the pencil to start adding.
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          skills.map((s) => (
+            <span
+              key={s}
+              className="inline-flex items-center gap-2 rounded-md border border-gray-700 bg-gray-950/60 px-3 py-1 text-xs text-gray-200"
+            >
+              {s}
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={() => removeSkill(s)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ×
+                </button>
+              )}
+            </span>
+          ))
+        )}
       </div>
 
       {isEditing && (
@@ -103,6 +120,12 @@ export default function SkillsSection({
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addSkill();
+              }
+            }}
             placeholder="Add a skill"
             className="h-9 flex-1 rounded-md border border-gray-700 bg-black px-3 text-sm text-white"
           />

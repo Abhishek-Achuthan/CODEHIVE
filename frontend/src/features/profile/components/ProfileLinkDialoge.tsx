@@ -19,7 +19,7 @@ export interface ProfileLinksDialogProps {
     githubUrl?: string;
     linkedInUrl?: string;
     websiteUrl?: string;
-  }) => void;
+  }) => void | Promise<void>;
 }
 
 export default function ProfileLinksDialog({
@@ -31,17 +31,34 @@ export default function ProfileLinksDialog({
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
       setGithubUrl(initialValues.githubUrl ?? "");
       setLinkedInUrl(initialValues.linkedInUrl ?? "");
       setWebsiteUrl(initialValues.websiteUrl ?? "");
+      setSaving(false);
     }
   }, [open, initialValues]);
 
+  const submit = async () => {
+    if (saving) return;
+
+    try {
+      setSaving(true);
+      await onSave({
+        githubUrl: githubUrl.trim() || undefined,
+        linkedInUrl: linkedInUrl.trim() || undefined,
+        websiteUrl: websiteUrl.trim() || undefined,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onCancel}>
+    <Dialog open={open} onOpenChange={(nextOpen) => (!nextOpen ? onCancel() : undefined)}>
       <DialogContent className="border border-gray-800 bg-black text-white">
         <DialogHeader>
           <DialogTitle>Edit profile links</DialogTitle>
@@ -81,21 +98,17 @@ export default function ProfileLinksDialog({
             type="button"
             onClick={onCancel}
             className="rounded-md border border-gray-600 px-4 py-2 text-xs"
+            disabled={saving}
           >
             Cancel
           </button>
           <button
             type="button"
-            onClick={() =>
-              onSave({
-                githubUrl: githubUrl.trim() || undefined,
-                linkedInUrl: linkedInUrl.trim() || undefined,
-                websiteUrl: websiteUrl.trim() || undefined,
-              })
-            }
+            onClick={submit}
             className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            disabled={saving}
           >
-            Save
+            {saving ? "Saving..." : "Save"}
           </button>
         </DialogFooter>
       </DialogContent>

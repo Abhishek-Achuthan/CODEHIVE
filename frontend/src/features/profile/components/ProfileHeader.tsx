@@ -1,26 +1,23 @@
 import { Globe, Pencil } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { useState } from "react";
 
 import type { ProfileUser } from "../types";
-import ProfileAvatarCropper, {
-  type AvatarCropMode,
-  type AvatarCropValues,
-} from "./ProfileAvatarCropper";
+import ProfileAvatarCropper from "./ProfileAvatarCropper";
 import SectionCard from "./SectionCard";
-import type { Area } from "react-easy-crop";
+import ProfileHeaderEditDialog from "./ProfileHeaderEditDialog";
 
 export interface ProfileHeaderProps {
   user: ProfileUser;
-  avatarMode: AvatarCropMode;
-  avatarImageSrc: string | null;
-  avatarValues: AvatarCropValues;
-  onAvatarSelectFile: (file: File) => void;
-  onAvatarCropChange: (crop: { x: number; y: number }) => void;
-  onAvatarZoomChange: (zoom: number) => void;
-  onAvatarCropComplete: (croppedArea: Area, croppedAreaPixels: Area) => void;
-  onAvatarCancel: () => void;
-  onAvatarConfirm: () => void;
-  onEditProfile: () => void;
+  onSaveAvatar: (img: File) => Promise<void>;
+  onSaveProfileHeader: (values: {
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    githubUrl?: string;
+    linkedInUrl?: string;
+    websiteUrl?: string;
+  }) => Promise<void>;
   onClickMentor: () => void;
   onClickDashboard: () => void;
   onClickSessions: () => void;
@@ -31,16 +28,8 @@ export interface ProfileHeaderProps {
 
 export default function ProfileHeader({
   user,
-  avatarMode,
-  avatarImageSrc,
-  avatarValues,
-  onAvatarSelectFile,
-  onAvatarCropChange,
-  onAvatarZoomChange,
-  onAvatarCropComplete,
-  onAvatarCancel,
-  onAvatarConfirm,
-  onEditProfile,
+  onSaveAvatar,
+  onSaveProfileHeader,
   onClickMentor,
   onClickDashboard,
   onClickSessions,
@@ -48,15 +37,32 @@ export default function ProfileHeader({
   onClickLinkedIn,
   onClickWebsite,
 }: ProfileHeaderProps) {
+  const [editOpen, setEditOpen] = useState(false);
+
   return (
     <SectionCard
       showHeader={false}
       className="mb-5 relative"
       contentClassName="py-4"
     >
+      <ProfileHeaderEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        initialValues={{
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          githubUrl: user.githubUrl,
+          linkedInUrl: user.linkedInUrl,
+          websiteUrl: user.websiteUrl,
+          avatarUrl: user.avatarUrl
+        }}
+        onSave={onSaveProfileHeader}
+      />
+
       <button
         type="button"
-        onClick={onEditProfile}
+        onClick={() => setEditOpen(true)}
         className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
         aria-label="Edit profile"
       >
@@ -66,24 +72,23 @@ export default function ProfileHeader({
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           <ProfileAvatarCropper
-            mode={avatarMode}
-            avatarPreviewUrl={user.avatarUrl}
-            imageSrc={avatarImageSrc}
-            values={avatarValues}
-            onSelectFile={onAvatarSelectFile}
-            onCropChange={onAvatarCropChange}
-            onZoomChange={onAvatarZoomChange}
-            onCropComplete={onAvatarCropComplete}
-            onCancelCrop={onAvatarCancel}
-            onConfirmCrop={onAvatarConfirm}
+            url={user.avatarUrl}
+            onSave={onSaveAvatar}
           />
 
           <div>
-            <div className="text-lg font-semibold leading-tight">{user.displayName}</div>
+            <div className="text-lg font-semibold leading-tight">
+              {user.displayName}
+            </div>
+
             <div className="text-sm text-gray-400">{user.email}</div>
+            {user.phone ? (
+              <div className="text-sm text-gray-400">{user.phone}</div>
+            ) : null}
 
             <div className="mt-1 text-xs text-gray-400">
-              <span className="text-gray-200">{user.roleTitle}</span> @ {user.company}
+              <span className="text-gray-200">{user.roleTitle}</span> @{" "}
+              {user.company}
               <span className="mx-2 text-gray-600">|</span>
               {user.location}
             </div>

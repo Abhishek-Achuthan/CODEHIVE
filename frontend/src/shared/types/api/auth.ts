@@ -25,6 +25,11 @@ export type ResetPasswordData = {
   password: string;
 };
 
+export type changePasswordData = {
+  previousPass : string,
+  newPass : string,
+}
+
 // Response DTOs
 export type ExperienceApi = {
   id: string;
@@ -41,6 +46,7 @@ export interface UserApi {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   role: string;
   isBlocked: boolean;
   avatarUrl?: string;

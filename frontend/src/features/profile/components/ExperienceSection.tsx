@@ -174,59 +174,83 @@ export default function ExperienceSection({
         )
       }
     >
-      {/* Timeline */}
-      <div className="-ml-4">
-        <Timeline
-          position="right"
-          sx={{
-            padding: 0,
-            margin: 0,
-            "& .MuiTimelineItem-root:before": { flex: 0, padding: 0 },
-          }}
-        >
-          {viewItems.map((it, idx) => (
-            <TimelineItem key={it.id}>
-              <TimelineOppositeContent
-                sx={{ flex: 0.28, fontSize: 12, color: "rgb(156,163,175)" }}
-              >
-                {it.dateRange}
-              </TimelineOppositeContent>
+      {viewItems.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-gray-700 bg-gray-950/30 px-4 py-4">
+          <div className="text-sm font-semibold text-gray-200">
+            No experience added yet
+          </div>
+          <div className="mt-1 text-xs text-gray-400">
+            Add roles, internships, freelance work, open-source, or learning milestones.
+          </div>
 
-              <TimelineSeparator>
-                <TimelineDot variant="outlined" />
-                {idx < viewItems.length - 1 && <TimelineConnector />}
-              </TimelineSeparator>
+          {isEditing ? (
+            <button
+              type="button"
+              onClick={openAdd}
+              className="mt-3 rounded-md border border-gray-600 px-4 py-2 text-xs text-white hover:bg-gray-900"
+            >
+              Add your first experience
+            </button>
+          ) : (
+            <div className="mt-3 text-xs text-gray-400">
+              Click the pencil to start adding.
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="-ml-4">
+          <Timeline
+            position="right"
+            sx={{
+              padding: 0,
+              margin: 0,
+              "& .MuiTimelineItem-root:before": { flex: 0, padding: 0 },
+            }}
+          >
+            {viewItems.map((it, idx) => (
+              <TimelineItem key={it.id}>
+                <TimelineOppositeContent
+                  sx={{ flex: 0.28, fontSize: 12, color: "rgb(156,163,175)" }}
+                >
+                  {it.dateRange}
+                </TimelineOppositeContent>
 
-              <TimelineContent>
-                <div className="rounded-lg border border-gray-700 bg-black px-3 py-2">
-                  <div className="flex justify-between gap-4">
-                    <div>
-                      <div className="text-xs text-gray-400">
-                        {typeLabel[it.type]}
+                <TimelineSeparator>
+                  <TimelineDot variant="outlined" />
+                  {idx < viewItems.length - 1 && <TimelineConnector />}
+                </TimelineSeparator>
+
+                <TimelineContent>
+                  <div className="rounded-lg border border-gray-700 bg-black px-3 py-2">
+                    <div className="flex justify-between gap-4">
+                      <div>
+                        <div className="text-xs text-gray-400">
+                          {typeLabel[it.type]}
+                        </div>
+                        <div className="text-sm font-semibold">{it.title}</div>
+                        <div className="text-sm text-gray-300">
+                          {it.organization}
+                        </div>
                       </div>
-                      <div className="text-sm font-semibold">{it.title}</div>
-                      <div className="text-sm text-gray-300">
-                        {it.organization}
-                      </div>
+
+                      {isEditing && (
+                        <div className="flex gap-2">
+                          <button type="button" onClick={() => openEdit(it.id)}>
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button type="button" onClick={() => remove(it.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
-
-                    {isEditing && (
-                      <div className="flex gap-2">
-                        <button onClick={() => openEdit(it.id)}>
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button onClick={() => remove(it.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    )}
                   </div>
-                </div>
-              </TimelineContent>
-            </TimelineItem>
-          ))}
-        </Timeline>
-      </div>
+                </TimelineContent>
+              </TimelineItem>
+            ))}
+          </Timeline>
+        </div>
+      )}
 
       {isEditing && (
         <div className="mt-4 flex justify-end gap-2">

@@ -3,6 +3,7 @@ export interface CurrentUserView {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   role: string;
   isBlocked: boolean;
   avatarUrl?: string;

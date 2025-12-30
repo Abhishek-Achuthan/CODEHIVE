@@ -43,6 +43,7 @@ export default function AuthCallbackPage() {
           firstName: String(obj.firstName ?? ""),
           lastName: String(obj.lastName ?? ""),
           email: String(obj.email ?? ""),
+          phone: typeof obj.phone === "string" ? obj.phone : undefined,
           role: String(obj.role ?? ""),
           isBlocked: Boolean(obj.isBlocked),
           avatarUrl: typeof obj.avatarUrl === "string" ? obj.avatarUrl : undefined,

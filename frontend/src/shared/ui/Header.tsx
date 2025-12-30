@@ -27,7 +27,7 @@ export default function Header() {
               Features
             </a>
             <Link
-              to="/qna"
+              to={"/qna"}
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
             >
               Q&A
@@ -47,7 +47,10 @@ export default function Header() {
           </nav>
           <div className="flex items-center space-x-4">
             <span className="text-white text-sm flex items-center gap-2">
-              <MdPersonOutline className="text-white w-6 h-6" />
+              <Link to={"/profile"}>
+                <MdPersonOutline className="text-white w-6 h-6" />
+              </Link>
+
               {user ? user.firstName : "Hello Guest"}
             </span>
 

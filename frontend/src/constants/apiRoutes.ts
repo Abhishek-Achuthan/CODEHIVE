@@ -12,6 +12,7 @@ export const API_ROUTES = {
     USER_FORGOT_VERIFY_OTP: "/auth/forgot-password/verify-otp",
     USER_RESET_PASSWORD: "/auth/reset-password",
     USER_GOOGLE_LOGIN: "/auth/google-login",
+    USER_CHANGE_PASSWORD:"/auth/change-password"
   },
 
   USER: {

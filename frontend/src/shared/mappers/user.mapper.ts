@@ -22,6 +22,7 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    phone: user.phone,
     role: user.role,
     isBlocked: user.isBlocked,
     avatarUrl: user.avatarUrl,

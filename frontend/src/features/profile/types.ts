@@ -9,7 +9,10 @@ export type ExperienceType =
 
 export interface ProfileUser {
   displayName: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  phone?: string;
   roleTitle: string;
   company: string;
   location: string;

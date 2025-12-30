@@ -1,5 +1,5 @@
 import apiClient from '../apiClient';
-import type { ForgotPasswordData, LoginData, OTPData, RegisterData, ResetPasswordData } from '../../shared/types/api/auth';
+import type { changePasswordData, ForgotPasswordData, LoginData, OTPData, RegisterData, ResetPasswordData } from '../../shared/types/api/auth';
 import { API_ROUTES } from '../../constants/apiRoutes';
 
 export const registerUser = (otp:string,data:RegisterData) => apiClient.post(API_ROUTES.AUTH.USER_REGISTER,{data,otp});
@@ -19,3 +19,5 @@ export const resetPassword = (data:ResetPasswordData) => apiClient.post(API_ROUT
 export const userLogout = () => apiClient.delete(API_ROUTES.AUTH.USER_LOGOUT);
 
 export const googleLogin = (code:string) => apiClient.post(API_ROUTES.AUTH.USER_GOOGLE_LOGIN,{ code });
+
+export const changePassword = (data:changePasswordData) => apiClient.patch(API_ROUTES.AUTH.USER_CHANGE_PASSWORD,data)

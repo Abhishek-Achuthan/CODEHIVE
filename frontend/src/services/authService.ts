@@ -70,6 +70,15 @@ export class AuthService {
     }
   }
 
+  static async changePassword(data:AuthType.changePasswordData) {
+    try {
+      const response = await AuthApi.changePassword(data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   static async logout() {
     try {
       await AuthApi.userLogout()
