@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
 
 import QnaLayout from "../../../layouts/QnaLayout";
 import QuestionEditor from "../components/QuestionEditor";

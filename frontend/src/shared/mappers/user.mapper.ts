@@ -25,5 +25,13 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     role: user.role,
     isBlocked: user.isBlocked,
     avatarUrl: user.avatarUrl,
+    about: user.about,
+    skills: user.skills,
+    experience: user.experience,
+    githubUrl: user.githubUrl,
+    linkedInUrl: user.linkedInUrl,
+    websiteUrl: user.websiteUrl,
+    mentorStatus: user.mentorStatus,
+    mentorAppliedAt: user.mentorAppliedAt,
   };
 }

@@ -82,6 +82,16 @@ const authSlice = createSlice({
 
       localStorage.setItem("accessToken", action.payload);
     },
+
+    setCurrentUser: (state, action: PayloadAction<CurrentUserView | null>) => {
+      state.user = action.payload;
+
+      if (action.payload) {
+        localStorage.setItem("user", JSON.stringify(action.payload));
+      } else {
+        localStorage.removeItem("user");
+      }
+    },
   },
 });
 
@@ -92,4 +102,5 @@ export const {
   loginSuccess,
   logout,
   setAccessToken,
+  setCurrentUser,
 } = authSlice.actions;

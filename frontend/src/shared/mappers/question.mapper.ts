@@ -36,7 +36,7 @@ export function mapQuestionToView(
     tags: question.tags,
 
     voteCount: question.votes,
-    userVote: 0, // owned by vote hook
+    userVote: 0, 
 
     views: question.views,
     answerCount: question.answerCount,

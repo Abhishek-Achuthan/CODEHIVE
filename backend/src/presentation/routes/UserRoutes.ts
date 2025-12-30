@@ -2,18 +2,22 @@ import { Router } from 'express';
 import { questionController } from '../../config/di/resolver';
 import { answerController } from '../../config/di/resolver';
 import { authMiddleware } from '../../config/di/resolver';
+import { userController } from '../../config/di/resolver';
 
 export class UserRoute {
   private _router: Router;
   private _questionController;
   private _answerController;
   private _authMiddleware;
+  private _userController;
 
   constructor() {
     this._router = Router();
     this._questionController = questionController;
     this._answerController = answerController;
     this._authMiddleware = authMiddleware;
+    this._userController = userController;
+
     this._setRoutes();
   }
 
@@ -30,6 +34,13 @@ export class UserRoute {
     this._authMiddleware.check,
     this._questionController.handleListAnsweredQuestions.bind(
         this._questionController
+    )
+   );
+   this._router.patch(
+    '/me/profile',
+    this._authMiddleware.check,
+    this._userController.handleUpdateProfile.bind(
+      this._userController
     )
    );
 

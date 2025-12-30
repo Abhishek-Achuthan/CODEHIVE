@@ -82,7 +82,7 @@ export default function ProfileAvatarCropper({
       ) : null}
 
       {mode === "cropping" && imageSrc ? (
-        <div className="ml-auto w-[240px]">
+        <div className="ml-auto w-60">
           <div className="relative h-40 w-full overflow-hidden rounded-lg border border-gray-700 bg-black">
             <Cropper
               image={imageSrc}

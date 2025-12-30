@@ -26,6 +26,16 @@ export type ResetPasswordData = {
 };
 
 // Response DTOs
+export type ExperienceApi = {
+  id: string;
+  type: "job" | "freelance" | "open_source" | "teaching" | "self_learning";
+  title: string;
+  organization?: string;
+  startDate?: string;
+  endDate?: string;
+  isCurrent?: boolean;
+};
+
 export interface UserApi {
   id: string;
   firstName: string;
@@ -34,6 +44,14 @@ export interface UserApi {
   role: string;
   isBlocked: boolean;
   avatarUrl?: string;
+  about?: string;
+  skills?: string[];
+  experience?: ExperienceApi[];
+  githubUrl?: string;
+  linkedInUrl?: string;
+  websiteUrl?: string;
+  mentorStatus?: "none" | "pending" | "approved";
+  mentorAppliedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }

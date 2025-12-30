@@ -14,6 +14,10 @@ export const API_ROUTES = {
     USER_GOOGLE_LOGIN: "/auth/google-login",
   },
 
+  USER: {
+    UPDATE_MY_PROFILE: "/users/me/profile",
+  },
+
   ADMIN: {
     USER_LISTING: (params: {
       role: string;

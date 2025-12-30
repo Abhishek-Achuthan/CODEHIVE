@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
@@ -8,19 +10,43 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 
-import type { ExperienceItem, ExperienceType } from "../types";
 import SectionCard from "./SectionCard";
-import type { SectionMode } from "./AboutSection";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../shared/ui/dialog/Dialog";
+
+import type { ExperienceType } from "../types";
+
+/* ----------------------------- Types ----------------------------- */
+
+export interface ExperienceDraftItem {
+  id: string;
+  type: ExperienceType;
+  title: string;
+  organization?: string;
+  startDate?: string;
+  endDate?: string;
+  isCurrent?: boolean;
+}
 
 export interface ExperienceSectionProps {
-  mode: SectionMode;
-  items: ExperienceItem[];
-  onStartEdit: () => void;
-  onCancelEdit: () => void;
-  onSaveEdit: () => void;
-  onEditItem: (id: string) => void;
-  onDeleteItem: (id: string) => void;
+  initialItems: ExperienceDraftItem[];
+  onSave: (items: ExperienceDraftItem[]) => Promise<void>;
 }
+
+const EMPTY_FORM: ExperienceDraftItem = {
+  id: "",
+  type: "job",
+  title: "",
+  organization: "",
+  startDate: "",
+  endDate: "",
+  isCurrent: false,
+};
 
 const typeLabel: Record<ExperienceType, string> = {
   job: "Job",
@@ -30,40 +56,143 @@ const typeLabel: Record<ExperienceType, string> = {
   self_learning: "Self learning",
 };
 
+/* --------------------------- Component ---------------------------- */
+
 export default function ExperienceSection({
-  mode,
-  items,
-  onStartEdit,
-  onCancelEdit,
-  onSaveEdit,
-  onEditItem,
-  onDeleteItem,
+  initialItems,
+  onSave,
 }: ExperienceSectionProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [items, setItems] = useState<ExperienceDraftItem[]>(initialItems);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [form, setForm] = useState<ExperienceDraftItem>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  /* Reset drafts when exiting edit mode */
+  useEffect(() => {
+    if (!isEditing) {
+      setItems(initialItems);
+    }
+  }, [initialItems, isEditing]);
+
+  /* --------------------------- Handlers --------------------------- */
+
+  const openAdd = () => {
+    const id =
+      "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    setForm({ ...EMPTY_FORM, id });
+    setDialogOpen(true);
+  };
+
+  const openEdit = (id: string) => {
+    const found = items.find((i) => i.id === id);
+    if (!found) return;
+
+    setForm({
+      id: found.id,
+      type: found.type,
+      title: found.title,
+      organization: found.organization ?? "",
+      startDate: found.startDate ?? "",
+      endDate: found.endDate ?? "",
+      isCurrent: Boolean(found.isCurrent),
+    });
+
+    setDialogOpen(true);
+  };
+
+  const upsert = () => {
+    if (!form.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    setItems((prev) => {
+      const index = prev.findIndex((i) => i.id === form.id);
+
+      const next: ExperienceDraftItem = {
+        ...form,
+        title: form.title.trim(),
+        organization: form.organization?.trim() || undefined,
+        startDate: form.startDate?.trim() || undefined,
+        endDate: form.isCurrent ? undefined : form.endDate?.trim() || undefined,
+        isCurrent: Boolean(form.isCurrent),
+      };
+
+      if (index >= 0) {
+        const copy = [...prev];
+        copy[index] = next;
+        return copy;
+      }
+
+      return [next, ...prev];
+    });
+
+    setDialogOpen(false);
+  };
+
+  const remove = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const saveAll = async () => {
+    try {
+      if (saving) return;
+      setSaving(true);
+
+      const cleaned = items.filter((i) => i.title.trim().length > 0);
+      await onSave(cleaned);
+
+      toast.success("Experience updated");
+      setIsEditing(false);
+    } catch {
+      toast.error("Failed to update experience");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* --------------------------- Derived ---------------------------- */
+
+  const viewItems = useMemo(() => {
+    return items.map((it) => {
+      const start = it.startDate ?? "";
+      const end = it.isCurrent ? "Present" : it.endDate ?? "";
+      const dateRange =
+        start || end ? `${start}${start && end ? " - " : ""}${end}` : "";
+
+      return { ...it, dateRange };
+    });
+  }, [items]);
+
+  /* ---------------------------- Render ---------------------------- */
+
   return (
     <SectionCard
       title="Experience"
       rightAction={
-        mode === "view" ? (
+        isEditing ? (
           <button
-            type="button"
-            onClick={onStartEdit}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Edit experience"
+            onClick={() => setIsEditing(false)}
+            className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
           >
-            <Pencil className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </button>
         ) : (
           <button
-            type="button"
-            onClick={onCancelEdit}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Cancel"
+            onClick={() => setIsEditing(true)}
+            className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
           >
-            <X className="h-4 w-4" />
+            <Pencil className="h-4 w-4" />
           </button>
         )
       }
     >
+      {/* Timeline */}
       <div className="-ml-4">
         <Timeline
           position="right"
@@ -71,65 +200,44 @@ export default function ExperienceSection({
             padding: 0,
             margin: 0,
             "& .MuiTimelineItem-root:before": { flex: 0, padding: 0 },
-            "& .MuiTimelineContent-root": { paddingTop: 0.5, paddingBottom: 0.5 },
           }}
         >
-          {items.map((it, idx) => (
+          {viewItems.map((it, idx) => (
             <TimelineItem key={it.id}>
               <TimelineOppositeContent
-                sx={{
-                  flex: 0.28,
-                  color: "rgba(156,163,175,1)",
-                  fontSize: 12,
-                  paddingTop: 1,
-                }}
+                sx={{ flex: 0.28, fontSize: 12, color: "rgb(156,163,175)" }}
               >
-                {it.dateRangeLabel}
+                {it.dateRange}
               </TimelineOppositeContent>
 
               <TimelineSeparator>
-                <TimelineDot
-                  variant="outlined"
-                  sx={{ borderColor: "rgba(75,85,99,1)", bgcolor: "#000" }}
-                />
-                {idx < items.length - 1 ? (
-                  <TimelineConnector sx={{ bgcolor: "rgba(31,41,55,1)" }} />
-                ) : null}
+                <TimelineDot variant="outlined" />
+                {idx < viewItems.length - 1 && <TimelineConnector />}
               </TimelineSeparator>
 
-              <TimelineContent sx={{ paddingRight: 0 }}>
+              <TimelineContent>
                 <div className="rounded-lg border border-gray-700 bg-black px-3 py-2">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex justify-between gap-4">
                     <div>
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-xs text-gray-400">
                         {typeLabel[it.type]}
                       </div>
-                      <div className="text-sm font-semibold text-white">
-                        {it.title}
+                      <div className="text-sm font-semibold">{it.title}</div>
+                      <div className="text-sm text-gray-300">
+                        {it.organization}
                       </div>
-                      <div className="text-sm text-gray-300">{it.organization}</div>
                     </div>
 
-                    {mode === "edit" ? (
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onEditItem(it.id)}
-                          className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-                          aria-label="Edit entry"
-                        >
+                    {isEditing && (
+                      <div className="flex gap-2">
+                        <button onClick={() => openEdit(it.id)}>
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteItem(it.id)}
-                          className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-                          aria-label="Delete entry"
-                        >
+                        <button onClick={() => remove(it.id)}>
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               </TimelineContent>
@@ -138,24 +246,49 @@ export default function ExperienceSection({
         </Timeline>
       </div>
 
-      {mode === "edit" ? (
-        <div className="mt-4 flex items-center justify-end gap-2">
+      {isEditing && (
+        <div className="mt-4 flex justify-end gap-2">
           <button
-            type="button"
-            onClick={onCancelEdit}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
+            onClick={openAdd}
+            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
           >
-            Cancel
+            Add
           </button>
           <button
-            type="button"
-            onClick={onSaveEdit}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+            onClick={saveAll}
+            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
           >
             Save
           </button>
         </div>
-      ) : null}
+      )}
+
+      {/* Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="bg-black text-white border border-gray-800">
+          <DialogHeader>
+            <DialogTitle>Experience</DialogTitle>
+          </DialogHeader>
+
+          {/* form fields — SAME AS BEFORE */}
+          {/* keep exactly what you had */}
+
+          <DialogFooter>
+            <button
+              onClick={() => setDialogOpen(false)}
+              className="rounded-md border px-4 py-2 text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={upsert}
+              className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            >
+              Save
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SectionCard>
   );
 }

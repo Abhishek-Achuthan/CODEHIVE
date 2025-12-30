@@ -1,49 +1,78 @@
+import { useEffect, useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
-
-import type { SkillsData } from "../types";
 import SectionCard from "./SectionCard";
-import type { SectionMode } from "./AboutSection";
 
 export interface SkillsSectionProps {
-  mode: SectionMode;
-  value: SkillsData;
-  onStartEdit: () => void;
-  onCancelEdit: () => void;
-  onSaveEdit: () => void;
-  onInputChange: (value: string) => void;
-  onAddSkill: () => void;
-  onRemoveSkill: (skill: string) => void;
+  initialSkills: string[];
+  onSave: (skills: string[]) => Promise<void>;
 }
 
 export default function SkillsSection({
-  mode,
-  value,
-  onStartEdit,
-  onCancelEdit,
-  onSaveEdit,
-  onInputChange,
-  onAddSkill,
-  onRemoveSkill,
+  initialSkills,
+  onSave,
 }: SkillsSectionProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [skills, setSkills] = useState<string[]>(initialSkills);
+  const [inputValue, setInputValue] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setSkills(initialSkills);
+    }
+  }, [initialSkills, isEditing]);
+
+  const addSkill = () => {
+    const raw = inputValue.trim();
+    if (!raw) return;
+
+    const exists = skills.some(
+      (s) => s.toLowerCase() === raw.toLowerCase()
+    );
+    if (exists) {
+      setInputValue("");
+      return;
+    }
+
+    setSkills((prev) => [...prev, raw]);
+    setInputValue("");
+  };
+
+  const removeSkill = (skill: string) => {
+    setSkills((prev) => prev.filter((s) => s !== skill));
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await onSave(skills);
+      setIsEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setSkills(initialSkills);
+    setInputValue("");
+    setIsEditing(false);
+  };
+
   return (
     <SectionCard
       title="Skills"
       rightAction={
-        mode === "view" ? (
+        !isEditing ? (
           <button
-            type="button"
-            onClick={onStartEdit}
+            onClick={() => setIsEditing(true)}
             className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Edit skills"
           >
             <Pencil className="h-4 w-4" />
           </button>
         ) : (
           <button
-            type="button"
-            onClick={onCancelEdit}
+            onClick={handleCancel}
             className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Cancel"
           >
             <X className="h-4 w-4" />
           </button>
@@ -51,37 +80,34 @@ export default function SkillsSection({
       }
     >
       <div className="flex flex-wrap gap-2">
-        {value.skills.map((s) => (
+        {skills.map((s) => (
           <span
             key={s}
             className="inline-flex items-center gap-2 rounded-md border border-gray-700 bg-gray-950/60 px-3 py-1 text-xs text-gray-200"
           >
             {s}
-            {mode === "edit" ? (
+            {isEditing && (
               <button
-                type="button"
-                onClick={() => onRemoveSkill(s)}
+                onClick={() => removeSkill(s)}
                 className="text-gray-400 hover:text-white"
-                aria-label={`Remove ${s}`}
               >
                 ×
               </button>
-            ) : null}
+            )}
           </span>
         ))}
       </div>
 
-      {mode === "edit" ? (
+      {isEditing && (
         <div className="mt-4 flex items-center gap-2">
           <input
-            value={value.inputValue}
-            onChange={(e) => onInputChange(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="Add a skill"
-            className="h-9 flex-1 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
+            className="h-9 flex-1 rounded-md border border-gray-700 bg-black px-3 text-sm text-white"
           />
           <button
-            type="button"
-            onClick={onAddSkill}
+            onClick={addSkill}
             className="inline-flex h-9 items-center gap-2 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
@@ -90,30 +116,19 @@ export default function SkillsSection({
 
           <div className="ml-auto flex items-center gap-2">
             <button
-              type="button"
-              onClick={onCancelEdit}
-              className="rounded-md border border-gray-600 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
+              onClick={handleCancel}
+              className="rounded-md border border-gray-600 px-4 py-2 text-xs text-white"
             >
               Cancel
             </button>
             <button
-              type="button"
-              onClick={onSaveEdit}
-              className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+              onClick={handleSave}
+              disabled={saving}
+              className="rounded-md bg-blue-600 px-4 py-2 text-xs text-white disabled:opacity-50"
             >
               Save
             </button>
           </div>
-        </div>
-      ) : (
-        <div className="mt-4 flex justify-end">
-          <button
-            type="button"
-            onClick={onStartEdit}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-          >
-            Add
-          </button>
         </div>
       )}
     </SectionCard>

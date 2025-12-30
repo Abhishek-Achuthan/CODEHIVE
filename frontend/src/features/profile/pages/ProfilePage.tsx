@@ -9,68 +9,183 @@ import ProfileHeader from "../components/ProfileHeader";
 import RightColumn from "../components/RightColumn";
 import SkillsSection from "../components/SkillsSection";
 
+import { useMemo, useState } from "react";
+import toast from "react-hot-toast";
+
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../shared/ui/dialog/Dialog";
+
+import { useAppDispatch, useAppSelector } from "../../../shared/hooks/storeHooks";
+import { UserService } from "../../../services/userService";
+import { BaseError } from "../../../shared/errors/BaseError";
+import { setCurrentUser } from "../../../store/slices/authSlice";
+import { useProfileUpdater } from "../hooks/useProfileUpdater";
+
 import type {
-  AboutData,
   MentorChecklist,
-  ProfileEditSection,
   ProfileUser,
-  SkillsData,
-  ExperienceItem,
 } from "../types";
 
+
 export default function ProfilePage() {
-  const activeEditSection: ProfileEditSection = null;
+  const dispatch = useAppDispatch();
+  const authUser = useAppSelector((state) => state.auth.user);
 
-  const user: ProfileUser = {
-    displayName: "Kunjuz",
-    email: "kunju@gmail.com",
-    roleTitle: "Software engineer",
-    company: "meta",
-    location: "kochi ,india",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?auto=format&fit=crop&w=256&h=256&q=60",
-    linkedInUrl: "https://www.linkedin.com/in/kunjuz",
-    githubUrl: "https://github.com/kunjuz",
-    websiteUrl: "https://kunjuz.dev",
+  const [linksDialogOpen, setLinksDialogOpen] = useState(false);
+  const [githubUrlDraft, setGithubUrlDraft] = useState(authUser?.githubUrl ?? "");
+  const [linkedInUrlDraft, setLinkedInUrlDraft] = useState(authUser?.linkedInUrl ?? "");
+  const [websiteUrlDraft, setWebsiteUrlDraft] = useState(authUser?.websiteUrl ?? "");
+
+  const {updateProfile} = useProfileUpdater();
+
+  const [saving, setSaving] = useState(false);
+
+  const profileUser: ProfileUser = useMemo(() => {
+    const displayName = authUser
+      ? `${authUser.firstName ?? ""} ${authUser.lastName ?? ""}`.trim()
+      : "";
+
+    return {
+      displayName,
+      email: authUser?.email ?? "",
+      roleTitle: authUser?.role ?? "",
+      company: "",
+      location: "",
+      avatarUrl: authUser?.avatarUrl ?? "",
+      linkedInUrl: authUser?.linkedInUrl,
+      githubUrl: authUser?.githubUrl,
+      websiteUrl: authUser?.websiteUrl,
+    };
+
+  }, [authUser]);
+
+
+
+  const mentorChecklist: MentorChecklist = useMemo(
+    () => ({
+      aboutComplete: Boolean((authUser?.about ?? "").trim()),
+      skillsComplete: Boolean((authUser?.skills ?? []).length),
+      experienceComplete: Boolean((authUser?.experience ?? []).length),
+    }),
+    [authUser]
+  );
+
+  const openUrl = (url?: string) => {
+    if (!url) {
+      toast.error("Link not set");
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const about: AboutData = {
-    text: "I’m a Software Engineer with experience in JavaScript, specializing in React and Node.js. I focus on building efficient, scalable web applications and writing clean, maintainable code.",
+  const startEditLinks = () => {
+    setGithubUrlDraft(authUser?.githubUrl ?? "");
+    setLinkedInUrlDraft(authUser?.linkedInUrl ?? "");
+    setWebsiteUrlDraft(authUser?.websiteUrl ?? "");
+    setLinksDialogOpen(true);
   };
 
-  const experience: ExperienceItem[] = [
-    {
-      id: "exp_1",
-      type: "job",
-      title: "Software engineer",
-      organization: "Meta-Full-time",
-      dateRangeLabel: "Aug 2024 - present - 1 year",
-    },
-  ];
+  const saveLinks = async () => {
+    try {
+      if (saving) return;
+      if (!authUser) {
+        toast.error("You must be signed in.");
+        return;
+      }
 
-  const skills: SkillsData = {
-    skills: ["Javascript", "Node js", "MongoDB", "React"],
-    inputValue: "",
+      setSaving(true);
+
+      const updated = await UserService.updateMyProfile({
+        githubUrl: githubUrlDraft.trim() || undefined,
+        linkedInUrl: linkedInUrlDraft.trim() || undefined,
+        websiteUrl: websiteUrlDraft.trim() || undefined,
+      });
+
+      dispatch(setCurrentUser({ ...authUser, ...updated }));
+      toast.success("Profile updated");
+      setLinksDialogOpen(false);
+    } catch (error) {
+      if (error instanceof BaseError) toast.error(error.message);
+      else toast.error("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const mentorChecklist: MentorChecklist = {
-    aboutComplete: true,
-    skillsComplete: true,
-    experienceComplete: true,
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
 
+      <Dialog open={linksDialogOpen} onOpenChange={setLinksDialogOpen}>
+        <DialogContent className="border border-gray-800 bg-black text-white">
+          <DialogHeader>
+            <DialogTitle>Edit profile links</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-3">
+            <label className="grid gap-1">
+              <span className="text-xs text-gray-400">GitHub</span>
+              <input
+                value={githubUrlDraft}
+                onChange={(e) => setGithubUrlDraft(e.target.value)}
+                placeholder="https://github.com/username"
+                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
+              />
+            </label>
+            <label className="grid gap-1">
+              <span className="text-xs text-gray-400">LinkedIn</span>
+              <input
+                value={linkedInUrlDraft}
+                onChange={(e) => setLinkedInUrlDraft(e.target.value)}
+                placeholder="https://linkedin.com/in/username"
+                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
+              />
+            </label>
+            <label className="grid gap-1">
+              <span className="text-xs text-gray-400">Website</span>
+              <input
+                value={websiteUrlDraft}
+                onChange={(e) => setWebsiteUrlDraft(e.target.value)}
+                placeholder="https://your-site.com"
+                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
+              />
+            </label>
+          </div>
+
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setLinksDialogOpen(false)}
+              className="rounded-md border border-gray-600 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={saveLinks}
+              className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
       <main>
         <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
             <ProfileHeader
-              user={user}
+              user={profileUser}
               avatarMode={activeEditSection === "avatar" ? "cropping" : "view"}
               avatarImageSrc={null}
               avatarValues={{ crop: { x: 0, y: 0 }, zoom: 1 }}
@@ -80,13 +195,13 @@ export default function ProfilePage() {
               onAvatarCropComplete={() => {}}
               onAvatarCancel={() => {}}
               onAvatarConfirm={() => {}}
-              onEditProfile={() => {}}
+              onEditProfile={startEditLinks}
               onClickMentor={() => {}}
               onClickDashboard={() => {}}
               onClickSessions={() => {}}
-              onClickLinkedIn={() => {}}
-              onClickGitHub={() => {}}
-              onClickWebsite={() => {}}
+              onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
+              onClickGitHub={() => openUrl(authUser?.githubUrl)}
+              onClickWebsite={() => openUrl(authUser?.websiteUrl)}
             />
 
             <ActivityCard
@@ -101,32 +216,16 @@ export default function ProfilePage() {
               left={
                 <LeftColumn>
                   <AboutSection
-                    mode={activeEditSection === "about" ? "edit" : "view"}
-                    value={about}
-                    draftText={about.text}
-                    onStartEdit={() => {}}
-                    onCancelEdit={() => {}}
-                    onSaveEdit={() => {}}
-                    onDraftChange={() => {}}
+                    initialText={authUser?.about??""}
+                    onSave={(text) => updateProfile({about:text})}
                   />
                   <ExperienceSection
-                    mode={activeEditSection === "experience" ? "edit" : "view"}
-                    items={experience}
-                    onStartEdit={() => {}}
-                    onCancelEdit={() => {}}
-                    onSaveEdit={() => {}}
-                    onEditItem={() => {}}
-                    onDeleteItem={() => {}}
+                   initialItems = {authUser?.experience ??[]}
+                   onSave = {(items) => updateProfile({experience:items})}
                   />
                   <SkillsSection
-                    mode={activeEditSection === "skills" ? "edit" : "view"}
-                    value={skills}
-                    onStartEdit={() => {}}
-                    onCancelEdit={() => {}}
-                    onSaveEdit={() => {}}
-                    onInputChange={() => {}}
-                    onAddSkill={() => {}}
-                    onRemoveSkill={() => {}}
+                    initialSkills ={authUser?.skills ??[]}
+                    onSave = {(skills) => updateProfile({skills})}
                   />
                 </LeftColumn>
               }
