@@ -38,8 +38,8 @@ export default function ProfileAvatarCropper({
     setSaving(false);
   };
 
-  /* ---------------- file selection ---------------- */
-
+  
+  //file selection
   const handleSelectFile = (file: File) => {
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     const maxBytes = 5 * 1024 * 1024;
@@ -75,8 +75,8 @@ export default function ProfileAvatarCropper({
     e.target.value = "";
   };
 
-  /* ---------------- crop helpers ---------------- */
-
+  
+  //crop helpers
   const onCropComplete = useCallback((_: Area, area: Area) => {
     setCroppedAreaPixels(area);
   }, []);
@@ -133,7 +133,6 @@ export default function ProfileAvatarCropper({
     }
   };
 
-  /* ---------------- UI ---------------- */
 
   return (
     <>
@@ -163,7 +162,7 @@ export default function ProfileAvatarCropper({
         />
       </div>
 
-      {/* Crop Modal */}
+      {/*crop modal */}
       {mode === "cropping" && imageSrc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="relative w-[90vw] max-w-md rounded-lg border border-gray-800 bg-black p-4 text-white">

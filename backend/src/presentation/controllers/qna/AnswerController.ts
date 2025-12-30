@@ -8,6 +8,7 @@ import { AnswerSort } from '../../../domain/types/AnswerSort';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import {
   PostAnswerSchema,
+  AnswerListSchema,
   EditAnswerSchema,
   ValidAnswerIdSchema,
   VoteAnswerSchema,
@@ -53,7 +54,7 @@ export class AnswerController {
         },
       });
 
-      const answeredBy = req.user?.id ?? '';
+      const answeredBy = req.user.id
 
       const data = await this._postAnswerUseCase.execute({
         answeredBy,
@@ -73,15 +74,17 @@ export class AnswerController {
 
   async handleListAnswers(req: Request, res: Response, next: NextFunction) {
     try {
-      const { questionId } = req.params;
-      const { page, limit, sortBy, search } = req.query;
+      const validated = AnswerListSchema.parse({
+        questionId: req.params.questionId,
+        ...req.query,
+      });
 
       const data = await this._listAnswerUseCase.execute({
-        questionId: String(questionId),
-        page: page ? Number(page) : 1,
-        limit: limit ? Number(limit) : 10,
-        sortBy: sortBy ? (sortBy as AnswerSort) : AnswerSort.Newest,
-        ...(search ? { search: String(search) } : {}),
+        questionId: validated.questionId,
+        page: validated.page,
+        limit: validated.limit,
+        sortBy: validated.sortBy as AnswerSort,
+        ...(validated.search ? { search: validated.search } : {}),
       });
 
       return res.status(HttpStatus.OK).json(data);
@@ -92,7 +95,9 @@ export class AnswerController {
 
   async handleEditAnswer(req: Request, res: Response, next: NextFunction) {
     try {
-      const { answerId } = req.params;
+      const { answerId } = ValidAnswerIdSchema.parse({
+        answerId: req.params.answerId,
+      });
       const userId = req.user.id;
 
       const validated = EditAnswerSchema.parse({
@@ -117,7 +122,7 @@ export class AnswerController {
         answerText: cleanHtml,
         version: validated.version,
         userId,
-        ...(answerId && { answerId }),
+        answerId,
       };
 
       const updatedAns = await this._editAnswerUseCase.execute(data);
@@ -134,9 +139,11 @@ export class AnswerController {
 
   async handleGetAnswer(req: Request, res: Response, next: NextFunction) {
     try {
-      const { answerId } = req.params
+      const { answerId } = ValidAnswerIdSchema.parse({
+        answerId: req.params.answerId,
+      });
 
-      const data = await this._getAnswerUseCase.execute(answerId!);
+      const data = await this._getAnswerUseCase.execute(answerId);
 
       return res.status(HttpStatus.OK).json(data);
     } catch (error) {

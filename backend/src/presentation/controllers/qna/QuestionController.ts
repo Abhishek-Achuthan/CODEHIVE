@@ -11,6 +11,7 @@ import {
   EditQuestionSchema,
   UserIdParamSchema,
   VoteQuestionSchema,
+  AcceptAnswerSchema,
   AiAssistSchema,
   AiChatSessionIdParamSchema,
   AiChatSessionListQuerySchema,
@@ -274,7 +275,7 @@ export class QuestionController {
     try {
       const userId = req.user.id;
       const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
-      const { answerId } = req.body;
+      const { answerId } = AcceptAnswerSchema.parse(req.body);
 
       const inputData = { userId, questionId, answerId };
 

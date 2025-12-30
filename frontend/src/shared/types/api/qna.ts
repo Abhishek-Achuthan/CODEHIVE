@@ -140,7 +140,8 @@ export type GetQuestionAPIResponse = {
     views: number;
     answerCount: number;
     createdAt: string;
-    updatedAt?: string;
+    updatedAt?: string | null;
+    lastEditedAt?: string | null;
     version: number;
   };
   isBookmarked: boolean;

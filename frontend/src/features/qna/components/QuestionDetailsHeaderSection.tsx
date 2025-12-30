@@ -27,7 +27,7 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
 }) => {
   const currentUser = useAppSelector((state) => state.auth.user);
   const created = parseDate(data.createdAt);
-  const updated = parseDate(data.updatedAt);
+  const updated = parseDate(data.lastEditedAt);
   const isAuthor = currentUser?.id === data.author.id;
 
   console.log('data from question details',data)

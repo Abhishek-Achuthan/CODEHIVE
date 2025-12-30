@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import SectionCard from "./SectionCard";
 
+const ABOUT_MAX_CHARS = 200;
+
 export interface AboutSectionProps {
   initialText: string;
   onSave: (text: string) => Promise<void>;
@@ -15,7 +17,6 @@ export default function AboutSection({
   const [draft, setDraft] = useState(initialText);
   const [saving, setSaving] = useState(false);
 
-  // keep draft in sync if profile updates externally
   useEffect(() => {
     if (!isEditing) {
       setDraft(initialText);
@@ -26,9 +27,11 @@ export default function AboutSection({
     const trimmed = draft.trim();
     if (!trimmed) return;
 
+    const normalized = trimmed.replace(/\s+/g, " ");
+
     try {
       setSaving(true);
-      await onSave(trimmed);
+      await onSave(normalized);
       setIsEditing(false);
     } finally {
       setSaving(false);
@@ -66,7 +69,7 @@ export default function AboutSection({
       }
     >
       {!isEditing ? (
-        <p className="text-xs leading-relaxed text-gray-300 line-clamp-3">
+        <p className="text-xs leading-relaxed text-gray-300">
           {initialText || "No description provided."}
         </p>
       ) : (
@@ -74,22 +77,18 @@ export default function AboutSection({
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            maxLength={ABOUT_MAX_CHARS}
             className="min-h-28 w-full resize-none rounded-lg border border-gray-700 bg-black px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-blue-600/40"
           />
 
           <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="rounded-md border border-gray-600 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
-              disabled={saving}
-            >
-              Cancel
-            </button>
+            <div className="mr-auto text-xs text-gray-400">
+              {draft.length}/{ABOUT_MAX_CHARS}
+            </div>
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || !draft.trim()}
               className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
               Save

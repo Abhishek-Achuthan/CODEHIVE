@@ -13,7 +13,6 @@ export interface ExperienceFormDialogProps {
   onOpenChange: (open: boolean) => void;
   value: ExperienceDraftItem;
   onChange: (value: ExperienceDraftItem) => void;
-  onCancel: () => void;
   onSave: () => void;
 }
 
@@ -22,7 +21,6 @@ export default function ExperienceFormDialog({
   onOpenChange,
   value,
   onChange,
-  onCancel,
   onSave,
 }: ExperienceFormDialogProps) {
   const setField = <K extends keyof ExperienceDraftItem>(
@@ -77,6 +75,7 @@ export default function ExperienceFormDialog({
             <label className="grid gap-1">
               <span className="text-xs text-gray-400">Start date</span>
               <input
+                type="month"
                 value={value.startDate ?? ""}
                 onChange={(e) => setField("startDate", e.target.value)}
                 placeholder="2025-01"
@@ -87,6 +86,7 @@ export default function ExperienceFormDialog({
             <label className="grid gap-1">
               <span className="text-xs text-gray-400">End date</span>
               <input
+                type="month"
                 value={value.endDate ?? ""}
                 onChange={(e) => setField("endDate", e.target.value)}
                 disabled={Boolean(value.isCurrent)}
@@ -107,13 +107,6 @@ export default function ExperienceFormDialog({
         </div>
 
         <DialogFooter>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
-          >
-            Cancel
-          </button>
           <button
             type="button"
             onClick={onSave}

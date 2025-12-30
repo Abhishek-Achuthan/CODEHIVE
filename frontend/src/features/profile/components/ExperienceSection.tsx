@@ -15,6 +15,14 @@ import ExperienceFormDialog from "./ExperienceFormDialog";
 
 import type { ExperienceDraftItem, ExperienceType } from "../types";
 
+const YEAR_MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+const isValidYearMonth = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  return YEAR_MONTH_REGEX.test(trimmed);
+};
+
 export interface ExperienceSectionProps {
   initialItems: ExperienceDraftItem[];
   onSave: (items: ExperienceDraftItem[]) => Promise<void>;
@@ -51,15 +59,14 @@ export default function ExperienceSection({
   const [form, setForm] = useState<ExperienceDraftItem>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
-  /* Reset drafts when exiting edit mode */
   useEffect(() => {
     if (!isEditing) {
       setItems(initialItems);
     }
   }, [initialItems, isEditing]);
 
-  /* --------------------------- Handlers --------------------------- */
-
+  
+  // hanlde
   const openAdd = () => {
     const id =
       "randomUUID" in crypto
@@ -90,6 +97,24 @@ export default function ExperienceSection({
   const upsert = () => {
     if (!form.title.trim()) {
       toast.error("Title is required");
+      return;
+    }
+
+    if (!isValidYearMonth(form.startDate ?? "")) {
+      toast.error("Invalid start date. Use YYYY-MM");
+      return;
+    }
+
+    if (!form.isCurrent && !isValidYearMonth(form.endDate ?? "")) {
+      toast.error("Invalid end date. Use YYYY-MM");
+      return;
+    }
+
+    const start = (form.startDate ?? "").trim();
+    const end = form.isCurrent ? "" : (form.endDate ?? "").trim();
+
+    if (start && end && end < start) {
+      toast.error("End date cannot be before start date");
       return;
     }
 
@@ -274,7 +299,6 @@ export default function ExperienceSection({
         onOpenChange={setDialogOpen}
         value={form}
         onChange={setForm}
-        onCancel={() => setDialogOpen(false)}
         onSave={upsert}
       />
     </SectionCard>

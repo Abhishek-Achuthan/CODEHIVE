@@ -44,7 +44,8 @@ export function mapQuestionToView(
     bookmarked: isBookmarked,
 
     createdAt: question.createdAt,
-    updatedAt: question.updatedAt,
+    lastEditedAt:
+      question.lastEditedAt ?? question.createdAt,
   };
 }
 

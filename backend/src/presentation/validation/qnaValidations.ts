@@ -95,7 +95,28 @@ export const ValidListIdSchema = z.object({
 }).transform((raw) => ({ listId: raw.listId } as { listId: string }));
 
 export const CreateSavedListSchema = z.object({
-  name: z.string().min(1).max(60).transform(v => v.trim()),
+  name: z.string().trim().min(1).max(60),
+});
+
+export const AnswerListSchema = z.object({
+  questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid question ID' }),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+  sortBy: z.enum(['newest', 'oldest', 'votes']).default('newest'),
+  search: z.string()
+    .max(200, 'Search query must not exceed 200 characters')
+    .transform(val => val?.trim())
+    .optional(),
+}).transform((raw) => ({
+  questionId: raw.questionId,
+  page: raw.page,
+  limit: raw.limit,
+  sortBy: raw.sortBy,
+  search: raw.search,
+}));
+
+export const AcceptAnswerSchema = z.object({
+  answerId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid answer ID' }),
 });
 
 export const AiAssistSchema = z.object({

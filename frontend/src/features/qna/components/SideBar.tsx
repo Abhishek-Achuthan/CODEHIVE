@@ -1,8 +1,8 @@
 import {
   MdOutlineQuestionAnswer,
   MdOutlineLightbulb,
-  MdLabelOutline,
-  MdPersonOutline,
+  MdOutlineBookmarkBorder,
+  // MdPersonOutline,
   MdOutlineArticle,
   MdOutlineCheckCircle,
 } from "react-icons/md";
@@ -42,17 +42,11 @@ export default function Sidebar() {
       path: "/qna/ai-assist" 
     },
     { 
-      icon: MdLabelOutline, 
+      icon: MdOutlineBookmarkBorder, 
       label: "Saved", 
       count: null,
       path: "/qna/saved" 
     },
-    { 
-      icon: MdPersonOutline, 
-      label: "Users", 
-      count: null,
-      path: "/qna/users" 
-    }
   ];
 
   const handleNavigation = (path: string) => {

@@ -20,7 +20,7 @@ export interface QuestionDetailsView {
   bookmarked: boolean;
 
   createdAt: string;
-  updatedAt?: string;
+  lastEditedAt: string;
 
   version?: number;
 }

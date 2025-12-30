@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 import SectionCard from "./SectionCard";
 
+const SKILL_MAX_CHARS = 40;
+
 export interface SkillsSectionProps {
   initialSkills: string[];
   onSave: (skills: string[]) => Promise<void>;
@@ -23,8 +25,9 @@ export default function SkillsSection({
   }, [initialSkills, isEditing]);
 
   const addSkill = () => {
-    const raw = inputValue.trim();
+    const raw = inputValue.replace(/\s+/g, " ").trim();
     if (!raw) return;
+    if (raw.length > SKILL_MAX_CHARS) return;
 
     const exists = skills.some(
       (s) => s.toLowerCase() === raw.toLowerCase()
@@ -57,6 +60,9 @@ export default function SkillsSection({
     setInputValue("");
     setIsEditing(false);
   };
+
+  const canAdd = Boolean(inputValue.replace(/\s+/g, " ").trim()) &&
+    inputValue.replace(/\s+/g, " ").trim().length <= SKILL_MAX_CHARS;
 
   return (
     <SectionCard
@@ -127,10 +133,12 @@ export default function SkillsSection({
               }
             }}
             placeholder="Add a skill"
+            maxLength={SKILL_MAX_CHARS}
             className="h-9 flex-1 rounded-md border border-gray-700 bg-black px-3 text-sm text-white"
           />
           <button
             onClick={addSkill}
+            disabled={!canAdd}
             className="inline-flex h-9 items-center gap-2 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
@@ -138,12 +146,6 @@ export default function SkillsSection({
           </button>
 
           <div className="ml-auto flex items-center gap-2">
-            <button
-              onClick={handleCancel}
-              className="rounded-md border border-gray-600 px-4 py-2 text-xs text-white"
-            >
-              Cancel
-            </button>
             <button
               onClick={handleSave}
               disabled={saving}

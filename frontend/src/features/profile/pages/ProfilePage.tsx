@@ -28,8 +28,7 @@ export default function ProfilePage() {
   const { updateProfile } = useProfileUpdater();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
-  /* ------------------------ Derived Data ------------------------ */
-
+  //data
   const profileUser: ProfileUser = useMemo(() => {
     const displayName = authUser
       ? `${authUser.firstName ?? ""} ${authUser.lastName ?? ""}`.trim()
@@ -60,8 +59,7 @@ export default function ProfilePage() {
     [authUser]
   );
 
-  /* ------------------------- Helpers ---------------------------- */
-
+  //helpers
   const openUrl = (url?: string) => {
     if (!url) {
       toast.error("Link not set");
@@ -148,8 +146,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* -------------------------- Render ---------------------------- */
-
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
@@ -165,15 +161,6 @@ export default function ProfilePage() {
           <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
             <ProfileHeader
               user={profileUser}
-              // avatarMode="view"
-              // avatarImageSrc={null}
-              // avatarValues={{ crop: { x: 0, y: 0 }, zoom: 1 }}
-              // onAvatarSelectFile={() => {}}
-              // onAvatarCropChange={() => {}}
-              // onAvatarZoomChange={() => {}}
-              // onAvatarCropComplete={() => {}}
-              // onAvatarCancel={() => {}}
-              // onAvatarConfirm={() => {}}
               onSaveAvatar={handleAvatarUpload}
               onSaveProfileHeader={(values) => updateProfile(values)}
               onClickMentor={() => {}}
