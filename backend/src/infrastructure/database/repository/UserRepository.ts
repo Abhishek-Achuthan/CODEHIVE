@@ -53,7 +53,7 @@ export class UserRepository
 
     const users = userDoc.map((doc) => this.leanToEntity(doc as UserLeanDoc));
 
-    return { items:users, totalItems, totalPages };
+    return { items: users, totalItems, totalPages };
   }
   protected toDocument(data: Partial<UserEntity>): Partial<UserDocument> {
     const {
@@ -62,6 +62,15 @@ export class UserRepository
       lastName,
       phone,
       password,
+      about,
+      avatarUrl,
+      githubUrl,
+      linkedInUrl,
+      websiteUrl,
+      mentorStatus,
+      mentorAppliedAt,
+      skills,
+      experience,
       role,
       isBlocked,
       googleId,
@@ -73,6 +82,15 @@ export class UserRepository
     if (lastName !== undefined) doc.lastName = lastName;
     if (phone !== undefined) doc.phone = phone;
     if (password !== undefined) doc.password = password;
+    if (about !== undefined) doc.about = about;
+    if (avatarUrl !== undefined) doc.avatarUrl = avatarUrl;
+    if (githubUrl !== undefined) doc.githubUrl = githubUrl;
+    if (linkedInUrl !== undefined) doc.linkedInUrl = linkedInUrl;
+    if (websiteUrl !== undefined) doc.websiteUrl = websiteUrl;
+    if (mentorStatus !== undefined) doc.mentorStatus = mentorStatus;
+    if (mentorAppliedAt !== undefined) doc.mentorAppliedAt = mentorAppliedAt;
+    if (skills !== undefined) doc.skills = skills;
+    if (experience !== undefined) doc.experience = experience;
     if (role !== undefined) doc.role = role;
     if (isBlocked !== undefined) doc.isBlocked = isBlocked;
     if (googleId !== undefined) doc.googleId = googleId;
@@ -92,10 +110,21 @@ export class UserRepository
       role: doc.role,
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
+      skills: doc.skills,
+      experience: doc.experience,
+      ...(doc.about !== undefined ? { about: doc.about } : {}),
+      ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
+      ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
+      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
+      ...(doc.mentorAppliedAt !== undefined
+        ? { mentorAppliedAt: doc.mentorAppliedAt }
+        : {}),
+      mentorStatus: doc.mentorStatus,
     };
   }
 
-  leanToEntity(doc:UserLeanDoc):UserEntity {
+  leanToEntity(doc: UserLeanDoc): UserEntity {
     return {
       email: doc.email,
       phone: doc.phone ?? '',
@@ -107,6 +136,17 @@ export class UserRepository
       role: doc.role,
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
-    }
+      skills: doc.skills,
+      experience: doc.experience,
+      mentorStatus: doc.mentorStatus,
+      ...(doc.about !==undefined ? {about: doc.about } : {}), 
+      ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
+      ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
+      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
+      ...(doc.mentorAppliedAt !== undefined
+        ? { mentorAppliedAt: doc.mentorAppliedAt }
+        : {}),
+    };
   }
 }

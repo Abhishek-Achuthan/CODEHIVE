@@ -83,6 +83,8 @@ import { IListAiChatSessionsUseCase } from '../../application/useCase/interface/
 import { ListAiChatSessionsUseCase } from '../../application/useCase/qna/ListAiChatSessionsUseCase';
 import { IGetAiChatMessagesUseCase } from '../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
 import { GetAiChatMessagesUseCase } from '../../application/useCase/qna/GetAiChatMessagesUseCase';
+import { IUpdateUserProfileUseCase } from '../../application/useCase/interface/user/IUpdateUserProfileUseCase';
+import { UpdateUserProfileUseCase } from '../../application/useCase/user/UpdateUserProfileUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -257,20 +259,24 @@ export class UseCaseModule {
       useClass: AcceptAnswerUseCase,
     });
 
-    container.register('IAiAssistantUseCase' , {
+    container.register<IAiAssistantUseCase>('IAiAssistantUseCase' , {
       useClass : AiAssistantUseCase
     })
 
-    container.register('ICreateAiChatSessionUseCase', {
+    container.register<ICreateAiChatSessionUseCase>('ICreateAiChatSessionUseCase', {
       useClass: CreateAiChatSessionUseCase,
     });
 
-    container.register('IListAiChatSessionsUseCase', {
+    container.register<IListAiChatSessionsUseCase>('IListAiChatSessionsUseCase', {
       useClass: ListAiChatSessionsUseCase,
     });
 
-    container.register('IGetAiChatMessagesUseCase', {
+    container.register<IGetAiChatMessagesUseCase>('IGetAiChatMessagesUseCase', {
       useClass: GetAiChatMessagesUseCase,
+    });
+
+    container.register<IUpdateUserProfileUseCase>('IUpdateUserProfileUseCase', {
+      useClass: UpdateUserProfileUseCase,
     });
 
   }

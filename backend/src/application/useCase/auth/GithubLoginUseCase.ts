@@ -2,11 +2,12 @@ import { inject,injectable } from 'tsyringe';
 import type { IGithubLoginUseCase } from '../interface/auth/IGithubLoginUseCase';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import type { IJWTService } from '../../ports/security/IJWTService';
-import { UserEntity } from '../../../domain/entities/UserEntity';
 import type { IGithubAuthService } from '../../ports/security/IGithubAuthService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { UserRole } from '../../../domain/types/UserRole';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { IUserLoginResponseDTO } from '../../dto/UserDTO';
+import { UserMapper } from '../../mapper/UserMapper';
 
 
 @injectable()
@@ -18,7 +19,7 @@ export class GithubLoginUseCase implements IGithubLoginUseCase {
     ) {}
 
 
-    async execute(code: string): Promise<{ user: UserEntity; accessToken: string; refreshToken: string; }> {
+    async execute(code: string): Promise<IUserLoginResponseDTO> {
         
         const githubUser = await this._githubAuthService.getUserFromCode(code);
 
@@ -51,7 +52,7 @@ export class GithubLoginUseCase implements IGithubLoginUseCase {
         const refreshToken = this._jwtService.genarateRefreshToken({userRole:user.role,sub:user.id});
 
 
-        return {user,accessToken,refreshToken}
+        return UserMapper.toLoginResponse(user,accessToken,refreshToken)
 
    }
 

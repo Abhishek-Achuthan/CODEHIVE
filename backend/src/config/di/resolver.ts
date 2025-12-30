@@ -8,6 +8,7 @@ import { RoleMiddleware } from '../../presentation/middlewares/roleMiddleware';
 import { QuestionController } from '../../presentation/controllers/qna/QuestionController';
 import { AnswerController } from '../../presentation/controllers/qna/AnswerController';
 import { SavedController } from '../../presentation/controllers/qna/SavedController';
+import { UserController } from '../../presentation/controllers/user/UserController';
 
 ContainerSetup.registerAll();
 
@@ -24,6 +25,8 @@ export const questionController =  container.resolve(QuestionController);
 export const answerController = container.resolve(AnswerController);
 
 export const savedController = container.resolve(SavedController);
+
+export const userController = container.resolve(UserController);
 
 
 

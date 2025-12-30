@@ -66,11 +66,11 @@ export class RepositoryModule {
             useClass: VoteRepository
         });
 
-        container.register('IAiChatSessionRepository', {
+        container.register<IAiChatSessionRepository>('IAiChatSessionRepository', {
             useClass: AiChatSessionRepository
         });
 
-        container.register('IAiChatMessageRepository', {
+        container.register<IAiChatMessageRepository>('IAiChatMessageRepository', {
             useClass: AiChatMessageRepository
         });
     }

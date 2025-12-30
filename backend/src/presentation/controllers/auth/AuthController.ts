@@ -210,13 +210,13 @@ export class AuthController {
 
       const data = await this._googleLoginUseCase.execute(authCode);
 
-      const { accessToken, refreshToken, user } = data;
+      const { accessToken, refreshToken, ...userData } = data;
 
       if (refreshToken) setCookie(res, refreshToken, 'refreshToken');
 
       return res.status(HttpStatus.OK).json({
         success: true,
-        data: { user, accessToken: accessToken },
+        data: { user: userData, accessToken: accessToken },
         message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
       });
     } catch (error) {
@@ -247,7 +247,7 @@ export class AuthController {
 
       const data = await this._githubLoginUseCase.execute(code);
 
-      const { accessToken, refreshToken, user } = data;
+      const { accessToken, refreshToken, ...userData } = data;
 
       if (refreshToken) setCookie(res, refreshToken, 'refreshToken');
 
@@ -255,9 +255,9 @@ export class AuthController {
 
       const frontendUrl = process.env.FRONTEND_URL
       
-      const userData = encodeURIComponent(JSON.stringify(user));
+      const encodedUserData = encodeURIComponent(JSON.stringify(userData));
 
-      const redirectUrl = `${frontendUrl}/auth/callback?user=${userData}`;
+      const redirectUrl = `${frontendUrl}/auth/callback?user=${encodedUserData}`;
       
       return res.redirect(redirectUrl);
 

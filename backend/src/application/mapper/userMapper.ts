@@ -1,5 +1,5 @@
 import { UserEntity } from '../../domain/entities/UserEntity';
-import { IUserListResponseDTO, IUserLoginResponseDTO } from '../dto/UserDTO';
+import { IUserListResponseDTO, IUserLoginResponseDTO, IUserProfileResponseDTO } from '../dto/UserDTO';
 
 export class UserMapper {
   public static toLoginResponse(
@@ -12,9 +12,20 @@ export class UserMapper {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      ...(user.about !== undefined ? { about: user.about } : {}),
+      skills: user.skills,
+      experience: user.experience,
+      ...(user.avatarUrl !== undefined ? { avatarUrl: user.avatarUrl } : {}),
+      ...(user.githubUrl !== undefined ? { githubUrl: user.githubUrl } : {}),
+      ...(user.linkedInUrl !== undefined ? { linkedInUrl: user.linkedInUrl } : {}),
+      ...(user.websiteUrl !== undefined ? { websiteUrl: user.websiteUrl } : {}),
       isBlocked: user.isBlocked,
       phone: user.phone??'',
       role: user.role,
+      ...(user.mentorAppliedAt !== undefined
+        ? { mentorAppliedAt: user.mentorAppliedAt }
+        : {}),
+      mentorStatus: user.mentorStatus,
       refreshToken: refreshToken,
       accessToken: accessToken,
     };
@@ -29,6 +40,27 @@ export class UserMapper {
       phone: user.phone??'',
       role: user.role,
       isBlocked: user.isBlocked,
+    };
+  }
+
+    public static toUserProfileResponse(
+    user: UserEntity
+  ): IUserProfileResponseDTO {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      ...(user.about !== undefined ? { about: user.about } : {}),
+      skills: user.skills,
+      experience: user.experience,
+      ...(user.avatarUrl !== undefined ? { avatarUrl: user.avatarUrl } : {}),
+      ...(user.githubUrl !== undefined ? { githubUrl: user.githubUrl } : {}),
+      ...(user.linkedInUrl !== undefined ? { linkedInUrl: user.linkedInUrl } : {}),
+      ...(user.websiteUrl !== undefined ? { websiteUrl: user.websiteUrl } : {}),
+      ...(user.mentorAppliedAt !== undefined
+        ? { mentorAppliedAt: user.mentorAppliedAt }
+        : {}),
+      mentorStatus: user.mentorStatus,
     };
   }
 

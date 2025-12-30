@@ -1,5 +1,6 @@
 import { Document, Schema, Types } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
+import { Experience } from '../../../domain/types/ExperienceType';
 
   export interface UserDocument extends Document{
     _id: Types.ObjectId;
@@ -10,6 +11,15 @@ import { UserRole } from '../../../domain/types/UserRole';
     password?: string;
     googleId?: string;
     githubId?: string;
+    about?:string;
+    avatarUrl?:string;
+    githubUrl?:string;
+    websiteUrl?:string;
+    linkedInUrl?:string;
+    mentorStatus:'none' | 'pending' | 'approved';
+    mentorAppliedAt?:Date;
+    skills:string[];
+    experience:Experience[];
     role: UserRole;
     isBlocked: boolean;
     createdAt:Date;
@@ -25,6 +35,15 @@ import { UserRole } from '../../../domain/types/UserRole';
     password?: string;
     googleId?: string;
     githubId?: string;
+    about?:string;
+    avatarUrl?:string;
+    githubUrl?:string;
+    websiteUrl?:string;
+    linkedInUrl?:string;
+    mentorStatus:'none' | 'pending' | 'approved';
+    mentorAppliedAt?:Date;
+    skills:string[];
+    experience:Experience[];
     role: UserRole;
     isBlocked: boolean;
     createdAt:Date;
@@ -40,6 +59,36 @@ export const UserSchema = new Schema<UserDocument>(
     password: { type: String, required: false },
     googleId: { type: String, required: false },
     githubId: { type: String, required: false },
+    about: { type: String, required: false },
+    avatarUrl: { type: String, required: false },
+    githubUrl: { type: String, required: false },
+    websiteUrl: { type: String, required: false },
+    linkedInUrl: { type: String, required: false },
+    mentorStatus: {
+      type: String,
+      enum: ['none', 'pending', 'approved'],
+      default: 'none',
+    },
+    mentorAppliedAt: { type: Date, required: false },
+    skills: { type: [String], default: [] },
+    experience: {
+      type: [
+        {
+          id: { type: String, required: true },
+          type: {
+            type: String,
+            enum: ['job', 'freelance', 'open_source', 'teaching', 'self_learning'],
+            required: true,
+          },
+          title: { type: String, required: true },
+          organization: { type: String, required: false },
+          startDate: { type: String, required: false },
+          endDate: { type: String, required: false },
+          isCurrent: { type: Boolean, required: false },
+        },
+      ],
+      default: [],
+    },
     role: {
       type: String,
       enum: Object.values(UserRole),

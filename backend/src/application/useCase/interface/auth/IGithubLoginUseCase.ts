@@ -1,5 +1,5 @@
-import { UserEntity } from '../../../../domain/entities/UserEntity';
+import { IUserLoginResponseDTO } from '../../../dto/UserDTO';
 
 export interface IGithubLoginUseCase {
-    execute(code:string) : Promise<{user:UserEntity,accessToken:string,refreshToken:string}>
+    execute(code:string) : Promise<IUserLoginResponseDTO>
 }
