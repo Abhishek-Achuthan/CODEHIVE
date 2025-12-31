@@ -61,7 +61,7 @@ export class AiChatSessionRepository implements IAiChatSessionRepository {
     return this.toEntity(doc as AiChatSessionDoc);
   }
 
-  async touch(sessionId: string): Promise<void> {
+  async markActive(sessionId: string): Promise<void> {
     await this._model.findByIdAndUpdate(sessionId, { $set: { updatedAt: new Date() } });
   }
 

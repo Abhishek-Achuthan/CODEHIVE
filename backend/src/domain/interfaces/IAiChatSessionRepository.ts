@@ -6,7 +6,7 @@ export interface IAiChatSessionRepository {
   listByUserId(userId: string, limit: number): Promise<AiChatSessionEntity[]>;
   listOldSessionIdsByUserId(userId: string, keepLimit: number): Promise<string[]>;
   create(userId: string): Promise<AiChatSessionEntity>;
-  touch(sessionId: string): Promise<void>;
+  markActive(sessionId: string): Promise<void>;
   deleteByIds(sessionIds: string[]): Promise<void>;
   deleteByUserId(userId: string): Promise<void>;
 };

@@ -49,7 +49,7 @@ export class AiAssistantUseCase implements IAiAssistantUseCase {
             content: text,
         });
 
-        await this._sessionRepo.touch(session.id);
+        await this._sessionRepo.markActive(session.id);
 
         if (createdNewSession) {
             const oldIds = await this._sessionRepo.listOldSessionIdsByUserId(userId, 10);
