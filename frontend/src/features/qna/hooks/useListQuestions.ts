@@ -42,7 +42,7 @@ export function useQuestionsList() {
         search: debouncedSearch || undefined,
       };
 
-      const res = await QnAService.listQuestions(params);
+      const res = await QnAService.listQuestion(params);
 
       const items = Array.isArray(res?.items) ? res.items.map(mapQuestionListItemToView) : [];
       setQuestions(items);

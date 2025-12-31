@@ -18,6 +18,10 @@ export function useAnswers(
   const list = useAnswerList(questionId);
   const actions = useAnswerActions({ questionId, currentUser });
 
+  const deletedCount = useMemo(() => {
+    return Object.keys(actions.deletedAnswerIds).filter((id) => !id.startsWith('temp-')).length;
+  }, [actions.deletedAnswerIds]);
+
   const shouldShowLocal =
     list.currentPage === 1 && list.searchTerm.length === 0;
 
@@ -28,18 +32,21 @@ export function useAnswers(
     ];
 
     const seen = new Set<string>();
-    return merged.filter((a) => {
-      if (seen.has(a.id)) return false;
-      seen.add(a.id);
-      return true;
-    }).map(a => {
-      if (actions.newlyAcceptedId) {
-        // If we have a local accepted action, override isAccepted
-        return { ...a, isAccepted: a.id === actions.newlyAcceptedId };
-      }
-      return a;
-    });
-  }, [list.answers, actions.localAnswers, shouldShowLocal, actions.newlyAcceptedId]);
+    return merged
+      .filter((a) => !actions.deletedAnswerIds[a.id])
+      .filter((a) => {
+        if (seen.has(a.id)) return false;
+        seen.add(a.id);
+        return true;
+      })
+      .map((a) => {
+        if (actions.newlyAcceptedId !== undefined) {
+          // If we have a local accepted override, enforce it (including explicit null)
+          return { ...a, isAccepted: a.id === actions.newlyAcceptedId };
+        }
+        return a;
+      });
+  }, [list.answers, actions.localAnswers, actions.deletedAnswerIds, shouldShowLocal, actions.newlyAcceptedId]);
 
   return {
     /* ---------- data ---------- */
@@ -47,9 +54,11 @@ export function useAnswers(
     loading: list.loading,
     isPosting: actions.isPosting,
 
-    totalAnswers:
-      list.totalItems +
-      (shouldShowLocal ? actions.localAnswers.length : 0),
+    totalAnswers: Math.max(
+      0,
+      list.totalItems - deletedCount +
+        (shouldShowLocal ? actions.localAnswers.length : 0)
+    ),
 
     totalPages: list.totalPages,
     currentPage: list.currentPage,

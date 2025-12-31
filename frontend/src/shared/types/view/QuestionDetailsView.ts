@@ -16,6 +16,8 @@ export interface QuestionDetailsView {
 
   views: number;
   answerCount: number;
+  isAnswered: boolean;
+  acceptedAnswerId: string | null;
 
   bookmarked: boolean;
 

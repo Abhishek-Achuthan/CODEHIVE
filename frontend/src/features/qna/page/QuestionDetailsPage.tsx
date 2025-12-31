@@ -6,11 +6,13 @@ import { RelatedQuestionsSection } from "../components/RelatetdQuestionSection";
 import AnswerEditorSection from "../components/AnswerEditorSection";
 import { QuestionAnswersSection } from "../components/QuestionAnswersSection";
 import { useQuestionDetails } from "../hooks/useQuestionDetails";
+import { useDeleteQuestion } from "../hooks/useDeleteQuestion";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 
 const QuestionDetailsPage: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
   const currentUser = useAppSelector((state) => state.auth.user);
+  const { deleteQuestion } = useDeleteQuestion();
 
   const controller = useQuestionDetails(questionId);
 
@@ -45,6 +47,10 @@ const QuestionDetailsPage: React.FC = () => {
     isPostingAnswer
   } = controller
 
+  const effectiveAcceptedAnswerId = answersLoading
+    ? question.acceptedAnswerId
+    : (answers.find((a) => a.isAccepted)?.id ?? null);
+
   return (
     <QnaLayout>
       <div className="flex flex-col lg:flex-row gap-8">
@@ -58,9 +64,12 @@ const QuestionDetailsPage: React.FC = () => {
               userVote={questionVote.userVote}
               onUpvote={() => questionVote.vote(1)}
               onDownvote={() => questionVote.vote(-1)}
+              onDeleteQuestion={() => questionId && deleteQuestion(questionId)}
             />
 
             <QuestionAnswersSection
+              questionId={questionId}
+              acceptedAnswerId={effectiveAcceptedAnswerId}
               answers={answers}
               loading={answersLoading}
               totalAnswers={totalAnswers}
@@ -77,15 +86,29 @@ const QuestionDetailsPage: React.FC = () => {
               onSortChange={actions.changeSort}
               onPageChange={actions.changePage}
               onAcceptAnswer={actions.acceptAnswer}
+              onRemoveAcceptedAnswer={actions.removeAcceptedAnswer}
+              onDeleteAnswer={actions.deleteAnswer}
               questionAskedBy={question.author.id}
               currentUserId={currentUser?.id}
             />
 
-            <AnswerEditorSection
-              initialHtml={undefined}
-              onSubmitHtml={actions.submitAnswer}
-              isPosting={isPostingAnswer}
-            />
+            {effectiveAcceptedAnswerId ? (
+              <div className="mt-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-200">
+                <div className="font-semibold mb-1">Accepted answer selected</div>
+                <div className="text-sm text-green-200/90">
+                  This question already has an accepted answer, so new answers can’t be posted.
+                  {currentUser?.id === question.author.id
+                    ? " You can still change the accepted answer by selecting a different one above."
+                    : ""}
+                </div>
+              </div>
+            ) : (
+              <AnswerEditorSection
+                initialHtml={undefined}
+                onSubmitHtml={actions.submitAnswer}
+                isPosting={isPostingAnswer}
+              />
+            )}
           </div>
         </div>
 

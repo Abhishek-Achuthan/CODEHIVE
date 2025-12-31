@@ -87,6 +87,13 @@ import { IGetAiChatMessagesUseCase } from '../../application/useCase/interface/q
 import { GetAiChatMessagesUseCase } from '../../application/useCase/qna/GetAiChatMessagesUseCase';
 import { IUpdateUserProfileUseCase } from '../../application/useCase/interface/user/IUpdateUserProfileUseCase';
 import { UpdateUserProfileUseCase } from '../../application/useCase/user/UpdateUserProfileUseCase';
+import { IDeleteQuestionUseCase } from '../../application/useCase/interface/qna/IDeleteQuestionUseCase';
+import { DeleteQuestionUseCase } from '../../application/useCase/qna/DeleteQuestionUseCase';
+import { IDeleteAnswerUseCase } from '../../application/useCase/interface/qna/IDeleteAnswerUseCase';
+import { DeleteAnswerUseCase } from '../../application/useCase/qna/DeleteAnswerUseCase';
+import { IRemoveAcceptedAnswerUseCase } from '../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
+import { RemoveAcceptedAnswerUseCase } from '../../application/useCase/qna/RemoveAcceptedAnswerUseCase';
+
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -283,6 +290,18 @@ export class UseCaseModule {
 
     container.register<IUpdateUserProfileUseCase>('IUpdateUserProfileUseCase', {
       useClass: UpdateUserProfileUseCase,
+    });
+
+    container.register<IDeleteQuestionUseCase>('IDeleteQuestionUseCase',{
+      useClass: DeleteQuestionUseCase
+    });
+
+    container.register<IDeleteAnswerUseCase>('IDeleteAnswerUseCase',{
+      useClass:DeleteAnswerUseCase
+    })
+
+    container.register<IRemoveAcceptedAnswerUseCase>('IRemoveAcceptedAnswerUseCase', {
+      useClass: RemoveAcceptedAnswerUseCase,
     });
 
   }

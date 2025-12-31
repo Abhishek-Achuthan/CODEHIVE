@@ -92,6 +92,18 @@ export class QnARoutes {
             this._questionController.handleAcceptAnswer.bind(this._questionController)
         );
 
+        this._router.delete(
+            '/questions/:id/accept-answer',
+            this._authMiddleware.check,
+            this._questionController.handleRemoveAcceptedAnswer.bind(this._questionController)
+        );
+
+        this._router.delete(
+            '/questions/:id',
+            this._authMiddleware.check,
+            this._questionController.handleDeleteQuestion.bind(this._questionController)
+        );
+
         //--------------------------Saved Routes-----------------------------------//
 
         this._router.get(
@@ -171,6 +183,12 @@ export class QnARoutes {
             '/answers/:answerId/vote',
             this._authMiddleware.check,
             this._answerController.handleVoteAnswer.bind(this._answerController)
+        );
+
+        this._router.delete(
+            '/answers/:answerId',
+            this._authMiddleware.check,
+            this._answerController.handleDeleteAnswer.bind(this._answerController)
         );
        
     }

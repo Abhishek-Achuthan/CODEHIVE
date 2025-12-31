@@ -31,7 +31,7 @@ import type {
 } from '../shared/types/api/qna';
 
 export class QnAService {
-    static async listQuestions(data: QuestionListParams): Promise<QuestionListPaginatedResponse> {
+    static async listQuestion(data?: QuestionListParams): Promise<QuestionListPaginatedResponse> {
         try {
             const response = await QnAApi.listQuestion(data);
             return response.data as QuestionListPaginatedResponse;
@@ -239,6 +239,14 @@ export class QnAService {
         }
     }
 
+    static async removeAcceptedAnswer(questionId: string): Promise<void> {
+        try {
+            await QnAApi.removeAcceptedAnswer(questionId);
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
     static async aiAssist(prompt: string, sessionId?: string): Promise<AiAssistResponse> {
         try {
             const response = await QnAApi.aiAssist(prompt, sessionId);
@@ -275,6 +283,22 @@ export class QnAService {
         }
     }
 
+    static async deleteQuestion(questionId: string): Promise<void> {
+        try {
+            await QnAApi.deleteQuestion(questionId);
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async deleteAnswer(answerId: string): Promise<void> {
+        try {
+            await QnAApi.deleteAnswer(answerId);
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
     private static handleError(error: unknown): never {
         if (error instanceof AxiosError) {
             const msg = error.response?.data.message || 'Something went wrong';
@@ -284,8 +308,6 @@ export class QnAService {
         if (error instanceof Error) {
             throw new BaseError(error.message);
         }
-
         throw new BaseError('Unexpected error');
     }
-
 }

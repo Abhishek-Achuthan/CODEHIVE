@@ -139,6 +139,8 @@ export type GetQuestionAPIResponse = {
     votes: number;
     views: number;
     answerCount: number;
+    isAnswered: boolean;
+    acceptedAnswerId: string | null;
     createdAt: string;
     updatedAt?: string | null;
     lastEditedAt?: string | null;

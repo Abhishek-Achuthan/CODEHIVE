@@ -40,6 +40,8 @@ export function mapQuestionToView(
 
     views: question.views,
     answerCount: question.answerCount,
+    isAnswered: question.isAnswered,
+    acceptedAnswerId: question.acceptedAnswerId,
 
     bookmarked: isBookmarked,
 

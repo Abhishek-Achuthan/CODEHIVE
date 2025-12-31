@@ -17,6 +17,7 @@ import type { IEditAnswerUseCase } from '../../../application/useCase/interface/
 import { IEditAnswerInputDTO } from '../../../application/dto/AnswerDTO';
 import type { IGetAnswerUseCase } from '../../../application/useCase/interface/qna/IGetAnswerUseCase';
 import type { IVoteAnswerUseCase } from '../../../application/useCase/interface/qna/IVoteAnswerUseCase';
+import type { IDeleteAnswerUseCase } from '../../../application/useCase/interface/qna/IDeleteAnswerUseCase';
 
 @injectable()
 export class AnswerController {
@@ -30,7 +31,9 @@ export class AnswerController {
     @inject('IGetAnswerUseCase')
     private readonly _getAnswerUseCase: IGetAnswerUseCase,
     @inject('IVoteAnswerUseCase')
-    private readonly _voteAnswerUseCase: IVoteAnswerUseCase
+    private readonly _voteAnswerUseCase: IVoteAnswerUseCase,
+    @inject('IDeleteAnswerUseCase')
+    private readonly _deleteAnswerUseCase: IDeleteAnswerUseCase
   ) {}
 
   async handlePostAnswer(req: Request, res: Response, next: NextFunction) {
@@ -161,6 +164,17 @@ export class AnswerController {
       const result = await this._voteAnswerUseCase.execute(answerId, userId, value);
 
       return res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleDeleteAnswer(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { answerId } = ValidAnswerIdSchema.parse({ answerId: req.params.answerId });
+      const userId = req.user.id;
+      await this._deleteAnswerUseCase.execute(userId, answerId);
+      res.status(HttpStatus.NoContent).send();
     } catch (error) {
       next(error);
     }

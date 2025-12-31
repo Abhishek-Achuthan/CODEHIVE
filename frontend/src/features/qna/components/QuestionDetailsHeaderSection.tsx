@@ -1,5 +1,5 @@
 import type React from "react";
-import { MdShare, MdRemoveRedEye as MdEye, MdBookmark, MdEdit } from "react-icons/md";
+import { MdShare, MdRemoveRedEye as MdEye, MdBookmark, MdEdit, MdDelete } from "react-icons/md";
 import { QnaRichContent } from "./QnaRichContent";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Link } from "react-router-dom";
@@ -14,6 +14,7 @@ interface QuestionHeaderSectionProps {
   userVote?: 1 | -1 | 0;
   onUpvote?: () => void;
   onDownvote?: () => void;
+  onDeleteQuestion?: () => void;
 }
 
 export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
@@ -24,6 +25,7 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
   userVote = 0,
   onUpvote,
   onDownvote,
+  onDeleteQuestion,
 }) => {
   const currentUser = useAppSelector((state) => state.auth.user);
   const created = parseDate(data.createdAt);
@@ -93,13 +95,22 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
           </h1>
           
           {isAuthor && (
-            <Link
-              to={`/qna/question/${data.id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              <MdEdit size={16} className="shrink-0" />
-              <span>Edit Question</span>
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                to={`/qna/question/${data.id}/edit`}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <MdEdit size={16} className="shrink-0" />
+                <span>Edit</span>
+              </Link>
+              <button
+                onClick={onDeleteQuestion}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <MdDelete size={16} className="shrink-0" />
+                <span>Delete</span>
+              </button>
+            </div>
           )}
         </div>
 

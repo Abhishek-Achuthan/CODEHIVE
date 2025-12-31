@@ -1,6 +1,8 @@
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdDelete } from "react-icons/md";
 import { GiCheckMark } from "react-icons/gi";
 import { QnaRichContent } from "./QnaRichContent";
+import { useMemo, useState } from "react";
+import ConfirmAcceptedAnswerModal from "./ConfirmAcceptedAnswerModal";
 
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Pagination } from "../../../shared/ui/Pagination";
@@ -10,6 +12,8 @@ import type { AnswerView } from "../../../shared/types/view/AnswerView";
 type AnswerSort = "newest" | "oldest" | "votes";
 
 type Props = {
+  questionId?: string;
+  acceptedAnswerId?: string | null;
   answers: AnswerView[];
   loading: boolean;
   totalAnswers: number;
@@ -26,12 +30,16 @@ type Props = {
   onSearchChange: (value: string) => void;
   onSortChange: (value: AnswerSort) => void;
   onPageChange: (page: number) => void;
-  onAcceptAnswer?: (answerId: string) => void;
+  onAcceptAnswer?: (answerId: string) => Promise<boolean>;
+  onRemoveAcceptedAnswer?: () => Promise<boolean>;
+  onDeleteAnswer?: (answerId: string) => void;
   questionAskedBy?: string;
 };
 
 export function QuestionAnswersSection(props: Props) {
   const {
+    questionId,
+    acceptedAnswerId,
     answers,
     loading,
     totalAnswers,
@@ -49,8 +57,90 @@ export function QuestionAnswersSection(props: Props) {
     onSortChange,
     onPageChange,
     onAcceptAnswer,
+    onDeleteAnswer,
+    onRemoveAcceptedAnswer,
     questionAskedBy,
   } = props;
+
+  const isQuestionOwner = currentUserId && questionAskedBy && currentUserId === questionAskedBy;
+
+  type PendingAction =
+    | { type: 'accept'; answerId: string }
+    | { type: 'switch'; answerId: string }
+    | { type: 'remove'; answerId: string };
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pending, setPending] = useState<PendingAction | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const modalCopy = useMemo(() => {
+    if (!pending) return null;
+
+    if (pending.type === 'remove') {
+      return {
+        title: 'Remove accepted answer',
+        description: 'Remove the accepted answer for this question? You can accept another answer later.',
+        confirmText: 'Remove',
+      };
+    }
+
+    if (pending.type === 'switch') {
+      return {
+        title: 'Switch accepted answer',
+        description: 'Mark this as the accepted answer instead? The previously accepted answer will be unaccepted.',
+        confirmText: 'Switch',
+      };
+    }
+
+    return {
+      title: 'Accept answer',
+      description: 'Are you satisfied with this answer? This will mark it as accepted.',
+      confirmText: 'Accept',
+    };
+  }, [pending]);
+
+  const onClickAccept = (answerId: string, isAccepted: boolean) => {
+    if (!isQuestionOwner) return;
+    if (!questionId) return;
+
+    if (isAccepted || (acceptedAnswerId && acceptedAnswerId === answerId)) {
+      setPending({ type: 'remove', answerId });
+      setConfirmOpen(true);
+      return;
+    }
+
+    if (acceptedAnswerId) {
+      setPending({ type: 'switch', answerId });
+      setConfirmOpen(true);
+      return;
+    }
+
+    setPending({ type: 'accept', answerId });
+    setConfirmOpen(true);
+  };
+
+  const onConfirm = async () => {
+    if (!pending) return;
+    setConfirmLoading(true);
+
+    try {
+      let ok: boolean | undefined;
+
+      if (pending.type === 'remove') {
+        ok = await onRemoveAcceptedAnswer?.();
+      } else {
+        ok = await onAcceptAnswer?.(pending.answerId);
+      }
+
+      // If the handler reports failure, keep the modal open.
+      if (ok === false) return;
+
+      setConfirmOpen(false);
+      setPending(null);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
 
   return (
     <div className="mt-8">
@@ -71,6 +161,21 @@ export function QuestionAnswersSection(props: Props) {
       </div>
 
       <SearchInput value={searchTerm} onChange={onSearchChange} />
+
+      {modalCopy && (
+        <ConfirmAcceptedAnswerModal
+          open={confirmOpen}
+          onOpenChange={(open) => {
+            setConfirmOpen(open);
+            if (!open) setPending(null);
+          }}
+          title={modalCopy.title}
+          description={modalCopy.description}
+          confirmText={modalCopy.confirmText}
+          onConfirm={onConfirm}
+          loading={confirmLoading}
+        />
+      )}
 
       {loading ? (
         <div className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50 text-center text-zinc-400">
@@ -117,14 +222,9 @@ export function QuestionAnswersSection(props: Props) {
                     </svg>
                   </button>
 
-                  {/* Accept Answer Checkmark */}
                   {(a.isAccepted || (currentUserId && currentUserId === questionAskedBy)) && (
                     <button
-                      onClick={() => {
-                         if (currentUserId === questionAskedBy) {
-                            onAcceptAnswer?.(a.id);
-                         }
-                      }}
+                      onClick={() => onClickAccept(a.id, a.isAccepted)}
                        className={`mt-2 flex items-center justify-center w-8 h-8 transition-all ${
                         a.isAccepted
                           ? "text-green-500"
@@ -155,12 +255,21 @@ export function QuestionAnswersSection(props: Props) {
                     </div>
 
                     {a.author.id === currentUserId && (
-                      <button
-                        type="button"
-                        className="text-blue-500 hover:text-blue-400 flex items-center text-sm"
-                      >
-                        <MdEdit className="mr-1" /> Edit
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          className="text-blue-500 hover:text-blue-400 flex items-center text-sm"
+                        >
+                          <MdEdit className="mr-1" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteAnswer?.(a.id)}
+                          className="text-red-500 hover:text-red-400 flex items-center text-sm"
+                        >
+                          <MdDelete className="mr-1" /> Delete
+                        </button>
+                      </div>
                     )}
                   </div>
 

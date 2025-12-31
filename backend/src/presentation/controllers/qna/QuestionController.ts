@@ -32,6 +32,8 @@ import type { IAiAssistantUseCase } from '../../../application/useCase/interface
 import type { ICreateAiChatSessionUseCase } from '../../../application/useCase/interface/qna/ICreateAiChatSessionUseCase';
 import type { IListAiChatSessionsUseCase } from '../../../application/useCase/interface/qna/IListAiChatSessionsUseCase';
 import type { IGetAiChatMessagesUseCase } from '../../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
+import type { IDeleteQuestionUseCase } from '../../../application/useCase/interface/qna/IDeleteQuestionUseCase';
+import type { IRemoveAcceptedAnswerUseCase } from '../../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
 
 
 @injectable()
@@ -64,7 +66,11 @@ export class QuestionController {
     @inject('IListAiChatSessionsUseCase')
     private readonly _listAiChatSessionsUseCase: IListAiChatSessionsUseCase,
     @inject('IGetAiChatMessagesUseCase')
-    private readonly _getAiChatMessagesUseCase: IGetAiChatMessagesUseCase
+    private readonly _getAiChatMessagesUseCase: IGetAiChatMessagesUseCase,
+    @inject('IDeleteQuestionUseCase')
+    private readonly _deleteQuestionUseCase: IDeleteQuestionUseCase,
+    @inject('IRemoveAcceptedAnswerUseCase')
+    private readonly _removeAcceptedAnswerUseCase: IRemoveAcceptedAnswerUseCase,
   ) { }
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
@@ -97,6 +103,19 @@ export class QuestionController {
         messsage: RESPONSE_MESSAGES.QA.QUESTION_POSTED,
         data: created,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleRemoveAcceptedAnswer(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
+      const userId = req.user.id;
+
+      await this._removeAcceptedAnswerUseCase.execute(userId, questionId);
+
+      return res.status(HttpStatus.NoContent).send();
     } catch (error) {
       next(error);
     }
@@ -346,6 +365,17 @@ export class QuestionController {
       const messages = await this._getAiChatMessagesUseCase.execute(userId, sessionId, limit);
 
       return res.status(HttpStatus.OK).json(messages);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleDeleteQuestion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { questionId } = ValidIdSchema.parse({ questionId: req.params.id });
+      const userId = req.user.id;
+      await this._deleteQuestionUseCase.execute(userId, questionId);
+      res.status(HttpStatus.NoContent).send();
     } catch (error) {
       next(error);
     }

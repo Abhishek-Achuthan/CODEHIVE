@@ -179,6 +179,9 @@ export const API_ROUTES = {
 
     ACCEPT_ANSWER: (questionId: string) => `/qna/questions/${questionId}/accept-answer`,
 
+    REMOVE_ACCEPTED_ANSWER: (questionId: string) =>
+      `/qna/questions/${questionId}/accept-answer`,
+
     AI_ASSIST: `/qna/questions/ai-assist`,
 
     AI_SESSIONS: (params?: { limit?: number }) => {

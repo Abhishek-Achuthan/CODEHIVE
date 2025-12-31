@@ -42,6 +42,7 @@ export function useAnswerActions({
   /* ---------- optimistic answers ---------- */
   const [localAnswers, setLocalAnswers] = useState<AnswerView[]>([]);
   const [isPosting, setIsPosting] = useState(false);
+  const [deletedAnswerIds, setDeletedAnswerIds] = useState<Record<string, true>>({});
 
   /* ---------- voting state ---------- */
   const [voteCounts, setVoteCounts] = useState<Record<string, number>>({});
@@ -49,7 +50,9 @@ export function useAnswerActions({
   const [votingById, setVotingById] = useState<Record<string, boolean>>({});
 
   /* ---------- accepted state ---------- */
-  const [newlyAcceptedId, setNewlyAcceptedId] = useState<string | null>(null);
+  const [newlyAcceptedId, setNewlyAcceptedId] = useState<string | null | undefined>(
+    undefined
+  );
 
   /* ---------- submit answer ---------- */
   const submitAnswer = async (html: string) => {
@@ -117,6 +120,7 @@ export function useAnswerActions({
     localAnswers,
     isPosting,
     newlyAcceptedId,
+    deletedAnswerIds,
 
     votes: {
       getCount: (id: string, fallback = 0) =>
@@ -128,7 +132,8 @@ export function useAnswerActions({
     actions: {
       submitAnswer,
       acceptAnswer: async (answerId: string) => {
-        if (!questionId) return;
+        if (!questionId) return false;
+        const prev = newlyAcceptedId;
         try {
           // Optimistic update
           setNewlyAcceptedId(answerId);
@@ -138,10 +143,51 @@ export function useAnswerActions({
         } catch (error) {
           if (error instanceof BaseError) toast.error(error.message);
           // Revert if failed
-          setNewlyAcceptedId(null);
+          setNewlyAcceptedId(prev);
           return false;
         }
-      }
+      },
+      removeAcceptedAnswer: async () => {
+        if (!questionId) return false;
+
+        const prev = newlyAcceptedId;
+        // Optimistic: explicitly clear accepted answer
+        setNewlyAcceptedId(null);
+
+        try {
+          await QnAService.removeAcceptedAnswer(questionId);
+          toast.success("Accepted answer removed");
+          return true;
+        } catch (error) {
+          setNewlyAcceptedId(prev);
+          const message =
+            error instanceof BaseError
+              ? error.message
+              : "Failed to remove accepted answer";
+          toast.error(message);
+          return false;
+        }
+      },
+      deleteAnswer: async (answerId: string) => {
+        setDeletedAnswerIds((prev) => ({ ...prev, [answerId]: true }));
+        setLocalAnswers((prev) => prev.filter((a) => a.id !== answerId));
+
+        try {
+          await QnAService.deleteAnswer(answerId);
+          toast.success("Answer deleted");
+          return true;
+        } catch (error) {
+          setDeletedAnswerIds((prev) => {
+            const next = { ...prev };
+            delete next[answerId];
+            return next;
+          });
+
+          const message = error instanceof BaseError ? error.message : "Failed to delete answer";
+          toast.error(message);
+          return false;
+        }
+      },
     },
   };
 }
