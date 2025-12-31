@@ -75,6 +75,12 @@ export const RelatedQuestionsSection: React.FC<RelatedQuestionsSectionProps> = (
           ))}
         </div>
 
+        {total === 0 && (
+          <div className="mt-4 text-sm text-zinc-400">
+            No related questions are available
+          </div>
+        )}
+
         {canToggle && (
           <button
             type="button"

@@ -58,8 +58,7 @@ export function useAnsweredQuestions() {
         } catch (error) {
             if (seq !== requestSeq.current) return;
 
-            // If backend returns 404 when there are no answered questions,
-            // treat it as a normal empty state (no toast).
+
             if (error instanceof BaseError && error.status === 404) {
                 setQuestions([]);
                 setTotalQuestions(0);

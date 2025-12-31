@@ -75,7 +75,7 @@ export default function ExperienceFormDialog({
             <label className="grid gap-1">
               <span className="text-xs text-gray-400">Start date</span>
               <input
-                type="month"
+                type="text"
                 value={value.startDate ?? ""}
                 onChange={(e) => setField("startDate", e.target.value)}
                 placeholder="2025-01"
@@ -86,7 +86,7 @@ export default function ExperienceFormDialog({
             <label className="grid gap-1">
               <span className="text-xs text-gray-400">End date</span>
               <input
-                type="month"
+                type="text"
                 value={value.endDate ?? ""}
                 onChange={(e) => setField("endDate", e.target.value)}
                 disabled={Boolean(value.isCurrent)}

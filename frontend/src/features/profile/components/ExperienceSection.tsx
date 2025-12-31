@@ -17,6 +17,13 @@ import type { ExperienceDraftItem, ExperienceType } from "../types";
 
 const YEAR_MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
+const getCurrentYearMonth = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+};
+
 const isValidYearMonth = (value: string) => {
   const trimmed = value.trim();
   if (!trimmed) return true;
@@ -66,7 +73,6 @@ export default function ExperienceSection({
   }, [initialItems, isEditing]);
 
   
-  // hanlde
   const openAdd = () => {
     const id =
       "randomUUID" in crypto
@@ -76,6 +82,8 @@ export default function ExperienceSection({
     setForm({ ...EMPTY_FORM, id });
     setDialogOpen(true);
   };
+
+  
 
   const openEdit = (id: string) => {
     const found = items.find((i) => i.id === id);
@@ -113,10 +121,22 @@ export default function ExperienceSection({
     const start = (form.startDate ?? "").trim();
     const end = form.isCurrent ? "" : (form.endDate ?? "").trim();
 
+    const currentYearMonth = getCurrentYearMonth();
+    if (start && start > currentYearMonth) {
+      toast.error("Start date cannot be in the future");
+      return;
+    }
+
+    if (end && end > currentYearMonth) {
+      toast.error("End date cannot be in the future");
+      return;
+    }
+
     if (start && end && end < start) {
       toast.error("End date cannot be before start date");
       return;
     }
+
 
     setItems((prev) => {
       const index = prev.findIndex((i) => i.id === form.id);

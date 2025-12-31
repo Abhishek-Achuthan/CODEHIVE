@@ -24,17 +24,24 @@ export function FilterModal({
   onApply,
 }: FilterModalProps): JSX.Element | null {
   const [form, setForm] = useState<FilterState>(defaultState);
+  const [tagsText, setTagsText] = useState<string>("");
 
   if (!open) return null;
 
   const handleReset = (): void => {
     setForm(defaultState);
+    setTagsText("");
     onApply(defaultState);
     onOpenChange(false);
   };
 
   const handleApply = (): void => {
-    onApply(form);
+    const tags = tagsText
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+
+    onApply({ ...form, tags });
     onOpenChange(false);
   };
 
@@ -108,14 +115,9 @@ export function FilterModal({
           <input
             type="text"
             placeholder="e.g., react, javascript, typescript"
-            value={form.tags.join(",")}
+            value={tagsText}
             onChange={(e) => {
-              const tagString = e.target.value;
-              const tagArray = tagString
-              .split(',')
-              .map(tag => tag.trim())
-              .filter(tag => tag.length >0);
-              setForm((prev) => ({ ...prev, tags: tagArray }));
+              setTagsText(e.target.value);
             }}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
           />

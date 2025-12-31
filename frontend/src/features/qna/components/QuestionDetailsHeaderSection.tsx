@@ -1,5 +1,5 @@
 import type React from "react";
-import { MdShare, MdRemoveRedEye as MdEye, MdBookmark, MdEdit, MdDelete } from "react-icons/md";
+import { MdRemoveRedEye as MdEye, MdBookmark, MdEdit, MdDelete } from "react-icons/md";
 import { QnaRichContent } from "./QnaRichContent";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Link } from "react-router-dom";
@@ -82,9 +82,9 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
           />
         </button>
 
-        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-zinc-800 hover:border-blue-500/50 text-zinc-400 hover:text-blue-400 transition-all">
+        {/* <button className="w-8 h-8 flex items-center justify-center rounded-full border border-zinc-800 hover:border-blue-500/50 text-zinc-400 hover:text-blue-400 transition-all">
           <MdShare size={18} />
-        </button>
+        </button> */}
       </div>
 
       {/* Main question content */}
@@ -157,10 +157,6 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
 
             <p className="text-sm text-white font-semibold leading-tight">
               {data.author.firstName}
-            </p>
-
-            <p className="text-xs text-zinc-400">
-              {(votes ?? data.voteCount)} reputation
             </p>
 
             <p className="text-xs text-zinc-400 mb-1">

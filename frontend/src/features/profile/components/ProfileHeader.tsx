@@ -86,13 +86,6 @@ export default function ProfileHeader({
               <div className="text-sm text-gray-400">{user.phone}</div>
             ) : null}
 
-            <div className="mt-1 text-xs text-gray-400">
-              <span className="text-gray-200">{user.roleTitle}</span> @{" "}
-              {user.company}
-              <span className="mx-2 text-gray-600">|</span>
-              {user.location}
-            </div>
-
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"

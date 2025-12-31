@@ -41,7 +41,7 @@ export function useAnswers(
       })
       .map((a) => {
         if (actions.newlyAcceptedId !== undefined) {
-          // If we have a local accepted override, enforce it (including explicit null)
+          //if we have a local accepted override, enforce it (including explicit null)
           return { ...a, isAccepted: a.id === actions.newlyAcceptedId };
         }
         return a;

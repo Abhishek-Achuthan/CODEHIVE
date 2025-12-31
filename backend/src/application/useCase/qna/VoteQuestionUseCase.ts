@@ -6,6 +6,7 @@ import { VoteTargetType } from '../../../domain/types/VoteTargetType';
 import { VoteValue } from '../../../domain/types/VoteValue';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { IVoteQuestionUseCase } from '../interface/qna/IVoteQuestionUseCase';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 export interface VoteQuestionResult {
   votes: number;
@@ -28,7 +29,7 @@ export class VoteQuestionUseCase implements IVoteQuestionUseCase {
   ): Promise<VoteQuestionResult> {
     const question = await this._questionRepository.find(questionId);
 
-    if (!question) throw new NotFoundError('Question not found');
+    if (!question) throw new NotFoundError(ERROR_MESSAGES.QnA.NOT_FOUND);
 
     const targetType = VoteTargetType.QUESTION;
 
@@ -38,7 +39,7 @@ export class VoteQuestionUseCase implements IVoteQuestionUseCase {
       targetType
     );
 
-    let delta = 0;
+    let voteChange = 0;
     let userVote: VoteValue | 0 = value;
 
     if (!existing) {
@@ -48,17 +49,17 @@ export class VoteQuestionUseCase implements IVoteQuestionUseCase {
         targetType,
         value,
       });
-      delta = value;
+      voteChange = value;
     } else if (existing.value === value) {
       await this._voteRepository.delete(existing.id);
-      delta = -value;
+      voteChange = -value;
       userVote = 0;
     } else {
       await this._voteRepository.update(existing.id, { value });
-      delta = value - existing.value;
+      voteChange = value - existing.value;
     }
 
-    const votes = await this._questionRepository.incrementVotes(questionId, delta);
+    const votes = await this._questionRepository.incrementVotes(questionId, voteChange);
 
     return { votes, userVote };
   }

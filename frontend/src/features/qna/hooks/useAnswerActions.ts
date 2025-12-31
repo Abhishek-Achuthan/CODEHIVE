@@ -128,21 +128,19 @@ export function useAnswerActions({
       getUserVote: (id: string) => userVotes[id] ?? 0,
       vote,
     },
-
+    //optimistic updte
     actions: {
       submitAnswer,
       acceptAnswer: async (answerId: string) => {
         if (!questionId) return false;
         const prev = newlyAcceptedId;
         try {
-          // Optimistic update
           setNewlyAcceptedId(answerId);
           await QnAService.acceptAnswer({ questionId, answerId });
           toast.success("Answer accepted");
           return true;
         } catch (error) {
           if (error instanceof BaseError) toast.error(error.message);
-          // Revert if failed
           setNewlyAcceptedId(prev);
           return false;
         }
@@ -151,7 +149,7 @@ export function useAnswerActions({
         if (!questionId) return false;
 
         const prev = newlyAcceptedId;
-        // Optimistic: explicitly clear accepted answer
+        // clear accepted answer optimistic
         setNewlyAcceptedId(null);
 
         try {

@@ -81,7 +81,6 @@ export default function SavedQuestionsPage() {
       />
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Lists sidebar (workspace content, not app layout) */}
         <SavedListsSidebar
           listsLoading={listsLoading}
           lists={lists}

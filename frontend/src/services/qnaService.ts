@@ -133,7 +133,6 @@ export class QnAService {
     static async getAnswer(answerId: string): Promise<GetAnswerAPIResponse> {
         try {
             const response = await QnAApi.getAnswer(answerId);
-            console.log(response)
             return response.data as GetAnswerAPIResponse;
         } catch (error) {
             throw this.handleError(error);

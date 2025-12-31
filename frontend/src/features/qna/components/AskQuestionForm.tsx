@@ -4,6 +4,7 @@ import { MdAdd, MdClose } from "react-icons/md";
 import QuestionEditor from "./QuestionEditor";
 import toast from "react-hot-toast";
 import { useCreateQuestion } from "../hooks/useCreateQuestion";
+import { BaseError } from "../../../shared/errors/BaseError";
 
 export default function AskQuestionForm(): JSX.Element {
   const navigate = useNavigate();
@@ -71,7 +72,8 @@ export default function AskQuestionForm(): JSX.Element {
 
       if (ok) navigate(`/qna`);
     } catch (error) {
-      toast.error("Failed to post Question");
+    if(error instanceof BaseError)
+       toast.error(error.message ||"Failed to post Question");
     } finally {
       setSubmitting(false);
     }
