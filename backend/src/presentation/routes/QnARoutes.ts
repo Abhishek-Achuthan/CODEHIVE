@@ -9,7 +9,7 @@ export class QnARoutes {
     private _router: Router;
     private _questionController
     private _answerController
-    private _savedController
+    private _savedController 
     private _authMiddleware
 
 

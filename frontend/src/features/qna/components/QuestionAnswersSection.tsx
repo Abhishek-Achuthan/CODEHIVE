@@ -132,7 +132,6 @@ export function QuestionAnswersSection(props: Props) {
         ok = await onAcceptAnswer?.(pending.answerId);
       }
 
-      // If the handler reports failure, keep the modal open.
       if (ok === false) return;
 
       setConfirmOpen(false);
