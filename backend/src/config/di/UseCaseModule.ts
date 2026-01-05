@@ -175,7 +175,7 @@ export class UseCaseModule {
 
     container.register<ICreateQuestionUseCase>('ICreateQuestionUseCase', {
       useClass: CreateQuestionUseCase,
-    });
+    }); 
 
     container.register<IListQuestionUseCase>('IListQuestionUseCase', {
       useClass: ListQuestionUseCase,

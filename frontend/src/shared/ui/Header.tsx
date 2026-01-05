@@ -9,9 +9,11 @@ export default function Header() {
       <div className="max-w mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
           <div className="shrink-0 flex justify-center items-center">
-            <span className="font-black text-2xl text-white tracking-tight">
-              CODE<span className="text-indigo-500">HIVE</span>
-            </span>
+            <Link to="/">
+              <span className="font-black text-2xl text-white tracking-tight">
+                CODE<span className="text-indigo-500">HIVE</span>
+              </span>
+            </Link>
           </div>
           <nav className="hidden md:flex space-x-8">
             <a
