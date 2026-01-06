@@ -1,4 +1,4 @@
-import { UserEntity } from '../../domain/entities/UserEntity';
+
 import { Experience } from '../../domain/types/ExperienceType';
 interface IUserRegisterInputDTO {
   firstName: string;
@@ -13,9 +13,26 @@ interface IUserLoginInputDTO {
   password: string;
 }
 
-interface IUserLoginResponseDTO extends Omit<UserEntity, 'password'> {
+interface IUserLoginResponseDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  isBlocked: boolean;
+  phone?: string | undefined;
+  about?: string | undefined;
+  skills: string[];
+  experience: Experience[];
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
+  mentorStatus: 'none' | 'pending' | 'approved';
+  mentorAppliedAt?: Date | undefined;
+
   accessToken: string;
-  refreshToken?: string;
+  refreshToken?: string | undefined;
 }
 
 interface IUserListResponseDTO {
@@ -23,10 +40,9 @@ interface IUserListResponseDTO {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
+  phone?: string | undefined;
   role: string;
   isBlocked: boolean;
-  createdAt?: Date;
 }
 
 interface UpdateUserProfileDTO {
@@ -46,14 +62,14 @@ interface IUserProfileResponseDTO {
   id: string;
   firstName: string;
   lastName: string;
-  phone?: string;
-  about?: string;
+  phone?: string | undefined;
+  about?: string | undefined;
   skills: string[];
   experience: Experience[];
-  avatarUrl?: string;
-  githubUrl?: string;
-  linkedInUrl?: string;
-  websiteUrl?: string;
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
   mentorStatus: 'none' | 'pending' | 'approved';
 }
 

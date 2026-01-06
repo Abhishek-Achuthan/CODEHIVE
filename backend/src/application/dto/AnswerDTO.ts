@@ -11,9 +11,9 @@ export interface IAnswerResponseDTO {
   version: number;
   createdAt: string;
   updatedAt: string;
-  lastEditedAt?: string;
-  lastEditedBy?: string | null;
-  editCount?: number;
+  lastEditedAt?: string | undefined;
+  lastEditedBy?: string | null | undefined;
+  editCount?: number | undefined;
 }
 
 export interface IGetAnswerResponseDTO {
@@ -49,10 +49,10 @@ export interface AnswerWithAuthorDTO {
 }
 
 export interface IEditAnswerInputDTO {
-  userId:string ;
-  answerText?:string;
-  answerId?:string;
-  version:number;
+  userId: string;
+  answerText?: string;
+  answerId?: string;
+  version: number;
 }
 
 export interface IAcceptAnswerInputDTO {
