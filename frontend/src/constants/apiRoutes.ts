@@ -12,7 +12,7 @@ export const API_ROUTES = {
     USER_FORGOT_VERIFY_OTP: "/auth/forgot-password/verify-otp",
     USER_RESET_PASSWORD: "/auth/reset-password",
     USER_GOOGLE_LOGIN: "/auth/google-login",
-    USER_CHANGE_PASSWORD:"/auth/change-password"
+    USER_CHANGE_PASSWORD: "/auth/change-password"
   },
 
   USER: {
@@ -221,4 +221,19 @@ export const API_ROUTES = {
     GET_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     VOTE_ANSWER: (answerId: string) => `/qna/answers/${answerId}/vote`,
   },
+
+  MENTORSHIP: {
+    SET_AVAILABILITY: "/session/mentors/availability",
+    GET_AVAILABILITY: (mentorId: string) => `/session/mentors/${mentorId}/available`,
+    LIST_MENTORS: (params?: any) => {
+      const qp = new URLSearchParams();
+      if (params?.search) qp.append('search', params.search);
+      if (params?.page) qp.append('page', String(params.page));
+      if (params?.limit) qp.append('limit', String(params.limit));
+      const query = qp.toString();
+      return query ? `/session/mentors?${query}` : `/session/mentors`;
+    },
+    BOOK_SESSION: "/sessions",
+    GET_BOOKED_SESSIONS: "/sessions",
+  }
 };

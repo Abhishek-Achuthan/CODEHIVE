@@ -19,6 +19,9 @@ import MyQuestionsPage from "../features/qna/page/MyQuestionsPage";
 import SavedQuestionsPage from "../features/qna/page/SavedQuestionsPage";
 import AiAssistPage from "../features/qna/page/AiAssistPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
+import MentorListingPage from "../features/mentorship/pages/MentorListingPage";
+import MentorAvailabilityPage from "../features/mentorship/pages/MentorAvailabilityPage";
+import BookingPage from "../features/mentorship/pages/BookingPage";
 
 export default function AppRoutes() {
   return (
@@ -52,6 +55,11 @@ export default function AppRoutes() {
           <Route path="/qna/my-questions" element={<MyQuestionsPage />} />
           <Route path="/qna/saved" element={<SavedQuestionsPage />} />
           <Route path="/qna/ai-assist" element={<AiAssistPage />} />
+
+          {/* Mentorship Routes */}
+          <Route path="/mentors" element={<MentorListingPage />} />
+          <Route path="/mentor/availability" element={<MentorAvailabilityPage />} />
+          <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
