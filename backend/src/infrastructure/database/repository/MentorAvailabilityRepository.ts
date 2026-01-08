@@ -1,18 +1,21 @@
 import { Model, Types } from 'mongoose';
 import { GenericRepository } from './GenericRepository';
 import { MentorAvailabilityDoc } from '../schemas/session/MentorAvailabilitySchema';
-import { MentorAvailablityEntity } from '../../../domain/session/MentorAvailablityEntity';
-import { IMentorAvailablityRepository } from '../../../domain/interfaces/IMentorAvailablityRepository';
+import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
+import { IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
+import { injectable } from 'tsyringe';
+import { MentorAvailabilityModel } from '../models/session/MentorAvailablityModel';
 
+@injectable()
 export class MentorAvailabilityRepository
-  extends GenericRepository<MentorAvailabilityDoc, MentorAvailablityEntity>
-  implements IMentorAvailablityRepository
+  extends GenericRepository<MentorAvailabilityDoc, MentorAvailabilityEntity>
+  implements IMentorAvailabilityRepository
 {
-  constructor(model: Model<MentorAvailabilityDoc>) {
-    super(model);
+  constructor() {
+    super(MentorAvailabilityModel as Model<MentorAvailabilityDoc>);
   }
 
-  async findByMentor(mentorId: string): Promise<MentorAvailablityEntity[]> {
+  async findByMentor(mentorId: string): Promise<MentorAvailabilityEntity[]> {
     const doc = await this._model.find({
       mentorId: new Types.ObjectId(mentorId),
       isActive: true,
@@ -21,7 +24,7 @@ export class MentorAvailabilityRepository
     return doc.map((d) => this.toEntity(d));
   }
 
-  async deactivate(id: string): Promise<MentorAvailablityEntity | null> {
+  async deactivate(id: string): Promise<MentorAvailabilityEntity | null> {
     const updated = await this._model.findByIdAndUpdate(
       id,
       { isActive: false },
@@ -32,7 +35,7 @@ export class MentorAvailabilityRepository
   }
 
   protected toDocument(
-    data: Partial<MentorAvailablityEntity>
+    data: Partial<MentorAvailabilityEntity>
   ): Partial<MentorAvailabilityDoc> {
     const doc: Partial<MentorAvailabilityDoc> = {};
     if (data.mentorId) doc.mentorId = new Types.ObjectId(data.mentorId);
@@ -47,7 +50,7 @@ export class MentorAvailabilityRepository
     return doc;
   }
 
-  protected toEntity(doc: MentorAvailabilityDoc): MentorAvailablityEntity {
+  protected toEntity(doc: MentorAvailabilityDoc): MentorAvailabilityEntity {
     return {
       id: doc.id,
       mentorId: doc.mentorId.toString(),

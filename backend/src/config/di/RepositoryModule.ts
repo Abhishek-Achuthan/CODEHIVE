@@ -20,33 +20,35 @@ import { IAiChatSessionRepository } from '../../domain/interfaces/IAiChatSession
 import { AiChatSessionRepository } from '../../infrastructure/database/repository/AiChatSessionRepository';
 import { IAiChatMessageRepository } from '../../domain/interfaces/IAiChatMessageRepository';
 import { AiChatMessageRepository } from '../../infrastructure/database/repository/AiChatMessageRepository';
-import { IMentorAvailablityRepository } from '../../domain/interfaces/IMentorAvailablityRepository';
+import { IMentorAvailabilityRepository } from '../../domain/interfaces/IMentorAvailabilityRepository';
 import { MentorAvailabilityRepository } from '../../infrastructure/database/repository/MentorAvailabilityRepository';
+import { ISessionRepository } from '../../domain/interfaces/ISessionReposiotry';
+import { SessionRepository } from '../../infrastructure/database/repository/SessionRepository';
 
 export class RepositoryModule {
-    static registerModules():void {
+    static registerModules(): void {
 
         //-------------------------------UserRepo--------------------------------------//
 
-        container.register<IUserRepository>('IUserRepository',{
-            useClass:UserRepository
+        container.register<IUserRepository>('IUserRepository', {
+            useClass: UserRepository
         });
 
         //-------------------------------QuestionRepo----------------------------------//
 
-        container.register<IQuestionRepository>('IQuestionRepository',{
-            useClass:QuestionRepository
+        container.register<IQuestionRepository>('IQuestionRepository', {
+            useClass: QuestionRepository
         });
 
         //------------------------------AnswerRepo------------------------------------//
 
-        container.register<IAnswerRepository>('IAnswerRepository',{
-            useClass:AnswerRepository
+        container.register<IAnswerRepository>('IAnswerRepository', {
+            useClass: AnswerRepository
         });
 
-         //-------------------------Saved Question Repository------------------------//
-         
-        container.register<ISavedQuestionRepository>('ISavedQuestionRepository',{
+        //-------------------------Saved Question Repository------------------------//
+
+        container.register<ISavedQuestionRepository>('ISavedQuestionRepository', {
             useClass: SavedQuestionRepository
         });
 
@@ -78,8 +80,13 @@ export class RepositoryModule {
 
         //-------------------------Session Repository------------------------------//
 
-        container.register<IMentorAvailablityRepository>('IMentorAvailablityRepository', {
+        container.register<IMentorAvailabilityRepository>('IMentorAvailabilityRepository', {
             useClass: MentorAvailabilityRepository
+        });
+        
+
+        container.register<ISessionRepository>('ISessionRepository', {
+            useClass: SessionRepository
         });
     }
 }

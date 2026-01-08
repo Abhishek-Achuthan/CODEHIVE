@@ -1,4 +1,4 @@
-export interface MentorAvailablityEntity {
+export interface MentorAvailabilityEntity {
   id: string;
   mentorId: string;
   rrule:string;

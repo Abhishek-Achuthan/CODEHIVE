@@ -1,23 +1,20 @@
 import { inject, injectable } from 'tsyringe';
-import { ICreateMentorAvailabiltyUseCase } from '../interface/session/ICreateMentorAvailabilityUseCase';
-import { type IMentorAvailablityRepository } from '../../../domain/interfaces/IMentorAvailablityRepository';
-import { MentorAvailablityEntity } from '../../../domain/session/MentorAvailablityEntity';
-import { CreateMentorAvailailityDTO } from '../../dto/SessionDTO';
-
-
+import { ICreateMentorAvailabilityUseCase } from '../interface/session/ICreateMentorAvailabilityUseCase';
+import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
+import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
+import { CreateMentorAvailabilityDTO } from '../../dto/SessionDTO';
 
 
 
 @injectable()
-export class CreateMentorAvailabilityUseCase implements ICreateMentorAvailabiltyUseCase {
+export class CreateMentorAvailabilityUseCase implements ICreateMentorAvailabilityUseCase {
     constructor(
-        @inject('IMentorAvailabilityRepository') private readonly _mentorAvailablityRepository:IMentorAvailablityRepository
+        @inject('IMentorAvailabilityRepository') private readonly _mentorAvailabilityRepository:IMentorAvailabilityRepository
     ){}
 
-    async execute(input: CreateMentorAvailailityDTO): Promise<MentorAvailablityEntity> {
+    async execute(input: CreateMentorAvailabilityDTO): Promise<MentorAvailabilityEntity> {
         
-
-        return this._mentorAvailablityRepository.create(
+        return this._mentorAvailabilityRepository.create(
            { ...input,
             isActive:true}
         )

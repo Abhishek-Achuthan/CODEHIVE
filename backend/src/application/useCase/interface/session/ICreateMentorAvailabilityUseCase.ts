@@ -1,6 +1,6 @@
-import { MentorAvailablityEntity } from '../../../../domain/session/MentorAvailablityEntity';
-import { CreateMentorAvailailityDTO } from '../../../dto/SessionDTO';
+import { MentorAvailabilityEntity } from '../../../../domain/session/MentorAvailabilityEntity';
+import { CreateMentorAvailabilityDTO } from '../../../dto/SessionDTO';
 
-export interface ICreateMentorAvailabiltyUseCase {
-    execute(input:CreateMentorAvailailityDTO):Promise<MentorAvailablityEntity>;
+export interface ICreateMentorAvailabilityUseCase {
+    execute(input:CreateMentorAvailabilityDTO):Promise<MentorAvailabilityEntity>;
 }

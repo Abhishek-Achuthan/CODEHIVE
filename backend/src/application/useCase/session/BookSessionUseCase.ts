@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IBookSessionUseCase } from '../interface/session/IBookSessionUseCase';
-import { type IMentorAvailablityRepository } from '../../../domain/interfaces/IMentorAvailablityRepository';
+import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
 import { type ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
 import { type IRRuleSlotService } from '../../ports/slot/IRRuleSlotService';
 import { type ISlotConflictService } from '../../ports/slot/ISlotConflictService';
@@ -15,8 +15,8 @@ import { SessionMapper } from '../../mapper/SessionMapper';
 @injectable()
 export class BookSessionUseCase implements IBookSessionUseCase {
   constructor(
-    @inject('IMentorAvailablityRepository')
-    private readonly _availabilityRepo: IMentorAvailablityRepository,
+    @inject('IMentorAvailabilityRepository')
+    private readonly _availabilityRepo: IMentorAvailabilityRepository,
     @inject('ISessionRepository')
     private readonly _sessionRepo: ISessionRepository,
     @inject('IRRuleSlotService')
@@ -28,7 +28,7 @@ export class BookSessionUseCase implements IBookSessionUseCase {
   ) {}
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
-    const { mentorId, userId, date, startTime, endTime } = input;
+    const { mentorId, userId, date, startTime, endTime, topic } = input;
 
     const mentor = await this._userRepository.find(mentorId);
 
@@ -81,10 +81,11 @@ export class BookSessionUseCase implements IBookSessionUseCase {
     const session = await this._sessionRepo.create({
       mentorId,
       userId,
-      date,
+      date, 
       startTime,
       endTime,
       status: 'upcoming',
+      topic
     });
 
     return SessionMapper.toResponse(session)

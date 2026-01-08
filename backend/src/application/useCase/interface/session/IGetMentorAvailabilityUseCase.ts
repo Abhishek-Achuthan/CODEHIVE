@@ -1,5 +1,5 @@
-import { MentorAvailablityEntity } from '../../../../domain/session/MentorAvailablityEntity';
+import { MentorAvailabilityEntity } from '../../../../domain/session/MentorAvailabilityEntity';
 
 export interface IGetMentorAvailabilityUseCase {
-    execute(mentorId:string):Promise<MentorAvailablityEntity[]>
+    execute(mentorId:string):Promise<MentorAvailabilityEntity[]>
 }

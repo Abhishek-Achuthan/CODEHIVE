@@ -11,6 +11,7 @@ import { errorHandler } from './presentation/middlewares/errorHanlder';
 import cookieParser from 'cookie-parser';
 import { QnARoutes } from './presentation/routes/QnARoutes';
 import { UserRoute } from './presentation/routes/UserRoutes';
+import { SessionRoutes } from './presentation/routes/SessionRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -37,7 +38,7 @@ export class App {
       })
     );
     this._app.use(express.json());
-    this._app.use(express.urlencoded({extended:true}));
+    this._app.use(express.urlencoded({ extended: true }));
     this._app.use(cookieParser());
   }
 
@@ -46,10 +47,12 @@ export class App {
     const adminRoute = new AdminRoute();
     const qnaRoutes = new QnARoutes;
     const userRoute = new UserRoute;
+    const sessionRoutes = new SessionRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
-    this._app.use('/api/admin',adminRoute.getRoutes());
-    this._app.use('/api/qna',qnaRoutes.getRoutes());
-    this._app.use('/api/users',userRoute.getRoutes());
+    this._app.use('/api/admin', adminRoute.getRoutes());
+    this._app.use('/api/qna', qnaRoutes.getRoutes());
+    this._app.use('/api/users', userRoute.getRoutes());
+    this._app.use('/api/session', sessionRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

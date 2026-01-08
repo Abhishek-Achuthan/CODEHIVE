@@ -6,6 +6,7 @@ export interface SessionEntity {
     startTime:string;
     endTime:string;
     status:'upcoming' | 'completed'|'cancelled'
+    topic:string;
     createdAt:Date;
     updatedAt:Date;
 }

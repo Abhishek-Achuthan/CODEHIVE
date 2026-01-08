@@ -19,6 +19,10 @@ import { IGithubAuthService } from '../../application/ports/security/IGithubAuth
 import { GitHubAuthService } from '../../infrastructure/adapters/security/GithubAuthService';
 import { IAIService } from '../../application/ports/ai/IAIService';
 import { AIService } from '../../infrastructure/adapters/ai/AIService';
+import { IRRuleSlotService } from '../../application/ports/slot/IRRuleSlotService';
+import { RRuleSlotService } from '../../infrastructure/adapters/session/RRuleSlotService';
+import { ISlotConflictService } from '../../application/ports/slot/ISlotConflictService';
+import { SlotConflictService } from '../../infrastructure/adapters/session/SlotConflictService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -60,6 +64,14 @@ export class ServiceModule {
 
     container.register<IAIService>('IAIService', {
       useClass : AIService
+    })
+
+    container.register<IRRuleSlotService>('IRRuleSlotService',{
+      useClass: RRuleSlotService
+    });
+
+    container.register<ISlotConflictService>('ISlotConflictService',{
+      useClass: SlotConflictService
     })
   }
 }

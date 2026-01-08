@@ -1,11 +1,11 @@
 import { RRule, rrulestr } from 'rrule';
 import { IRRuleSlotService } from '../../../application/ports/slot/IRRuleSlotService';
-import { MentorAvailablityEntity } from '../../../domain/session/MentorAvailablityEntity';
+import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 import { DerivedSlot } from '../../../domain/types/DerivedSlot';
 
 export class RRuleSlotService implements IRRuleSlotService {
   generateSlots(
-    availabilities: MentorAvailablityEntity[],
+    availabilities: MentorAvailabilityEntity[],
     from: Date,
     to: Date
   ): DerivedSlot[] {
@@ -26,7 +26,7 @@ export class RRuleSlotService implements IRRuleSlotService {
   }
 
   private generateSlotsForDate(
-    availability: MentorAvailablityEntity,
+    availability: MentorAvailabilityEntity,
     date: Date
   ): DerivedSlot[] {
     const slots: DerivedSlot[] = [];

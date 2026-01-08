@@ -95,12 +95,22 @@ import { IRemoveAcceptedAnswerUseCase } from '../../application/useCase/interfac
 import { RemoveAcceptedAnswerUseCase } from '../../application/useCase/qna/RemoveAcceptedAnswerUseCase';
 import { IUnsaveItemUseCase } from '../../application/useCase/interface/qna/IUnsaveItemUseCase';
 import { UnsaveItemUseCase } from '../../application/useCase/qna/UnsaveItemUseCase';
+import { IListMentorsUseCase } from '../../application/useCase/interface/session/IListMentorsUseCase';
+import { ListMentorsUseCase } from '../../application/useCase/session/ListMentorsUseCase';
+import { IGetBookedSessionsUseCase } from '../../application/useCase/interface/session/IGetBookedSessionsUseCase';
+import { GetBookedSessionsUseCase } from '../../application/useCase/session/GetBookedSessionsUseCase';
+import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/interface/session/ICreateMentorAvailabilityUseCase';
+import { CreateMentorAvailabilityUseCase } from '../../application/useCase/session/CreateMentorAvailabilityUseCase';
+import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/session/IGetMentorAvailabilityUseCase';
+import { GetMentorAvailabilityUseCase } from '../../application/useCase/session/GetMentorAvailabilityUseCase';
+import { IBookSessionUseCase } from '../../application/useCase/interface/session/IBookSessionUseCase';
+import { BookSessionUseCase } from '../../application/useCase/session/BookSessionUseCase';
 
 
 export class UseCaseModule {
   static registerModules(): void {
     //----------------------------------Auth----------------------------------------//
-     
+
     container.register<IUserRegisterUseCase>('IUserRegisterUseCase', {
       useClass: UserRegisterUseCase,
     });
@@ -138,33 +148,33 @@ export class UseCaseModule {
     container.register<IChangePasswordUseCase>('IChangePasswordUseCase', {
       useClass: ChangePasswordUseCase,
     });
-    
+
     container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
       useClass: UserLogoutUseCase,
     });
-    
+
     container.register<IRefreshAccessTokenUseCase>(
       'IRefreshAccessTokenUseCase',
       {
         useClass: RefreshAccessTokenUseCase,
       }
     );
-    
+
     container.register<IGoogleLoginUseCase>('IGoogleLoginUseCase', {
       useClass: GoogleLoginUseCase,
     });
-    
+
     container.register<IGithubLoginUseCase>('IGithubLoginUseCase', {
       useClass: GithubLoginUseCase,
     });
-    
+
     container.register<IInitiateGithubOAuthUseCase>('IInitiateGithubOAuthUseCase', {
       useClass: InitiateGithubOAuthUseCase,
     });
 
     //----------------------------------Admin----------------------------------------//
 
-    
+
     container.register<IListUsersUseCase>('IListUsersUseCase', {
       useClass: ListUsersUseCase,
     });
@@ -177,7 +187,7 @@ export class UseCaseModule {
 
     container.register<ICreateQuestionUseCase>('ICreateQuestionUseCase', {
       useClass: CreateQuestionUseCase,
-    }); 
+    });
 
     container.register<IListQuestionUseCase>('IListQuestionUseCase', {
       useClass: ListQuestionUseCase,
@@ -187,7 +197,7 @@ export class UseCaseModule {
       useClass: PostAnswerUseCase,
     });
 
-    container.register<IListAnswerUseCase>('IListAnswerUseCase',{
+    container.register<IListAnswerUseCase>('IListAnswerUseCase', {
       useClass: ListAnswerUseCase,
     });
 
@@ -199,7 +209,7 @@ export class UseCaseModule {
       useClass: RelatedQuestionUseCase,
     });
 
-    container.register<IToggleSaveQuestionUseCase>('IToggleSaveQuestionUseCase',{
+    container.register<IToggleSaveQuestionUseCase>('IToggleSaveQuestionUseCase', {
       useClass: ToggleSaveQuestionUseCase,
     });
 
@@ -208,23 +218,23 @@ export class UseCaseModule {
     })
 
     container.register<IEditQuestionUseCase>('IEditQuestionUseCase', {
-      useClass:EditQuestionUseCase,
+      useClass: EditQuestionUseCase,
     });
 
-    container.register<IEditAnswerUseCase>('IEditAnswerUseCase',{
+    container.register<IEditAnswerUseCase>('IEditAnswerUseCase', {
       useClass: EditAnswerUseCase,
     });
 
-    container.register<IGetAnswerUseCase>('IGetAnswerUseCase',{
-      useClass:GetAnswerUseCase,
+    container.register<IGetAnswerUseCase>('IGetAnswerUseCase', {
+      useClass: GetAnswerUseCase,
     });
 
-    container.register<IListUserQuestionsUseCase>('IListUserQuestionsUseCase',{
-      useClass:ListUserQuestionsUseCase
+    container.register<IListUserQuestionsUseCase>('IListUserQuestionsUseCase', {
+      useClass: ListUserQuestionsUseCase
     });
 
     container.register<IListAnsweredQuestionUseCase>('IListAnsweredQuestionUseCase', {
-      useClass:listAnsweredQuestionUseCase
+      useClass: listAnsweredQuestionUseCase
     });
 
     container.register<IRecordQuestionViewUseCase>('IRecordQuestionViewUseCase', {
@@ -274,12 +284,12 @@ export class UseCaseModule {
       useClass: DeleteSavedListUseCase,
     });
 
-    container.register<IAcceptAnswerUseCase>('IAcceptAnswerUseCase',{
+    container.register<IAcceptAnswerUseCase>('IAcceptAnswerUseCase', {
       useClass: AcceptAnswerUseCase,
     });
 
-    container.register<IAiAssistantUseCase>('IAiAssistantUseCase' , {
-      useClass : AiAssistantUseCase
+    container.register<IAiAssistantUseCase>('IAiAssistantUseCase', {
+      useClass: AiAssistantUseCase
     })
 
     container.register<ICreateAiChatSessionUseCase>('ICreateAiChatSessionUseCase', {
@@ -298,16 +308,38 @@ export class UseCaseModule {
       useClass: UpdateUserProfileUseCase,
     });
 
-    container.register<IDeleteQuestionUseCase>('IDeleteQuestionUseCase',{
+    container.register<IDeleteQuestionUseCase>('IDeleteQuestionUseCase', {
       useClass: DeleteQuestionUseCase
     });
 
-    container.register<IDeleteAnswerUseCase>('IDeleteAnswerUseCase',{
-      useClass:DeleteAnswerUseCase
+    container.register<IDeleteAnswerUseCase>('IDeleteAnswerUseCase', {
+      useClass: DeleteAnswerUseCase
     })
 
     container.register<IRemoveAcceptedAnswerUseCase>('IRemoveAcceptedAnswerUseCase', {
       useClass: RemoveAcceptedAnswerUseCase,
+    });
+
+    //---------------------------------Session---------------------------------------//
+
+    container.register<IListMentorsUseCase>('IListMentorsUseCase', {
+      useClass: ListMentorsUseCase
+    });
+
+    container.register<IGetBookedSessionsUseCase>('IGetBookedSessionsUseCase', {
+      useClass: GetBookedSessionsUseCase
+    });
+
+    container.register<ICreateMentorAvailabilityUseCase>('ICreateMentorAvailabilityUseCase', {
+      useClass: CreateMentorAvailabilityUseCase
+    });
+
+    container.register<IGetMentorAvailabilityUseCase>('IGetMentorAvailabilityUseCase', {
+      useClass: GetMentorAvailabilityUseCase
+    });
+
+    container.register<IBookSessionUseCase>('IBookSessionUseCase', {
+      useClass: BookSessionUseCase
     });
 
   }

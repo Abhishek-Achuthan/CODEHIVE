@@ -1,19 +1,19 @@
 import { inject,injectable } from 'tsyringe';
 import { IGetMentorAvailabilityUseCase } from '../interface/session/IGetMentorAvailabilityUseCase';
-import { type IMentorAvailablityRepository } from '../../../domain/interfaces/IMentorAvailablityRepository';
-import { MentorAvailablityEntity } from '../../../domain/session/MentorAvailablityEntity';
+import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
+import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 
 
 
 @injectable()
 export class GetMentorAvailabilityUseCase implements IGetMentorAvailabilityUseCase {
     constructor(
-        @inject('IMentorAvailablityRepository') private readonly _mentorRepository:IMentorAvailablityRepository
+        @inject('IMentorAvailabilityRepository') private readonly _mentorRepository:IMentorAvailabilityRepository
     ){}
 
-    async execute(mentorId: string): Promise<MentorAvailablityEntity[]> {
-        const availability =  await this._mentorRepository.findByMentor(mentorId);
+    async execute(mentorId: string): Promise<MentorAvailabilityEntity[]> {
+        const availabilities =  await this._mentorRepository.findByMentor(mentorId);
         
-        return availability;
+        return availabilities;
     }
 }

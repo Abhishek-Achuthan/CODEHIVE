@@ -11,6 +11,7 @@ export class SessionMapper {
       startTime: session.startTime,
       endTime: session.endTime,
       status: session.status,
+      topic:session.topic
     };
   }
 
