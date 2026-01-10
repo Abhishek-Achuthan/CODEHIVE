@@ -6,6 +6,9 @@ import { Loader2, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { BaseError } from '../../../shared/errors/BaseError';
 
+import Header from "../../../shared/ui/Header";
+import Footer from "../../../shared/ui/Footer";
+
 const BookingPage: React.FC = () => {
     const { mentorId } = useParams<{ mentorId: string }>();
     const location = useLocation();
@@ -63,11 +66,14 @@ const BookingPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white pt-24 px-4 pb-12">
-            <div className="max-w-4xl mx-auto">
-                <button onClick={() => navigate(-1)} className="flex items-center text-zinc-400 hover:text-white mb-8 transition">
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Back
-                </button>
+        <div className="min-h-screen bg-black text-white">
+            <Header />
+
+            <main className="px-4 py-10">
+                <div className="mx-auto max-w-4xl">
+                    <button onClick={() => navigate(-1)} className="flex items-center text-gray-400 hover:text-white mb-8 transition">
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                    </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
@@ -137,7 +143,10 @@ const BookingPage: React.FC = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+                </div>
+            </main>
+
+            <Footer />
         </div>
     );
 };

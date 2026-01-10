@@ -42,6 +42,7 @@ export class SessionController {
 
     async handleListMentors(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log('helloo')
             const { search, page, limit } = req.query;
             const params: { search?: string; page?: number; limit?: number } = {};
 

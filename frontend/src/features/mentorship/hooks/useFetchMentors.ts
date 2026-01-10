@@ -13,6 +13,7 @@ export interface MentorListingParams {
 
 export function useFetchMentors(initialParams?: MentorListingParams) {
   const [loading, setLoading] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [mentors, setMentors] = useState<MentorListItemView[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,10 +37,12 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
           ...params,
           search: debouncedSearch,
         });
+        console.log(response)
 
         if (response.items) {
           const mappedMentors = response.items.map(mapMentorListItemToView);
           setMentors(mappedMentors);
+          setTotalPages(response.totalPages);
         }
       } catch (err) {
         if (err instanceof BaseError) {
@@ -63,5 +66,6 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
     error,
     params,
     setParams,
+    totalPages,
   };
 }

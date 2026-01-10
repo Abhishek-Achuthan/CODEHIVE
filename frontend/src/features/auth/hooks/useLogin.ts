@@ -31,6 +31,7 @@ export function useLogin() {
       if (response.success === true) {
         if (userView.role === "user") navigate("/home");
         else if (userView.role === "admin") navigate("/admin/users");
+        else if(userView.role === 'mentor') navigate("/mentors")
       }
     } catch (error) {
       if (error instanceof BaseError) {

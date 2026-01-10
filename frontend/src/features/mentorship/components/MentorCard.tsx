@@ -8,55 +8,53 @@ interface MentorCardProps {
         firstName: string;
         lastName: string;
         avatarUrl?: string;
-        // location: string;
-        jobTitle?: string; 
-        rating?: number;   
+        location?: string;
+        jobTitle?: string;
+        rating?: number;
     }
 }
 
 export const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors group">
-            <div className="p-6">
-                <div className="flex items-start justify-between">
-                    <div className="flex gap-4">
-                        <div className="w-16 h-16 rounded-full bg-zinc-800 overflow-hidden shrink-0">
-                            {mentor.avatarUrl ? (
-                                <img src={mentor.avatarUrl} alt={mentor.firstName} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-zinc-500">
-                                    <User className="w-8 h-8" />
-                                </div>
-                            )}
-                        </div>
-                        <div className="space-y-1">
-                            <h3 className="font-semibold text-lg text-zinc-100 group-hover:text-blue-400 transition-colors">
-                                {mentor.firstName} {mentor.lastName}
-                            </h3>
-                            <p className="text-sm text-zinc-400">Mentor</p>
-
-                            <div className="flex items-center text-xs text-zinc-500 gap-1">
-                                <MapPin className="w-3 h-3" />
-                                <span>Bangalore, India</span> 
+        <div className="rounded-xl border border-gray-700 bg-black px-4 py-4 hover:bg-gray-950/40 transition-colors">
+            <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 overflow-hidden rounded-full bg-gray-900 shrink-0">
+                        {mentor.avatarUrl ? (
+                            <img src={mentor.avatarUrl} alt={mentor.firstName} className="h-full w-full object-cover" />
+                        ) : (
+                            <div className="flex h-full w-full items-center justify-center text-gray-500">
+                                <User className="h-6 w-6" />
                             </div>
+                        )}
+                    </div>
 
-                            <div className="flex items-center gap-1 text-yellow-500 text-sm mt-1">
-                                <span className="font-medium">4.5</span>
-                                <Star className="w-3 h-3 fill-current" />
+                    <div>
+                        <div className="text-sm font-semibold text-white">
+                            {mentor.firstName} {mentor.lastName}
+                        </div>
+                        <div className="text-xs text-gray-400">{mentor.jobTitle ?? "Mentor"}</div>
+
+                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                <span>{mentor.location ?? "Bangalore, India"}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-500">
+                                <span className="font-medium">{mentor.rating ?? 4.5}</span>
+                                <Star className="h-3 w-3 fill-current" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-6">
-                    <Link
-                        to={`/mentors/${mentor.id}/book`}
-                        state={{ mentor }}
-                        className="block w-full py-2.5 text-center text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600"
-                    >
-                        Book Session
-                    </Link>
-                </div>
+                <Link
+                    to={`/mentors/${mentor.id}/book`}
+                    state={{ mentor }}
+                    className="rounded-md bg-linear-to-r from-blue-600 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                >
+                    Book
+                </Link>
             </div>
         </div>
     );
