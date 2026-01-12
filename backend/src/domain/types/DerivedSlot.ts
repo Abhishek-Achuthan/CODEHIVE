@@ -3,5 +3,6 @@ export interface DerivedSlot {
     availabilityId:string;
     date:string;
     startTime:string;
+    price:number;
     endTime:string;
 }

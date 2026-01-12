@@ -6,6 +6,7 @@ export interface MentorAvailabilityEntity {
   endTime: string;
   slotDurationMinutes: number;
   bufferMinutes: number;
+  slotPrice:number;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

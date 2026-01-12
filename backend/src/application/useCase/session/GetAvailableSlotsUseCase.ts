@@ -13,7 +13,7 @@ import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 @injectable()
 export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase{
     constructor(
-        @inject('IMentorAvailabilityReposiotry') private readonly _availabilityRepo: IMentorAvailabilityRepository,
+        @inject('IMentorAvailabilityRepository') private readonly _availabilityRepo: IMentorAvailabilityRepository,
         @inject('IRRuleSlotService') private readonly _rruleSlotService : IRRuleSlotService,
         @inject('ISessionRepository') private readonly _sessionRepository : ISessionRepository,
         @inject('ISlotConflictService') private readonly _slotConflictService : ISlotConflictService,
@@ -28,7 +28,7 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase{
         from.setHours(0,0,0,0);
 
         const to = new Date(date);
-        to.setHours(0,0,0,0);
+        to.setHours(23,59,59,999);
 
         const derivedSlots = this._rruleSlotService.generateSlots(availabilities,from,to);
 

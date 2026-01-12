@@ -8,6 +8,7 @@ export interface MentorAvailabilityDoc extends Document {
     endTime:string;
     slotDurationMinutes:number;
     bufferMinutes:number;
+    slotPrice:number;
     isActive:boolean;
     createdAt:Date;
     updatedAt:Date;
@@ -21,6 +22,7 @@ export const MentorAvailabilitySchema = new Schema<MentorAvailabilityDoc>(
         endTime:{type:String,required:true},
         slotDurationMinutes:{type:Number,required:true},
         bufferMinutes:{type:Number,default:0},
+        slotPrice:{type:Number,required:true},
         isActive:{type:Boolean,default:true},
     },
     {timestamps:true}

@@ -1,5 +1,5 @@
-import { SessionEntity } from '../../../../domain/session/SessionEntity';
+import { IBookedSessionResponseDTO } from '../../../dto/SessionDTO';
 
 export interface IGetBookedSessionsUseCase {
-    execute(userId: string): Promise<SessionEntity[]>;
+    execute(userId: string): Promise<IBookedSessionResponseDTO[]>;
 }

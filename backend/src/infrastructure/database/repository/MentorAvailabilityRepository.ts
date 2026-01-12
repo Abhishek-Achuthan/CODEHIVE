@@ -47,6 +47,7 @@ export class MentorAvailabilityRepository
     if (data.isActive !== undefined) doc.isActive = data.isActive;
     if (data.bufferMinutes !== undefined)
       doc.bufferMinutes = data.bufferMinutes;
+    if(data.slotPrice !== undefined) doc.slotPrice = data.slotPrice;
     return doc;
   }
 
@@ -60,6 +61,7 @@ export class MentorAvailabilityRepository
       endTime: doc.endTime,
       isActive: doc.isActive,
       bufferMinutes: doc.bufferMinutes,
+      slotPrice:doc.slotPrice,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
