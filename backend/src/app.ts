@@ -12,6 +12,7 @@ import cookieParser from 'cookie-parser';
 import { QnARoutes } from './presentation/routes/QnARoutes';
 import { UserRoute } from './presentation/routes/UserRoutes';
 import { SessionRoutes } from './presentation/routes/SessionRoutes';
+import { MentorRoutes } from './presentation/routes/MentorRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -48,11 +49,13 @@ export class App {
     const qnaRoutes = new QnARoutes;
     const userRoute = new UserRoute;
     const sessionRoutes = new SessionRoutes();
+    const mentorRoutes = new MentorRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
     this._app.use('/api/users', userRoute.getRoutes());
-    this._app.use('/api/session', sessionRoutes.getRoutes());
+    this._app.use('/api/sessions', sessionRoutes.getRoutes());
+    this._app.use('/api/mentors',mentorRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
