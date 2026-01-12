@@ -3,63 +3,172 @@ import { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotr
 import { SessionEntity } from '../../../domain/session/SessionEntity';
 import { GenericRepository } from './GenericRepository';
 import { SessionModel } from '../models/session/SessionModel';
-import { SessionDoc } from '../schemas/session/SessionSchema';
+import { SessionDoc, SessionLeanDoc } from '../schemas/session/SessionSchema';
 import { Model } from 'mongoose';
-
-
+import { PopulatedSessionDoc } from '../types/PopulatedSessionDoc';
+import { UserLeanDoc } from '../schemas/UserSchema';
+import { EssentialUserInfo } from '../../../domain/types/EssentialUserInfo';
+import { SessionWithParticipants } from '../../../domain/types/SessionWithParticipants';
 
 @injectable()
-export class SessionRepository extends GenericRepository<SessionDoc, SessionEntity> implements ISessionRepository {
-    constructor() {
-        super(SessionModel as Model<SessionDoc>);
-    }
+export class SessionRepository
+  extends GenericRepository<SessionDoc, SessionEntity>
+  implements ISessionRepository
+{
+  constructor() {
+    super(SessionModel as Model<SessionDoc>);
+  }
 
-    async create(data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt'>): Promise<SessionEntity> {
-        const session = await SessionModel.create(data);
-        return this.toEntity(session);
-    }
+  async create(
+    data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<SessionEntity> {
+    const session = await SessionModel.create(data);
+    return this.toEntity(session);
+  }
 
-    async findByMentorAndDate(mentorId: string, date: string): Promise<SessionEntity[]> {
-        const docs = await SessionModel.find({ mentorId, date });
-        return docs.map(doc => this.toEntity(doc));
-    }
+  async findByMentorAndDate(
+    mentorId: string,
+    date: string
+  ): Promise<SessionEntity[]> {
+    const docs = await SessionModel.find({ mentorId, date });
+    return docs.map((doc) => this.toEntity(doc));
+  }
 
-    async findByMentor(mentorId: string): Promise<SessionEntity[]> {
-        const docs = await SessionModel.find({ mentorId });
-        return docs.map(doc => this.toEntity(doc));
-    }
+  async findByMentor(mentorId: string): Promise<SessionWithParticipants[]> {
+    const docs = await SessionModel.find({ mentorId })
+      .populate<{ mentorId: UserLeanDoc }>({
+        path: 'mentorId',
+        select: 'firstName lastName',
+      })
+      .populate<{ userId: UserLeanDoc }>({
+        path: 'userId',
+        select: 'firstName lastName',
+      })
+      .lean<PopulatedSessionDoc[]>();
 
-    async findByUser(userId: string): Promise<SessionEntity[]> {
-        const docs = await SessionModel.find({ userId });
-        return docs.map(doc => this.toEntity(doc));
-    }
+    return docs.map((doc) => {
+      const mentor: EssentialUserInfo = {
+        id: doc.mentorId._id.toString(),
+        firstName: doc.mentorId.firstName,
+        lastName: doc.mentorId.lastName,
+      };
 
-    protected toEntity(doc: SessionDoc): SessionEntity {
-        return {
-            id: doc.id.toString(),
-            mentorId: doc.mentorId,
-            userId: doc.userId,
-            date: doc.date,
-            startTime: doc.startTime,
-            endTime: doc.endTime,
-            status: doc.status,
-            topic: doc.topic,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt
-        };
-    }
+      const user: EssentialUserInfo = {
+        id: doc.userId._id.toString(),
+        firstName: doc.userId.firstName,
+        lastName: doc.userId.lastName,
+      };
 
-    protected toDocument(data: Partial<SessionEntity>): Partial<SessionDoc> {
-        const doc : Partial<SessionDoc> = {}
-        
-        if(data.mentorId !== undefined) doc.mentorId = data.mentorId;
-        if(data.userId !== undefined) doc.userId = data.userId;
-        if(data.startTime !== undefined) doc.startTime = data.startTime;
-        if(data.endTime !== undefined) doc.endTime = data.endTime;
-        if(data.status !== undefined) doc.status = data.status;
-        if(data.topic !== undefined) doc.topic  = data.topic;
-        if(data.date !== undefined) doc.date = data.date;
-        
-         return doc;
-    }
+      const session: SessionEntity = {
+        id: doc._id.toString(),
+        mentorId: doc.mentorId._id.toString(),
+        userId: doc.userId._id.toString(),
+        date: doc.date,
+        startTime: doc.startTime,
+        endTime: doc.endTime,
+        amountPaid:doc.amountPaid,
+        refunded:doc.refunded,
+        status: doc.status,
+        topic: doc.topic,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt,
+      };
+
+      return { session, mentor, user };
+    });
+  }
+
+  async findByUser(userId: string): Promise<SessionWithParticipants[]> {
+    const docs = await SessionModel.find({ userId })
+      .populate<{ mentorId: UserLeanDoc }>({
+        path: 'mentorId',
+        select: 'firstName lastName',
+      })
+      .populate<{ userId: UserLeanDoc }>({
+        path: 'userId',
+        select: 'firstName lastName',
+      })
+      .lean<PopulatedSessionDoc[]>();
+
+    return docs.map((doc) => {
+      const mentor: EssentialUserInfo = {
+        id: doc.mentorId._id.toString(),
+        firstName: doc.mentorId.firstName,
+        lastName: doc.mentorId.lastName,
+      };
+
+      const user: EssentialUserInfo = {
+        id: doc.userId._id.toString(),
+        firstName: doc.userId.firstName,
+        lastName: doc.userId.lastName,
+      };
+
+      const session: SessionEntity = {
+        id: doc._id.toString(),
+        mentorId: doc.mentorId._id.toString(),
+        userId: doc.userId._id.toString(),
+        date: doc.date,
+        startTime: doc.startTime,
+        endTime: doc.endTime,
+        amountPaid:doc.amountPaid,
+        refunded:doc.refunded,
+        status: doc.status,
+        topic: doc.topic,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt,
+      };
+
+      return { session, mentor, user };
+    });
+  }
+
+  protected toEntity(doc: SessionDoc): SessionEntity {
+    return {
+      id: doc._id.toString(),
+      mentorId: doc.mentorId.toString(),
+      userId: doc.userId.toString(),
+      date: doc.date,
+      startTime: doc.startTime,
+      endTime: doc.endTime,
+      status: doc.status,
+      amountPaid:doc.amountPaid,
+      refunded:doc.refunded,
+      topic: doc.topic,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    };
+  }
+
+  private leanToEntity(doc: SessionLeanDoc): SessionEntity {
+    return {
+      id: doc._id.toString(),
+      mentorId: doc.mentorId.toString(),
+      userId: doc.userId.toString(),
+      date: doc.date,
+      startTime: doc.startTime,
+      endTime: doc.endTime,
+      amountPaid:doc.amountPaid,
+      refunded:doc.refunded,
+      status: doc.status,
+      topic: doc.topic,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    };
+  }
+
+  protected toDocument(data: Partial<SessionEntity>): Partial<SessionDoc> {
+    const doc: Partial<SessionDoc> = {};
+
+    if (data.mentorId !== undefined) doc.mentorId = data.mentorId as unknown as SessionDoc['mentorId'];
+    if (data.userId !== undefined) doc.userId = data.userId as unknown as SessionDoc['userId'];
+    if (data.startTime !== undefined) doc.startTime = data.startTime;
+    if (data.endTime !== undefined) doc.endTime = data.endTime;
+    if (data.status !== undefined) doc.status = data.status;
+    if (data.refunded !== undefined) doc.refunded = data.refunded;
+    if (data.amountPaid !== undefined) doc.amountPaid  = data.amountPaid;
+    if (data.topic !== undefined) doc.topic = data.topic;
+    if (data.date !== undefined) doc.date = data.date;
+
+    return doc;
+  }
 }

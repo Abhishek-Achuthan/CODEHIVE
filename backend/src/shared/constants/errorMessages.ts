@@ -63,6 +63,11 @@ export const ERROR_MESSAGES = {
     INTERNAL_ERROR: 'Internal Server Error',
   },
 
+  // Wallet errors
+  WALLET: {
+    NOT_FOUND: 'Wallet not found',
+  },
+
   //QnA errors
 
   QnA: {
@@ -85,5 +90,8 @@ export const ERROR_MESSAGES = {
     SLOT_NOT_AVAILABLE: 'Selected slot is no longer available',
     SESSION_NOT_FOUND: 'Session not found',
     ACCESS_DENIED: 'You are not allowed to access this session',
+    NOT_ALLOWED_TO_CANCEL: 'Not allowed to cancel this session',
+    ALREADY_STARTED: 'Session already started',
+    ALREADY_CANCELLED: 'Session already cancelled',
   },
 };
