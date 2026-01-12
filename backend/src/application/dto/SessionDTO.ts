@@ -1,3 +1,5 @@
+import { SessionStatus } from '../../domain/types/SessionStatus';
+
 export interface CreateMentorAvailabilityDTO {
     mentorId:string;
     rrule:string;
@@ -29,8 +31,35 @@ export interface ISessionResponseDTO {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
+  status: SessionStatus;
   topic:string;
+  createdAt: string;
+  updatedAt: string;
+  amountPaid: number;
+  refunded:boolean
+}
+
+export interface IUserSummaryDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface IBookedSessionResponseDTO {
+  id: string;
+  mentorId: string;
+  userId: string;
+  mentor: IUserSummaryDTO;
+  user: IUserSummaryDTO;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: SessionStatus;
+  topic: string;
+  amountPaid : number,
+  refunded : boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AvailableSlotDTO {
