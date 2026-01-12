@@ -224,17 +224,17 @@ export const API_ROUTES = {
   },
 
   MENTORSHIP: {
-    SET_AVAILABILITY: "/session/mentors/availability",
-    GET_AVAILABILITY: (mentorId: string) => `/session/mentors/${mentorId}/available`,
+    SET_AVAILABILITY: "/mentors/availability",
+    GET_AVAILABILITY: (mentorId: string) => `/mentors/${mentorId}/available`,
     LIST_MENTORS: (params?: MentorListingParams) => {
       const qp = new URLSearchParams();
       if (params?.search) qp.append('search', params.search);
       if (params?.page) qp.append('page', String(params.page));
       if (params?.limit) qp.append('limit', String(params.limit));
       const query = qp.toString();
-      return query ? `/session/mentors?${query}` : `/session/mentors`;
+      return query ? `/mentors?${query}` : `/mentors`;
     },
-    BOOK_SESSION: "/session/sessions",
-    GET_BOOKED_SESSIONS: "/session/sessions",
+    BOOK_SESSION: "/sessions",
+    GET_BOOKED_SESSIONS: "/sessions",
   }
 };

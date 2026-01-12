@@ -58,7 +58,7 @@ export default function AppRoutes() {
 
           {/* Mentorship Routes */}
           <Route path="/mentors" element={<MentorListingPage />} />
-          <Route path="/mentor/availability" element={<MentorAvailabilityPage />} />
+          <Route path="/mentors/availability" element={<MentorAvailabilityPage />} />
           <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

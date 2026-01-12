@@ -45,6 +45,17 @@ export interface SessionResponse {
     updatedAt: string;
 }
 
+export interface UserSummary {
+    id: string;
+    firstName: string;
+    lastName: string;
+}
+
+export interface BookedSessionResponse extends SessionResponse {
+    mentor: UserSummary;
+    user: UserSummary;
+}
+
 export interface MentorListingParams {
     search?: string;
     page?: number;

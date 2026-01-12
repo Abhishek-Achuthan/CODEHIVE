@@ -6,6 +6,7 @@ import type {
     MentorAvailabilityResponse,
     BookSessionRequest,
     SessionResponse,
+    BookedSessionResponse,
     MentorListingParams,
     PaginatedMentorListResponse,
     AvailableSlotResponse
@@ -48,10 +49,11 @@ export class MentorshipService {
         }
     }
 
-    static async getBookedSessions(): Promise<SessionResponse[]> {
+    static async getBookedSessions(): Promise<BookedSessionResponse[]> {
         try {
             const response = await MentorshipApi.getBookedSessions();
-            return (Array.isArray(response.data) ? response.data : []) as SessionResponse[];
+            console.log(response)
+            return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
         } catch (error) {
             throw this.handleError(error);
         }

@@ -7,13 +7,13 @@ import type { AvailabilityFormData } from '../types';
 
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
-import type { SessionResponse } from "../../../shared/types/api/mentorship";
+import type { BookedSessionResponse } from "../../../shared/types/api/mentorship";
 
 
 const MentorAvailabilityPage: React.FC = () => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [sessionsLoading, setSessionsLoading] = React.useState(false);
-    const [bookedSessions, setBookedSessions] = React.useState<SessionResponse[]>([]);
+    const [bookedSessions, setBookedSessions] = React.useState<BookedSessionResponse[]>([]);
 
     React.useEffect(() => {
         let mounted = true;
@@ -131,7 +131,8 @@ const MentorAvailabilityPage: React.FC = () => {
                                                 <div className="text-gray-400">Date</div>
                                                 <div>{s.date}</div>
                                                 <div className="text-gray-400">Booked by</div>
-                                                <div>{s.userId}</div>
+
+                                                <div>{s.user.firstName} {s.user.lastName}</div>
                                                 <div className="text-gray-400">Topic</div>
                                                 <div>{s.topic}</div>
                                                 <div className="text-gray-400">Status</div>
