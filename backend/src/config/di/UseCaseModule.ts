@@ -103,6 +103,8 @@ import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/inte
 import { CreateMentorAvailabilityUseCase } from '../../application/useCase/session/CreateMentorAvailabilityUseCase';
 import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/session/IGetMentorAvailabilityUseCase';
 import { GetMentorAvailabilityUseCase } from '../../application/useCase/session/GetMentorAvailabilityUseCase';
+import { IGetAvailableSlotsUseCase } from '../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
+import { GetAvailableSlotsUseCase } from '../../application/useCase/session/GetAvailableSlotsUseCase';
 import { IBookSessionUseCase } from '../../application/useCase/interface/session/IBookSessionUseCase';
 import { BookSessionUseCase } from '../../application/useCase/session/BookSessionUseCase';
 
@@ -332,6 +334,10 @@ export class UseCaseModule {
 
     container.register<ICreateMentorAvailabilityUseCase>('ICreateMentorAvailabilityUseCase', {
       useClass: CreateMentorAvailabilityUseCase
+    });
+
+    container.register<IGetAvailableSlotsUseCase>('IGetAvailableSlotsUseCase', {
+      useClass: GetAvailableSlotsUseCase
     });
 
     container.register<IGetMentorAvailabilityUseCase>('IGetMentorAvailabilityUseCase', {

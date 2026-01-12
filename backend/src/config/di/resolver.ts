@@ -10,6 +10,7 @@ import { AnswerController } from '../../presentation/controllers/qna/AnswerContr
 import { SavedController } from '../../presentation/controllers/qna/SavedController';
 import { UserController } from '../../presentation/controllers/user/UserController';
 import { SessionController } from '../../presentation/controllers/session/SessionController';
+import { MentorController } from '../../presentation/controllers/mentor/MentorController';
 
 ContainerSetup.registerAll();
 
@@ -30,6 +31,8 @@ export const savedController = container.resolve(SavedController);
 export const userController = container.resolve(UserController);
 
 export const sessionController = container.resolve(SessionController);
+
+export const mentorController = container.resolve(MentorController);
 
 
 

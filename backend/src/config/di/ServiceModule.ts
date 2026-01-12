@@ -23,6 +23,8 @@ import { IRRuleSlotService } from '../../application/ports/slot/IRRuleSlotServic
 import { RRuleSlotService } from '../../infrastructure/adapters/session/RRuleSlotService';
 import { ISlotConflictService } from '../../application/ports/slot/ISlotConflictService';
 import { SlotConflictService } from '../../infrastructure/adapters/session/SlotConflictService';
+import { IWalletService } from '../../application/ports/wallet/IWalletService';
+import { WalletService } from '../../infrastructure/adapters/wallet/WalletService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -72,6 +74,10 @@ export class ServiceModule {
 
     container.register<ISlotConflictService>('ISlotConflictService',{
       useClass: SlotConflictService
+    });
+
+    container.register<IWalletService>('IWalletService', {
+      useClass : WalletService,
     })
   }
 }
