@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import { type IPaymentService } from '../../../application/ports/payment/IPaymentService';
 import { NextFunction, Request, Response } from 'express';
-import { WebhookEvent } from '../../../domain/types/WebhookEvent';
 import { type IHandleStripeWebhookUseCase } from '../../../application/useCase/interface/payment/IHandleStripeWebhookUseCase';
+import { signatureSchema } from '../../validation/paymentValidation';
 
 @injectable()
 export class WebhookController {
@@ -15,19 +15,20 @@ export class WebhookController {
         try {
             const signature = req.headers['stripe-signature'];
 
-            if (!signature || typeof signature !== 'string') {
-                return res.status(400).json({ message: 'Missing stripe-signature header' });
+            const result = signatureSchema.safeParse(signature);
+            if (!result.success) {
+                return res.status(400).json({ message: result.error.message });
             }
 
             const event = this._paymentService.verifyWebhookSignature(
                 req.body,
-                signature
+                result.data
             );
 
             await this._handleStripeWebhook.execute(event)
             return res.status(200).json({ received: true });
         } catch (error) {
-            return res.status(400).json({ message: 'Webhook Error' });
+            next(error);
         }
 
     }
