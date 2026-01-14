@@ -23,8 +23,8 @@ export class SlotConflictService implements ISlotConflictService {
     const slotStart = this.toMinutes(slot.startTime);
     const slotEnd = this.toMinutes(slot.endTime);
 
-    const sessionStart = this.toMinutes(session.startTime);
-    const sessionEnd = this.toMinutes(session.endTime);
+    const sessionStart = this.toMinutes(session.startTime.toISOString());
+    const sessionEnd = this.toMinutes(session.endTime.toISOString());
 
     return slotStart < sessionEnd && slotEnd > sessionStart;
   }

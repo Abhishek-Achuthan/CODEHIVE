@@ -11,6 +11,7 @@ import { SavedController } from '../../presentation/controllers/qna/SavedControl
 import { UserController } from '../../presentation/controllers/user/UserController';
 import { SessionController } from '../../presentation/controllers/session/SessionController';
 import { MentorController } from '../../presentation/controllers/mentor/MentorController';
+import { WebhookController } from '../../presentation/controllers/webhooks/WebhookController';
 
 ContainerSetup.registerAll();
 
@@ -33,6 +34,8 @@ export const userController = container.resolve(UserController);
 export const sessionController = container.resolve(SessionController);
 
 export const mentorController = container.resolve(MentorController);
+
+export const webhookController = container.resolve(WebhookController)
 
 
 

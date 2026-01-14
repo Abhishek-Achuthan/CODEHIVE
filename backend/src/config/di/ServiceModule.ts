@@ -25,6 +25,8 @@ import { ISlotConflictService } from '../../application/ports/slot/ISlotConflict
 import { SlotConflictService } from '../../infrastructure/adapters/session/SlotConflictService';
 import { IWalletService } from '../../application/ports/wallet/IWalletService';
 import { WalletService } from '../../infrastructure/adapters/wallet/WalletService';
+import { IPaymentService } from '../../application/ports/payment/IPaymentService';
+import { PaymentService } from '../../infrastructure/adapters/payment/PaymentService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -56,7 +58,7 @@ export class ServiceModule {
       useClass: TokenBlacklistService,
     });
 
-    container.register<IGoogleAuthService>('IGoogleAuthService' , {
+    container.register<IGoogleAuthService>('IGoogleAuthService', {
       useClass: GoogleAuthService,
     })
 
@@ -65,19 +67,23 @@ export class ServiceModule {
     });
 
     container.register<IAIService>('IAIService', {
-      useClass : AIService
+      useClass: AIService
     })
 
-    container.register<IRRuleSlotService>('IRRuleSlotService',{
+    container.register<IRRuleSlotService>('IRRuleSlotService', {
       useClass: RRuleSlotService
     });
 
-    container.register<ISlotConflictService>('ISlotConflictService',{
+    container.register<ISlotConflictService>('ISlotConflictService', {
       useClass: SlotConflictService
     });
 
     container.register<IWalletService>('IWalletService', {
-      useClass : WalletService,
+      useClass: WalletService,
     })
+
+    container.register<IPaymentService>('IPaymentService', {
+      useClass: PaymentService,
+    });
   }
 }

@@ -107,7 +107,8 @@ import { IGetAvailableSlotsUseCase } from '../../application/useCase/interface/s
 import { GetAvailableSlotsUseCase } from '../../application/useCase/session/GetAvailableSlotsUseCase';
 import { IBookSessionUseCase } from '../../application/useCase/interface/session/IBookSessionUseCase';
 import { BookSessionUseCase } from '../../application/useCase/session/BookSessionUseCase';
-
+import { IHandleStripeWebhookUseCase } from '../../application/useCase/interface/payment/IHandleStripeWebhookUseCase';
+import { HandleStripeWebhookUseCase } from '../../application/useCase/payment/HandleStripeWebhookUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -346,6 +347,12 @@ export class UseCaseModule {
 
     container.register<IBookSessionUseCase>('IBookSessionUseCase', {
       useClass: BookSessionUseCase
+    });
+
+    //---------------------------------Payment---------------------------------------//
+
+    container.register<IHandleStripeWebhookUseCase>('IHandleStripeWebhookUseCase', {
+      useClass: HandleStripeWebhookUseCase,
     });
 
   }

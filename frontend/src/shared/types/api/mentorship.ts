@@ -8,7 +8,7 @@ export interface CreateMentorAvailabilityRequest {
     startTime: string;
     endTime: string;
     slotDurationMinutes: number;
-    bufferMinutes: number;
+    bufferMinutes?: number;
 }
 
 export interface MentorAvailabilityResponse {
@@ -41,6 +41,8 @@ export interface SessionResponse {
     endTime: string;
     status: 'upcoming' | 'completed' | 'cancelled';
     topic: string;
+    amountPaid: number;
+    refunded: boolean;
     createdAt: string;
     updatedAt: string;
 }

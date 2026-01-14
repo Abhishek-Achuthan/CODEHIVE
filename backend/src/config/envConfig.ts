@@ -16,8 +16,10 @@ export const env = {
   refreshTokenExp: process.env.REFRESH_TOKEN_EXPIRY || '7d',
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  githubClientId:process.env.GITHUB_CLIENT_ID,
-  githubClientSecret:process.env.GITHUB_CLIENT_SECRET,
-  aiApiKey:process.env.GEMINI_API_KEY,
-  aiModel:process.env.GEMINI_MODEL||'gemini-2.5-flash'
+  githubClientId: process.env.GITHUB_CLIENT_ID,
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
+  aiApiKey: process.env.GEMINI_API_KEY,
+  aiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  stripeSKY: process.env.STRIPE_SECRET_KEY,
+  stripeWebhookSKY: process.env.STRIPE_WEBHOOK_SECRET_KEY,
 };

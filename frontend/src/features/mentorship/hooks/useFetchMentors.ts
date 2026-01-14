@@ -37,7 +37,6 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
           ...params,
           search: debouncedSearch,
         });
-        console.log(response)
 
         if (response.items) {
           const mappedMentors = response.items.map(mapMentorListItemToView);

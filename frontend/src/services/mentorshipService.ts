@@ -52,7 +52,6 @@ export class MentorshipService {
     static async getBookedSessions(): Promise<BookedSessionResponse[]> {
         try {
             const response = await MentorshipApi.getBookedSessions();
-            console.log(response)
             return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
         } catch (error) {
             throw this.handleError(error);
