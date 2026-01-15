@@ -1,16 +1,13 @@
 import { AxiosError } from 'axios';
-import * as MentorshipApi from '../api/endpoints/mentorshipAPI';
+import * as MentorshipApi from '../api/endpoints/mentorAPI';
 import { BaseError } from '../shared/errors/BaseError';
 import type {
     CreateMentorAvailabilityRequest,
     MentorAvailabilityResponse,
-    BookSessionRequest,
-    SessionResponse,
-    BookedSessionResponse,
     MentorListingParams,
     PaginatedMentorListResponse,
     AvailableSlotResponse
-} from '../shared/types/api/mentorship';
+} from '../shared/types/api/mentor';
 
 export class MentorshipService {
     static async setAvailability(data: Omit<CreateMentorAvailabilityRequest, 'mentorId'>): Promise<MentorAvailabilityResponse> {
@@ -35,24 +32,6 @@ export class MentorshipService {
         try {
             const response = await MentorshipApi.listMentors(params);
             return response.data;
-        } catch (error) {
-            throw this.handleError(error);
-        }
-    }
-
-    static async bookSession(data: BookSessionRequest): Promise<SessionResponse> {
-        try {
-            const response = await MentorshipApi.bookSession(data);
-            return response.data as SessionResponse;
-        } catch (error) {
-            throw this.handleError(error);
-        }
-    }
-
-    static async getBookedSessions(): Promise<BookedSessionResponse[]> {
-        try {
-            const response = await MentorshipApi.getBookedSessions();
-            return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
         } catch (error) {
             throw this.handleError(error);
         }

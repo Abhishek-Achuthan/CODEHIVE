@@ -19,9 +19,9 @@ import MyQuestionsPage from "../features/qna/page/MyQuestionsPage";
 import SavedQuestionsPage from "../features/qna/page/SavedQuestionsPage";
 import AiAssistPage from "../features/qna/page/AiAssistPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
-import MentorListingPage from "../features/mentorship/pages/MentorListingPage";
-import MentorAvailabilityPage from "../features/mentorship/pages/MentorAvailabilityPage";
-import BookingPage from "../features/mentorship/pages/BookingPage";
+import MentorListingPage from "../features/session/pages/MentorListingPage";
+import MentorAvailabilityPage from "../features/session/pages/MentorAvailabilityPage";
+import BookingPage from "../features/session/pages/BookingPage";
 
 export default function AppRoutes() {
   return (

@@ -1,4 +1,4 @@
-import type { MentorListItemAPI } from "../types/api/mentorship";
+import type { MentorListItemAPI } from "../types/api/mentor";
 import type { MentorListItemView } from "../types/view/MentorListItemView";
 
 export function mapMentorListItemToView(

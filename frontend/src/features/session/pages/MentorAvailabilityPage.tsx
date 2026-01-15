@@ -1,13 +1,14 @@
 import React from 'react';
 import { AvailabilityForm } from '../components/AvailabilityForm';
-import { MentorshipService } from '../../../services/mentorshipService';
+import { MentorshipService } from '../../../services/mentorService';
 import toast from 'react-hot-toast';
 import { BaseError } from '../../../shared/errors/BaseError';
 import type { AvailabilityFormData } from '../types';
 
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
-import type { BookedSessionResponse } from "../../../shared/types/api/mentorship";
+import type { BookedSessionResponse } from "../../../shared/types/api/session";
+import { SessionService } from '../../../services/sessionService';
 
 
 const MentorAvailabilityPage: React.FC = () => {
@@ -20,7 +21,7 @@ const MentorAvailabilityPage: React.FC = () => {
         async function load() {
             try {
                 setSessionsLoading(true);
-                const data = await MentorshipService.getBookedSessions();
+                const data = await SessionService.getBookedSessions();
                 if (mounted) setBookedSessions(data);
             } catch (error) {
                 if (error instanceof BaseError) toast.error(error.message);
@@ -86,7 +87,7 @@ const MentorAvailabilityPage: React.FC = () => {
                                     onClick={async () => {
                                         try {
                                             setSessionsLoading(true);
-                                            const data = await MentorshipService.getBookedSessions();
+                                            const data = await SessionService.getBookedSessions();
                                             setBookedSessions(data);
                                         } catch (error) {
                                             if (error instanceof BaseError) toast.error(error.message);

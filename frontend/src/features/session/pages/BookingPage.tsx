@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { MentorshipService } from '../../../services/mentorshipService';
-import type { AvailableSlotResponse } from '../../../shared/types/api/mentorship';
+import { MentorshipService } from '../../../services/mentorService';
+import type { AvailableSlotResponse } from '../../../shared/types/api/mentor';
 import { Loader2, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { BaseError } from '../../../shared/errors/BaseError';
 
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
+import { SessionService } from '../../../services/sessionService';
 
 const BookingPage: React.FC = () => {
     const { mentorId } = useParams<{ mentorId: string }>();
@@ -48,7 +49,7 @@ const BookingPage: React.FC = () => {
 
         setIsBooking(true);
         try {
-            await MentorshipService.bookSession({
+            await SessionService.bookSession({
                 mentorId,
                 date: selectedDate,
                 startTime: selectedSlot.startTime,

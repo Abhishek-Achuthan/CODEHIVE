@@ -1,4 +1,4 @@
-import type { MentorListingParams } from "../shared/types/api/mentorship";
+import type { MentorListingParams } from "../shared/types/api/mentor";
 import type { AnswerListParams, QuestionListParams } from "../shared/types/api/qna";
 
 export const API_ROUTES = {
@@ -223,7 +223,7 @@ export const API_ROUTES = {
     VOTE_ANSWER: (answerId: string) => `/qna/answers/${answerId}/vote`,
   },
 
-  MENTORSHIP: {
+  MENTOR: {
     SET_AVAILABILITY: "/mentors/availability",
     GET_AVAILABILITY: (mentorId: string) => `/mentors/${mentorId}/available`,
     LIST_MENTORS: (params?: MentorListingParams) => {
@@ -234,6 +234,8 @@ export const API_ROUTES = {
       const query = qp.toString();
       return query ? `/mentors?${query}` : `/mentors`;
     },
+  },
+  SESSION: {
     BOOK_SESSION: "/sessions",
     GET_BOOKED_SESSIONS: "/sessions",
   }

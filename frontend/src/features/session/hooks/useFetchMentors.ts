@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { MentorshipService } from "../../../services/mentorshipService";
+import { MentorshipService } from "../../../services/mentorService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import { useDebounce } from "../../admin/hooks/useDebounce";
-import { mapMentorListItemToView } from "../../../shared/mappers/mentorship.mapper";
+import { mapMentorListItemToView } from "../../../shared/mappers/mentor.mapper";
 import type { MentorListItemView } from "../../../shared/types/view/MentorListItemView";
 
 export interface MentorListingParams {
