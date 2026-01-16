@@ -54,10 +54,10 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
     const isRefundEligible = startTimeMs - now >= twentyFourHoursMs;
 
     if (isRefundEligible) {
-      const wallet = await this._walletRepository.findByUserId(userId);
+      let wallet = await this._walletRepository.findByUserId(userId);
 
       if (!wallet) {
-        throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
+        wallet = await this._walletRepository.createWallet(userId);
       }
 
       const transaction: Credit = {
