@@ -113,6 +113,8 @@ import { IHandleStripeWebhookUseCase } from '../../application/useCase/interface
 import { HandleStripeWebhookUseCase } from '../../application/useCase/payment/HandleStripeWebhookUseCase';
 import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/IGetMyWalletUseCase';
 import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
+import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
+import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -355,6 +357,10 @@ export class UseCaseModule {
 
     container.register<IBookSessionWithWalletUseCase>('IBookSessionWithWalletUseCase', {
       useClass: BookSessionWithWalletUseCase
+    });
+
+    container.register<ICancelSessionUseCase>('ICancelSessionUseCase', {
+      useClass: CancelSessionUseCase
     });
 
     //---------------------------------Payment---------------------------------------//

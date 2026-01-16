@@ -239,6 +239,7 @@ export const API_ROUTES = {
     BOOK_SESSION_STRIPE: "/sessions/stripe",
     BOOK_SESSION_WALLET: "/sessions/wallet",
     GET_BOOKED_SESSIONS: "/sessions",
+    CANCEL_SESSION: (sessionId:string) => `/sessions/${sessionId}`
   },
 
   WALLET: {

@@ -39,3 +39,4 @@ export interface BookedSessionResponse extends SessionResponse {
     mentor: UserSummary;
     user: UserSummary;
 }
+

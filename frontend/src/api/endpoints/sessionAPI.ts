@@ -10,3 +10,9 @@ export const bookSessionWithWallet = (data: BookSessionRequest) =>
 
 export const getBookedSessions = () =>
     apiClient.get(API_ROUTES.SESSION.GET_BOOKED_SESSIONS);
+
+export const cancelSession = (sessionId:string) => 
+    apiClient.delete(API_ROUTES.SESSION.CANCEL_SESSION(sessionId));
+
+
+

@@ -10,6 +10,7 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import { SessionCard } from "../components/SessionCard";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
+import { useCancelSession } from "../hooks/useCancelSession";
 
 export default function MySessionsPage() {
     const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
@@ -18,6 +19,8 @@ export default function MySessionsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
+
+    const { cancelSession, loading: cancelLoading } = useCancelSession();
 
     useEffect(() => {
         fetchSessions();
@@ -62,6 +65,15 @@ export default function MySessionsPage() {
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
         setCurrentPage(1);
+    };
+
+    const handleCancelSession = async (sessionId: string) => {
+        try {
+            await cancelSession(sessionId);
+            await fetchSessions();
+        } catch {
+            // Error already handled in hook
+        }
     };
 
     return (
@@ -118,12 +130,11 @@ export default function MySessionsPage() {
                                     <SessionCard
                                         key={session.id}
                                         session={session}
-                                        onCancel={() => {
-                                            toast.error("Cancel not implemented yet");
-                                        }}
+                                        onCancel={() => handleCancelSession(session.id)}
                                         onJoinRoom={() => {
                                             toast.success("Joining room...");
                                         }}
+                                        isCancelling={cancelLoading}
                                     />
                                 ))}
                             </div>

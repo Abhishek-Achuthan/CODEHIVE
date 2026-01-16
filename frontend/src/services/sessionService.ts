@@ -38,6 +38,15 @@ export class SessionService {
         }
     }
 
+    static async cancelSession(sessionId : string): Promise<boolean>{
+        try {
+            const response = await SessionAPI.cancelSession(sessionId);
+            return response as unknown as boolean 
+        } catch (error) {
+            throw this.handleError(error);
+       }
+   }
+
     private static handleError(error: unknown): never {
             if (error instanceof AxiosError) {
                 const msg = error.response?.data.message || 'Something went wrong';

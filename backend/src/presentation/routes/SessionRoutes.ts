@@ -32,6 +32,12 @@ export class SessionRoutes {
             this._authMiddleware.check,
             this._sessionController.handleGetBookedSessions.bind(this._sessionController)
         );
+        
+        this._router.delete(
+            '/:id',
+            this._authMiddleware.check,
+            this._sessionController.handleCancelSession.bind(this._sessionController)
+        )
 
     }
 
