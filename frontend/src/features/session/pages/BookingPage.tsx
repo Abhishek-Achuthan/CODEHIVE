@@ -9,6 +9,68 @@ import { BaseError } from '../../../shared/errors/BaseError';
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import { SessionService } from '../../../services/sessionService';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string);
+
+type PaymentMethod = 'WALLET' | 'STRIPE';
+
+const StripePaymentModal: React.FC<{
+    clientSecret: string;
+    onClose: () => void;
+    onPaid: () => void;
+}> = ({ clientSecret, onClose, onPaid }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [isPaying, setIsPaying] = useState(false);
+
+    const handlePay = async () => {
+        if (!stripe || !elements) return;
+
+        setIsPaying(true);
+        try {
+            const result = await stripe.confirmPayment({
+                elements,
+                redirect: 'if_required',
+            });
+
+            if (result.error) {
+                toast.error(result.error.message || 'Payment failed');
+                return;
+            }
+
+            onPaid();
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+            <div className="w-full max-w-lg rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Complete payment</h3>
+                    <button onClick={onClose} className="text-zinc-400 hover:text-white">Close</button>
+                </div>
+                <div className="rounded-lg bg-zinc-800 p-4 border border-zinc-700">
+                    <PaymentElement />
+                </div>
+
+                <button
+                    onClick={handlePay}
+                    disabled={!stripe || !elements || isPaying}
+                    className={`mt-6 w-full py-3 rounded-lg font-semibold flex items-center justify-center transition-all ${!stripe || !elements || isPaying
+                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                        : 'bg-linear-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow-lg shadow-indigo-500/20'
+                        }`}
+                >
+                    {isPaying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay now'}
+                </button>
+            </div>
+        </div>
+    );
+};
 
 const BookingPage: React.FC = () => {
     const { mentorId } = useParams<{ mentorId: string }>();
@@ -22,6 +84,8 @@ const BookingPage: React.FC = () => {
     const [topic, setTopic] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isBooking, setIsBooking] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('STRIPE');
+    const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
 
     useEffect(() => {
         if (mentorId && selectedDate) {
@@ -49,15 +113,33 @@ const BookingPage: React.FC = () => {
 
         setIsBooking(true);
         try {
-            await SessionService.bookSession({
+            if (paymentMethod === 'WALLET') {
+                await SessionService.bookSessionWithWallet({
+                    mentorId,
+                    date: selectedDate,
+                    startTime: selectedSlot.startTime,
+                    endTime: selectedSlot.endTime,
+                    topic
+                });
+                toast.success("Session booked with wallet successfully!");
+                navigate('/qna');
+                return;
+            }
+
+            if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+                toast.error('Missing VITE_STRIPE_PUBLISHABLE_KEY in frontend env');
+                return;
+            }
+
+            const result = await SessionService.bookSessionWithStripe({
                 mentorId,
                 date: selectedDate,
                 startTime: selectedSlot.startTime,
                 endTime: selectedSlot.endTime,
                 topic
             });
-            toast.success("Session booked successfully!");
-            navigate('/qna');
+
+            setStripeClientSecret(result.clientSecret);
         } catch (error) {
             if (error instanceof BaseError)
                 toast.error(error.message || "Failed to book session");
@@ -126,11 +208,42 @@ const BookingPage: React.FC = () => {
                                             : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
                                             }`}
                                     >
-                                        {slot.startTime} - {slot.endTime}
+                                        <div>{slot.startTime} - {slot.endTime}</div>
+                                        <div className="text-xs mt-1 opacity-80">₹{slot.price}</div>
                                     </button>
                                 ))}
                             </div>
                         )}
+
+                        <div className="mb-4 rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+                            <div className="text-sm text-zinc-300 mb-2">Payment method</div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => setPaymentMethod('STRIPE')}
+                                    className={`py-2 rounded-lg text-sm font-medium transition-all ${paymentMethod === 'STRIPE'
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                        : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                                        }`}
+                                >
+                                    Stripe
+                                </button>
+                                <button
+                                    onClick={() => setPaymentMethod('WALLET')}
+                                    className={`py-2 rounded-lg text-sm font-medium transition-all ${paymentMethod === 'WALLET'
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                        : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                                        }`}
+                                >
+                                    Wallet
+                                </button>
+                            </div>
+
+                            {selectedSlot ? (
+                                <div className="mt-3 text-sm text-zinc-400">
+                                    Selected slot price: <span className="text-white font-semibold">₹{selectedSlot.price}</span>
+                                </div>
+                            ) : null}
+                        </div>
 
                         <button
                             onClick={handleBook}
@@ -140,7 +253,7 @@ const BookingPage: React.FC = () => {
                                 : 'bg-linear-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow-lg shadow-indigo-500/20'
                                 }`}
                         >
-                            {isBooking ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm Booking'}
+                            {isBooking ? <Loader2 className="w-5 h-5 animate-spin" /> : paymentMethod === 'WALLET' ? 'Pay with Wallet' : 'Pay with Stripe'}
                         </button>
                     </div>
                 </div>
@@ -148,6 +261,20 @@ const BookingPage: React.FC = () => {
             </main>
 
             <Footer />
+
+            {stripeClientSecret ? (
+                <Elements stripe={stripePromise} options={{ clientSecret: stripeClientSecret }}>
+                    <StripePaymentModal
+                        clientSecret={stripeClientSecret}
+                        onClose={() => setStripeClientSecret(null)}
+                        onPaid={() => {
+                            setStripeClientSecret(null);
+                            toast.success('Payment successful!');
+                            navigate('/qna');
+                        }}
+                    />
+                </Elements>
+            ) : null}
         </div>
     );
 };

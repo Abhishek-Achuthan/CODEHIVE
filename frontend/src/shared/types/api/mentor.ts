@@ -9,6 +9,7 @@ export interface CreateMentorAvailabilityRequest {
     endTime: string;
     slotDurationMinutes: number;
     bufferMinutes?: number;
+    slotPrice:number;
 }
 
 export interface MentorAvailabilityResponse {
@@ -19,6 +20,7 @@ export interface MentorAvailabilityResponse {
     endTime: string;
     slotDurationMinutes: number;
     bufferMinutes: number;
+    amount:number;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
@@ -34,6 +36,7 @@ export interface MentorListingParams {
 export interface AvailableSlotResponse {
     startTime: string;
     endTime: string;
+    price: number;
 }
 
 

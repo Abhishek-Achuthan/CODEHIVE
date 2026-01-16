@@ -1,4 +1,9 @@
-import type { BookedSessionResponse, BookSessionRequest, SessionResponse } from "../shared/types/api/session";
+import type {
+    BookedSessionResponse,
+    BookSessionRequest,
+    SessionResponse,
+    StripeBookSessionResponse
+} from "../shared/types/api/session";
 import * as SessionAPI from '../api/endpoints/sessionAPI'
 import { AxiosError } from "axios";
 import { BaseError } from "../shared/errors/BaseError";
@@ -6,11 +11,19 @@ import { BaseError } from "../shared/errors/BaseError";
 
 export class SessionService {
 
-
-        static async bookSession(data: BookSessionRequest): Promise<SessionResponse> {
+    static async bookSessionWithWallet(data: BookSessionRequest): Promise<SessionResponse> {
         try {
-            const response = await SessionAPI.bookSession(data);
+            const response = await SessionAPI.bookSessionWithWallet(data);
             return response.data as SessionResponse;
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async bookSessionWithStripe(data: BookSessionRequest): Promise<StripeBookSessionResponse> {
+        try {
+            const response = await SessionAPI.bookSessionWithStripe(data);
+            return response.data as StripeBookSessionResponse;
         } catch (error) {
             throw this.handleError(error);
         }

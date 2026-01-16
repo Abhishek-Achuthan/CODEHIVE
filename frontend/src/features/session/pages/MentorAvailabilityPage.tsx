@@ -59,7 +59,8 @@ const MentorAvailabilityPage: React.FC = () => {
                 startTime: data.startTime,
                 endTime: data.endTime,
                 slotDurationMinutes: Number(data.slotDurationMinutes),
-                bufferMinutes: Number(data.bufferMinutes)
+                bufferMinutes: Number(data.bufferMinutes),
+                slotPrice:data.slotPrice
             };
 
             await MentorshipService.setAvailability(payload);
@@ -74,7 +75,7 @@ const MentorAvailabilityPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-black text-white">
-            <Header />
+            <Header /> 
 
             <main className="px-4 py-10">
                 <div className="mx-auto max-w-6xl">

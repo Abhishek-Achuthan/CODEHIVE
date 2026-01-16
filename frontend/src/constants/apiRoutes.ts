@@ -236,7 +236,12 @@ export const API_ROUTES = {
     },
   },
   SESSION: {
-    BOOK_SESSION: "/sessions",
+    BOOK_SESSION_STRIPE: "/sessions/stripe",
+    BOOK_SESSION_WALLET: "/sessions/wallet",
     GET_BOOKED_SESSIONS: "/sessions",
+  },
+
+  WALLET: {
+    GET_MY_WALLET: "/wallet/me",
   }
 };

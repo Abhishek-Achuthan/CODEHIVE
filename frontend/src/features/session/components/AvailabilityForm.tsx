@@ -3,12 +3,13 @@ import { useForm } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 
 interface AvailabilityFormData {
-    startTime: string; 
-    endTime: string; 
+    startTime: string;
+    endTime: string;
     slotDurationMinutes: number;
     bufferMinutes: number;
     isRecurring: boolean;
     date?: string;
+    slotPrice: number;
 }
 
 interface AvailabilityFormProps {
@@ -21,7 +22,8 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
         defaultValues: {
             slotDurationMinutes: 30,
             bufferMinutes: 0,
-            isRecurring: false
+            isRecurring: false,
+            slotPrice: 0
         }
     });
 
@@ -127,6 +129,20 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                             placeholder="e.g. 5"
                         />
                     </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-400">Session Price (₹)</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
+                            <input
+                                type="number"
+                                {...register('slotPrice', { required: 'Price is required', min: { value: 0, message: 'Price must be positive' } })}
+                                className="w-full rounded-lg border border-gray-700 bg-black pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all placeholder:text-gray-600"
+                                placeholder="e.g. 500"
+                            />
+                        </div>
+                        {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
+                    </div>
                 </div>
 
                 {/* Scheduling Type */}
@@ -136,9 +152,9 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         <label className="flex items-center space-x-3 cursor-pointer group">
                             <input
                                 type="radio"
-                                value="false" 
+                                value="false"
                                 {...register('isRecurring', {
-                                    setValueAs: (v) => v === 'true' 
+                                    setValueAs: (v) => v === 'true'
                                 })}
                                 className="hidden peer"
                                 defaultChecked
@@ -152,7 +168,7 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         <label className="flex items-center space-x-3 cursor-pointer group">
                             <input
                                 type="radio"
-                                value="true" 
+                                value="true"
                                 {...register('isRecurring', {
                                     setValueAs: (v) => v === 'true'
                                 })}

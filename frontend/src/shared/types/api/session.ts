@@ -12,13 +12,14 @@ export interface SessionResponse {
     startTime: string;
     endTime: string;
     status: 'upcoming' | 'completed' | 'cancelled';
+    paymentSource: 'STRIPE' | 'WALLET';
+    paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+    paymentReferenceId: string | null;
     topic: string;
-    amountPaid: number;
-    refunded: boolean;
+    amount: number;
     createdAt: string;
     updatedAt: string;
 }
-
 
 export interface BookSessionRequest {
     mentorId: string;
@@ -26,6 +27,12 @@ export interface BookSessionRequest {
     startTime: string;
     endTime: string;
     topic: string;
+}
+
+export interface StripeBookSessionResponse {
+    session: SessionResponse;
+    clientSecret: string;
+    paymentIntentId: string;
 }
 
 export interface BookedSessionResponse extends SessionResponse {

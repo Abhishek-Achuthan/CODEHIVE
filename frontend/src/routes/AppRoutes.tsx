@@ -57,7 +57,7 @@ export default function AppRoutes() {
           <Route path="/qna/ai-assist" element={<AiAssistPage />} />
 
           {/* Mentorship Routes */}
-          <Route path="/mentors" element={<MentorListingPage />} />
+          <Route path="/session" element={<MentorListingPage />} />
           <Route path="/mentors/availability" element={<MentorAvailabilityPage />} />
           <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
         </Route>
