@@ -1,6 +1,7 @@
 import ActivityCard from "../components/ActivityCard";
 import AboutSection from "../components/AboutSection";
 import ExperienceSection from "../components/ExperienceSection";
+import ExpertiseSection from "../components/ExpertiseSection";
 import LeftColumn from "../components/LeftColumn";
 import MainContent from "../components/MainContent";
 import MentorCard from "../components/MentorCard";
@@ -112,11 +113,11 @@ export default function ProfilePage() {
       if (!res.ok) {
         const message =
           json &&
-          typeof json === "object" &&
-          json !== null &&
-          "error" in json &&
-          (json as { error?: unknown }).error &&
-          typeof (json as { error?: { message?: unknown } }).error?.message === "string"
+            typeof json === "object" &&
+            json !== null &&
+            "error" in json &&
+            (json as { error?: unknown }).error &&
+            typeof (json as { error?: { message?: unknown } }).error?.message === "string"
             ? ((json as { error: { message: string } }).error.message as string)
             : "Failed to upload image";
 
@@ -125,10 +126,10 @@ export default function ProfilePage() {
 
       const secureUrl =
         json &&
-        typeof json === "object" &&
-        json !== null &&
-        "secure_url" in json &&
-        typeof (json as { secure_url?: unknown }).secure_url === "string"
+          typeof json === "object" &&
+          json !== null &&
+          "secure_url" in json &&
+          typeof (json as { secure_url?: unknown }).secure_url === "string"
           ? ((json as { secure_url: string }).secure_url as string)
           : "";
 
@@ -163,9 +164,9 @@ export default function ProfilePage() {
               user={profileUser}
               onSaveAvatar={handleAvatarUpload}
               onSaveProfileHeader={(values) => updateProfile(values)}
-              onClickMentor={() => {}}
-              onClickDashboard={() => {}}
-              onClickSessions={() => {}}
+              onClickMentor={() => { }}
+              onClickDashboard={() => { }}
+              onClickSessions={() => { }}
               onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
               onClickGitHub={() => openUrl(authUser?.githubUrl)}
               onClickWebsite={() => openUrl(authUser?.websiteUrl)}
@@ -197,6 +198,12 @@ export default function ProfilePage() {
                     initialSkills={authUser?.skills ?? []}
                     onSave={(skills) => updateProfile({ skills })}
                   />
+
+                  <ExpertiseSection
+                    initialPrimaryExpertise={authUser?.primaryExpertise}
+                    initialExperienceLevel={authUser?.experienceLevel}
+                    onSave={(data) => updateProfile(data)}
+                  />
                 </LeftColumn>
               }
               right={
@@ -215,7 +222,7 @@ export default function ProfilePage() {
                     checked={false}
                     disabled={false}
                     checklist={mentorChecklist}
-                    onToggle={() => {}}
+                    onToggle={() => { }}
                   />
                 </RightColumn>
               }

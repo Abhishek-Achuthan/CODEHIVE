@@ -76,6 +76,9 @@ const UpdateUserProfileSchema = z
     githubUrl: z.string().optional(),
     linkedInUrl: z.string().optional(),
     websiteUrl: z.string().optional(),
+    experienceLevel: z.string().optional(),
+    primaryExpertise: z.string().optional()
+    
   })
   .strict();
 
