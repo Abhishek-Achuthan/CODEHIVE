@@ -24,6 +24,8 @@ export class UserMapper {
       role: user.role,
       mentorAppliedAt: user.mentorAppliedAt,
       mentorStatus: user.mentorStatus,
+      primaryExpertise: user.primaryExpertise,
+      experienceLevel: user.experienceLevel,
       refreshToken: refreshToken,
       accessToken: accessToken,
     };
@@ -57,6 +59,8 @@ export class UserMapper {
       linkedInUrl: user.linkedInUrl,
       websiteUrl: user.websiteUrl,
       mentorStatus: user.mentorStatus,
+      primaryExpertise: user.primaryExpertise,
+      experienceLevel: user.experienceLevel,
     };
   }
 

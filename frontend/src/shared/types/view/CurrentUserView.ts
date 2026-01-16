@@ -23,4 +23,6 @@ export interface CurrentUserView {
   websiteUrl?: string;
   mentorStatus?: "none" | "pending" | "approved";
   mentorAppliedAt?: string;
+  primaryExpertise?: string;
+  experienceLevel?: string;
 }

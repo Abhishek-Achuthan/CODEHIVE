@@ -9,7 +9,7 @@ export interface CreateMentorAvailabilityRequest {
     endTime: string;
     slotDurationMinutes: number;
     bufferMinutes?: number;
-    slotPrice:number;
+    slotPrice: number;
 }
 
 export interface MentorAvailabilityResponse {
@@ -20,7 +20,7 @@ export interface MentorAvailabilityResponse {
     endTime: string;
     slotDurationMinutes: number;
     bufferMinutes: number;
-    amount:number;
+    amount: number;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
@@ -53,6 +53,8 @@ export interface MentorListItemAPI {
     linkedInUrl?: string;
     websiteUrl?: string;
     mentorStatus: "none" | "pending" | "approved";
+    primaryExpertise?: string;
+    experienceLevel?: string;
 }
 
 export type PaginatedMentorListResponse = PaginatedResponse<MentorListItemAPI>;

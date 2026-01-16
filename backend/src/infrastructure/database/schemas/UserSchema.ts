@@ -22,6 +22,8 @@ import { Experience } from '../../../domain/types/ExperienceType';
     experience:Experience[];
     role: UserRole;
     isBlocked: boolean;
+    primaryExpertise:string;
+    experienceLevel:string;
     createdAt:Date;
     updatedAt:Date;
   }
@@ -46,6 +48,8 @@ import { Experience } from '../../../domain/types/ExperienceType';
     experience:Experience[];
     role: UserRole;
     isBlocked: boolean;
+    primaryExpertise:string;
+    experienceLevel:string;
     createdAt:Date;
     updatedAt:Date;
   }
@@ -95,6 +99,8 @@ export const UserSchema = new Schema<UserDocument>(
       default: UserRole.USER,
     },
     isBlocked: { type: Boolean, default: false },
+    primaryExpertise: {type:String,required:false},
+    experienceLevel: {type:String,required:false}
   },
   { timestamps: true }
 );

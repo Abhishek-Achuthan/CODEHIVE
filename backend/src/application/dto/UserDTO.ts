@@ -30,6 +30,8 @@ interface IUserLoginResponseDTO {
   websiteUrl?: string | undefined;
   mentorStatus: 'none' | 'pending' | 'approved';
   mentorAppliedAt?: Date | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
 
   accessToken: string;
   refreshToken?: string | undefined;
@@ -56,6 +58,8 @@ interface UpdateUserProfileDTO {
   githubUrl?: string | undefined;
   linkedInUrl?: string | undefined;
   websiteUrl?: string | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
 }
 
 interface IUserProfileResponseDTO {
@@ -71,6 +75,8 @@ interface IUserProfileResponseDTO {
   linkedInUrl?: string | undefined;
   websiteUrl?: string | undefined;
   mentorStatus: 'none' | 'pending' | 'approved';
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
 }
 
 

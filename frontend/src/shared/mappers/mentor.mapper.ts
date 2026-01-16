@@ -16,5 +16,7 @@ export function mapMentorListItemToView(
         githubUrl: mentor.githubUrl,
         linkedInUrl: mentor.linkedInUrl,
         websiteUrl: mentor.websiteUrl,
+        primaryExpertise: mentor.primaryExpertise,
+        experienceLevel: mentor.experienceLevel,
     };
 }

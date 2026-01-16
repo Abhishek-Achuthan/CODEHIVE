@@ -11,6 +11,8 @@ export type UpdateMyProfileRequest = {
   githubUrl?: string;
   linkedInUrl?: string;
   websiteUrl?: string;
+  primaryExpertise?: string;
+  experienceLevel?: string;
 };
 
 export type UserProfileApi = {
@@ -26,4 +28,6 @@ export type UserProfileApi = {
   linkedInUrl?: string;
   websiteUrl?: string;
   mentorStatus: "none" | "pending" | "approved";
+  primaryExpertise?: string;
+  experienceLevel?: string;
 };

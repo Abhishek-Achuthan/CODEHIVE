@@ -26,8 +26,8 @@ export type ResetPasswordData = {
 };
 
 export type changePasswordData = {
-  previousPass : string,
-  newPass : string,
+  previousPass: string,
+  newPass: string,
 }
 
 // Response DTOs
@@ -58,6 +58,8 @@ export interface UserApi {
   websiteUrl?: string;
   mentorStatus?: "none" | "pending" | "approved";
   mentorAppliedAt?: string;
+  primaryExpertise?: string;
+  experienceLevel?: string;
   createdAt?: string;
   updatedAt?: string;
 }

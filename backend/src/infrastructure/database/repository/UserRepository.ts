@@ -75,6 +75,8 @@ export class UserRepository
       isBlocked,
       googleId,
       githubId,
+      experienceLevel,
+      primaryExpertise,
     } = data;
     const doc: Partial<UserDocument> = {};
     if (email !== undefined) doc.email = email;
@@ -95,6 +97,9 @@ export class UserRepository
     if (isBlocked !== undefined) doc.isBlocked = isBlocked;
     if (googleId !== undefined) doc.googleId = googleId;
     if (githubId !== undefined) doc.githubId = githubId;
+    if (experienceLevel !== undefined) doc.experienceLevel = experienceLevel;
+    if (primaryExpertise !== undefined) doc.primaryExpertise = primaryExpertise;
+
     return doc;
   }
 
@@ -121,6 +126,8 @@ export class UserRepository
         ? { mentorAppliedAt: doc.mentorAppliedAt }
         : {}),
       mentorStatus: doc.mentorStatus,
+      primaryExpertise : doc.primaryExpertise,
+      experienceLevel : doc.experienceLevel,
     };
   }
 
@@ -139,6 +146,8 @@ export class UserRepository
       skills: doc.skills,
       experience: doc.experience,
       mentorStatus: doc.mentorStatus,
+      experienceLevel: doc.experienceLevel,
+      primaryExpertise: doc.primaryExpertise,
       ...(doc.about !==undefined ? {about: doc.about } : {}), 
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
       ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),

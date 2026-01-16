@@ -12,4 +12,6 @@ export interface MentorListItemView {
     githubUrl?: string;
     linkedInUrl?: string;
     websiteUrl?: string;
+    primaryExpertise?: string;
+    experienceLevel?: string;
 }
