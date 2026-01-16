@@ -1,17 +1,59 @@
-import { injectable } from 'tsyringe';
-import { WebhookEvent } from '../../../domain/types/WebhookEvent';
-import { IHandleStripeWebhookUseCase } from '../interface/payment/IHandleStripeWebhookUseCase';
+import { inject, injectable } from 'tsyringe';
+import type { WebhookEvent } from '../../../domain/types/WebhookEvent';
+import type { IHandleStripeWebhookUseCase } from '../interface/payment/IHandleStripeWebhookUseCase';
+import type { IStripeWebhookEventRepository } from '../../../domain/interfaces/IStripeWebhookEventRepository';
+import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
+import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
 
 @injectable()
 export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
-    async execute(event: WebhookEvent): Promise<void> {
-        switch (event.type) {
-            case 'payment_intent.succeeded':
-                return;
-            case 'payment_intent.payment_failed':
-                return;
-            default:
-                return;
-        }
+  constructor(
+    @inject('IStripeWebhookEventRepository')
+    private readonly _stripeWebhookEventRepository: IStripeWebhookEventRepository,
+    @inject('ISessionRepository')
+    private readonly _sessionRepository: ISessionRepository
+  ) {}
+
+  async execute(event: WebhookEvent): Promise<void> {
+    const shouldProcess =
+      await this._stripeWebhookEventRepository.markProcessed(event.id);
+
+    if (!shouldProcess) {
+      return;
     }
+
+    const data = event.data as any;
+    const paymentIntentId: string | undefined = data?.object?.id;
+
+    if (!paymentIntentId) {
+      return;
+    }
+
+    switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const session = await this._sessionRepository.findByPaymentReference(
+          paymentIntentId
+        );
+        if (!session) return;
+
+        await this._sessionRepository.update(session.id, {
+          paymentStatus: SessionPaymentStatus.PAID,
+        });
+        return;
+      }
+      case 'payment_intent.payment_failed': {
+        const session = await this._sessionRepository.findByPaymentReference(
+          paymentIntentId
+        );
+        if (!session) return;
+
+        await this._sessionRepository.update(session.id, {
+          paymentStatus: SessionPaymentStatus.FAILED,
+        });
+        return;
+      }
+      default:
+        return;
+    }
+  }
 }

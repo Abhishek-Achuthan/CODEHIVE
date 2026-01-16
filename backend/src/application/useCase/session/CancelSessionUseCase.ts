@@ -9,6 +9,7 @@ import { Credit } from '../../../domain/types/WalletTransactionInput';
 import { WalletTransactionReason } from '../../../domain/types/WalletTransactionReason';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
+import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
 
 @injectable()
 export class CancelSessionUseCase implements ICancelSessionUseCase {
@@ -25,49 +26,61 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
   async execute(sessionId: string,userId:string): Promise<boolean> {
     const session = await this._sessionRepository.find(sessionId);
 
-    if (!session || !session.startTime)
+    if (!session || !session.startTime) {
       throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
+    }
 
-    if(session.userId !== userId) 
+    if (session.userId !== userId) {
       throw new BadRequestError(ERROR_MESSAGES.SESSION.NOT_ALLOWED_TO_CANCEL);
+    }
 
-    const now: number = Date.now();
-    const twentyFourHoursInMs: number = 24 * 60 * 60 * 1000;
+    if (session.paymentStatus !== SessionPaymentStatus.PAID) {
+      throw new BadRequestError('Only paid sessions can be cancelled');
+    }
 
+    if (session.status === SessionStatus.CANCELLED) {
+      throw new BadRequestError(ERROR_MESSAGES.SESSION.ALREADY_CANCELLED);
+    }
+
+    const now = Date.now();
     const startTimeMs = session.startTime.getTime();
 
     if (startTimeMs <= now) {
       throw new BadRequestError(ERROR_MESSAGES.SESSION.ALREADY_STARTED);
     }
 
-    const isRefundable = startTimeMs - now > twentyFourHoursInMs;
+    const twentyFourHoursMs = 24 * 60 * 60 * 1000;
 
-    if(session.status === SessionStatus.CANCELLED || session.refunded ===true) 
-      throw new BadRequestError(ERROR_MESSAGES.SESSION.ALREADY_CANCELLED); 
+    const isRefundEligible = startTimeMs - now >= twentyFourHoursMs;
 
-
-    let refunded = false;
-
-    if(isRefundable) {
-
+    if (isRefundEligible) {
       const wallet = await this._walletRepository.findByUserId(userId);
 
-      if(!wallet) throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
-
-
-      const transaction : Credit = {
-        walletId : wallet.id,
-        amount : session.amountPaid,
-        reason : WalletTransactionReason.SESSION_REFUND,
-        referenceId:sessionId
+      if (!wallet) {
+        throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
       }
+
+      const transaction: Credit = {
+        walletId: wallet.id,
+        amount: session.amount,
+        referenceId: session.id,
+        reason: WalletTransactionReason.SESSION_REFUND,
+      };
 
       await this._walletService.credit(transaction);
 
-      refunded = true;
-    } 
+      await this._sessionRepository.update(sessionId, {
+        paymentStatus: SessionPaymentStatus.REFUNDED,
+        status: SessionStatus.CANCELLED,
+      });
 
-    await this._sessionRepository.update(sessionId,{status:SessionStatus.CANCELLED,refunded});
+      return true;
+    }
+
+    await this._sessionRepository.update(sessionId, {
+      status: SessionStatus.CANCELLED,
+    });
+
     return true;
   }
 }

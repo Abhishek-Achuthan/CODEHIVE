@@ -12,6 +12,7 @@ import { UserController } from '../../presentation/controllers/user/UserControll
 import { SessionController } from '../../presentation/controllers/session/SessionController';
 import { MentorController } from '../../presentation/controllers/mentor/MentorController';
 import { WebhookController } from '../../presentation/controllers/webhooks/WebhookController';
+import { WalletController } from '../../presentation/controllers/wallet/WalletController';
 
 ContainerSetup.registerAll();
 
@@ -36,6 +37,8 @@ export const sessionController = container.resolve(SessionController);
 export const mentorController = container.resolve(MentorController);
 
 export const webhookController = container.resolve(WebhookController)
+
+export const walletController = container.resolve(WalletController);
 
 
 

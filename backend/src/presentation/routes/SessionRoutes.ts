@@ -16,9 +16,15 @@ export class SessionRoutes {
 
     private _setRoutes() {
         this._router.post(
-            '/',
+            '/stripe',
             this._authMiddleware.check,
-            this._sessionController.handleBookSession.bind(this._sessionController)
+            this._sessionController.handleBookSessionWithStripe.bind(this._sessionController)
+        );
+
+        this._router.post(
+            '/wallet',
+            this._authMiddleware.check,
+            this._sessionController.handleBookSessionWithWallet.bind(this._sessionController)
         );
 
         this._router.get(
@@ -26,6 +32,7 @@ export class SessionRoutes {
             this._authMiddleware.check,
             this._sessionController.handleGetBookedSessions.bind(this._sessionController)
         );
+
     }
 
     public getRoutes(): Router {

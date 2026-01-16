@@ -1,3 +1,5 @@
+import { PaymentSource } from '../../domain/types/PaymentSource';
+import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
 
 export interface CreateMentorAvailabilityDTO {
@@ -32,11 +34,12 @@ export interface ISessionResponseDTO {
   startTime: string;
   endTime: string;
   status: SessionStatus;
+  paymentSource: PaymentSource;
+  paymentStatus: SessionPaymentStatus;
   topic:string;
   createdAt: string;
   updatedAt: string;
-  amountPaid: number;
-  refunded:boolean
+  amount: number;
 }
 
 export interface IUserSummaryDTO {
@@ -56,8 +59,9 @@ export interface IBookedSessionResponseDTO {
   endTime: string;
   status: SessionStatus;
   topic: string;
-  amountPaid : number,
-  refunded : boolean;
+  paymentSource: PaymentSource;
+  paymentStatus: SessionPaymentStatus;
+  amount : number,
   createdAt: string;
   updatedAt: string;
 }
@@ -65,5 +69,6 @@ export interface IBookedSessionResponseDTO {
 export interface AvailableSlotDTO {
   startTime: string; 
   endTime: string;   
+  price: number;
 }
 

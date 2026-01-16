@@ -3,7 +3,7 @@ import { SessionWithParticipants } from '../types/SessionWithParticipants';
 import { IGenericRepository } from './IGenericRepository';
 
 export interface ISessionRepository extends IGenericRepository<SessionEntity> {
-    create(data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt' | 'refunded'>): Promise<SessionEntity>;
+    create(data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt' >): Promise<SessionEntity>;
 
     findByMentorAndDate(
         mentorId: string,
@@ -12,4 +12,5 @@ export interface ISessionRepository extends IGenericRepository<SessionEntity> {
 
     findByMentor(mentorId: string): Promise<SessionWithParticipants[]>;
     findByUser(userId: string): Promise<SessionWithParticipants[]>;
+    findByPaymentReference(referenceId:string): Promise<SessionEntity | null>
 }

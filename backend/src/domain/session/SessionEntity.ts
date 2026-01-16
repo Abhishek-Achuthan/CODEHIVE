@@ -1,3 +1,5 @@
+import { PaymentSource } from '../types/PaymentSource';
+import { SessionPaymentStatus } from '../types/SessionPaymentStatus';
 import { SessionStatus } from '../types/SessionStatus';
 
 export interface SessionEntity {
@@ -9,8 +11,10 @@ export interface SessionEntity {
     endTime:Date;
     status: SessionStatus;
     topic:string;
-    amountPaid:number;
-    refunded : boolean;
+    paymentStatus:SessionPaymentStatus;
+    paymentSource:PaymentSource;
+    paymentReferenceId:string | null;
+    amount:number;
     createdAt:Date;
     updatedAt:Date;
 }

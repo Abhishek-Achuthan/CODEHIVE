@@ -14,6 +14,7 @@ import { UserRoute } from './presentation/routes/UserRoutes';
 import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
+import { WalletRoutes } from './presentation/routes/WalletRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -53,6 +54,7 @@ export class App {
     const sessionRoutes = new SessionRoutes();
     const mentorRoutes = new MentorRoutes();
     const webhookRoutes = new WebhooksRoutes;
+    const walletRoutes = new WalletRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -60,6 +62,7 @@ export class App {
     this._app.use('/api/sessions', sessionRoutes.getRoutes());
     this._app.use('/api/mentors',mentorRoutes.getRoutes());
     this._app.use('/api/webhook',webhookRoutes.getRoutes());
+    this._app.use('/api/wallet', walletRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

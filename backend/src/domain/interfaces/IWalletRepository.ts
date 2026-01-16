@@ -3,7 +3,7 @@ import { WalletTransactionEntity } from '../entities/Wallet/WalletTransactionEnt
 
 export interface IWalletRepository {
     findByUserId(userId:string):Promise<WalletEntity | null>;
-    createWallet(wallet:WalletEntity):Promise<WalletEntity>;
+    createWallet(userId:string):Promise<WalletEntity>;
     addTransaction(transaction:WalletTransactionEntity):Promise<WalletTransactionEntity>;
     findTransactionsByWalletId(walletId:string):Promise<WalletTransactionEntity[]>
     getBalance(walletId:string): Promise<number>

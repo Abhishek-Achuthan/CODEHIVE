@@ -66,8 +66,10 @@ export class SessionRepository
         date: doc.date,
         startTime: doc.startTime,
         endTime: doc.endTime,
-        amountPaid:doc.amountPaid,
-        refunded:doc.refunded,
+        paymentStatus:doc.paymentStatus,
+        paymentSource:doc.paymentSource,
+        paymentReferenceId:doc.paymentReferenceId,
+        amount:doc.amount,
         status: doc.status,
         topic: doc.topic,
         createdAt: doc.createdAt,
@@ -110,8 +112,10 @@ export class SessionRepository
         date: doc.date,
         startTime: doc.startTime,
         endTime: doc.endTime,
-        amountPaid:doc.amountPaid,
-        refunded:doc.refunded,
+        paymentStatus:doc.paymentStatus,
+        paymentSource:doc.paymentSource,
+        paymentReferenceId:doc.paymentReferenceId,
+        amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
         createdAt: doc.createdAt,
@@ -120,6 +124,14 @@ export class SessionRepository
 
       return { session, mentor, user };
     });
+  }
+
+  async findByPaymentReference(referenceId: string): Promise<SessionEntity | null> {
+    
+    const doc = await SessionModel.findOne({paymentReferenceId: referenceId})
+
+    return doc ? this.leanToEntity(doc) : null
+
   }
 
   protected toEntity(doc: SessionDoc): SessionEntity {
@@ -131,8 +143,10 @@ export class SessionRepository
       startTime: doc.startTime,
       endTime: doc.endTime,
       status: doc.status,
-      amountPaid:doc.amountPaid,
-      refunded:doc.refunded,
+      paymentStatus: doc.paymentStatus,
+      paymentSource: doc.paymentSource,
+      paymentReferenceId: doc.paymentReferenceId,
+      amount:doc.amount,
       topic: doc.topic,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -147,9 +161,11 @@ export class SessionRepository
       date: doc.date,
       startTime: doc.startTime,
       endTime: doc.endTime,
-      amountPaid:doc.amountPaid,
-      refunded:doc.refunded,
       status: doc.status,
+      paymentStatus:doc.paymentStatus,
+      paymentSource: doc.paymentSource,
+      paymentReferenceId: doc.paymentReferenceId,
+      amount:doc.amount,
       topic: doc.topic,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -164,8 +180,10 @@ export class SessionRepository
     if (data.startTime !== undefined) doc.startTime = data.startTime;
     if (data.endTime !== undefined) doc.endTime = data.endTime;
     if (data.status !== undefined) doc.status = data.status;
-    if (data.refunded !== undefined) doc.refunded = data.refunded;
-    if (data.amountPaid !== undefined) doc.amountPaid  = data.amountPaid;
+    if (data.paymentSource !== undefined) doc.paymentSource = data.paymentSource;
+    if (data.paymentStatus !== undefined) doc.paymentStatus = data.paymentStatus;
+    if (data.paymentReferenceId !== undefined) doc.paymentReferenceId = data.paymentReferenceId;
+    if (data.amount !== undefined) doc.amount = data.amount; 
     if (data.topic !== undefined) doc.topic = data.topic;
     if (data.date !== undefined) doc.date = data.date;
 

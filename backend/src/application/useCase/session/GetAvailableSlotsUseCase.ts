@@ -40,7 +40,8 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase{
 
         return freeSlots.map((slot) => ({
             startTime:slot.startTime,
-            endTime:slot.endTime
+            endTime:slot.endTime,
+            price: slot.price,
         }));
     }
 

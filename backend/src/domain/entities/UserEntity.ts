@@ -17,6 +17,8 @@ export interface UserEntity {
   password?: string;
   googleId?:string;
   githubId?:string;
+  primaryExpertise?:string;
+  experienceLevel?:string;
   isBlocked: boolean;
   mentorAppliedAt?:Date;
   mentorStatus:'none' | 'pending' | 'approved';

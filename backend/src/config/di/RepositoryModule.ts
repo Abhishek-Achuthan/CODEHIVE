@@ -24,6 +24,10 @@ import { IMentorAvailabilityRepository } from '../../domain/interfaces/IMentorAv
 import { MentorAvailabilityRepository } from '../../infrastructure/database/repository/MentorAvailabilityRepository';
 import { ISessionRepository } from '../../domain/interfaces/ISessionReposiotry';
 import { SessionRepository } from '../../infrastructure/database/repository/SessionRepository';
+import { IWalletRepository } from '../../domain/interfaces/IWalletRepository';
+import { WalletRepository } from '../../infrastructure/database/repository/WalletRepository';
+import { IStripeWebhookEventRepository } from '../../domain/interfaces/IStripeWebhookEventRepository';
+import { StripeWebhookEventRepository } from '../../infrastructure/database/repository/StripeWebhookEventRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -87,6 +91,14 @@ export class RepositoryModule {
 
         container.register<ISessionRepository>('ISessionRepository', {
             useClass: SessionRepository
+        });
+
+        container.register<IWalletRepository>('IWalletRepository', {
+            useClass: WalletRepository
+        });
+
+        container.register<IStripeWebhookEventRepository>('IStripeWebhookEventRepository', {
+            useClass: StripeWebhookEventRepository
         });
     }
 }

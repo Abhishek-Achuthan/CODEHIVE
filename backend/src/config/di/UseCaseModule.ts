@@ -105,10 +105,14 @@ import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interfa
 import { GetMentorAvailabilityUseCase } from '../../application/useCase/session/GetMentorAvailabilityUseCase';
 import { IGetAvailableSlotsUseCase } from '../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
 import { GetAvailableSlotsUseCase } from '../../application/useCase/session/GetAvailableSlotsUseCase';
-import { IBookSessionUseCase } from '../../application/useCase/interface/session/IBookSessionUseCase';
-import { BookSessionUseCase } from '../../application/useCase/session/BookSessionUseCase';
+import { IBookSessionWithStripeUseCase } from '../../application/useCase/interface/session/IBookSessionWithStripeUseCase';
+import { BookSessionWithStripeUseCase } from '../../application/useCase/session/BookSessionWithStripeUseCase';
+import { IBookSessionWithWalletUseCase } from '../../application/useCase/interface/session/IBookSessionWithWalletUseCase';
+import { BookSessionWithWalletUseCase } from '../../application/useCase/session/BookSessionWithWalletUseCase';
 import { IHandleStripeWebhookUseCase } from '../../application/useCase/interface/payment/IHandleStripeWebhookUseCase';
 import { HandleStripeWebhookUseCase } from '../../application/useCase/payment/HandleStripeWebhookUseCase';
+import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/IGetMyWalletUseCase';
+import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -345,14 +349,24 @@ export class UseCaseModule {
       useClass: GetMentorAvailabilityUseCase
     });
 
-    container.register<IBookSessionUseCase>('IBookSessionUseCase', {
-      useClass: BookSessionUseCase
+    container.register<IBookSessionWithStripeUseCase>('IBookSessionWithStripeUseCase', {
+      useClass: BookSessionWithStripeUseCase
+    });
+
+    container.register<IBookSessionWithWalletUseCase>('IBookSessionWithWalletUseCase', {
+      useClass: BookSessionWithWalletUseCase
     });
 
     //---------------------------------Payment---------------------------------------//
 
     container.register<IHandleStripeWebhookUseCase>('IHandleStripeWebhookUseCase', {
       useClass: HandleStripeWebhookUseCase,
+    });
+
+    //---------------------------------Wallet---------------------------------------//
+
+    container.register<IGetMyWalletUseCase>('IGetMyWalletUseCase', {
+      useClass: GetMyWalletUseCase,
     });
 
   }

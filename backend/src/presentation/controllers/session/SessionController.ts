@@ -1,21 +1,37 @@
 import { inject, injectable } from 'tsyringe';
 import { Request, Response, NextFunction } from 'express';
-import type { IBookSessionUseCase } from '../../../application/useCase/interface/session/IBookSessionUseCase';
+import type { IBookSessionWithStripeUseCase } from '../../../application/useCase/interface/session/IBookSessionWithStripeUseCase';
+import type { IBookSessionWithWalletUseCase } from '../../../application/useCase/interface/session/IBookSessionWithWalletUseCase';
 import type { IGetBookedSessionsUseCase } from '../../../application/useCase/interface/session/IGetBookedSessionsUseCase';
 
 @injectable()
 export class SessionController {
     constructor(
-        @inject('IBookSessionUseCase') private readonly _bookSession: IBookSessionUseCase,
+        @inject('IBookSessionWithStripeUseCase') private readonly _bookSessionWithStripe: IBookSessionWithStripeUseCase,
+        @inject('IBookSessionWithWalletUseCase') private readonly _bookSessionWithWallet: IBookSessionWithWalletUseCase,
         @inject('IGetBookedSessionsUseCase') private readonly _getBookedSessions: IGetBookedSessionsUseCase,
     ) { }
 
 
-    async handleBookSession(req: Request, res: Response, next: NextFunction) {
+    async handleBookSessionWithStripe(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.user;
             console.log(req.body);
-            const result = await this._bookSession.execute({
+            const result = await this._bookSessionWithStripe.execute({
+                userId: id,
+                ...req.body
+            });
+            res.status(201).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async handleBookSessionWithWallet(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.user;
+            console.log(req.body);
+            const result = await this._bookSessionWithWallet.execute({
                 userId: id,
                 ...req.body
             });

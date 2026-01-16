@@ -1,6 +1,8 @@
 import { Types } from 'mongoose';
 import { Document, Schema } from 'mongoose';
 import { SessionStatus } from '../../../../domain/types/SessionStatus';
+import { SessionPaymentStatus } from '../../../../domain/types/SessionPaymentStatus';
+import { PaymentSource } from '../../../../domain/types/PaymentSource';
 
 export interface SessionDoc extends Document  {
     _id: Schema.Types.ObjectId,
@@ -10,8 +12,10 @@ export interface SessionDoc extends Document  {
     startTime:Date;
     endTime:Date;
     status: SessionStatus; 
-    amountPaid:number;
-    refunded:boolean
+    paymentSource:PaymentSource;
+    paymentStatus:SessionPaymentStatus;
+    paymentReferenceId:string | null;
+    amount:number;
     topic:string;
     createdAt:Date;
     updatedAt:Date;
@@ -25,8 +29,10 @@ export interface SessionLeanDoc{
     startTime:Date;
     endTime:Date;
     status: SessionStatus; 
-    refunded:boolean;
-    amountPaid:number;
+    paymentSource:PaymentSource;
+    paymentStatus:SessionPaymentStatus;
+    paymentReferenceId:string | null;
+    amount:number;
     topic:string;
     createdAt:Date;
     updatedAt:Date;
@@ -38,9 +44,11 @@ export const SessionSchema = new Schema({
     userId: { type: Types.ObjectId, ref: 'User', required: true },
     date: { type: String, required: true },
     startTime: { type: Date, required: true },
-    amountPaid:{type:Number,required:true},
-    refunded:{type : Boolean, default : false},
+    amount:{type:Number,required:true},
     endTime: { type: Date, required: true },
+    paymentStatus: {type:String,enum:Object.values(SessionPaymentStatus),default: SessionPaymentStatus.PENDING},
+    paymentSource:{type:String,enum:Object.values(PaymentSource)},
+    paymentReferenceId:{type:String,default:null},
     status: { type: String, enum: Object.values(SessionStatus), default: SessionStatus.UPCOMING },
     topic: { type: String, required: true },
 }, {
