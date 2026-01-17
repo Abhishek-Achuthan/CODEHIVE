@@ -112,7 +112,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       endTime: end,
       status: SessionStatus.UPCOMING,
       paymentSource: PaymentSource.STRIPE,
-      paymentStatus: SessionPaymentStatus.PENDING,
+      paymentStatus: SessionPaymentStatus.PAID,
       paymentReferenceId: payment.paymentIntentId,
       topic,
       amount,

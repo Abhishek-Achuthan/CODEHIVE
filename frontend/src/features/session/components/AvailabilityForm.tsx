@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, Clock, Info } from 'lucide-react';
 
-interface AvailabilityFormData {
+export interface AvailabilityFormData {
     startTime: string;
     endTime: string;
     slotDurationMinutes: number;
@@ -15,19 +15,31 @@ interface AvailabilityFormData {
 interface AvailabilityFormProps {
     onSubmit: (data: AvailabilityFormData) => Promise<void>;
     isLoading?: boolean;
+    isRecurring: boolean;
+    selectedDate?: Date | null;
 }
 
-export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, isLoading }) => {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<AvailabilityFormData>({
+export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, isLoading, isRecurring, selectedDate }) => {
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AvailabilityFormData>({
         defaultValues: {
             slotDurationMinutes: 30,
-            bufferMinutes: 0,
-            isRecurring: false,
+            bufferMinutes: 10,
+            isRecurring: isRecurring,
             slotPrice: 0
         }
     });
 
-    const isRecurring = watch('isRecurring');
+    useEffect(() => {
+        setValue('isRecurring', isRecurring);
+        if (selectedDate && !isRecurring) {
+            const y = selectedDate.getFullYear();
+            const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const d = String(selectedDate.getDate()).padStart(2, '0');
+            setValue('date', `${y}-${m}-${d}`);
+        }
+    }, [isRecurring, selectedDate, setValue]);
+
+
     const startTime = watch('startTime');
     const endTime = watch('endTime');
     const slotDurationMinutes = watch('slotDurationMinutes');
@@ -44,7 +56,9 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
         const format = (mins: number) => {
             const h = Math.floor(mins / 60);
             const m = mins % 60;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const displayH = h % 12 || 12;
+            return `${displayH}:${String(m).padStart(2, '0')} ${ampm}`;
         };
 
         const start = parse(startTime);
@@ -59,162 +73,132 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
 
         const out: Array<{ startTime: string; endTime: string }> = [];
         let cursor = start;
+
+        // Ensure loop terminates
         while (cursor + duration <= end) {
             out.push({ startTime: format(cursor), endTime: format(cursor + duration) });
             cursor = cursor + duration + buffer;
+            // Safety break to prevent infinite loops if logic fails
+            if (out.length > 50) break;
         }
 
         return out;
     }, [startTime, endTime, slotDurationMinutes, bufferMinutes]);
 
     return (
-        <div className="rounded-xl border border-gray-800 bg-black px-6 py-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Set Availability</h2>
+        <div className="rounded-xl border border-gray-800 bg-black p-6">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                {isRecurring ? (
+                    <>
+                        <Clock className="h-5 w-5 text-indigo-400" />
+                        Weekly Recurring Schedule
+                    </>
+                ) : (
+                    <>
+                        <Plus className="h-5 w-5 text-indigo-400" />
+                        Add Availability for {selectedDate?.toLocaleDateString()}
+                    </>
+                )}
+            </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Time Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">From</label>
+                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Start Time</label>
                         <input
                             type="time"
                             {...register('startTime', { required: 'Start time is required' })}
-                            className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all cursor-pointer"
+                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                         />
                         {errors.startTime && <p className="text-red-400 text-xs mt-1">{errors.startTime.message}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">To</label>
+                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">End Time</label>
                         <input
                             type="time"
                             {...register('endTime', { required: 'End time is required' })}
-                            className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all cursor-pointer"
+                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                         />
                         {errors.endTime && <p className="text-red-400 text-xs mt-1">{errors.endTime.message}</p>}
                     </div>
                 </div>
 
-                {!isRecurring && (
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Date</label>
-                        <input
-                            type="date"
-                            {...register('date', { required: !isRecurring ? 'Date is required' : false })}
-                            className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all cursor-pointer"
-                            min={new Date().toISOString().split('T')[0]}
-                        />
-                        {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date.message}</p>}
-                    </div>
-                )}
-
                 {/* Duration & Buffer */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Duration (minutes)</label>
+                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Slot Duration <span className="text-gray-600">(min)</span></label>
                         <input
                             type="number"
                             {...register('slotDurationMinutes', { required: true, min: 15 })}
-                            className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all placeholder:text-gray-600"
-                            placeholder="e.g. 30"
+                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Buffer time (minutes)</label>
+                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Buffer <span className="text-gray-600">(min)</span></label>
                         <input
                             type="number"
                             {...register('bufferMinutes', { required: true, min: 0 })}
-                            className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all placeholder:text-gray-600"
-                            placeholder="e.g. 5"
+                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
                         />
                     </div>
+                </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Session Price (₹)</label>
-                        <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
-                            <input
-                                type="number"
-                                {...register('slotPrice', { required: 'Price is required', min: { value: 0, message: 'Price must be positive' } })}
-                                className="w-full rounded-lg border border-gray-700 bg-black pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all placeholder:text-gray-600"
-                                placeholder="e.g. 500"
-                            />
-                        </div>
-                        {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Price per Session</label>
+                    <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <input
+                            type="number"
+                            {...register('slotPrice', { required: 'Price is required', min: { value: 0, message: 'Price must be positive' } })}
+                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 pl-8 pr-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                            placeholder="500"
+                        />
                     </div>
                 </div>
 
-                {/* Scheduling Type */}
-                <div className="space-y-4">
-                    <label className="text-sm font-medium text-zinc-400 block">Scheduling Type</label>
-                    <div className="flex flex-col space-y-3">
-                        <label className="flex items-center space-x-3 cursor-pointer group">
-                            <input
-                                type="radio"
-                                value="false"
-                                {...register('isRecurring', {
-                                    setValueAs: (v) => v === 'true'
-                                })}
-                                className="hidden peer"
-                                defaultChecked
-                            />
-                            <div className="w-5 h-5 rounded border border-zinc-600 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-colors">
-                                {!isRecurring && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
-                            </div>
-                            <span className={`text-zinc-300 group-hover:text-zinc-100 transition-colors ${!isRecurring ? 'text-blue-100' : ''}`}>One-time availability</span>
-                        </label>
+                {/* Hidden Date Input for Form Submission */}
+                {!isRecurring && (
+                    <input type="hidden" {...register('date')} />
+                )}
 
-                        <label className="flex items-center space-x-3 cursor-pointer group">
-                            <input
-                                type="radio"
-                                value="true"
-                                {...register('isRecurring', {
-                                    setValueAs: (v) => v === 'true'
-                                })}
-                                className="hidden peer"
-                            />
-                            <div className="w-5 h-5 rounded border border-zinc-600 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-colors">
-                                {isRecurring && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
-                            </div>
-                            <span className={`text-zinc-300 group-hover:text-zinc-100 transition-colors ${isRecurring ? 'text-blue-100' : ''}`}>Recurring weekly schedule</span>
-                        </label>
+                <div className="rounded-lg bg-indigo-500/5 border border-indigo-500/10 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Info className="h-4 w-4 text-indigo-400" />
+                        <span className="text-xs font-medium text-indigo-300">Preview Slots</span>
                     </div>
-                </div>
-
-                <div className="space-y-3">
-                    <div className="text-sm font-medium text-zinc-400">Hourly Slots</div>
                     {slotsPreview.length === 0 ? (
-                        <div className="text-xs text-gray-500">
-                            Add start time, end time, duration and buffer to preview slots.
+                        <div className="text-xs text-gray-500 italic">
+                            Set start and end times to see generated slots.
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-3">
-                            {slotsPreview.slice(0, 6).map((slot, idx) => (
-                                <div
-                                    key={`${slot.startTime}_${slot.endTime}_${idx}`}
-                                    className="rounded-lg border border-gray-700 bg-black px-3 py-2 text-xs text-gray-200"
+                        <div className="flex flex-wrap gap-2">
+                            {slotsPreview.slice(0, 8).map((slot, idx) => (
+                                <span
+                                    key={`${slot.startTime}-${idx}`}
+                                    className="inline-flex items-center rounded-md border border-indigo-500/20 bg-indigo-500/10 px-2 py-1 text-xs font-medium text-indigo-300"
                                 >
                                     {slot.startTime} - {slot.endTime}
-                                </div>
+                                </span>
                             ))}
+                            {slotsPreview.length > 8 && (
+                                <span className="text-xs text-gray-500 flex items-center self-center">
+                                    +{slotsPreview.length - 8} more
+                                </span>
+                            )}
                         </div>
                     )}
                 </div>
 
-                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 py-3 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full rounded-lg bg-linear-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                    {isLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : (
-                        'Save Availability'
-                    )}
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Availability'}
                 </button>
-
             </form>
         </div>
     );
