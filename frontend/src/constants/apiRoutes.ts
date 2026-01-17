@@ -225,6 +225,9 @@ export const API_ROUTES = {
 
   MENTOR: {
     SET_AVAILABILITY: "/mentors/availability",
+    GET_MY_AVAILABILITY: "/mentors/me/availability",
+    DELETE_AVAILABILITY: (id: string) => `/mentors/availability/${id}`,
+    ADD_EXCEPTION: (id: string) => `/mentors/availability/${id}/exceptions`,
     GET_AVAILABILITY: (mentorId: string) => `/mentors/${mentorId}/available`,
     LIST_MENTORS: (params?: MentorListingParams) => {
       const qp = new URLSearchParams();
@@ -239,7 +242,7 @@ export const API_ROUTES = {
     BOOK_SESSION_STRIPE: "/sessions/stripe",
     BOOK_SESSION_WALLET: "/sessions/wallet",
     GET_BOOKED_SESSIONS: "/sessions",
-    CANCEL_SESSION: (sessionId:string) => `/sessions/${sessionId}`
+    CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`
   },
 
   WALLET: {

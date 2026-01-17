@@ -4,9 +4,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface CalendarProps {
     selectedDate: Date | null;
     onSelectDate: (date: Date | null) => void;
+    showRecurringOption?: boolean;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate }) => {
+export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, showRecurringOption = false }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const getDaysInMonth = (date: Date) => {
@@ -104,20 +105,22 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate }
                 {renderDays()}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-6">
-                <button
-                    onClick={() => onSelectDate(null)}
-                    className={`
+            {showRecurringOption && (
+                <div className="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-6">
+                    <button
+                        onClick={() => onSelectDate(null)}
+                        className={`
                         w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors
                         ${selectedDate === null
-                            ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
-                            : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                        }
+                                ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
+                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                            }
                     `}
-                >
-                    Set Recurring Schedule
-                </button>
-            </div>
+                    >
+                        Set Recurring Schedule
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

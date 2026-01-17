@@ -34,7 +34,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     private readonly _userRepository: IUserRepository,
     @inject('IPaymentService')
     private readonly _paymentService: IPaymentService
-  ) {}
+  ) { }
 
   async execute(input: BookSessionDTO): Promise<StripeCheckoutResponseDTO> {
     const { mentorId, userId, date, startTime, endTime, topic } = input;
@@ -112,7 +112,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       endTime: end,
       status: SessionStatus.UPCOMING,
       paymentSource: PaymentSource.STRIPE,
-      paymentStatus: SessionPaymentStatus.PAID,
+      paymentStatus: SessionPaymentStatus.PENDING,
       paymentReferenceId: payment.paymentIntentId,
       topic,
       amount,

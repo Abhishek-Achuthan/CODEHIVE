@@ -1,9 +1,18 @@
 import { API_ROUTES } from "../../constants/apiRoutes";
 import apiClient from "../apiClient";
-import type { CreateMentorAvailabilityRequest, MentorListingParams} from "../../shared/types/api/mentor";
+import type { CreateMentorAvailabilityRequest, MentorListingParams } from "../../shared/types/api/mentor";
 
 export const setAvailability = (data: Omit<CreateMentorAvailabilityRequest, 'mentorId'>) =>
     apiClient.post(API_ROUTES.MENTOR.SET_AVAILABILITY, data);
+
+export const getMyAvailability = () =>
+    apiClient.get(API_ROUTES.MENTOR.GET_MY_AVAILABILITY);
+
+export const deleteAvailability = (id: string) =>
+    apiClient.delete(API_ROUTES.MENTOR.DELETE_AVAILABILITY(id));
+
+export const addException = (id: string, date: string) =>
+    apiClient.patch(API_ROUTES.MENTOR.ADD_EXCEPTION(id), { date });
 
 export const getAvailability = (mentorId: string, date: string) =>
     apiClient.get(`${API_ROUTES.MENTOR.GET_AVAILABILITY(mentorId)}?date=${date}`);
@@ -12,6 +21,3 @@ export const listMentors = (params?: MentorListingParams) => {
     const url = API_ROUTES.MENTOR.LIST_MENTORS(params);
     return apiClient.get(url);
 };
-
-
-

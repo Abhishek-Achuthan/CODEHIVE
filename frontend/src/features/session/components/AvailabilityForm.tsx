@@ -1,16 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Loader2, Plus, Clock, Info } from 'lucide-react';
-
-export interface AvailabilityFormData {
-    startTime: string;
-    endTime: string;
-    slotDurationMinutes: number;
-    bufferMinutes: number;
-    isRecurring: boolean;
-    date?: string;
-    slotPrice: number;
-}
+import type { AvailabilityFormData } from '../types';
 
 interface AvailabilityFormProps {
     onSubmit: (data: AvailabilityFormData) => Promise<void>;
@@ -25,7 +16,10 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
             slotDurationMinutes: 30,
             bufferMinutes: 10,
             isRecurring: isRecurring,
-            slotPrice: 0
+            slotPrice: 0,
+            selectedDays: [],
+            durationType: 'forever',
+            occurrenceCount: 12
         }
     });
 
@@ -37,6 +31,12 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
             const d = String(selectedDate.getDate()).padStart(2, '0');
             setValue('date', `${y}-${m}-${d}`);
         }
+
+        // Reset recurring-specific fields when switching modes
+        if (!isRecurring) {
+            setValue('selectedDays', []);
+            setValue('durationType', 'forever');
+        }
     }, [isRecurring, selectedDate, setValue]);
 
 
@@ -44,6 +44,27 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     const endTime = watch('endTime');
     const slotDurationMinutes = watch('slotDurationMinutes');
     const bufferMinutes = watch('bufferMinutes');
+    const selectedDays = watch('selectedDays');
+    const durationType = watch('durationType');
+
+    const DAYS = [
+        { value: 'MO', label: 'Mon' },
+        { value: 'TU', label: 'Tue' },
+        { value: 'WE', label: 'Wed' },
+        { value: 'TH', label: 'Thu' },
+        { value: 'FR', label: 'Fri' },
+        { value: 'SA', label: 'Sat' },
+        { value: 'SU', label: 'Sun' }
+    ];
+
+    const toggleDay = (dayValue: string) => {
+        const current = selectedDays || [];
+        if (current.includes(dayValue)) {
+            setValue('selectedDays', current.filter(d => d !== dayValue));
+        } else {
+            setValue('selectedDays', [...current, dayValue]);
+        }
+    };
 
     const slotsPreview = React.useMemo(() => {
         const parse = (t?: string) => {
@@ -158,6 +179,96 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         />
                     </div>
                 </div>
+
+                {/* Recurring-specific controls */}
+                {isRecurring && (
+                    <>
+                        {/* Day Selection */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Repeat on</label>
+                            <div className="grid grid-cols-7 gap-2">
+                                {DAYS.map(day => (
+                                    <button
+                                        key={day.value}
+                                        type="button"
+                                        onClick={() => toggleDay(day.value)}
+                                        className={`py-2 px-1 rounded-lg text-xs font-semibold transition-all border ${selectedDays?.includes(day.value)
+                                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                            : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600'
+                                            }`}
+                                    >
+                                        {day.label}
+                                    </button>
+                                ))}
+                            </div>
+                            {selectedDays?.length === 0 && (
+                                <p className="text-xs text-yellow-500">Select at least one day for recurring schedule</p>
+                            )}
+                        </div>
+
+                        {/* Duration Options */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Duration</label>
+
+                            <div className="space-y-3">
+                                {/* Forever */}
+                                <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
+                                    <input
+                                        type="radio"
+                                        {...register('durationType')}
+                                        value="forever"
+                                        className="text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <span className="text-sm text-white">Repeat indefinitely</span>
+                                </label>
+
+                                {/* Until Date */}
+                                <label className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
+                                    <input
+                                        type="radio"
+                                        {...register('durationType')}
+                                        value="until"
+                                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <div className="flex-1 space-y-2">
+                                        <span className="text-sm text-white block">End on specific date</span>
+                                        {durationType === 'until' && (
+                                            <input
+                                                type="date"
+                                                {...register('endDate')}
+                                                min={new Date().toISOString().split('T')[0]}
+                                                className="w-full rounded-lg border border-gray-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                            />
+                                        )}
+                                    </div>
+                                </label>
+
+                                {/* Count */}
+                                <label className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
+                                    <input
+                                        type="radio"
+                                        {...register('durationType')}
+                                        value="count"
+                                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <div className="flex-1 space-y-2">
+                                        <span className="text-sm text-white block">Repeat a specific number of times</span>
+                                        {durationType === 'count' && (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    {...register('occurrenceCount', { min: 1, max: 52 })}
+                                                    className="w-24 rounded-lg border border-gray-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                />
+                                                <span className="text-xs text-gray-400">weeks</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 {/* Hidden Date Input for Form Submission */}
                 {!isRecurring && (

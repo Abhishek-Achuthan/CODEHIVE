@@ -16,14 +16,14 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
   constructor(
     @inject('ISessionRepository')
     private readonly _sessionRepository: ISessionRepository,
-    @inject('IWalletService') 
-    private readonly _walletService : IWalletService,
-    @inject('IWalletRepository') 
-    private readonly _walletRepository : IWalletRepository
+    @inject('IWalletService')
+    private readonly _walletService: IWalletService,
+    @inject('IWalletRepository')
+    private readonly _walletRepository: IWalletRepository
 
-  ) {}
+  ) { }
 
-  async execute(sessionId: string,userId:string): Promise<boolean> {
+  async execute(sessionId: string, userId: string): Promise<boolean> {
     const session = await this._sessionRepository.find(sessionId);
 
     if (!session || !session.startTime) {
@@ -67,16 +67,22 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
         reason: WalletTransactionReason.SESSION_REFUND,
       };
 
-      await this._walletService.credit(transaction);
+      try {
+        await this._walletService.credit(transaction);
 
-      await this._sessionRepository.update(sessionId, {
-        paymentStatus: SessionPaymentStatus.REFUNDED,
-        status: SessionStatus.CANCELLED,
-      });
+        await this._sessionRepository.update(sessionId, {
+          paymentStatus: SessionPaymentStatus.REFUNDED,
+          status: SessionStatus.CANCELLED,
+        });
 
-      return true;
+        return true;
+      } catch (error) {
+        console.error('CRITICAL: Wallet credited but session update failed for session:', sessionId, error);
+        throw error;
+      }
     }
 
+    // Not eligible for refund but still cancel
     await this._sessionRepository.update(sessionId, {
       status: SessionStatus.CANCELLED,
     });

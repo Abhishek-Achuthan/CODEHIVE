@@ -36,7 +36,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     private readonly _walletRepository: IWalletRepository,
     @inject('IWalletService')
     private readonly _walletService: IWalletService
-  ) {}
+  ) { }
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
     const { mentorId, userId, date, startTime, endTime, topic } = input;
@@ -106,37 +106,46 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
       throw new BadRequestError('Insufficient wallet balance');
     }
 
-    const session = await this._sessionRepo.create({
-      mentorId,
-      userId,
-      date,
-      startTime: start,
-      endTime: end,
-      status: SessionStatus.UPCOMING,
-      paymentSource: PaymentSource.WALLET,
-      paymentStatus: SessionPaymentStatus.PAID,
-      paymentReferenceId: null,
-      topic,
-      amount,
-    });
 
-    await this._walletService.debit({
-      walletId: wallet.id,
-      amount,
-      reason: WalletTransactionReason.SESSION_BOOKING,
-      referenceId: session.id,
-    });
+    let session;
+    try {
+      session = await this._sessionRepo.create({
+        mentorId,
+        userId,
+        date,
+        startTime: start,
+        endTime: end,
+        status: SessionStatus.UPCOMING,
+        paymentSource: PaymentSource.WALLET,
+        paymentStatus: SessionPaymentStatus.PAID,
+        paymentReferenceId: null,
+        topic,
+        amount,
+      });
 
-    await this._sessionRepo.update(session.id, {
-      paymentReferenceId: session.id,
-    });
+      await this._walletService.debit({
+        walletId: wallet.id,
+        amount,
+        reason: WalletTransactionReason.SESSION_BOOKING,
+        referenceId: session.id,
+      });
 
-    const updated = await this._sessionRepo.find(session.id);
+      await this._sessionRepo.update(session.id, {
+        paymentReferenceId: session.id,
+      });
 
-    if (!updated) {
-      throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
+      const updated = await this._sessionRepo.find(session.id);
+
+      if (!updated) {
+        throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
+      }
+
+      return SessionMapper.toResponse(updated);
+    } catch (error) {
+      if (session) {
+        await this._sessionRepo.delete(session.id);
+      }
+      throw error;
     }
-
-    return SessionMapper.toResponse(updated);
   }
 }

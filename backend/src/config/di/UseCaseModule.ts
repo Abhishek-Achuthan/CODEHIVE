@@ -115,6 +115,10 @@ import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/
 import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
 import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
 import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
+import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/interface/session/IDeleteMentorAvailabilityUseCase';
+import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/session/DeleteMentorAvailabilityUseCase';
+import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/session/IAddAvailabilityExceptionUseCase';
+import { AddAvailabilityExceptionUseCase } from '../../application/useCase/session/AddAvailabilityExceptionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -361,6 +365,14 @@ export class UseCaseModule {
 
     container.register<ICancelSessionUseCase>('ICancelSessionUseCase', {
       useClass: CancelSessionUseCase
+    });
+
+    container.register<IDeleteMentorAvailabilityUseCase>('IDeleteMentorAvailabilityUseCase', {
+      useClass: DeleteMentorAvailabilityUseCase
+    });
+
+    container.register<IAddAvailabilityExceptionUseCase>('IAddAvailabilityExceptionUseCase', {
+      useClass: AddAvailabilityExceptionUseCase
     });
 
     //---------------------------------Payment---------------------------------------//

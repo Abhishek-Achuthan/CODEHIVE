@@ -19,6 +19,32 @@ export class MentorshipService {
         }
     }
 
+    static async getMyAvailability(): Promise<MentorAvailabilityResponse[]> {
+        try {
+            const response = await MentorshipApi.getMyAvailability();
+            return (Array.isArray(response.data) ? response.data : []) as MentorAvailabilityResponse[];
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async deleteAvailability(id: string): Promise<void> {
+        try {
+            await MentorshipApi.deleteAvailability(id);
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async addException(id: string, date: string): Promise<MentorAvailabilityResponse> {
+        try {
+            const response = await MentorshipApi.addException(id, date);
+            return response.data.data as MentorAvailabilityResponse;
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
     static async getAvailability(mentorId: string, date: string): Promise<AvailableSlotResponse[]> {
         try {
             const response = await MentorshipApi.getAvailability(mentorId, date);

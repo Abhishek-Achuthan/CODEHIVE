@@ -24,6 +24,7 @@ import MentorAvailabilityPage from "../features/session/pages/MentorAvailability
 import BookingPage from "../features/session/pages/BookingPage";
 import WalletPage from "../features/wallet/pages/WalletPage";
 import MySessionsPage from "../features/session/pages/MySessionsPage";
+import PaymentPage from "../features/session/pages/PaymentPage";
 
 export default function AppRoutes() {
   return (
@@ -63,6 +64,7 @@ export default function AppRoutes() {
           <Route path="/session" element={<MentorListingPage />} />
           <Route path="/mentors/availability" element={<MentorAvailabilityPage />} />
           <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/my-sessions" element={<MySessionsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

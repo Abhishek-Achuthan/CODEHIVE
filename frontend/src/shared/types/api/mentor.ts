@@ -16,11 +16,12 @@ export interface MentorAvailabilityResponse {
     id: string;
     mentorId: string;
     rrule: string;
+    exdates: string[];
     startTime: string;
     endTime: string;
     slotDurationMinutes: number;
     bufferMinutes: number;
-    amount: number;
+    slotPrice: number;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;

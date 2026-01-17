@@ -58,6 +58,16 @@ export function SessionCard({ session, onJoinRoom, onCancel, isCancelling }: Ses
                             {formatTime(session.startTime)} - {formatTime(session.endTime)}
                         </span>
                     </div>
+                    <div className="flex items-center gap-2 text-sm">
+                        <span className="text-gray-400">Payment</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${session.paymentStatus === 'PAID' ? 'bg-green-500/10 text-green-400' :
+                                session.paymentStatus === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' :
+                                    session.paymentStatus === 'REFUNDED' ? 'bg-blue-500/10 text-blue-400' :
+                                        'bg-red-500/10 text-red-400'
+                            }`}>
+                            {session.paymentStatus}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Action Buttons */}
