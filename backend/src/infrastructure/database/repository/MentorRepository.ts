@@ -9,7 +9,6 @@ import { UserRole } from '../../../domain/types/UserRole';
 import { MentorListOptions } from '../../../domain/types/MentorListOptions';
 
 
-
 export class MentorRepository extends GenericRepository<UserDocument, UserEntity> implements IMentorRepository {
   constructor() {
     super(UserModel as Model<UserDocument>)
