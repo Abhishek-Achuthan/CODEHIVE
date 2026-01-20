@@ -3,14 +3,13 @@ import { GenericRepository } from './GenericRepository';
 import { UserEntity } from '../../../domain/entities/UserEntity';
 import UserModel from '../models/UserModel';
 import { UserDocument, UserLeanDoc } from '../schemas/UserSchema';
-import { FilterQuery, Model } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
+import { FilterQuery, Model } from 'mongoose';
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
-  implements IUserRepository
-{
+  implements IUserRepository {
   constructor() {
     super(UserModel as Model<UserDocument>);
   }
@@ -28,7 +27,7 @@ export class UserRepository
     currentPage: number = 1,
     pageSize: number = 10,
     sort: string = 'createdAt',
-    search: string = ''
+    search: string = '',
   ): Promise<PaginationResult<UserEntity>> {
     const query: FilterQuery<UserDocument> = { role };
 
@@ -120,14 +119,16 @@ export class UserRepository
       ...(doc.about !== undefined ? { about: doc.about } : {}),
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
       ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
-      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.linkedInUrl !== undefined
+        ? { linkedInUrl: doc.linkedInUrl }
+        : {}),
       ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
       ...(doc.mentorAppliedAt !== undefined
         ? { mentorAppliedAt: doc.mentorAppliedAt }
         : {}),
       mentorStatus: doc.mentorStatus,
-      primaryExpertise : doc.primaryExpertise,
-      experienceLevel : doc.experienceLevel,
+      ...(doc.primaryExpertise !== undefined ? { primaryExpertise: doc.primaryExpertise } : {}),
+      ...(doc.experienceLevel !== undefined ? { experienceLevel: doc.experienceLevel } : {}),
     };
   }
 
@@ -148,10 +149,12 @@ export class UserRepository
       mentorStatus: doc.mentorStatus,
       experienceLevel: doc.experienceLevel,
       primaryExpertise: doc.primaryExpertise,
-      ...(doc.about !==undefined ? {about: doc.about } : {}), 
+      ...(doc.about !== undefined ? { about: doc.about } : {}),
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
       ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
-      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.linkedInUrl !== undefined
+        ? { linkedInUrl: doc.linkedInUrl }
+        : {}),
       ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
       ...(doc.mentorAppliedAt !== undefined
         ? { mentorAppliedAt: doc.mentorAppliedAt }

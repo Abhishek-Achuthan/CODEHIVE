@@ -12,7 +12,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
     private readonly _stripeWebhookEventRepository: IStripeWebhookEventRepository,
     @inject('ISessionRepository')
     private readonly _sessionRepository: ISessionRepository
-  ) {}
+  ) { }
 
   async execute(event: WebhookEvent): Promise<void> {
     const shouldProcess =

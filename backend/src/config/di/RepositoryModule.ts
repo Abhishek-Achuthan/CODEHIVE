@@ -28,6 +28,8 @@ import { IWalletRepository } from '../../domain/interfaces/IWalletRepository';
 import { WalletRepository } from '../../infrastructure/database/repository/WalletRepository';
 import { IStripeWebhookEventRepository } from '../../domain/interfaces/IStripeWebhookEventRepository';
 import { StripeWebhookEventRepository } from '../../infrastructure/database/repository/StripeWebhookEventRepository';
+import { IMentorRepository } from '../../domain/interfaces/IMentorRepository';
+import { MentorRepository } from '../../infrastructure/database/repository/MentorRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -100,5 +102,11 @@ export class RepositoryModule {
         container.register<IStripeWebhookEventRepository>('IStripeWebhookEventRepository', {
             useClass: StripeWebhookEventRepository
         });
+
+        //-------------------------Mentor Repository--------------------------------------//
+
+        container.register<IMentorRepository>('IMentorRepository', {
+            useClass: MentorRepository
+        })
     }
 }

@@ -26,6 +26,7 @@ export class MentorController {
   ) { }
 
   async handleListMentors(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user.id
     try {
       const { search, page, limit } = req.query;
       const params: { search?: string; page?: number; limit?: number } = {};
@@ -34,7 +35,7 @@ export class MentorController {
       if (page) params.page = Number(page);
       if (limit) params.limit = Number(limit);
 
-      const result = await this._listMentors.execute(params);
+      const result = await this._listMentors.execute(params,userId);
       res.status(200).json(result);
     } catch (error) {
       next(error);
