@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { MentorshipService } from '../../../services/mentorService';
 import type { AvailableSlotResponse } from '../../../shared/types/api/mentor';
-import { Loader2, ArrowLeft, Calendar as CalendarIcon, Clock, ArrowRight, User } from 'lucide-react';
+import { Loader2, ArrowLeft, Calendar as CalendarIcon, Clock, ArrowRight, User, MessageSquare } from 'lucide-react';
 
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
@@ -41,7 +41,7 @@ const BookingPage: React.FC = () => {
             setSlots(data);
             setSelectedSlot(null);
         } catch (error) {
-            if (error instanceof BaseError) 
+            if (error instanceof BaseError)
                 console.log(error.message);
             setSlots([]);
         } finally {
@@ -164,8 +164,8 @@ const BookingPage: React.FC = () => {
                             <div className="flex flex-col md:flex-row gap-8">
                                 <div className="flex-1 space-y-4">
                                     <h3 className="text-xl font-semibold flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">3</div>
-                                        What would you like to discuss?
+                                        <MessageSquare className="w-5 h-5 text-indigo-500" />
+What would you like to discuss?
                                     </h3>
                                     <p className="text-zinc-400 text-sm">
                                         Please briefly describe the topic or questions you have for {mentor?.firstName}.
@@ -185,12 +185,20 @@ const BookingPage: React.FC = () => {
                                 </div>
 
                                 <div className="flex-1 flex flex-col items-end gap-4">
-                                    <textarea
-                                        value={topic}
-                                        onChange={(e) => setTopic(e.target.value)}
-                                        placeholder="I want to discuss about..."
-                                        className="w-full h-32 bg-zinc-950 border border-zinc-700 rounded-xl text-white p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition-all placeholder:text-zinc-600"
-                                    />
+                                    <div className="w-full">
+                                        <textarea
+                                            value={topic}
+                                            onChange={(e) => setTopic(e.target.value)}
+                                            placeholder="I want to discuss about..."
+                                            maxLength={100}
+                                            className="w-full h-32 bg-zinc-950 border border-zinc-700 rounded-xl text-white p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition-all placeholder:text-zinc-600"
+                                        />
+                                        <div className="flex justify-end mt-1">
+                                            <span className={`text-xs ${topic.length >= 100 ? 'text-red-400' : 'text-zinc-500'}`}>
+                                                {topic.length}/100
+                                            </span>
+                                        </div>
+                                    </div>
 
                                     <button
                                         onClick={handleProceedToPayment}

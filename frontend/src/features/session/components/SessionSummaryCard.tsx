@@ -68,12 +68,14 @@ const SessionSummaryCard: React.FC<SessionSummaryCardProps> = ({ mentor, slot, d
             <div className="space-y-4">
                 {/* Topic */}
                 <div className="flex items-start gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-500/10">
+                    <div className="flex items-center justify-center w-9 h-9 shrink-0 rounded-lg bg-indigo-500/10">
                         <BookOpen className="w-4 h-4 text-indigo-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0 flex-1">
                         <p className="text-gray-400 text-xs uppercase tracking-wider">Topic</p>
-                        <p className="text-white text-sm mt-0.5 font-medium">{topic}</p>
+                        <p className="text-white text-sm mt-0.5 font-medium break-words" title={topic}>
+                            {topic.length > 100 ? `${topic.substring(0, 100)}...` : topic}
+                        </p>
                     </div>
                 </div>
 
