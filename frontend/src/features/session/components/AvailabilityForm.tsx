@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Plus, Clock, Info } from 'lucide-react';
 import type { AvailabilityFormData } from '../types';
+import { availabilityFormSchema, type AvailabilityFormSchema } from '../validations/availabilityValidation';
 
 interface AvailabilityFormProps {
     onSubmit: (data: AvailabilityFormData) => Promise<void>;
@@ -11,15 +13,21 @@ interface AvailabilityFormProps {
 }
 
 export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, isLoading, isRecurring, selectedDate }) => {
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AvailabilityFormData>({
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AvailabilityFormSchema>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(availabilityFormSchema) as any,
         defaultValues: {
+            startTime: '',
+            endTime: '',
             slotDurationMinutes: 30,
             bufferMinutes: 10,
             isRecurring: isRecurring,
             slotPrice: 0,
             selectedDays: [],
             durationType: 'forever',
-            occurrenceCount: 12
+            occurrenceCount: 12,
+            date: '',
+            endDate: '',
         }
     });
 
@@ -46,6 +54,11 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     const bufferMinutes = watch('bufferMinutes');
     const selectedDays = watch('selectedDays');
     const durationType = watch('durationType');
+
+    const handleFormSubmit = async (data: AvailabilityFormSchema) => {
+        // Cast to AvailabilityFormData for parent component compatibility
+        await onSubmit(data as AvailabilityFormData);
+    };
 
     const DAYS = [
         { value: 'MO', label: 'Mon' },
@@ -122,14 +135,14 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                 )}
             </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
                 {/* Time Selection */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Start Time</label>
                         <input
                             type="time"
-                            {...register('startTime', { required: 'Start time is required' })}
+                            {...register('startTime')}
                             className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                         />
                         {errors.startTime && <p className="text-red-400 text-xs mt-1">{errors.startTime.message}</p>}
@@ -139,7 +152,7 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">End Time</label>
                         <input
                             type="time"
-                            {...register('endTime', { required: 'End time is required' })}
+                            {...register('endTime')}
                             className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                         />
                         {errors.endTime && <p className="text-red-400 text-xs mt-1">{errors.endTime.message}</p>}
@@ -152,18 +165,20 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Slot Duration <span className="text-gray-600">(min)</span></label>
                         <input
                             type="number"
-                            {...register('slotDurationMinutes', { required: true, min: 15 })}
+                            {...register('slotDurationMinutes')}
                             className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
                         />
+                        {errors.slotDurationMinutes && <p className="text-red-400 text-xs mt-1">{errors.slotDurationMinutes.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                         <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Buffer <span className="text-gray-600">(min)</span></label>
                         <input
                             type="number"
-                            {...register('bufferMinutes', { required: true, min: 0 })}
+                            {...register('bufferMinutes')}
                             className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
                         />
+                        {errors.bufferMinutes && <p className="text-red-400 text-xs mt-1">{errors.bufferMinutes.message}</p>}
                     </div>
                 </div>
 
@@ -173,10 +188,11 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
                         <input
                             type="number"
-                            {...register('slotPrice', { required: 'Price is required', min: { value: 0, message: 'Price must be positive' } })}
+                            {...register('slotPrice')}
                             className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 pl-8 pr-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
                             placeholder="500"
                         />
+                        {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
                     </div>
                 </div>
 
@@ -201,7 +217,10 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                                     </button>
                                 ))}
                             </div>
-                            {selectedDays?.length === 0 && (
+                            {(errors as any).selectedDays && (
+                                <p className="text-red-400 text-xs mt-1">{(errors as any).selectedDays.message}</p>
+                            )}
+                            {!((errors as any).selectedDays) && selectedDays?.length === 0 && (
                                 <p className="text-xs text-yellow-500">Select at least one day for recurring schedule</p>
                             )}
                         </div>
@@ -233,12 +252,15 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                                     <div className="flex-1 space-y-2">
                                         <span className="text-sm text-white block">End on specific date</span>
                                         {durationType === 'until' && (
-                                            <input
-                                                type="date"
-                                                {...register('endDate')}
-                                                min={new Date().toISOString().split('T')[0]}
-                                                className="w-full rounded-lg border border-gray-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                            />
+                                            <>
+                                                <input
+                                                    type="date"
+                                                    {...register('endDate')}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    className={`w-full rounded-lg border ${errors.endDate ? 'border-red-500' : 'border-gray-700'} bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
+                                                />
+                                                {errors.endDate && <p className="text-red-400 text-xs mt-1">{errors.endDate.message}</p>}
+                                            </>
                                         )}
                                     </div>
                                 </label>

@@ -56,7 +56,8 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
             const isToday = isSameDay(date, today);
-            const isPast = date < new Date(today.setHours(0, 0, 0, 0));
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const isPast = date < todayStart;
 
             days.push(
                 <button
