@@ -36,6 +36,7 @@ export function useSavedQuestionsPage() {
   const [loadingAddedListIds, setLoadingAddedListIds] = useState(false);
   const [addingToListId, setAddingToListId] = useState<string | null>(null);
   const [removingQuestionId, setRemovingQuestionId] = useState<string | null>(null);
+  const [unsavingQuestionId, setUnsavingQuestionId] = useState<string | null>(null);
 
   const [deleteListOpen, setDeleteListOpen] = useState(false);
   const [deleteListId, setDeleteListId] = useState<string | null>(null);
@@ -257,6 +258,34 @@ export function useSavedQuestionsPage() {
     }
   };
 
+  const handleUnsaveQuestion = async (questionId: string) => {
+    try {
+      setUnsavingQuestionId(questionId);
+      await QnAService.unsaveQuestion(questionId);
+      toast.success("Question unsaved");
+
+      const params: QuestionListParams = {
+        page: currentPage,
+        limit: LIMIT,
+        sortBy: "newest",
+        search: searchTerm.trim() || undefined,
+      };
+
+      const res = await QnAService.listSavedQuestions(params);
+      const items = Array.isArray(res?.items) ? res.items.map(mapQuestionListItemToView) : [];
+      setQuestions(items);
+      setTotalQuestions(typeof res?.totalItems === "number" ? res.totalItems : 0);
+    } catch (error) {
+      if (error instanceof BaseError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to unsave question");
+      }
+    } finally {
+      setUnsavingQuestionId(null);
+    }
+  };
+
   return {
     LIMIT,
 
@@ -300,6 +329,9 @@ export function useSavedQuestionsPage() {
 
     removingQuestionId,
     handleRemoveFromCurrentList,
+
+    unsavingQuestionId,
+    handleUnsaveQuestion,
 
     deleteListOpen,
     setDeleteListOpen,

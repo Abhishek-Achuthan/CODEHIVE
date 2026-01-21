@@ -112,3 +112,6 @@ export const deleteQuestion = (questionId: string) =>
 
 export const deleteAnswer = (answerId: string) =>
   apiClient.delete(API_ROUTES.QnA.GET_ANSWER(answerId));
+
+export const unsaveQuestion = (questionId:string) => 
+  apiClient.delete(API_ROUTES.QnA.UNSAVE_QUESTION(questionId));

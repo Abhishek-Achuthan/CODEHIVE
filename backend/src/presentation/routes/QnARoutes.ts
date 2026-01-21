@@ -80,6 +80,11 @@ export class QnARoutes {
             this._authMiddleware.check,
             this._questionController.handleSaveQuestion.bind(this._questionController)
         );
+        this._router.delete(
+            '/questions/:id/save',
+            authMiddleware.check,
+            this._questionController.handleUnsaveQuestion.bind(this._questionController)
+        );
         this._router.post(
             '/questions/:id/vote',
             this._authMiddleware.check,

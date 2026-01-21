@@ -71,6 +71,7 @@ export const API_ROUTES = {
     RELATED_QUESTIONS: (questionId: string) =>
       `/qna/questions/${questionId}/related`,
     SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
+    UNSAVE_QUESTION:(questionId: string) => `/qna/questions/${questionId}/save`,
     VOTE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/vote`,
     EDIT_QUESTION: (questionId: string) => `qna/questions/${questionId}`,
     ANSWERED_QUESTIONS: (params?: QuestionListParams) => {

@@ -50,6 +50,9 @@ export default function SavedQuestionsPage() {
     removingQuestionId,
     handleRemoveFromCurrentList,
 
+    unsavingQuestionId,
+    handleUnsaveQuestion,
+
     deleteListOpen,
     setDeleteListOpen,
     deleteListName,
@@ -109,6 +112,8 @@ export default function SavedQuestionsPage() {
           onRemoveFromList={handleRemoveFromCurrentList}
           removingQuestionId={removingQuestionId}
           onOpenAddToList={handleOpenAddToList}
+          onUnsaveQuestion={handleUnsaveQuestion}
+          unsavingQuestionId={unsavingQuestionId}
         />
       </div>
 

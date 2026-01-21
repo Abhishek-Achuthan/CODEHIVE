@@ -93,6 +93,8 @@ import { IDeleteAnswerUseCase } from '../../application/useCase/interface/qna/ID
 import { DeleteAnswerUseCase } from '../../application/useCase/qna/DeleteAnswerUseCase';
 import { IRemoveAcceptedAnswerUseCase } from '../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
 import { RemoveAcceptedAnswerUseCase } from '../../application/useCase/qna/RemoveAcceptedAnswerUseCase';
+import { IUnsaveItemUseCase } from '../../application/useCase/interface/qna/IUnsaveItemUseCase';
+import { UnsaveItemUseCase } from '../../application/useCase/qna/UnsaveItemUseCase';
 
 
 export class UseCaseModule {
@@ -200,6 +202,10 @@ export class UseCaseModule {
     container.register<IToggleSaveQuestionUseCase>('IToggleSaveQuestionUseCase',{
       useClass: ToggleSaveQuestionUseCase,
     });
+
+    container.register<IUnsaveItemUseCase>('IUnsaveItemUseCase',{
+      useClass: UnsaveItemUseCase,
+    })
 
     container.register<IEditQuestionUseCase>('IEditQuestionUseCase', {
       useClass:EditQuestionUseCase,

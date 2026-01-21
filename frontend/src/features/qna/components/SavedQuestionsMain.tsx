@@ -39,6 +39,9 @@ type Props = {
   onRemoveFromList: (questionId: string) => void;
   removingQuestionId: string | null;
 
+  onUnsaveQuestion: (questionId: string) => void;
+  unsavingQuestionId: string | null;
+
   onOpenAddToList: (questionId: string) => void;
 };
 
@@ -58,6 +61,8 @@ export default function SavedQuestionsMain({
   onCreateList,
   onRemoveFromList,
   removingQuestionId,
+  onUnsaveQuestion,
+  unsavingQuestionId,
   onOpenAddToList,
 }: Props) {
   const questionsWithActions = questions.map((q) => ({
@@ -75,7 +80,18 @@ export default function SavedQuestionsMain({
           >
             <Trash2 className="size-4 text-foreground" />
           </button>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => onUnsaveQuestion(q.id)}
+            disabled={unsavingQuestionId === q.id}
+            className="inline-flex items-center justify-center size-9 rounded-full border border-border/50 bg-background/60 hover:bg-red-500/10 hover:border-red-500/30 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label="Unsave question"
+            title="Unsave question"
+          >
+            <Trash2 className="size-4 text-red-500" />
+          </button>
+        )}
 
         <button
           type="button"

@@ -76,6 +76,15 @@ export class QnAService {
         }
     }
 
+    static async unsaveQuestion(questionId: string):Promise<boolean> {
+        try {
+            const response = await QnAApi.unsaveQuestion(questionId);
+            return response.data as boolean
+        } catch (error) {
+            throw this.handleError(error)
+        }
+    }
+
     static async voteQuestion(questionId: string, value: 1 | -1): Promise<{ votes: number; userVote: 1 | -1 | 0 }> {
         try {
             const response = await QnAApi.voteQuestion(questionId, value);
