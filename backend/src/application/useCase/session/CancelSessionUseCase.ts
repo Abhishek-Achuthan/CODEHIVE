@@ -67,22 +67,23 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
         reason: WalletTransactionReason.SESSION_REFUND,
       };
 
+      await this._sessionRepository.update(sessionId, {
+        paymentStatus: SessionPaymentStatus.REFUNDED,
+        status: SessionStatus.CANCELLED,
+      });
+
       try {
         await this._walletService.credit(transaction);
-
-        await this._sessionRepository.update(sessionId, {
-          paymentStatus: SessionPaymentStatus.REFUNDED,
-          status: SessionStatus.CANCELLED,
-        });
-
         return true;
       } catch (error) {
-        console.error('CRITICAL: Wallet credited but session update failed for session:', sessionId, error);
+        await this._sessionRepository.update(sessionId, {
+          paymentStatus: SessionPaymentStatus.PAID,
+          status: SessionStatus.UPCOMING,
+        });
         throw error;
       }
     }
 
-    // Not eligible for refund but still cancel
     await this._sessionRepository.update(sessionId, {
       status: SessionStatus.CANCELLED,
     });

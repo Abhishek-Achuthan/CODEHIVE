@@ -21,7 +21,7 @@ export class RRuleSlotService implements IRRuleSlotService {
         slots.push(...this.generateSlotsForDate(availability, date));
       }
     }
- 
+
     return slots;
   }
 
@@ -42,6 +42,24 @@ export class RRuleSlotService implements IRRuleSlotService {
     const end = new Date(date);
     end.setHours(endHour!, endMinute, 0, 0);
 
+    const now  = new Date();
+
+    const isToday = 
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate();
+
+      if(isToday && current < now) {
+        current.setTime(now.getTime());
+
+        current.setMinutes(
+          Math.ceil(current.getMinutes()/availability.slotDurationMinutes) *
+          availability.slotDurationMinutes,
+          0,
+          0
+        );
+      }
+
     while (current < end) {
       const slotStart = new Date(current);
       const slotEnd = new Date(current);
@@ -58,13 +76,13 @@ export class RRuleSlotService implements IRRuleSlotService {
         date: slotStart.toISOString().split('T')[0]!,
         startTime: this.formatTime(slotStart),
         endTime: this.formatTime(slotEnd),
-        price:availability.slotPrice
+        price: availability.slotPrice
       });
 
       current.setMinutes(
         current.getMinutes() +
-          availability.slotDurationMinutes +
-          availability.bufferMinutes
+        availability.slotDurationMinutes +
+        availability.bufferMinutes
       );
     }
 
