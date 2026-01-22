@@ -58,7 +58,7 @@ const PaymentPage: React.FC = () => {
                     topic
                 });
                 toast.success("Session booked successfully!");
-                navigate('/home');
+                navigate('/my-sessions');
                 return;
             }
 
@@ -132,7 +132,7 @@ const PaymentPage: React.FC = () => {
                         onPaid={() => {
                             setStripeClientSecret(null);
                             toast.success('Payment successful!');
-                            navigate('/home');
+                            navigate('/my-sessions');
                         }}
                     />
                 </Elements>
