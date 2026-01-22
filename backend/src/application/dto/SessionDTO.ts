@@ -3,27 +3,27 @@ import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
 
 export interface CreateMentorAvailabilityDTO {
-    mentorId:string;
-    rrule:string;
-    startTime:string;
-    endTime:string;
-    slotDurationMinutes:number;
-    bufferMinutes?:number;
+  mentorId: string;
+  rrule: string;
+  startTime: string;
+  endTime: string;
+  slotDurationMinutes: number;
+  bufferMinutes?: number;
 }
 
 export interface BookSessionDTO {
-    mentorId:string;
-    userId:string;
-    date:string;
-    startTime:string;
-    endTime:string;
-    topic:string;
+  mentorId: string;
+  userId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  topic: string;
 }
 
 export interface MentorListinputDTO {
-  search?:string;
-  page?:number;
-  limit?:number;
+  search?: string | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
 }
 
 export interface ISessionResponseDTO {
@@ -36,7 +36,7 @@ export interface ISessionResponseDTO {
   status: SessionStatus;
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
-  topic:string;
+  topic: string;
   createdAt: string;
   updatedAt: string;
   amount: number;
@@ -61,14 +61,14 @@ export interface IBookedSessionResponseDTO {
   topic: string;
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
-  amount : number,
+  amount: number,
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AvailableSlotDTO {
-  startTime: string; 
-  endTime: string;   
+  startTime: string;
+  endTime: string;
   price: number;
 }
 

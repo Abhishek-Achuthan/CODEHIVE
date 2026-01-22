@@ -14,11 +14,6 @@ export class AddAvailabilityExceptionUseCase implements IAddAvailabilityExceptio
     ) { }
 
     async execute(availabilityId: string, mentorId: string, exdate: string): Promise<MentorAvailabilityEntity | null> {
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!dateRegex.test(exdate)) {
-            throw new BadRequestError('Date must be in YYYY-MM-DD format');
-        }
-
         const exceptionDate = new Date(exdate);
         const today = new Date();
         today.setHours(0, 0, 0, 0);

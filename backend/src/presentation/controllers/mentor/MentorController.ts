@@ -6,7 +6,13 @@ import { type ICreateMentorAvailabilityUseCase } from '../../../application/useC
 import { type IGetAvailableSlotsUseCase } from '../../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
 import { type IDeleteMentorAvailabilityUseCase } from '../../../application/useCase/interface/session/IDeleteMentorAvailabilityUseCase';
 import { type IAddAvailabilityExceptionUseCase } from '../../../application/useCase/interface/session/IAddAvailabilityExceptionUseCase';
-import { BadRequestError } from '../../../core/errors/BadRequestError';
+import {
+  MentorListQuerySchema,
+  MentorIdParamSchema,
+  AvailabilityIdParamSchema,
+  GetAvailableSlotsQuerySchema,
+  AddExceptionBodySchema,
+} from '../../validation/mentorValidations';
 
 @injectable()
 export class MentorController {
@@ -26,16 +32,11 @@ export class MentorController {
   ) { }
 
   async handleListMentors(req: Request, res: Response, next: NextFunction) {
-    const userId = req.user.id
     try {
-      const { search, page, limit } = req.query;
-      const params: { search?: string; page?: number; limit?: number } = {};
+      const userId = req.user.id;
+      const params = MentorListQuerySchema.parse(req.query);
 
-      if (search) params.search = String(search);
-      if (page) params.page = Number(page);
-      if (limit) params.limit = Number(limit);
-
-      const result = await this._listMentors.execute(params,userId);
+      const result = await this._listMentors.execute(params, userId);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -44,9 +45,9 @@ export class MentorController {
 
   async handleGetAvailability(req: Request, res: Response, next: NextFunction) {
     try {
-      const { mentorId } = req.params;
+      const { mentorId } = MentorIdParamSchema.parse(req.params);
 
-      const result = await this._getAvailability.execute(mentorId!);
+      const result = await this._getAvailability.execute(mentorId);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -55,11 +56,10 @@ export class MentorController {
 
   async handleGetAvailableSlots(req: Request, res: Response, next: NextFunction) {
     try {
-      const { mentorId } = req.params;
-      const date = typeof req.query.date === 'string' ? req.query.date : undefined;
-      if (!date) throw new BadRequestError('date query param is required (YYYY-MM-DD)');
+      const { mentorId } = MentorIdParamSchema.parse(req.params);
+      const { date } = GetAvailableSlotsQuerySchema.parse(req.query);
 
-      const result = await this._getAvailableSlots.execute(mentorId!, date);
+      const result = await this._getAvailableSlots.execute(mentorId, date);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -92,9 +92,7 @@ export class MentorController {
   async handleDeleteAvailability(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: mentorId } = req.user;
-      const { id: availabilityId } = req.params;
-
-      if (!availabilityId) throw new BadRequestError('Availability ID is required');
+      const { id: availabilityId } = AvailabilityIdParamSchema.parse(req.params);
 
       const result = await this._deleteAvailability.execute(availabilityId, mentorId);
       res.status(200).json({ message: 'Availability rule deleted', data: result });
@@ -106,11 +104,8 @@ export class MentorController {
   async handleAddException(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: mentorId } = req.user;
-      const { id: availabilityId } = req.params;
-      const { date } = req.body;
-
-      if (!availabilityId) throw new BadRequestError('Availability ID is required');
-      if (!date) throw new BadRequestError('date is required in body (YYYY-MM-DD)');
+      const { id: availabilityId } = AvailabilityIdParamSchema.parse(req.params);
+      const { date } = AddExceptionBodySchema.parse(req.body);
 
       const result = await this._addException.execute(availabilityId, mentorId, date);
       res.status(200).json({ message: 'Exception date added', data: result });
