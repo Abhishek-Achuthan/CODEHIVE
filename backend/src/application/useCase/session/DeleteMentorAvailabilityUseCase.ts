@@ -4,6 +4,7 @@ import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/I
 import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class DeleteMentorAvailabilityUseCase implements IDeleteMentorAvailabilityUseCase {
@@ -15,13 +16,13 @@ export class DeleteMentorAvailabilityUseCase implements IDeleteMentorAvailabilit
     async execute(availabilityId: string, mentorId: string): Promise<MentorAvailabilityEntity | null> {
         const availability = await this._mentorAvailabilityRepository.find(availabilityId);
 
-        if (!availability) {
-            throw new NotFoundError('Availability rule not found');
-        }
+        if (!availability) 
+            throw new NotFoundError(ERROR_MESSAGES.SESSION.AVAILABILITY_NOT_FOUND);
+        
 
-        if (availability.mentorId !== mentorId) {
-            throw new ForbiddenError('You can only delete your own availability rules');
-        }
+        if (availability.mentorId !== mentorId) 
+            throw new ForbiddenError(ERROR_MESSAGES.SESSION.AVAILABILITY_DELETE_FORBIDDEN);
+        
 
         return this._mentorAvailabilityRepository.deactivate(availabilityId);
     }

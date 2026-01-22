@@ -35,7 +35,7 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
     }
 
     if (session.paymentStatus !== SessionPaymentStatus.PAID) {
-      throw new BadRequestError('Only paid sessions can be cancelled');
+      throw new BadRequestError(ERROR_MESSAGES.SESSION.ONLY_PAID_SESSIONS_CANCELLABLE);
     }
 
     if (session.status === SessionStatus.CANCELLED) {

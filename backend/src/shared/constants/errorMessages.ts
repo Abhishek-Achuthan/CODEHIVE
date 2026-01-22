@@ -66,6 +66,7 @@ export const ERROR_MESSAGES = {
   // Wallet errors
   WALLET: {
     NOT_FOUND: 'Wallet not found',
+    INSUFFICIENT_BALANCE: 'Insufficient wallet balance',
   },
 
   //QnA errors
@@ -82,7 +83,7 @@ export const ERROR_MESSAGES = {
   },
 
   // Session errors
-  
+
   SESSION: {
     MENTOR_NOT_FOUND: 'Mentor not found',
     MENTOR_NOT_APPROVED: 'Mentor is not approved yet',
@@ -93,5 +94,10 @@ export const ERROR_MESSAGES = {
     NOT_ALLOWED_TO_CANCEL: 'Not allowed to cancel this session',
     ALREADY_STARTED: 'Session already started',
     ALREADY_CANCELLED: 'Session already cancelled',
+    EXCEPTION_DATE_IN_PAST: 'Exception date cannot be in the past',
+    AVAILABILITY_NOT_FOUND: 'Availability rule not found',
+    AVAILABILITY_MODIFY_FORBIDDEN: 'You can only modify your own availability rules',
+    AVAILABILITY_DELETE_FORBIDDEN: 'You can only delete your own availability rules',
+    ONLY_PAID_SESSIONS_CANCELLABLE: 'Only paid sessions can be cancelled',
   },
 };

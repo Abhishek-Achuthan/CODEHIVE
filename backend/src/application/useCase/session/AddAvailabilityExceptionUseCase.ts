@@ -5,6 +5,7 @@ import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabi
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class AddAvailabilityExceptionUseCase implements IAddAvailabilityExceptionUseCase {
@@ -18,17 +19,17 @@ export class AddAvailabilityExceptionUseCase implements IAddAvailabilityExceptio
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         if (exceptionDate < today) {
-            throw new BadRequestError('Exception date cannot be in the past');
+            throw new BadRequestError(ERROR_MESSAGES.SESSION.EXCEPTION_DATE_IN_PAST);
         }
 
         const availability = await this._mentorAvailabilityRepository.find(availabilityId);
 
         if (!availability) {
-            throw new NotFoundError('Availability rule not found');
+            throw new NotFoundError(ERROR_MESSAGES.SESSION.AVAILABILITY_NOT_FOUND);
         }
 
         if (availability.mentorId !== mentorId) {
-            throw new ForbiddenError('You can only modify your own availability rules');
+            throw new ForbiddenError(ERROR_MESSAGES.SESSION.AVAILABILITY_MODIFY_FORBIDDEN);
         }
 
         const storedExdate = exdate.replace(/-/g, '');
