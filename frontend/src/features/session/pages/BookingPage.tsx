@@ -77,8 +77,15 @@ const BookingPage: React.FC = () => {
                     </button>
 
                     <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex items-start gap-6 shadow-lg shadow-black/20">
-                        <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-                            <User className="h-8 w-8 text-white" />
+                        <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20 overflow-hidden">
+                            {mentor?.avatarUrl ? (
+                                <img 
+                                    src={mentor.avatarUrl} 
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <User className="w-8 h-8 text-white" />
+                            )}
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
