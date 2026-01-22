@@ -12,6 +12,7 @@ import { UserRole } from '../../../domain/types/UserRole';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
 import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
 import { PaymentSource } from '../../../domain/types/PaymentSource';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
 import { SessionMapper } from '../../mapper/SessionMapper';
 import { BookSessionDTO } from '../../dto/SessionDTO';
 import type {
@@ -44,7 +45,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     if (
       !mentor ||
       mentor.role !== UserRole.MENTOR ||
-      mentor.mentorStatus !== 'approved'
+      mentor.mentorStatus !== MentorStatus.APPROVED
     ) {
       throw new NotFoundError(ERROR_MESSAGES.SESSION.MENTOR_NOT_FOUND);
     }

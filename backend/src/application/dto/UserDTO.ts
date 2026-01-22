@@ -1,5 +1,6 @@
 
 import { Experience } from '../../domain/types/ExperienceType';
+import { MentorStatus } from '../../domain/types/MentorStatus';
 interface IUserRegisterInputDTO {
   firstName: string;
   lastName: string;
@@ -28,7 +29,7 @@ interface IUserLoginResponseDTO {
   githubUrl?: string | undefined;
   linkedInUrl?: string | undefined;
   websiteUrl?: string | undefined;
-  mentorStatus: 'none' | 'pending' | 'approved';
+  mentorStatus: MentorStatus;
   mentorAppliedAt?: Date | undefined;
   primaryExpertise?: string | undefined;
   experienceLevel?: string | undefined;
@@ -74,7 +75,7 @@ interface IUserProfileResponseDTO {
   githubUrl?: string | undefined;
   linkedInUrl?: string | undefined;
   websiteUrl?: string | undefined;
-  mentorStatus: 'none' | 'pending' | 'approved';
+  mentorStatus: MentorStatus;
   primaryExpertise?: string | undefined;
   experienceLevel?: string | undefined;
 }

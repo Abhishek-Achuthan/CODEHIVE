@@ -1,58 +1,59 @@
 import { Document, Schema, Types } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
 import { Experience } from '../../../domain/types/ExperienceType';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
 
-  export interface UserDocument extends Document{
-    _id: Types.ObjectId;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-    password?: string;
-    googleId?: string;
-    githubId?: string;
-    about?:string;
-    avatarUrl?:string;
-    githubUrl?:string;
-    websiteUrl?:string;
-    linkedInUrl?:string;
-    mentorStatus:'none' | 'pending' | 'approved';
-    mentorAppliedAt?:Date;
-    skills:string[];
-    experience:Experience[];
-    role: UserRole;
-    isBlocked: boolean;
-    primaryExpertise:string;
-    experienceLevel:string;
-    createdAt:Date;
-    updatedAt:Date;
-  }
+export interface UserDocument extends Document {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  password?: string;
+  googleId?: string;
+  githubId?: string;
+  about?: string;
+  avatarUrl?: string;
+  githubUrl?: string;
+  websiteUrl?: string;
+  linkedInUrl?: string;
+  mentorStatus: MentorStatus;
+  mentorAppliedAt?: Date;
+  skills: string[];
+  experience: Experience[];
+  role: UserRole;
+  isBlocked: boolean;
+  primaryExpertise: string;
+  experienceLevel: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-  export type UserLeanDoc  = {
-    _id: Types.ObjectId;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-    password?: string;
-    googleId?: string;
-    githubId?: string;
-    about?:string;
-    avatarUrl?:string;
-    githubUrl?:string;
-    websiteUrl?:string;
-    linkedInUrl?:string;
-    mentorStatus:'none' | 'pending' | 'approved';
-    mentorAppliedAt?:Date;
-    skills:string[];
-    experience:Experience[];
-    role: UserRole;
-    isBlocked: boolean;
-    primaryExpertise:string;
-    experienceLevel:string;
-    createdAt:Date;
-    updatedAt:Date;
-  }
+export type UserLeanDoc = {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  password?: string;
+  googleId?: string;
+  githubId?: string;
+  about?: string;
+  avatarUrl?: string;
+  githubUrl?: string;
+  websiteUrl?: string;
+  linkedInUrl?: string;
+  mentorStatus: MentorStatus;
+  mentorAppliedAt?: Date;
+  skills: string[];
+  experience: Experience[];
+  role: UserRole;
+  isBlocked: boolean;
+  primaryExpertise: string;
+  experienceLevel: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export const UserSchema = new Schema<UserDocument>(
   {
@@ -70,8 +71,8 @@ export const UserSchema = new Schema<UserDocument>(
     linkedInUrl: { type: String, required: false },
     mentorStatus: {
       type: String,
-      enum: ['none', 'pending', 'approved'],
-      default: 'none',
+      enum: Object.values(MentorStatus),
+      default: MentorStatus.NONE,
     },
     mentorAppliedAt: { type: Date, required: false },
     skills: { type: [String], default: [] },
@@ -99,8 +100,8 @@ export const UserSchema = new Schema<UserDocument>(
       default: UserRole.USER,
     },
     isBlocked: { type: Boolean, default: false },
-    primaryExpertise: {type:String,required:false},
-    experienceLevel: {type:String,required:false}
+    primaryExpertise: { type: String, required: false },
+    experienceLevel: { type: String, required: false }
   },
   { timestamps: true }
 );
