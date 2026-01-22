@@ -23,8 +23,8 @@ export class SlotConflictService implements ISlotConflictService {
     const slotStart = this.toMinutes(slot.startTime);
     const slotEnd = this.toMinutes(slot.endTime);
 
-    const sessionStart = this.toMinutes(session.startTime.toISOString());
-    const sessionEnd = this.toMinutes(session.endTime.toISOString());
+    const sessionStart = this.extractMinutesFromDate(session.startTime);
+    const sessionEnd = this.extractMinutesFromDate(session.endTime);
 
     return slotStart < sessionEnd && slotEnd > sessionStart;
   }
@@ -32,5 +32,9 @@ export class SlotConflictService implements ISlotConflictService {
   private toMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours! * 60 + minutes!;
+  }
+
+  private extractMinutesFromDate(date: Date): number {
+    return date.getHours() * 60 + date.getMinutes();
   }
 }
