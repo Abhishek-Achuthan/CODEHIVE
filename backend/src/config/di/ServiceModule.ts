@@ -27,6 +27,8 @@ import { IWalletService } from '../../application/ports/wallet/IWalletService';
 import { WalletService } from '../../infrastructure/adapters/wallet/WalletService';
 import { IPaymentService } from '../../application/ports/payment/IPaymentService';
 import { PaymentService } from '../../infrastructure/adapters/payment/PaymentService';
+import { ISocketService } from '../../application/ports/socket/ISocketService';
+import { SocketService } from '../../infrastructure/adapters/socket/SocketService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -85,5 +87,7 @@ export class ServiceModule {
     container.register<IPaymentService>('IPaymentService', {
       useClass: PaymentService,
     });
+
+    container.registerSingleton<ISocketService>('ISocketService', SocketService);
   }
 }

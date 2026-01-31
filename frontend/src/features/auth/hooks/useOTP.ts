@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export function useOTP<
   TOtpVia extends string,
@@ -12,6 +13,7 @@ export function useOTP<
 ) {
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [otpActiveFor, setOtpActiveFor] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!otpModalOpen) {
@@ -65,6 +67,7 @@ export function useOTP<
     if (isVerified) {
       setOtpModalOpen(false);
       setOtpActiveFor(null);
+      navigate('/login');
     }
   };
 

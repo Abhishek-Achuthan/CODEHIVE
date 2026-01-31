@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
 import type { IListMentorsUseCase } from '../interface/session/IListMentorsUseCase';
-import { UserRole } from '../../../domain/types/UserRole';
 import type { PaginationResult } from '../../../domain/types/PaginationResult';
 import type { UserEntity } from '../../../domain/entities/UserEntity';
 import { MentorListinputDTO } from '../../dto/SessionDTO';

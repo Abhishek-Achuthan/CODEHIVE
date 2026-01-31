@@ -40,7 +40,6 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
             setValue('date', `${y}-${m}-${d}`);
         }
 
-        // Reset recurring-specific fields when switching modes
         if (!isRecurring) {
             setValue('selectedDays', []);
             setValue('durationType', 'forever');
@@ -56,7 +55,6 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     const durationType = watch('durationType');
 
     const handleFormSubmit = async (data: AvailabilityFormSchema) => {
-        // Cast to AvailabilityFormData for parent component compatibility
         await onSubmit(data as AvailabilityFormData);
     };
 
@@ -108,11 +106,9 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
         const out: Array<{ startTime: string; endTime: string }> = [];
         let cursor = start;
 
-        // Ensure loop terminates
         while (cursor + duration <= end) {
             out.push({ startTime: format(cursor), endTime: format(cursor + duration) });
             cursor = cursor + duration + buffer;
-            // Safety break to prevent infinite loops if logic fails
             if (out.length > 50) break;
         }
 

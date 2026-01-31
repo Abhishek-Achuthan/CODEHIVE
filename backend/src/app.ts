@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
 import express, { Express } from 'express';
+import { createServer, Server as HttpServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import { AuthRoute } from './presentation/routes/AuthRoutes';
 import { AdminRoute } from './presentation/routes/AdminRoutes';
 import { MongodbConfig } from './config/MongodbConfig';
@@ -15,15 +17,26 @@ import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
+import { socketService } from './config/di/resolver';
 
 export class App {
   private readonly _app: Express;
+  private readonly _httpServer: HttpServer;
+  private readonly _io: SocketIOServer;
 
   constructor() {
     this._app = express();
+    this._httpServer = createServer(this._app);
+    this._io = new SocketIOServer(this._httpServer, {
+      cors: {
+        origin: env.frontendUrl,
+        credentials: true,
+      },
+    });
     this.configMiddlewares();
     this.configRoutes();
     this.configDb();
+    this.configSocket();
     this.configErrorHanldingMiddleWares();
   }
 
@@ -40,7 +53,7 @@ export class App {
         credentials: true,
       })
     );
-    this._app.use('/api/webhook/stripe',express.raw({type:'application/json'}));
+    this._app.use('/api/webhook/stripe', express.raw({ type: 'application/json' }));
     this._app.use(express.json());
     this._app.use(express.urlencoded({ extended: true }));
     this._app.use(cookieParser());
@@ -60,20 +73,24 @@ export class App {
     this._app.use('/api/qna', qnaRoutes.getRoutes());
     this._app.use('/api/users', userRoute.getRoutes());
     this._app.use('/api/sessions', sessionRoutes.getRoutes());
-    this._app.use('/api/mentors',mentorRoutes.getRoutes());
-    this._app.use('/api/webhook',webhookRoutes.getRoutes());
+    this._app.use('/api/mentors', mentorRoutes.getRoutes());
+    this._app.use('/api/webhook', webhookRoutes.getRoutes());
     this._app.use('/api/wallet', walletRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
     this._app.use(errorHandler);
-  };
+  }
+
+  private configSocket() {
+    socketService.initialize(this._io);
+  }
 
   public listen() {
-    this._app.listen(env.port, () => {
+    this._httpServer.listen(env.port, () => {
       console.log(`server started at port ${env.port}`);
     });
-  };
+  }
 }
 
 const app = new App();

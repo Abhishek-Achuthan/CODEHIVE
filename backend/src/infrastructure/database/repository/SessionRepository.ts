@@ -9,6 +9,7 @@ import { PopulatedSessionDoc } from '../types/PopulatedSessionDoc';
 import { UserLeanDoc } from '../schemas/UserSchema';
 import { EssentialUserInfo } from '../../../domain/types/EssentialUserInfo';
 import { SessionWithParticipants } from '../../../domain/types/SessionWithParticipants';
+import { SessionStatus } from '../../../domain/types/SessionStatus';
 
 @injectable()
 export class SessionRepository
@@ -30,7 +31,7 @@ export class SessionRepository
     mentorId: string,
     date: string
   ): Promise<SessionEntity[]> {
-    const docs = await SessionModel.find({ mentorId, date });
+    const docs = await SessionModel.find({ mentorId, date,status:{$ne:SessionStatus.CANCELLED} });
     return docs.map((doc) => this.toEntity(doc));
   }
 

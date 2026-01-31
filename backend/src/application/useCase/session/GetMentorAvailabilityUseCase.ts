@@ -4,7 +4,6 @@ import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/I
 import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 
 
-
 @injectable()
 export class GetMentorAvailabilityUseCase implements IGetMentorAvailabilityUseCase {
     constructor(

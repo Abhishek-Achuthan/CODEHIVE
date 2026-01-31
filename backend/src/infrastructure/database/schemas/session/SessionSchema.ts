@@ -55,8 +55,7 @@ export const SessionSchema = new Schema({
     timestamps: true
 });
 
-// Unique constraint to prevent double booking of the same slot
-// Only applies to non-cancelled sessions
+
 SessionSchema.index(
     { mentorId: 1, date: 1, startTime: 1, endTime: 1 },
     {

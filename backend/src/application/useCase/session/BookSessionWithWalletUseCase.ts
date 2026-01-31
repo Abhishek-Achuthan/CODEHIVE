@@ -48,9 +48,9 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
       !mentor ||
       mentor.role !== UserRole.MENTOR ||
       mentor.mentorStatus !== MentorStatus.APPROVED
-    ) {
+    ) 
       throw new NotFoundError(ERROR_MESSAGES.SESSION.MENTOR_NOT_FOUND);
-    }
+    
 
     const availabilities = await this._availabilityRepo.findByMentor(mentorId);
 
@@ -97,15 +97,15 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
     const wallet = await this._walletRepository.findByUserId(userId);
 
-    if (!wallet) {
+    if (!wallet) 
       throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
-    }
+    
 
     const balance = await this._walletRepository.getBalance(wallet.id);
 
-    if (balance < amount) {
+    if (balance < amount) 
       throw new BadRequestError(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
-    }
+    
 
 
     let session;
@@ -137,9 +137,9 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
       const updated = await this._sessionRepo.find(session.id);
 
-      if (!updated) {
+      if (!updated) 
         throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
-      }
+      
 
       return SessionMapper.toResponse(updated);
     } catch (error) {

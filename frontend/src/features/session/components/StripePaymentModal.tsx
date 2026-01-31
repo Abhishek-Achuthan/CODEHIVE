@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
 import { Loader2, ShieldCheck } from 'lucide-react';
+import { useSocket } from '../../../shared/socket/useSocket';
 
 interface StripePaymentModalProps {
     onClose: () => void;
@@ -12,11 +13,43 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({ onClose, onPaid
     const stripe = useStripe();
     const elements = useElements();
     const [isPaying, setIsPaying] = useState(false);
+    const { socket } = useSocket();
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const hasCompletedRef = useRef(false);
+
+    const completePayment =useCallback(() => {
+        if (hasCompletedRef.current) return;
+        hasCompletedRef.current = true;
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        onPaid();
+    },[onPaid]);
+
+    // Listen for real-time payment confirmation from webhook
+    useEffect(() => {
+        if (!socket) return;
+
+        const handlePaymentStatus = (data: { sessionId: string; status: string }) => {
+            if (data.status === 'paid') {
+                completePayment();
+            } else if (data.status === 'failed') {
+                toast.error('Payment failed. Please try again.');
+                setIsPaying(false);
+            }
+        };
+
+        socket.on('payment:status', handlePaymentStatus);
+
+        return () => {
+            socket.off('payment:status', handlePaymentStatus);
+        };
+    }, [socket,completePayment]);
 
     const handlePay = async () => {
         if (!stripe || !elements) return;
 
         setIsPaying(true);
+        hasCompletedRef.current = false;
+
         try {
             const result = await stripe.confirmPayment({
                 elements,
@@ -25,14 +58,21 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({ onClose, onPaid
 
             if (result.error) {
                 toast.error(result.error.message || 'Payment failed');
+                setIsPaying(false);
                 return;
             }
 
-            onPaid();
-        } finally {
+            // Payment confirmed client-side
+            // Wait for socket event, but fallback after 5 seconds
+            timeoutRef.current = setTimeout(() => {
+                completePayment();
+            }, 5000);
+        } catch {
             setIsPaying(false);
         }
     };
+
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
