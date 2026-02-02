@@ -14,4 +14,6 @@ export interface IUserRepository
     sort?: string,
     search?: string
   ): Promise<PaginationResult<UserEntity>>;
+
+  findMentorApplications(currentPage?:number,pageSize?:number,search?:string):Promise<PaginationResult<UserEntity>>
 }

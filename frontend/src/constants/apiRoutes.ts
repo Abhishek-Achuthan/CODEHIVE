@@ -18,6 +18,7 @@ export const API_ROUTES = {
 
   USER: {
     UPDATE_MY_PROFILE: "/users/me/profile",
+    APPLY_FOR_MENTOR: "/users/me/mentor-applications"
   },
 
   ADMIN: {
@@ -38,6 +39,19 @@ export const API_ROUTES = {
       return `/admin/users?${query.toString()}`;
     },
     UPDATE_USER_STATUS: `/admin/update-user-status`,
+    MENTOR_APPLICATIONS: (params: {
+      page?: number;
+      pageSize?: number;
+      search?: string;
+    }) => {
+      const query = new URLSearchParams({
+        currentPage: (params.page ?? 1).toString(),
+        pageSize: (params.pageSize ?? 10).toString(),
+        search: params.search ?? "",
+      });
+      return `/admin/list-applications?${query.toString()}`;
+    },
+    UPDATE_MENTOR_STATUS: `/admin/update-mentor-status`,
   },
 
   QnA: {
@@ -72,7 +86,7 @@ export const API_ROUTES = {
     RELATED_QUESTIONS: (questionId: string) =>
       `/qna/questions/${questionId}/related`,
     SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
-    UNSAVE_QUESTION:(questionId: string) => `/qna/questions/${questionId}/save`,
+    UNSAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
     VOTE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/vote`,
     EDIT_QUESTION: (questionId: string) => `qna/questions/${questionId}`,
     ANSWERED_QUESTIONS: (params?: QuestionListParams) => {

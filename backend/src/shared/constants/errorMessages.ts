@@ -7,6 +7,7 @@ export const ERROR_MESSAGES = {
     ACCOUNT_BLOCKED: 'Your account is blocked',
     PASSWORD_NOT_SET:
       'This account does not have a password. Please sign in using Google or set a password first.',
+    
 
     // Token errors
     MISSING_REFRESH_TOKEN: 'Missing refresh token',
@@ -56,6 +57,9 @@ export const ERROR_MESSAGES = {
     ALREADY_EXIST: 'User already exist',
     NOT_FOUND: 'User not found',
     UPDATE_FAILED: 'Failed to update user status',
+    ALREADY_MENTOR: 'User is already a mentor',
+    APPLY_FOR_MENTOR_FAILED: 'Failed to apply for mentor',
+    ALREADY_APPLIED: 'You have already applied to be a mentor',
   },
 
   // Server errors

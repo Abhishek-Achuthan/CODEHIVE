@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, Calendar, DollarSign, BarChart3, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Calendar, DollarSign, BarChart3, LogOut, ClipboardList } from "lucide-react";
 import { useLogout } from "../features/auth/hooks/useLogout";
 
 
@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
 
-  const {logOut} = useLogout()
+  const { logOut } = useLogout()
 
   return (
     <div className="flex min-h-screen bg-black text-white">
@@ -21,8 +21,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -33,8 +32,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink
             to="/admin/users"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -45,8 +43,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink
             to="/admin/mentors"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -55,10 +52,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </NavLink>
 
           <NavLink
+            to="/admin/applications"
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
+              }`
+            }
+          >
+            <ClipboardList className="w-5 h-5" />
+            Applications
+          </NavLink>
+
+          <NavLink
             to="/admin/subscriptions"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -69,8 +76,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink
             to="/admin/plans"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -81,8 +87,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink
             to="/admin/reports"
             className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
+              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${isActive ? "bg-gray-800" : ""
               }`
             }
           >
@@ -98,7 +103,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </button>
         </nav>
 
-        
+
       </aside>
 
       <main className="flex-1 p-6 overflow-y-auto">{children}</main>

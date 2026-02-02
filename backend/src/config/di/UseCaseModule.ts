@@ -119,6 +119,12 @@ import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/inte
 import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/session/DeleteMentorAvailabilityUseCase';
 import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/session/IAddAvailabilityExceptionUseCase';
 import { AddAvailabilityExceptionUseCase } from '../../application/useCase/session/AddAvailabilityExceptionUseCase';
+import { IApplyForMentorUseCase } from '../../application/useCase/interface/user/IApplyForMentorUseCase';
+import { ApplyForMentorUseCase } from '../../application/useCase/user/ApplyForMentorUseCase';
+import { IListMentorApplicationUseCase } from '../../application/useCase/interface/admin/IListMentorApplicationUseCase';
+import { ListMentorApplicationUseCase } from '../../application/useCase/admin/ListMentorApplicationUseCase';
+import { IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
+import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -196,6 +202,14 @@ export class UseCaseModule {
       useClass: UpdateUserStatusUseCase,
     });
 
+    container.register<IListMentorApplicationUseCase>('IListMentorApplicationUseCase', {
+      useClass: ListMentorApplicationUseCase
+    });
+
+    container.register<IUpdateMentorStatusUseCase>('IUpdateMentorStatusUseCase', {
+      useClass: UpdateMentorStatusUseCase
+    });
+
     //----------------------------------QnA----------------------------------------//
 
     container.register<ICreateQuestionUseCase>('ICreateQuestionUseCase', {
@@ -226,7 +240,7 @@ export class UseCaseModule {
       useClass: ToggleSaveQuestionUseCase,
     });
 
-    container.register<IUnsaveItemUseCase>('IUnsaveItemUseCase',{
+    container.register<IUnsaveItemUseCase>('IUnsaveItemUseCase', {
       useClass: UnsaveItemUseCase,
     })
 
@@ -317,10 +331,6 @@ export class UseCaseModule {
       useClass: GetAiChatMessagesUseCase,
     });
 
-    container.register<IUpdateUserProfileUseCase>('IUpdateUserProfileUseCase', {
-      useClass: UpdateUserProfileUseCase,
-    });
-
     container.register<IDeleteQuestionUseCase>('IDeleteQuestionUseCase', {
       useClass: DeleteQuestionUseCase
     });
@@ -387,5 +397,14 @@ export class UseCaseModule {
       useClass: GetMyWalletUseCase,
     });
 
+    //---------------------------------User---------------------------------------//
+
+    container.register<IUpdateUserProfileUseCase>('IUpdateUserProfileUseCase', {
+      useClass: UpdateUserProfileUseCase,
+    });
+
+    container.register<IApplyForMentorUseCase>('IApplyForMentorUseCase', {
+      useClass: ApplyForMentorUseCase,
+    });
   }
 }

@@ -49,8 +49,24 @@ export interface SkillsData {
   inputValue: string;
 }
 
+export const MentorStatus = {
+  NONE: 'none',
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const;
+
+export type MentorStatus = typeof MentorStatus[keyof typeof MentorStatus];
+
 export interface MentorChecklist {
   aboutComplete: boolean;
   experienceComplete: boolean;
   skillsComplete: boolean;
+}
+
+export interface MentorApplicationState {
+  checklist: MentorChecklist;
+  status: MentorStatus;
+  rejectionReason?: string;
+  appliedAt?: string;
 }

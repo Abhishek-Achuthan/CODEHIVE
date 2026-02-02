@@ -12,7 +12,7 @@ import SkillsSection from "../components/SkillsSection";
 import AccountSecurityCard from "../components/AccountSecurityCard";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import Header from "../../../shared/ui/Header";
@@ -22,12 +22,19 @@ import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
 
 import type { MentorChecklist, ProfileUser } from "../types";
+import { MentorStatus } from "../types";
 import { BaseError } from "../../../shared/errors/BaseError";
 
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
-  const { updateProfile } = useProfileUpdater();
+  const { updateProfile, applyForMentor } = useProfileUpdater();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
+
+  // Refs for scrolling to sections
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const skillsRef = useRef<HTMLDivElement>(null);
+  const experienceRef = useRef<HTMLDivElement>(null);
 
   //data
   const profileUser: ProfileUser = useMemo(() => {
@@ -147,6 +154,36 @@ export default function ProfilePage() {
     }
   };
 
+  const scrollToSection = (section: 'about' | 'skills' | 'experience') => {
+    const refs = { about: aboutRef, skills: skillsRef, experience: experienceRef };
+    const targetRef = refs[section];
+
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      targetRef.current.classList.add('ring-2', 'ring-purple-500/50', 'rounded-lg');
+      setTimeout(() => {
+        targetRef.current?.classList.remove('ring-2', 'ring-purple-500/50', 'rounded-lg');
+      }, 2000);
+    }
+  };
+
+  const handleApplyForMentor = async () => {
+    try {
+      setIsApplyingForMentor(true);
+
+      await applyForMentor();
+
+      toast.success('Application submitted! We\'ll review your profile shortly.');
+    } catch (error) {
+      if (error instanceof BaseError) toast.error(error.message);
+      else if (error instanceof Error) toast.error(error.message);
+      else toast.error('Failed to submit application');
+    } finally {
+      setIsApplyingForMentor(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
@@ -184,20 +221,26 @@ export default function ProfilePage() {
             <MainContent
               left={
                 <LeftColumn>
-                  <AboutSection
-                    initialText={authUser?.about ?? ""}
-                    onSave={(text) => updateProfile({ about: text })}
-                  />
+                  <div ref={aboutRef}>
+                    <AboutSection
+                      initialText={authUser?.about ?? ""}
+                      onSave={(text) => updateProfile({ about: text })}
+                    />
+                  </div>
 
-                  <ExperienceSection
-                    initialItems={authUser?.experience ?? []}
-                    onSave={(items) => updateProfile({ experience: items })}
-                  />
+                  <div ref={experienceRef}>
+                    <ExperienceSection
+                      initialItems={authUser?.experience ?? []}
+                      onSave={(items) => updateProfile({ experience: items })}
+                    />
+                  </div>
 
-                  <SkillsSection
-                    initialSkills={authUser?.skills ?? []}
-                    onSave={(skills) => updateProfile({ skills })}
-                  />
+                  <div ref={skillsRef}>
+                    <SkillsSection
+                      initialSkills={authUser?.skills ?? []}
+                      onSave={(skills) => updateProfile({ skills })}
+                    />
+                  </div>
 
                   <ExpertiseSection
                     initialPrimaryExpertise={authUser?.primaryExpertise}
@@ -219,10 +262,12 @@ export default function ProfilePage() {
                   />
 
                   <MentorCard
-                    checked={false}
-                    disabled={false}
                     checklist={mentorChecklist}
-                    onToggle={() => { }}
+                    status={authUser?.mentorStatus ?? MentorStatus.NONE}
+                    rejectionReason={undefined}
+                    onApply={handleApplyForMentor}
+                    onScrollToSection={scrollToSection}
+                    isApplying={isApplyingForMentor}
                   />
                 </RightColumn>
               }

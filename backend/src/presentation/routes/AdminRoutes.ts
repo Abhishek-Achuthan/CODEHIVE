@@ -24,9 +24,21 @@ export class AdminRoute {
       roleMiddleware.authorize(['admin']),
       this._adminController.handleUpdateUserStatus.bind(this._adminController)
     );
+    this._router.get(
+      '/list-applications',
+      authMiddleware.check,
+      roleMiddleware.authorize(['admin']),
+      this._adminController.handleListMentorApplications.bind(this._adminController)
+    );
+    this._router.patch(
+      '/update-mentor-status',
+      authMiddleware.check,
+      roleMiddleware.authorize(['admin']),
+      this._adminController.handleUpdateMentorStatus.bind(this._adminController)
+    );
   }
 
-  public getRoutes():Router {
+  public getRoutes(): Router {
     return this._router;
   }
 }

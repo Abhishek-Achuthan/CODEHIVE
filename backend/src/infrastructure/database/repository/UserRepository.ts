@@ -6,6 +6,7 @@ import { UserDocument, UserLeanDoc } from '../schemas/UserSchema';
 import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { FilterQuery, Model } from 'mongoose';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
@@ -20,6 +21,35 @@ export class UserRepository
     if (!userDoc) return null;
 
     return this.toEntity(userDoc);
+  }
+
+  async findMentorApplications(currentPage?:number ,pageSize?:number,search?:string): Promise<PaginationResult<UserEntity>> {
+
+    currentPage = Math.max(1, currentPage ?? 1);
+    pageSize = Math.max(1, pageSize ?? 10);
+
+    const query: FilterQuery<UserDocument> = {
+      mentorStatus: MentorStatus.PENDING
+    };
+
+    if(search) {
+      query.$or = [
+        {firstName:{$regex:search,$options:'i'}},
+        {lastName:{$regex:search,$options:'i'}},
+        {email:{$regex:search,$options:'i'}},
+      ]
+    }
+    
+    query.mentorAppliedAt = {$exists: true};
+
+    const totalItems = await this._model.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const skip = (currentPage - 1) * pageSize;
+
+    const userDoc = await this._model.find(query).sort({mentorAppliedAt: -1}).skip(skip).limit(pageSize).lean<UserLeanDoc[]>();
+    const items = userDoc.map((doc) => this.leanToEntity(doc));
+
+    return {items,totalItems,totalPages}
   }
 
   async getAllUsers(

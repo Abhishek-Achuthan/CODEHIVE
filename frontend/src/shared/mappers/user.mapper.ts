@@ -1,7 +1,8 @@
-import type { AdminUserListItemApi } from "../types/api/admin";
+import type { AdminUserListItemApi, MentorApplicationApi } from "../types/api/admin";
 import type { UserApi } from "../types/api/auth";
 import type { AdminUserListItemView } from "../types/view/AdminUserListItemView";
 import type { CurrentUserView } from "../types/view/CurrentUserView";
+import type { MentorApplicationView } from "../types/view/MentorApplicationView";
 
 export function mapAdminUserListItemToView(
   user: AdminUserListItemApi
@@ -13,6 +14,19 @@ export function mapAdminUserListItemToView(
     email: user.email,
     role: user.role,
     isBlocked: user.isBlocked,
+  };
+}
+
+export function mapMentorApplicationToView(
+  application: MentorApplicationApi
+): MentorApplicationView {
+  return {
+    id: application.id,
+    firstName: application.firstName,
+    lastName: application.lastName,
+    email: application.email,
+    mentorStatus: application.mentorStatus,
+    mentorAppliedAt: new Date(application.mentorAppliedAt),
   };
 }
 

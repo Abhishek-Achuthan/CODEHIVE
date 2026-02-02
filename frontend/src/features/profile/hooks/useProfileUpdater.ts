@@ -5,14 +5,21 @@ import { setCurrentUser } from "../../../store/slices/authSlice";
 
 export function useProfileUpdater() {
     const dispatch = useAppDispatch();
-    const authUser = useAppSelector(s  => s.auth.user);
+    const authUser = useAppSelector(s => s.auth.user);
 
-    const updateProfile = async (payload:UpdateMyProfileRequest) => {
-        if(!authUser) throw new Error('Not authenticated');
+    const updateProfile = async (payload: UpdateMyProfileRequest) => {
+        if (!authUser) throw new Error('Not authenticated');
 
         const updated = await UserService.updateMyProfile(payload);
-        dispatch(setCurrentUser({...authUser,...updated}));
+        dispatch(setCurrentUser({ ...authUser, ...updated }));
     };
 
-    return {updateProfile}
+    const applyForMentor = async () => {
+        if (!authUser) throw new Error('Not authenticated');
+
+        const updated = await UserService.applyForMentor();
+        dispatch(setCurrentUser({ ...authUser, ...updated }));
+    };
+
+    return { updateProfile, applyForMentor }
 }

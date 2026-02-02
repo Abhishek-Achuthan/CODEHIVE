@@ -14,6 +14,15 @@ export class UserService {
     }
   }
 
+  static async applyForMentor(): Promise<UserProfileApi> {
+    try {
+      const response = await UserApi.applyForMentor();
+      return response.data as UserProfileApi
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
   private static handleError(error: unknown): never {
     if (error instanceof AxiosError) {
       const msg = error.response?.data?.message || "Something went wrong";

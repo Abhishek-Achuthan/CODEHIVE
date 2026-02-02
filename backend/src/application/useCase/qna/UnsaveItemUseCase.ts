@@ -1,9 +1,9 @@
-import { inject,injectable } from "tsyringe";
-import { IUnsaveItemUseCase } from "../interface/qna/IUnsaveItemUseCase";
-import { type IQuestionRepository } from "../../../domain/interfaces/IQuestionRepository";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { type ISavedQuestionRepository } from "../../../domain/interfaces/ISavedQuestionRepository";
+import { inject,injectable } from 'tsyringe';
+import { IUnsaveItemUseCase } from '../interface/qna/IUnsaveItemUseCase';
+import { type IQuestionRepository } from '../../../domain/interfaces/IQuestionRepository';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { type ISavedQuestionRepository } from '../../../domain/interfaces/ISavedQuestionRepository';
 
 @injectable()
 export class UnsaveItemUseCase implements IUnsaveItemUseCase {
