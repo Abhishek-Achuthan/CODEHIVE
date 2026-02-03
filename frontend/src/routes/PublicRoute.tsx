@@ -5,7 +5,7 @@ const PublicRoute = () => {
   const isAuthenticated = useAppSelector((state) => state.auth.user);
 
   if (isAuthenticated) {
-    if (isAuthenticated.role === "user") {
+    if (isAuthenticated.role === "user" || isAuthenticated.role === "mentor") {
       return <Navigate to="/home" replace />;
     } else if (isAuthenticated.role === "admin") {
       return <Navigate to="/admin/users" replace />;

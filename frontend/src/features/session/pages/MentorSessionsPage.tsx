@@ -1,18 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
 import { Search, Loader2, Calendar } from "lucide-react";
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
+import MentorLayout from "../../../layouts/MentorLayout";
 import { SessionService } from "../../../services/sessionService";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
 import toast from "react-hot-toast";
 import { BaseError } from "../../../shared/errors/BaseError";
-
 import { SessionCard } from "../components/SessionCard";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
+import { useAppSelector } from "../../../store";
+import type { RootState } from "../../../store";
+import { useNavigate } from "react-router-dom";
 
-export default function MySessionsPage() {
+export default function MentorSessionsPage() {
+    const navigate = useNavigate();
+    const user = useAppSelector((state: RootState) => state.auth.user);
     const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
@@ -23,14 +26,27 @@ export default function MySessionsPage() {
     const { cancelSession, loading: cancelLoading } = useCancelSession();
 
     useEffect(() => {
-        fetchSessions();
+        // Redirect if not an approved mentor
+        if (user?.mentorStatus !== "approved") {
+            navigate("/profile");
+        }
+    }, [user, navigate]);
+
+    useEffect(() => {
+        fetchMentorSessions();
     }, []);
 
-    const fetchSessions = async () => {
+    const fetchMentorSessions = async () => {
         try {
             setLoading(true);
+            // TODO: Create dedicated endpoint for mentor sessions
+            // For now, filter from all sessions where user is the mentor
             const data = await SessionService.getBookedSessions();
-            setSessions(data);
+            // Filter to only sessions where current user is the mentor
+            const mentorSessions = data.filter(
+                (session) => session.mentor?.id === user?.id
+            );
+            setSessions(mentorSessions);
         } catch (error) {
             if (error instanceof BaseError) toast.error(error.message);
             else toast.error("Failed to load sessions");
@@ -70,24 +86,22 @@ export default function MySessionsPage() {
     const handleCancelSession = async (sessionId: string) => {
         try {
             await cancelSession(sessionId);
-            await fetchSessions();
+            await fetchMentorSessions();
         } catch {
             // Error already handled in hook
         }
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            <Header />
-
-            <main className="px-4 py-10">
+        <MentorLayout>
+            <div className="px-4 py-10">
                 <div className="mx-auto max-w-6xl">
                     {/* Page Title */}
                     <h1 className="text-center text-2xl font-semibold italic text-white">
-                        My Booked Sessions
+                        My Hosted Sessions
                     </h1>
                     <p className="mt-2 text-center text-sm text-gray-400">
-                        Sessions you've booked as a user
+                        Sessions you're conducting as a mentor
                     </p>
 
                     {/* Tabs & Search */}
@@ -98,10 +112,10 @@ export default function MySessionsPage() {
                         <div className="relative">
                             <input
                                 type="text"
-                                placeholder="Search here..."
+                                placeholder="Search by student or topic..."
                                 value={searchQuery}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="w-56 rounded-lg border border-gray-700 bg-black py-2 pl-9 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                                className="w-64 rounded-lg border border-gray-700 bg-black py-2 pl-9 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                             />
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                         </div>
@@ -122,7 +136,7 @@ export default function MySessionsPage() {
                             </div>
                             <div className="mt-1 text-xs text-gray-500">
                                 {activeTab === "upcoming"
-                                    ? "You don't have any upcoming sessions booked"
+                                    ? "You don't have any upcoming sessions to host"
                                     : `No ${activeTab} sessions to display`}
                             </div>
                         </div>
@@ -133,9 +147,10 @@ export default function MySessionsPage() {
                                     <SessionCard
                                         key={session.id}
                                         session={session}
+                                        context="mentor"
                                         onCancel={() => handleCancelSession(session.id)}
                                         onJoinRoom={() => {
-                                            toast.success("Joining room...");
+                                            toast.success("Starting session...");
                                         }}
                                         isCancelling={cancelLoading}
                                     />
@@ -150,9 +165,7 @@ export default function MySessionsPage() {
                         </>
                     )}
                 </div>
-            </main>
-
-            <Footer />
-        </div>
+            </div>
+        </MentorLayout>
     );
 }

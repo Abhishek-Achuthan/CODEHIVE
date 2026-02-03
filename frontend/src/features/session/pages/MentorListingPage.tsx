@@ -19,11 +19,11 @@ const MentorListingPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="flex min-h-screen flex-col bg-black text-white">
             <Header />
 
-            <main className="px-4 py-10">
-                <div className="mx-auto max-w-6xl">
+            <main className="flex flex-1 flex-col px-4 py-10">
+                <div className="mx-auto w-full max-w-6xl">
                     <div className="flex items-center justify-between gap-4">
                         <h1 className="text-2xl font-semibold text-white">Mentors</h1>
 
@@ -57,7 +57,7 @@ const MentorListingPage: React.FC = () => {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-20">
+                        <div className="flex flex-1 items-center justify-center">
                             <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                         </div>
                     ) : mentors.length > 0 ? (
@@ -67,31 +67,36 @@ const MentorListingPage: React.FC = () => {
                                     <MentorCard key={mentor.id} mentor={mentor} />
                                 ))}
                             </div>
-
-                            <div className="mt-10 flex items-center justify-center gap-3">
-                                <button
-                                    onClick={() => setParams(prev => ({ ...prev, page: (prev.page || 1) - 1 }))}
-                                    disabled={(params.page || 1) <= 1}
-                                    className="rounded-md border border-gray-700 bg-black px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Prev
-                                </button>
-                                <span className="text-xs text-gray-400">
-                                    Page {params.page} of {totalPages}
-                                </span>
-                                <button
-                                    onClick={() => setParams(prev => ({ ...prev, page: (prev.page || 1) + 1 }))}
-                                    disabled={(params.page || 1) >= totalPages}
-                                    className="rounded-md border border-gray-700 bg-black px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Next
-                                </button>
-                            </div>
                         </>
                     ) : (
-                        <div className="py-20 text-center text-gray-400">No mentors found.</div>
+                        <div className="flex flex-1 items-center justify-center text-gray-400">No mentors found.</div>
                     )}
                 </div>
+
+                {/* Pagination - stays at bottom */}
+                {!loading && mentors.length > 0 && (
+                    <div className="mt-auto pt-10 pb-6">
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                onClick={() => setParams(prev => ({ ...prev, page: (prev.page || 1) - 1 }))}
+                                disabled={(params.page || 1) <= 1}
+                                className="rounded-md border border-gray-700 bg-black px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Prev
+                            </button>
+                            <span className="text-xs text-gray-400">
+                                Page {params.page} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => setParams(prev => ({ ...prev, page: (prev.page || 1) + 1 }))}
+                                disabled={(params.page || 1) >= totalPages}
+                                className="rounded-md border border-gray-700 bg-black px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                )}
             </main>
 
             <Footer />

@@ -2,7 +2,7 @@ import { injectable } from 'tsyringe';
 import { Types } from 'mongoose';
 import { IWalletRepository } from '../../../domain/interfaces/IWalletRepository';
 import { WalletEntity } from '../../../domain/entities/wallet/WalletEntity';
-import { WalletTransactionEntity } from '../../../domain/entities/wallet/WalletTransactionEntity';
+import { WalletTransactionEntity } from '../../../domain/entities/Wallet/WalletTransactionEntity';
 import { WalletModel } from '../models/wallet/WalletModel';
 import { WalletTransactionModel } from '../models/wallet/WalletTransactionModel';
 import { WalletDoc, WalletLeanDoc } from '../schemas/wallet/WalletSchema';

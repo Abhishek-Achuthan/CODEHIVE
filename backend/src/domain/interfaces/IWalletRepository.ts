@@ -1,5 +1,5 @@
 import { WalletEntity } from '../entities/wallet/WalletEntity';
-import { WalletTransactionEntity } from '../entities/wallet/WalletTransactionEntity';
+import { WalletTransactionEntity } from '../entities/Wallet/WalletTransactionEntity';
 
 export interface IWalletRepository {
     findByUserId(userId:string):Promise<WalletEntity | null>;

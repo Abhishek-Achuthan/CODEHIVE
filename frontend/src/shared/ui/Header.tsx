@@ -56,11 +56,25 @@ export default function Header() {
               Q&A
             </Link>
             <Link
-              to={"/session"}
+              to={"/sessions"}
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
             >
-              Session
+              Sessions
             </Link>
+            <Link
+              to={"/sessions/booked"}
+              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+            >
+              My Sessions
+            </Link>
+            {user?.mentorStatus === "approved" && (
+              <Link
+                to={"/mentor/dashboard"}
+                className="text-indigo-400 hover:text-indigo-300 px-3 py-2 text-sm font-medium"
+              >
+                Mentor
+              </Link>
+            )}
             <a
               href="#pricing"
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"

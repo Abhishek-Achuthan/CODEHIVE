@@ -6,9 +6,10 @@ interface SessionCardProps {
     onJoinRoom: () => void;
     onCancel: () => void;
     isCancelling?: boolean;
+    context?: "user" | "mentor"; // Determines which perspective to show
 }
 
-export function SessionCard({ session, onJoinRoom, onCancel, isCancelling }: SessionCardProps) {
+export function SessionCard({ session, onJoinRoom, onCancel, isCancelling, context = "user" }: SessionCardProps) {
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString("en-US", {
@@ -27,6 +28,14 @@ export function SessionCard({ session, onJoinRoom, onCancel, isCancelling }: Ses
         });
     };
 
+    // Determine which participant info to show based on context
+    const participantLabel = context === "mentor" ? "Student" : "Mentor";
+    const participantName = context === "mentor"
+        ? `${session.user.firstName} ${session.user.lastName}`
+        : session.mentor
+            ? `${session.mentor.firstName} ${session.mentor.lastName}`
+            : "N/A";
+
     return (
         <div className="rounded-2xl border border-gray-800 bg-black p-5 transition-colors hover:bg-gray-950/40">
             {/* Topic Title */}
@@ -43,9 +52,9 @@ export function SessionCard({ session, onJoinRoom, onCancel, isCancelling }: Ses
                 {/* Session Details */}
                 <div className="flex-1 space-y-1.5">
                     <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-400">User</span>
+                        <span className="text-gray-400">{participantLabel}</span>
                         <span className="text-white font-medium">
-                            {session.user.firstName} {session.user.lastName}
+                            {participantName}
                         </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
@@ -61,9 +70,9 @@ export function SessionCard({ session, onJoinRoom, onCancel, isCancelling }: Ses
                     <div className="flex items-center gap-2 text-sm">
                         <span className="text-gray-400">Payment</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${session.paymentStatus === 'PAID' ? 'bg-green-500/10 text-green-400' :
-                                session.paymentStatus === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' :
-                                    session.paymentStatus === 'REFUNDED' ? 'bg-blue-500/10 text-blue-400' :
-                                        'bg-red-500/10 text-red-400'
+                            session.paymentStatus === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' :
+                                session.paymentStatus === 'REFUNDED' ? 'bg-blue-500/10 text-blue-400' :
+                                    'bg-red-500/10 text-red-400'
                             }`}>
                             {session.paymentStatus}
                         </span>

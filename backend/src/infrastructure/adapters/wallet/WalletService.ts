@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { IWalletService } from '../../../application/ports/wallet/IWalletService';
 import { type IWalletRepository } from '../../../domain/interfaces/IWalletRepository';
-import { WalletTransactionEntity } from '../../../domain/entities/wallet/WalletTransactionEntity';
+import { WalletTransactionEntity } from '../../../domain/entities/Wallet/WalletTransactionEntity';
 import { WalletTransactionType } from '../../../domain/types/WalletTransactionType';
 import { Credit, Debit } from '../../../domain/types/WalletTransactionInput';
 

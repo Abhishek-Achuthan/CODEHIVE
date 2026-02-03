@@ -40,6 +40,8 @@ const MentorAvailabilityPage = lazy(() => import("../features/session/pages/Ment
 const BookingPage = lazy(() => import("../features/session/pages/BookingPage"));
 const PaymentPage = lazy(() => import("../features/session/pages/PaymentPage"));
 const MySessionsPage = lazy(() => import("../features/session/pages/MySessionsPage"));
+const MentorDashboardPage = lazy(() => import("../features/session/pages/MentorDashboardPage"));
+const MentorSessionsPage = lazy(() => import("../features/session/pages/MentorSessionsPage"));
 
 export default function AppRoutes() {
   return (
@@ -77,12 +79,16 @@ export default function AppRoutes() {
             <Route path="/qna/saved" element={<SavedQuestionsPage />} />
             <Route path="/qna/ai-assist" element={<AiAssistPage />} />
 
-            {/* Mentorship Routes */}
-            <Route path="/session" element={<MentorListingPage />} />
-            <Route path="/mentors/availability" element={<MentorAvailabilityPage />} />
+            {/* User Session Routes */}
+            <Route path="/sessions" element={<MentorListingPage />} />
+            <Route path="/sessions/booked" element={<MySessionsPage />} />
             <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
             <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/my-sessions" element={<MySessionsPage />} />
+
+            {/* Mentor Routes */}
+            <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
+            <Route path="/mentor/sessions" element={<MentorSessionsPage />} />
+            <Route path="/mentor/availability" element={<MentorAvailabilityPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
