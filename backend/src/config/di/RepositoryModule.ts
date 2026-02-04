@@ -20,6 +20,8 @@ import { IAiChatSessionRepository } from '../../domain/interfaces/IAiChatSession
 import { AiChatSessionRepository } from '../../infrastructure/database/repository/AiChatSessionRepository';
 import { IAiChatMessageRepository } from '../../domain/interfaces/IAiChatMessageRepository';
 import { AiChatMessageRepository } from '../../infrastructure/database/repository/AiChatMessageRepository';
+import { IRoomRepository } from '../../domain/interfaces/IRoomRepository';
+import { RoomRepository } from '../../infrastructure/database/repository/RoomRepository';
 
 export class RepositoryModule {
     static registerModules():void {
@@ -72,6 +74,12 @@ export class RepositoryModule {
 
         container.register<IAiChatMessageRepository>('IAiChatMessageRepository', {
             useClass: AiChatMessageRepository
+        });
+
+        //-------------------------------RoomRepo--------------------------------------//
+
+        container.register<IRoomRepository>('IRoomRepository', {
+            useClass: RoomRepository
         });
     }
 }

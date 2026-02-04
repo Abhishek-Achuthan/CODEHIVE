@@ -69,5 +69,9 @@ export const ERROR_MESSAGES = {
     ANSWER_NOT_FOUND: 'Answer not found',
     ANSWER_VERSION_CONFLICT: 'Answer has been modified. Please refresh and try again.',
     NOT_ALLOWED_TO_EDIT_ANSWER: 'You are not allowed to edit this answer'
+  },
+
+  ROOM: {
+    NOT_FOUND: 'Room not found',
   }
 };

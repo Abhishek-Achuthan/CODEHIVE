@@ -19,6 +19,8 @@ import { IGithubAuthService } from '../../application/ports/security/IGithubAuth
 import { GitHubAuthService } from '../../infrastructure/adapters/security/GithubAuthService';
 import { IAIService } from '../../application/ports/ai/IAIService';
 import { AIService } from '../../infrastructure/adapters/ai/AIService';
+import { IRoomCodeService } from '../../application/ports/room/IRoomCodeService';
+import { RoomCodeService } from '../../infrastructure/adapters/room/RoomCodeService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -60,6 +62,10 @@ export class ServiceModule {
 
     container.register<IAIService>('IAIService', {
       useClass : AIService
+    });
+
+    container.register<IRoomCodeService>('IRoomCodeService', {
+      useClass : RoomCodeService
     })
   }
 }
