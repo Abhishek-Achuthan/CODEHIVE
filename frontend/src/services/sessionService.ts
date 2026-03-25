@@ -59,5 +59,4 @@ export class SessionService {
             throw new BaseError('Unexpected error');
         }
 
-
 }

@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import * as AdminApi from "../api/endpoints/adminAPI";
+import * as AdminApi from "../api/endpoints/adminApi";
 import { AxiosError } from "axios";
 import type { ListUsersApiResponse, ListMentorApplicationsApiResponse } from "../shared/types/api/admin";
 

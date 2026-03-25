@@ -1,4 +1,4 @@
-import { WalletTransactionEntity } from '../../../domain/entities/Wallet/WalletTransactionEntity';
+import { WalletTransactionEntity } from '../../../domain/entities/wallet/WalletTransactionEntity';
 import { Credit, Debit } from '../../../domain/types/WalletTransactionInput';
 
 export interface IWalletService {
