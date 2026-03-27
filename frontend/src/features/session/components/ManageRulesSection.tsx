@@ -1,135 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Trash2, Ban, Loader2, CalendarX, RefreshCw, AlertCircle, Calendar, Repeat, CheckCircle2 } from 'lucide-react';
-import { MentorshipService } from '../../../services/mentorService';
-import type { MentorAvailabilityResponse } from '../../../shared/types/api/mentor';
-import toast from 'react-hot-toast';
+import { useManageRules } from '../hooks/useManageRules';
+import { parseRRuleSummary, formatExdate } from '../../../shared/utils/dateUtils';
 
 interface ManageRulesSectionProps {
     onRuleDeleted?: () => void;
 }
 
-const parseRRuleSummary = (rrule: string): { type: 'one-time' | 'recurring'; summary: string; details: string } => {
-    if (!rrule) return { type: 'recurring', summary: 'Unknown schedule', details: '' };
-
-    if (rrule.startsWith('DTSTART:')) {
-        const dateStr = rrule.replace('DTSTART:', '');
-        if (dateStr.length === 8) {
-            const year = dateStr.slice(0, 4);
-            const month = dateStr.slice(4, 6);
-            const day = dateStr.slice(6, 8);
-            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-            return {
-                type: 'one-time',
-                summary: date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
-                details: year
-            };
-        }
-        return { type: 'one-time', summary: dateStr, details: '' };
-    }
-
-    const parts: string[] = [];
-    const byDayMatch = rrule.match(/BYDAY=([A-Z,]+)/);
-    let daysStr = 'Every week';
-    if (byDayMatch) {
-        const dayMap: Record<string, string> = {
-            'MO': 'Mon', 'TU': 'Tue', 'WE': 'Wed', 'TH': 'Thu',
-            'FR': 'Fri', 'SA': 'Sat', 'SU': 'Sun'
-        };
-        const days = byDayMatch[1].split(',').map(d => dayMap[d] || d);
-        daysStr = days.join(', ');
-    }
-    parts.push(daysStr);
-
-    let details = '';
-    const untilMatch = rrule.match(/UNTIL=(\d{8})/);
-    if (untilMatch) {
-        const dateStr = untilMatch[1];
-        const year = dateStr.slice(0, 4);
-        const month = dateStr.slice(4, 6);
-        const day = dateStr.slice(6, 8);
-        details = `Until ${month}/${day}/${year}`;
-    }
-
-    const countMatch = rrule.match(/COUNT=(\d+)/);
-    if (countMatch) {
-        details = `For ${countMatch[1]} weeks`;
-    }
-
-    if (!details) {
-        details = 'Repeats indefinitely';
-    }
-
-    return { type: 'recurring', summary: parts.join(' '), details };
-};
-
-const formatExdate = (exdate: string): string => {
-    if (exdate.length === 8) {
-        const month = exdate.slice(4, 6);
-        const day = exdate.slice(6, 8);
-        return `${month}/${day}`;
-    }
-    return exdate;
-};
-
 export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDeleted }) => {
-    const [rules, setRules] = useState<MentorAvailabilityResponse[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [addingExceptionId, setAddingExceptionId] = useState<string | null>(null);
-    const [exceptionDate, setExceptionDate] = useState<string>('');
-    const [showExceptionModal, setShowExceptionModal] = useState<string | null>(null);
+    const {
+        rules,
+        isLoading,
+        deletingId,
+        addingExceptionId,
+        showExceptionModalForId,
+        exceptionDate,
+        setExceptionDate,
+        setShowExceptionModalForId,
+        fetchRules,
+        deleteRule,
+        addException
+    } = useManageRules(onRuleDeleted);
 
-    const fetchRules = async () => {
-        setIsLoading(true);
-        try {
-            const data = await MentorshipService.getMyAvailability();
-            setRules(data);
-        } catch {
-            toast.error('Failed to load availability rules');
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
-    useEffect(() => {
-        fetchRules();
-    }, []);
-
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this availability rule?')) return;
-
-        setDeletingId(id);
-        try {
-            await MentorshipService.deleteAvailability(id);
-            setRules(prev => prev.filter(r => r.id !== id));
-            toast.success('Availability rule deleted');
-            onRuleDeleted?.();
-        } catch {
-            toast.error('Failed to delete rule');
-        } finally {
-            setDeletingId(null);
-        }
-    };
-
-    const handleAddException = async (id: string) => {
-        if (!exceptionDate) {
-            toast.error('Please select a date');
-            return;
-        }
-
-        setAddingExceptionId(id);
-        try {
-            const updated = await MentorshipService.addException(id, exceptionDate);
-            setRules(prev => prev.map(r => r.id === id ? updated : r));
-            toast.success('Exception date added');
-            setShowExceptionModal(null);
-            setExceptionDate('');
-        } catch {
-            toast.error('Failed to add exception date');
-        } finally {
-            setAddingExceptionId(null);
-        }
-    };
 
     if (isLoading) {
         return (
@@ -261,7 +154,7 @@ export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDe
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {isRecurring && (
                                             <button
-                                                onClick={() => setShowExceptionModal(rule.id)}
+                                                onClick={() => setShowExceptionModalForId(rule.id)}
                                                 className="p-2.5 rounded-lg text-yellow-400 hover:bg-yellow-500/10 transition-colors"
                                                 title="Add exception date"
                                             >
@@ -270,7 +163,7 @@ export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDe
                                         )}
 
                                         <button
-                                            onClick={() => handleDelete(rule.id)}
+                                            onClick={() => deleteRule(rule.id)}
                                             disabled={deletingId === rule.id}
                                             className="p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                                             title="Delete rule"
@@ -286,7 +179,7 @@ export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDe
                             </div>
 
                             {/* Exception Modal */}
-                            {showExceptionModal === rule.id && (
+                            {showExceptionModalForId === rule.id && (
                                 <div className="border-t border-zinc-800 bg-zinc-900/50 p-5">
                                     <p className="text-sm font-medium text-white mb-3">Add Exception Date</p>
                                     <p className="text-xs text-gray-400 mb-4">Select a date to exclude from this recurring schedule. Sessions won't be available on this date.</p>
@@ -301,7 +194,7 @@ export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDe
                                             />
                                         </div>
                                         <button
-                                            onClick={() => handleAddException(rule.id)}
+                                            onClick={() => addException(rule.id)}
                                             disabled={addingExceptionId === rule.id}
                                             className="px-5 py-2.5 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                                         >
@@ -313,7 +206,7 @@ export const ManageRulesSection: React.FC<ManageRulesSectionProps> = ({ onRuleDe
                                         </button>
                                         <button
                                             onClick={() => {
-                                                setShowExceptionModal(null);
+                                                setShowExceptionModalForId(null);
                                                 setExceptionDate('');
                                             }}
                                             className="px-4 py-2.5 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-medium transition-colors"

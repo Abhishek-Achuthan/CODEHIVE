@@ -5,7 +5,7 @@ import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";
 
 import type { AnswerView } from "../../../shared/types/view/AnswerView";
-import type { AnswerEntityApi } from "../../../shared/types/api/qna";
+import { mapPostedAnswerToView } from "../../../shared/mappers/answer.mapper";
 
 type VoteValue = 1 | -1 | 0;
 
@@ -20,22 +20,8 @@ interface UseAnswerActionsParams {
   currentUser: CurrentUser | null;
 }
 
-function mapPostedAnswerToView(a: AnswerEntityApi, author: CurrentUser): AnswerView {
-  return {
-    id: a.id,
-    contentHtml: a.answerText,
-    isAccepted: a.isAccepted,
-    voteCount: a.voteCount,
-    createdAt: a.createdAt,
-    updatedAt: a.updatedAt,
-    author: {
-      id: author.id,
-      firstName: author.firstName ?? "",
-    },
-  };
-}
-
 export function useAnswerActions({
+
   questionId,
   currentUser,
 }: UseAnswerActionsParams) {

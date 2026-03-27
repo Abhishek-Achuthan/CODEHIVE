@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, DollarSign, Users, TrendingUp } from "lucide-react";
 import MentorLayout from "../../../layouts/MentorLayout";
-import { useAppSelector } from "../../../store";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import type { RootState } from "../../../store";
 import { useNavigate } from "react-router-dom";
 

@@ -7,6 +7,7 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import type { SavedListView } from "../../../shared/types/view/SavedListView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
+import { mapSavedListArrayToView } from "../../../shared/mappers/saved-list.mapper";
 
 const LIMIT = 5;
 
@@ -62,8 +63,7 @@ export function useSavedQuestionsPage() {
       try {
         setListsLoading(true);
         const res = await QnAService.listSavedLists();
-        const mapped = Array.isArray(res) ? res.map((l) => ({ id: l.id, name: l.name })) : [];
-        if (!cancelled) setLists(mapped);
+        if (!cancelled) setLists(mapSavedListArrayToView(res));
       } catch {
         toast.error("Failed to load saved lists");
       } finally {
@@ -80,7 +80,7 @@ export function useSavedQuestionsPage() {
 
   const refreshLists = async () => {
     const res = await QnAService.listSavedLists();
-    setLists(Array.isArray(res) ? res.map((l) => ({ id: l.id, name: l.name })) : []);
+    setLists(mapSavedListArrayToView(res));
   };
 
   const refreshAddedListIds = async (questionId: string) => {

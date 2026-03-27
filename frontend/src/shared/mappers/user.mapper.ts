@@ -48,5 +48,7 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     websiteUrl: user.websiteUrl,
     mentorStatus: user.mentorStatus,
     mentorAppliedAt: user.mentorAppliedAt,
+    primaryExpertise: user.primaryExpertise,
+    experienceLevel: user.experienceLevel,
   };
 }

@@ -2,11 +2,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPasswordSchema } from "../validations/authValidation";
 import type { ResetPasswordFormData } from "../types";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { AuthService } from "../../../services/authService";
-import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { Link } from "react-router-dom";
+import { useResetPassword } from "../hooks/useResetPassword";
 import { PasswordInput } from "./PasswordInput";
+
 export function ResetPasswordForm() {
   const {
     register,
@@ -20,29 +19,12 @@ export function ResetPasswordForm() {
     },
   });
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const email = location.state?.email;
-  const verified = location.state?.verified;
+  const { resetPassword } = useResetPassword();
 
   const onSubmit = async (values: ResetPasswordFormData) => {
-    if (!email || !verified) {
-      toast.error("OTP verification required before resetting password");
-      navigate("/forgot-password");
-      return;
-    }
-
-    try {
-      await AuthService.resetPassword({
-        email,
-        password: values.password,
-      });
-      navigate("/login");
-    } catch (error) {
-      if (error instanceof AxiosError)
-        toast.error(error.message || "Failed to reset password");
-    }
+    await resetPassword(values);
   };
+
 
   return (
     <div className="w-full max-w-md">

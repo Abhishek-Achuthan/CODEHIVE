@@ -1,96 +1,38 @@
-import { useState, useEffect, useMemo } from "react";
-import { Search, Loader2, Calendar } from "lucide-react";
-import MentorLayout from "../../../layouts/MentorLayout";
-import { SessionService } from "../../../services/sessionService";
-import type { BookedSessionResponse } from "../../../shared/types/api/session";
-import toast from "react-hot-toast";
-import { BaseError } from "../../../shared/errors/BaseError";
-import { SessionCard } from "../components/SessionCard";
-import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
-import { Pagination } from "../../../shared/ui/Pagination";
-import { useCancelSession } from "../hooks/useCancelSession";
-import { useAppSelector } from "../../../store";
-import type { RootState } from "../../../store";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
+import { useMentorSessions } from "../hooks/useMentorSessions";
+import type { RootState } from "../../../store";
+import { useEffect } from "react";
+import MentorLayout from "../../../layouts/MentorLayout";
+import { StatusTabs } from "../components/StatusTabs";
+import { Calendar, Loader2, Search } from "lucide-react";
+import { SessionCard } from "../components/SessionCard";
+import toast from "react-hot-toast";
+import { Pagination } from "../../../shared/ui/Pagination";
 
 export default function MentorSessionsPage() {
     const navigate = useNavigate();
     const user = useAppSelector((state: RootState) => state.auth.user);
-    const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6;
 
-    const { cancelSession, loading: cancelLoading } = useCancelSession();
+    const {
+        loading,
+        sessions,
+        totalPages,
+        currentPage,
+        cancelLoading,
+        activeTab,
+        searchQuery,
+        setCurrentPage,
+        handleTabChange,
+        handleSearchChange,
+        handleCancelSession,
+    } = useMentorSessions({ userId: user?.id });
 
     useEffect(() => {
-        // Redirect if not an approved mentor
         if (user?.mentorStatus !== "approved") {
             navigate("/profile");
         }
     }, [user, navigate]);
-
-    useEffect(() => {
-        fetchMentorSessions();
-    }, []);
-
-    const fetchMentorSessions = async () => {
-        try {
-            setLoading(true);
-            // TODO: Create dedicated endpoint for mentor sessions
-            // For now, filter from all sessions where user is the mentor
-            const data = await SessionService.getBookedSessions();
-            // Filter to only sessions where current user is the mentor
-            const mentorSessions = data.filter(
-                (session) => session.mentor?.id === user?.id
-            );
-            setSessions(mentorSessions);
-        } catch (error) {
-            if (error instanceof BaseError) toast.error(error.message);
-            else toast.error("Failed to load sessions");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const filteredSessions = useMemo(() => {
-        return sessions.filter((s) => {
-            const matchesStatus = s.status === activeTab;
-            const matchesSearch =
-                !searchQuery ||
-                s.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.user.lastName.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesStatus && matchesSearch;
-        });
-    }, [sessions, activeTab, searchQuery]);
-
-    const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-    const paginatedSessions = filteredSessions.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    const handleTabChange = (tab: StatusFilter) => {
-        setActiveTab(tab);
-        setCurrentPage(1);
-    };
-
-    const handleSearchChange = (value: string) => {
-        setSearchQuery(value);
-        setCurrentPage(1);
-    };
-
-    const handleCancelSession = async (sessionId: string) => {
-        try {
-            await cancelSession(sessionId);
-            await fetchMentorSessions();
-        } catch {
-            // Error already handled in hook
-        }
-    };
 
     return (
         <MentorLayout>
@@ -126,7 +68,7 @@ export default function MentorSessionsPage() {
                         <div className="flex justify-center py-20">
                             <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                         </div>
-                    ) : paginatedSessions.length === 0 ? (
+                    ) : sessions.length === 0 ? (
                         <div className="mt-16 flex flex-col items-center justify-center py-16">
                             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-900">
                                 <Calendar className="h-8 w-8 text-gray-600" />
@@ -143,7 +85,7 @@ export default function MentorSessionsPage() {
                     ) : (
                         <>
                             <div className="mt-10 grid gap-6 sm:grid-cols-2">
-                                {paginatedSessions.map((session) => (
+                                {sessions.map((session) => (
                                     <SessionCard
                                         key={session.id}
                                         session={session}

@@ -2,7 +2,6 @@ import AuthLayout from '../../../layouts/AuthLayout';
 import { LeftIntro } from '../components/LeftIntro';
 import { SignUpForm } from '../components/SignUpForm';
 import { signUpFields } from '../configs/formFields';
-import { AuthService } from '../../../services/authService';
 
 export default function RegisterPage() {
   return (
@@ -12,7 +11,6 @@ export default function RegisterPage() {
         <section aria-label="Sign up form" className="mx-auto w-full max-w-md md:max-w-none">
           <SignUpForm 
             fields={signUpFields}
-            sendOTP={(data)=>AuthService.sendOtp(data)}
             loginUrl='/'
           />
         </section>
@@ -20,3 +18,4 @@ export default function RegisterPage() {
     </AuthLayout>     
   );
 }
+

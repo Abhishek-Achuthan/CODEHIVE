@@ -1,43 +1,22 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Search, Loader2, Calendar } from "lucide-react";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
-import { SessionService } from "../../../services/sessionService";
-import type { BookedSessionResponse } from "../../../shared/types/api/session";
 import toast from "react-hot-toast";
-import { BaseError } from "../../../shared/errors/BaseError";
-
+import { useFetchSessions } from "../hooks/useFetchSessions";
 import { SessionCard } from "../components/SessionCard";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
 
 export default function MySessionsPage() {
-    const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {loading,sessions,fetchSessions} = useFetchSessions()
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
     const { cancelSession, loading: cancelLoading } = useCancelSession();
-
-    useEffect(() => {
-        fetchSessions();
-    }, []);
-
-    const fetchSessions = async () => {
-        try {
-            setLoading(true);
-            const data = await SessionService.getBookedSessions();
-            setSessions(data);
-        } catch (error) {
-            if (error instanceof BaseError) toast.error(error.message);
-            else toast.error("Failed to load sessions");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const filteredSessions = useMemo(() => {
         return sessions.filter((s) => {

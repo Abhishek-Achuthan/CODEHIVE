@@ -2,21 +2,18 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signUpSchema } from '../validations/authValidation';
 import { useOTP } from '../hooks/useOTP';
+import { useSignup } from '../hooks/useSignup';
 import { OTPModal } from '../../../shared/ui/dialog/OTPModal';
 import { OAuthButtons } from './OAuthButtons';
 import type { RegisterFormValues, SignUpFormProps } from '../types';
 import { FormField } from './FormField';
 import { Link } from 'react-router-dom';
-import { AuthService } from '../../../services/authService';
-import toast from 'react-hot-toast';
-import { BaseError } from '../../../shared/errors/BaseError';
 
 export function SignUpForm({
   fields = [],
-  sendOTP,
   loginUrl = '/',
   className,
-}: SignUpFormProps) {
+}: Omit<SignUpFormProps, 'sendOTP'>) {
   const {
     register,
     handleSubmit,
@@ -33,6 +30,8 @@ export function SignUpForm({
     },
   });
 
+  const { sendOTP, verifyAndRegister } = useSignup();
+
   const {
     otpModalOpen,
     setOtpModalOpen, 
@@ -40,39 +39,14 @@ export function SignUpForm({
     handleVerifyOtp,
   } = useOTP<"email", RegisterFormValues>(
     async (data) => {
-      try {
-        if (!data.email) throw new Error('Email is required');
-        if(!sendOTP) {
-          throw new Error('Send OTP function is not available');
-        }
-        const res = await sendOTP({ email: data.email });
-        toast.success(res.data.message);
-        
-      } catch (error) {
-        if(error instanceof BaseError) {
-          if(error.status===409) {
-           toast.error(error.message);
-           throw error
-          }
-        }
-      }
+      await sendOTP(data);
     },
     async (otp, values) => {
-
-      try {
-        const res = await AuthService.register(otp, values);
-        toast.success(res.message)
-        if(res?.success) return true;
-        return false
-      } catch (error) {
-        if(error instanceof BaseError) {
-          toast.error(error.message);
-        }
-        return false
-      }
+      return await verifyAndRegister(otp, values);
     },
     'email'
   );
+
 
   const onSubmit = async (values: RegisterFormValues) => {
     try {
@@ -130,7 +104,7 @@ export function SignUpForm({
         open={otpModalOpen}
         onOpenChange={setOtpModalOpen}
         onVerify={(otp) => handleVerifyOtp(otp, getValues())}
-        onResend={() => sendOTP && sendOTP({ email: getValues('email') })}
+        onResend={() => sendOTP({ email: getValues('email') })}
       />
     </div>
   );
