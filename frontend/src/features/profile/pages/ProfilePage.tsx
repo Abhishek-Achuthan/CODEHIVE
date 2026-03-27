@@ -27,7 +27,7 @@ import { BaseError } from "../../../shared/errors/BaseError";
 
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
-  const { updateProfile, applyForMentor } = useProfileUpdater();
+  const { updateProfile, applyForMentor, uploadAvatar } = useProfileUpdater();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
 
@@ -76,83 +76,6 @@ export default function ProfilePage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const handleAvatarUpload = async (imageFile: File) => {
-    try {
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-      const maxBytes = 5 * 1024 * 1024;
-
-      if (!allowedTypes.includes(imageFile.type)) {
-        throw new BaseError("Please select a JPG, PNG, or WEBP image");
-      }
-      if (imageFile.size > maxBytes) {
-        throw new BaseError("Image must be 5MB or less");
-      }
-
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as
-        | string
-        | undefined;
-      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as
-        | string
-        | undefined;
-
-      if (!cloudName || !uploadPreset) {
-        throw new BaseError(
-          "Cloudinary is not configured. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET"
-        );
-      }
-
-      const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("upload_preset", uploadPreset);
-
-      const folder = import.meta.env.VITE_CLOUDINARY_FOLDER as string | undefined;
-      if (folder && folder.trim().length) {
-        formData.append("folder", folder.trim());
-      }
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
-
-      const json = (await res.json()) as unknown;
-      if (!res.ok) {
-        const message =
-          json &&
-            typeof json === "object" &&
-            json !== null &&
-            "error" in json &&
-            (json as { error?: unknown }).error &&
-            typeof (json as { error?: { message?: unknown } }).error?.message === "string"
-            ? ((json as { error: { message: string } }).error.message as string)
-            : "Failed to upload image";
-
-        throw new BaseError(message);
-      }
-
-      const secureUrl =
-        json &&
-          typeof json === "object" &&
-          json !== null &&
-          "secure_url" in json &&
-          typeof (json as { secure_url?: unknown }).secure_url === "string"
-          ? ((json as { secure_url: string }).secure_url as string)
-          : "";
-
-      if (!secureUrl) {
-        throw new BaseError("Cloudinary upload did not return a secure URL");
-      }
-
-      await updateProfile({ avatarUrl: secureUrl });
-      toast.success("Avatar updated");
-    } catch (error) {
-      if (error instanceof BaseError) toast.error(error.message);
-      else if (error instanceof Error) toast.error(error.message);
-      else toast.error("Failed to update avatar");
-      throw error;
-    }
-  };
 
   const scrollToSection = (section: 'about' | 'skills' | 'experience') => {
     const refs = { about: aboutRef, skills: skillsRef, experience: experienceRef };
@@ -199,7 +122,7 @@ export default function ProfilePage() {
           <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
             <ProfileHeader
               user={profileUser}
-              onSaveAvatar={handleAvatarUpload}
+              onSaveAvatar={uploadAvatar}
               onSaveProfileHeader={(values) => updateProfile(values)}
               onClickMentor={() => { }}
               onClickDashboard={() => { }}
