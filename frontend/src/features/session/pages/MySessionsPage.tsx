@@ -1,20 +1,23 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Loader2, Calendar } from "lucide-react";
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
 import toast from "react-hot-toast";
 import { useFetchSessions } from "../hooks/useFetchSessions";
 import { SessionCard } from "../components/SessionCard";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
+import { SessionPageHeader } from "../components/SessionPageHeader";
 
 export default function MySessionsPage() {
-    const {loading,sessions,fetchSessions} = useFetchSessions()
+    const {loading,sessions,error,refetch} = useFetchSessions()
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
+
+    useEffect(() => {
+       if (error) toast.error(error);
+    }, [error]);
 
     const { cancelSession, loading: cancelLoading } = useCancelSession();
 
@@ -49,89 +52,82 @@ export default function MySessionsPage() {
     const handleCancelSession = async (sessionId: string) => {
         try {
             await cancelSession(sessionId);
-            await fetchSessions();
+            await refetch();
         } catch {
             // Error already handled in hook
         }
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            <Header />
+        <div className="flex flex-col">
+            <SessionPageHeader
+                title="My Sessions"
+                description="Sessions you've booked as a user"
+            />
 
-            <main className="px-4 py-10">
-                <div className="mx-auto max-w-6xl">
-                    {/* Page Title */}
-                    <h1 className="text-center text-2xl font-semibold italic text-white">
-                        My Booked Sessions
-                    </h1>
-                    <p className="mt-2 text-center text-sm text-gray-400">
-                        Sessions you've booked as a user
-                    </p>
+            {/* Tabs & Search */}
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-10">
+                <StatusTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-                    {/* Tabs & Search */}
-                    <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                        <StatusTabs activeTab={activeTab} onTabChange={handleTabChange} />
+                {/* Search */}
+                <div className="relative group w-full sm:w-80">
+                    <div className="absolute inset-0 bg-indigo-500/5 blur-lg group-focus-within:bg-indigo-500/10 transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="Search your sessions..."
+                        value={searchQuery}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        className="relative w-full rounded-xl border border-white/5 bg-white/[0.03] py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
+                    />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" />
+                </div>
+            </div>
 
-                        {/* Search */}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search here..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                                className="w-56 rounded-lg border border-gray-700 bg-black py-2 pl-9 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            {/* Sessions Content */}
+            {loading ? (
+                <div className="flex min-h-[400px] justify-center items-center bg-white/[0.01] rounded-3xl border border-white/5">
+                    <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+                </div>
+            ) : paginatedSessions.length === 0 ? (
+                <div className="flex min-h-[400px] flex-col items-center justify-center py-16 bg-white/[0.01] rounded-3xl border border-dashed border-white/10">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-900 border border-white/5 shadow-2xl relative">
+                        <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full" />
+                        <Calendar className="h-10 w-10 text-zinc-500 relative z-10" />
+                    </div>
+                    <div className="mt-6 text-base font-bold text-white text-center">
+                        No {activeTab} sessions
+                        <p className="mt-2 text-sm text-zinc-500 font-medium italic">
+                            {activeTab === "upcoming"
+                                ? "Time to explore new mentorship opportunities!"
+                                : `You don't have any ${activeTab} sessions listed.`}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className="mt-10 grid gap-6 sm:grid-cols-2">
+                        {paginatedSessions.map((session) => (
+                            <SessionCard
+                                key={session.id}
+                                session={session}
+                                onCancel={() => handleCancelSession(session.id)}
+                                onJoinRoom={() => {
+                                    toast.success("Joining room...");
+                                }}
+                                isCancelling={cancelLoading}
                             />
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Sessions Content */}
-                    {loading ? (
-                        <div className="flex justify-center py-20">
-                            <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-                        </div>
-                    ) : paginatedSessions.length === 0 ? (
-                        <div className="mt-16 flex flex-col items-center justify-center py-16">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-900">
-                                <Calendar className="h-8 w-8 text-gray-600" />
-                            </div>
-                            <div className="mt-4 text-sm font-medium text-gray-400">
-                                No {activeTab} sessions
-                            </div>
-                            <div className="mt-1 text-xs text-gray-500">
-                                {activeTab === "upcoming"
-                                    ? "You don't have any upcoming sessions booked"
-                                    : `No ${activeTab} sessions to display`}
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="mt-10 grid gap-6 sm:grid-cols-2">
-                                {paginatedSessions.map((session) => (
-                                    <SessionCard
-                                        key={session.id}
-                                        session={session}
-                                        onCancel={() => handleCancelSession(session.id)}
-                                        onJoinRoom={() => {
-                                            toast.success("Joining room...");
-                                        }}
-                                        isCancelling={cancelLoading}
-                                    />
-                                ))}
-                            </div>
-
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
-                        </>
-                    )}
-                </div>
-            </main>
-
-            <Footer />
+                    <div className="mt-10">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                </>
+            )}
         </div>
     );
 }

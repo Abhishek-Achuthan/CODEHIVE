@@ -25,41 +25,48 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
     const levelLabel = mentor.experienceLevel ? LEVEL_LABELS[mentor.experienceLevel] || mentor.experienceLevel : null;
 
     return (
-        <div className="rounded-xl border border-gray-700 bg-black px-4 py-4 hover:bg-gray-950/40 transition-colors">
-            <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 overflow-hidden rounded-full bg-gray-900 shrink-0">
-                        {mentor.avatarUrl ? (
-                            <img src={mentor.avatarUrl} alt={mentor.firstName} className="h-full w-full object-cover" />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center text-gray-500">
-                                <User className="h-6 w-6" />
-                            </div>
-                        )}
+        <div className="group relative rounded-2xl border border-white/5 bg-white/[0.02] p-5 transition-all duration-500 hover:bg-white/[0.04] hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/10 overflow-hidden">
+            {/* Background Decorative Gradient */}
+            <div className="absolute -right-10 -top-10 h-32 w-32 bg-indigo-500/5 blur-3xl transition-opacity duration-500 group-hover:opacity-100 opacity-0" />
+
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex gap-4">
+                    {/* Avatar with Ring */}
+                    <div className="relative shrink-0">
+                        <div className="h-16 w-16 overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10 group-hover:ring-indigo-500/50 transition-all duration-500">
+                            {mentor.avatarUrl ? (
+                                <img src={mentor.avatarUrl} alt={mentor.firstName} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center text-zinc-600">
+                                    <User className="h-8 w-8" />
+                                </div>
+                            )}
+                        </div>
+                        {/* Rating Badge */}
+                        <div className="absolute -bottom-2 -right-2 flex items-center gap-1 rounded-lg bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-yellow-500 border border-white/5 shadow-lg ring-1 ring-black/50">
+                            <span>{mentor.rating ?? 4.5}</span>
+                            <Star className="h-2.5 w-2.5 fill-current" />
+                        </div>
                     </div>
 
-                    <div>
-                        <div className="text-sm font-semibold text-white">
+                    <div className="flex flex-col">
+                        <h3 className="text-lg font-bold text-white tracking-tight group-hover:text-indigo-400 transition-colors duration-300">
                             {mentor.firstName} {mentor.lastName}
-                        </div>
+                        </h3>
 
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                             {mentor.primaryExpertise && (
-                                <div className="inline-flex items-center gap-1 text-indigo-400">
+                                <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400 border border-indigo-500/20">
                                     <Sparkles className="h-3 w-3" />
                                     <span>{mentor.primaryExpertise}</span>
                                 </div>
                             )}
                             {levelLabel && (
-                                <div className="inline-flex items-center gap-1 text-blue-400">
+                                <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-400 border border-blue-500/20">
                                     <TrendingUp className="h-3 w-3" />
                                     <span>{levelLabel}</span>
                                 </div>
                             )}
-                            <div className="flex items-center gap-1 text-yellow-500">
-                                <span className="font-medium">{mentor.rating ?? 4.5}</span>
-                                <Star className="h-3 w-3 fill-current" />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -67,7 +74,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
                 <Link
                     to={`/mentors/${mentor.id}/book`}
                     state={{ mentor }}
-                    className="rounded-md bg-linear-to-r from-blue-600 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                    className="relative shrink-0 overflow-hidden rounded-xl bg-white px-5 py-2 text-xs font-bold text-black transition-all duration-300 hover:bg-indigo-500 hover:text-white hover:shadow-lg active:scale-95"
                 >
                     Book
                 </Link>

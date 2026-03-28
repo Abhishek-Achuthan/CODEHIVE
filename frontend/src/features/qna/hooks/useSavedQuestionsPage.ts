@@ -157,7 +157,7 @@ export function useSavedQuestionsPage() {
       }
     } catch {
       toast.error("Failed to create list");
-      throw new Error("Failed to create list");
+      throw new BaseError("Failed to create list");
     }
   };
 

@@ -9,7 +9,7 @@ export function useCancelSession() {
 
   async function cancelSession(sessionId: string): Promise<void> {
     if (!sessionId) {
-      throw new Error("sessionId is required");
+      throw new BaseError("sessionId is required");
     }
 
     try {

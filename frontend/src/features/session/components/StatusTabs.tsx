@@ -19,8 +19,8 @@ export function StatusTabs({ activeTab, onTabChange }: StatusTabsProps) {
                     key={tab.value}
                     onClick={() => onTabChange(tab.value)}
                     className={`rounded-md px-4 py-1.5 text-xs font-medium transition-all ${activeTab === tab.value
-                            ? "bg-white text-black"
-                            : "text-gray-400 hover:text-white"
+                        ? "bg-white text-black"
+                        : "text-gray-400 hover:text-white"
                         }`}
                 >
                     {tab.label}

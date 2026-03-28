@@ -1,59 +1,13 @@
-import { useGoogleLogin } from "@react-oauth/google";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { AuthService } from "../../../services/authService";
-import { loginSuccess } from "../../../store/slices/authSlice";
-import toast from "react-hot-toast";
-import { mapCurrentUserToView } from "../../../shared/mappers/user.mapper";
+import { useOAuth } from "../hooks/useOAuth";
 
 export function OAuthButtons() {
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleGoogleLogin = useGoogleLogin({
-    flow: "auth-code",
-
-    onSuccess: async (tokenResponse) => {
-      const authCode = tokenResponse.code;
-
-      if (!authCode) {
-        toast.error("Google login failed: no token received");
-        return;
-      }
-
-      try {
-        const { message, data } = await AuthService.googleLogin(
-          authCode
-        );
-        const {user, accessToken} = data;
-
-        const userView = mapCurrentUserToView(user);
-
-        toast.success(message);
-        dispatch(loginSuccess({ user: userView, accessToken }));
-
-        navigate(userView.role === "admin" ? "/admin/users" : "/home");
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Google login failed");
-        }
-      }
-    },
-
-    onError: (error) => {
-      console.error("Google login error:", error);
-      toast.error("Google login error");
-    },
-  });
+  const { loginWithGoogle, loginWithGithub } = useOAuth();
 
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
         type="button"
-        onClick={() => handleGoogleLogin()}
+        onClick={loginWithGoogle}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GoogleIcon />
@@ -61,7 +15,7 @@ export function OAuthButtons() {
       </button>
       <button
         type="button"
-        onClick={() => AuthService.initiateGithubOAuth()}
+        onClick={loginWithGithub}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GithubIcon />

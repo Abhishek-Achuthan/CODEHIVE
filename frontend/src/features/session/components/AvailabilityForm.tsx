@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, Clock, Info } from 'lucide-react';
+import { Loader2, Clock, Info } from 'lucide-react';
 import type { AvailabilityFormData } from '../types';
 import { availabilityFormSchema, type AvailabilityFormSchema } from '../validations/availabilityValidation';
+
+import { Calendar } from './Calendar';
 
 interface AvailabilityFormProps {
     onSubmit: (data: AvailabilityFormData) => Promise<void>;
     isLoading?: boolean;
     isRecurring: boolean;
-    selectedDate?: Date | null;
+    selectedDate: Date | null;
+    onDateSelect: (date: Date | null) => void;
 }
 
-export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, isLoading, isRecurring, selectedDate }) => {
+export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, isLoading, isRecurring, selectedDate, onDateSelect }) => {
     const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AvailabilityFormSchema>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        resolver: zodResolver(availabilityFormSchema) as any,
+        resolver: zodResolver(availabilityFormSchema) as Resolver<AvailabilityFormSchema>,
         defaultValues: {
             startTime: '',
             endTime: '',
@@ -54,7 +56,7 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     const selectedDays = watch('selectedDays');
     const durationType = watch('durationType');
 
-    const handleFormSubmit = async (data: AvailabilityFormSchema) => {
+    const handleFormSubmit: SubmitHandler<AvailabilityFormSchema> = async (data) => {
         await onSubmit(data as AvailabilityFormData);
     };
 
@@ -116,219 +118,249 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     }, [startTime, endTime, slotDurationMinutes, bufferMinutes]);
 
     return (
-        <div className="rounded-xl border border-gray-800 bg-black p-6">
-            <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                {isRecurring ? (
-                    <>
-                        <Clock className="h-5 w-5 text-indigo-400" />
-                        Weekly Recurring Schedule
-                    </>
-                ) : (
-                    <>
-                        <Plus className="h-5 w-5 text-indigo-400" />
-                        Add Availability for {selectedDate?.toLocaleDateString()}
-                    </>
-                )}
-            </h2>
-
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-                {/* Time Selection */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Start Time</label>
-                        <input
-                            type="time"
-                            {...register('startTime')}
-                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
-                        />
-                        {errors.startTime && <p className="text-red-400 text-xs mt-1">{errors.startTime.message}</p>}
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">End Time</label>
-                        <input
-                            type="time"
-                            {...register('endTime')}
-                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
-                        />
-                        {errors.endTime && <p className="text-red-400 text-xs mt-1">{errors.endTime.message}</p>}
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+            {/* LEFT COLUMN: Controls */}
+            <div className="space-y-8 bg-zinc-900/40 p-6 sm:p-8 rounded-3xl border border-white/5 backdrop-blur-xl">
+                
+                {/* Top: Segmented Control */}
+                <div className="inline-flex rounded-xl bg-black/50 p-1 border border-white/5 w-full">
+                    <button
+                        type="button"
+                        onClick={() => onDateSelect(null)}
+                        className={`flex-1 rounded-lg px-4 py-2.5 text-xs font-bold transition-all ${
+                            isRecurring 
+                            ? 'bg-white text-black shadow-lg shadow-white/10' 
+                            : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        Weekly Recurring
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onDateSelect(selectedDate || new Date())}
+                        className={`flex-1 rounded-lg px-4 py-2.5 text-xs font-bold transition-all ${
+                            !isRecurring 
+                            ? 'bg-white text-black shadow-lg shadow-white/10' 
+                            : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        Specific Date
+                    </button>
                 </div>
 
-                {/* Duration & Buffer */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Slot Duration <span className="text-gray-600">(min)</span></label>
-                        <input
-                            type="number"
-                            {...register('slotDurationMinutes')}
-                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
-                        />
-                        {errors.slotDurationMinutes && <p className="text-red-400 text-xs mt-1">{errors.slotDurationMinutes.message}</p>}
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Buffer <span className="text-gray-600">(min)</span></label>
-                        <input
-                            type="number"
-                            {...register('bufferMinutes')}
-                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
-                        />
-                        {errors.bufferMinutes && <p className="text-red-400 text-xs mt-1">{errors.bufferMinutes.message}</p>}
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Price per Session</label>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                        <input
-                            type="number"
-                            {...register('slotPrice')}
-                            className="w-full rounded-lg border border-gray-800 bg-zinc-900/50 pl-8 pr-4 py-2.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-                            placeholder="500"
-                        />
-                        {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
-                    </div>
-                </div>
-
-                {/* Recurring-specific controls */}
-                {isRecurring && (
-                    <>
-                        {/* Day Selection */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Repeat on</label>
-                            <div className="grid grid-cols-7 gap-2">
-                                {DAYS.map(day => (
-                                    <button
-                                        key={day.value}
-                                        type="button"
-                                        onClick={() => toggleDay(day.value)}
-                                        className={`py-2 px-1 rounded-lg text-xs font-semibold transition-all border ${selectedDays?.includes(day.value)
-                                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                            : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600'
-                                            }`}
-                                    >
-                                        {day.label}
-                                    </button>
-                                ))}
+                <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
+                    {/* Section: Time Range & Duration */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2 border-b border-white/5 pb-3">
+                            <Clock className="h-4 w-4 text-indigo-400" />
+                            <h3 className="text-base font-bold text-white">Time Range & Slots</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Start Time</label>
+                                <input
+                                    type="time"
+                                    {...register('startTime')}
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all cursor-pointer"
+                                />
+                                {errors.startTime && <p className="text-red-400 text-xs mt-1">{errors.startTime.message}</p>}
                             </div>
-                            {(errors as any).selectedDays && (
-                                <p className="text-red-400 text-xs mt-1">{(errors as any).selectedDays.message}</p>
-                            )}
-                            {!((errors as any).selectedDays) && selectedDays?.length === 0 && (
-                                <p className="text-xs text-yellow-500">Select at least one day for recurring schedule</p>
-                            )}
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">End Time</label>
+                                <input
+                                    type="time"
+                                    {...register('endTime')}
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all cursor-pointer"
+                                />
+                                {errors.endTime && <p className="text-red-400 text-xs mt-1">{errors.endTime.message}</p>}
+                            </div>
                         </div>
 
-                        {/* Duration Options */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Duration</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex justify-between">
+                                    Slot Duration 
+                                    <span className="text-zinc-600">(min)</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    {...register('slotDurationMinutes')}
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                                />
+                                {errors.slotDurationMinutes && <p className="text-red-400 text-xs mt-1">{errors.slotDurationMinutes.message}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex justify-between">
+                                    Buffer <span className="text-zinc-600">(min)</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    {...register('bufferMinutes')}
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                                />
+                                {errors.bufferMinutes && <p className="text-red-400 text-xs mt-1">{errors.bufferMinutes.message}</p>}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Section: Pricing */}
+                    <div className="space-y-6">
+                        <h3 className="text-base font-bold text-white border-b border-white/5 pb-3">Session Pricing</h3>
+                        <div className="space-y-2 max-w-xs">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Price per Session</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">₹</span>
+                                <input
+                                    type="number"
+                                    {...register('slotPrice')}
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 pl-10 pr-4 py-3 text-lg font-black text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                                    placeholder="500"
+                                />
+                                {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Section: Recurring Rules */}
+                    {isRecurring && (
+                        <div className="space-y-6">
+                            <h3 className="text-base font-bold text-white border-b border-white/5 pb-3">Repeat Rules</h3>
+                            
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Repeat On Days</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {DAYS.map(day => {
+                                        const isActive = selectedDays?.includes(day.value);
+                                        return (
+                                            <button
+                                                key={day.value}
+                                                type="button"
+                                                onClick={() => toggleDay(day.value)}
+                                                className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border ${
+                                                    isActive
+                                                    ? 'bg-indigo-500 text-white border-indigo-400/50 shadow-[0_0_15px_rgba(99,102,241,0.3)]'
+                                                    : 'bg-black/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5'
+                                                }`}
+                                            >
+                                                {day.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {errors.selectedDays && (
+                                    <p className="text-red-400 text-xs mt-1">{errors.selectedDays.message}</p>
+                                )}
+                                {!errors.selectedDays && selectedDays?.length === 0 && (
+                                    <p className="text-xs text-yellow-500">Select at least one day for a recurring schedule</p>
+                                )}
+                            </div>
 
                             <div className="space-y-3">
-                                {/* Forever */}
-                                <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        {...register('durationType')}
-                                        value="forever"
-                                        className="text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <span className="text-sm text-white">Repeat indefinitely</span>
-                                </label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Duration Range</label>
+                                <div className="space-y-3">
+                                    <label className="flex items-center gap-3 p-4 rounded-xl border border-white/5 bg-black/50 cursor-pointer hover:bg-white/[0.02] transition-colors">
+                                        <input
+                                            type="radio"
+                                            {...register('durationType')}
+                                            value="forever"
+                                            className="text-indigo-600 focus:ring-indigo-500 bg-zinc-900 border-zinc-700"
+                                        />
+                                        <span className="text-sm font-semibold text-white">Repeat indefinitely</span>
+                                    </label>
 
-                                {/* Until Date */}
-                                <label className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        {...register('durationType')}
-                                        value="until"
-                                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <div className="flex-1 space-y-2">
-                                        <span className="text-sm text-white block">End on specific date</span>
-                                        {durationType === 'until' && (
-                                            <>
-                                                <input
-                                                    type="date"
-                                                    {...register('endDate')}
-                                                    min={new Date().toISOString().split('T')[0]}
-                                                    className={`w-full rounded-lg border ${errors.endDate ? 'border-red-500' : 'border-gray-700'} bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
-                                                />
-                                                {errors.endDate && <p className="text-red-400 text-xs mt-1">{errors.endDate.message}</p>}
-                                            </>
-                                        )}
-                                    </div>
-                                </label>
-
-                                {/* Count */}
-                                <label className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        {...register('durationType')}
-                                        value="count"
-                                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <div className="flex-1 space-y-2">
-                                        <span className="text-sm text-white block">Repeat a specific number of times</span>
-                                        {durationType === 'count' && (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    {...register('occurrenceCount', { min: 1, max: 52 })}
-                                                    className="w-24 rounded-lg border border-gray-700 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                                />
-                                                <span className="text-xs text-gray-400">weeks</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </label>
+                                    <label className="flex items-start gap-3 p-4 rounded-xl border border-white/5 bg-black/50 cursor-pointer hover:bg-white/[0.02] transition-colors">
+                                        <input
+                                            type="radio"
+                                            {...register('durationType')}
+                                            value="until"
+                                            className="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-zinc-900 border-zinc-700"
+                                        />
+                                        <div className="flex-1 space-y-2">
+                                            <span className="text-sm font-semibold text-white block">End on specific date</span>
+                                            {durationType === 'until' && (
+                                                <div className="mt-2">
+                                                    <input
+                                                        type="date"
+                                                        {...register('endDate')}
+                                                        min={new Date().toISOString().split('T')[0]}
+                                                        className={`max-w-xs w-full rounded-xl border ${errors.endDate ? 'border-red-500' : 'border-white/5'} bg-zinc-950 px-4 py-2.5 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white`}
+                                                    />
+                                                    {errors.endDate && <p className="text-red-400 text-xs mt-1">{errors.endDate.message}</p>}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </>
-                )}
+                    )}
 
-                {/* Hidden Date Input for Form Submission */}
-                {!isRecurring && (
-                    <input type="hidden" {...register('date')} />
-                )}
+                    {!isRecurring && (
+                        <input type="hidden" {...register('date')} />
+                    )}
 
-                <div className="rounded-lg bg-indigo-500/5 border border-indigo-500/10 p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Info className="h-4 w-4 text-indigo-400" />
-                        <span className="text-xs font-medium text-indigo-300">Preview Slots</span>
+                    {/* Action Area */}
+                    <div className="pt-6 border-t border-white/5">
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full rounded-xl bg-white py-4 text-sm font-black tracking-widest uppercase text-black shadow-xl shadow-white/10 transition-all hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin text-black" /> : 'Save Availability'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {/* RIGHT COLUMN: Live Previews */}
+            <div className="space-y-6 sticky top-24">
+                {/* Calendar Panel */}
+                <div className="rounded-3xl border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-xl">
+                    <div className="flex items-center justify-between mb-4 px-1">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Select Date</span>
+                        {selectedDate && !isRecurring && (
+                            <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-md">
+                                {selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </span>
+                        )}
+                    </div>
+                    <Calendar 
+                        selectedDate={!isRecurring ? (selectedDate || null) : null}
+                        onSelectDate={(date) => date && onDateSelect(date)}
+                        showRecurringOption={false}
+                    />
+                </div>
+                {/* Slots Preview Panel */}
+                <div className="rounded-3xl bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-xl">
+                    <div className="flex items-center gap-2 mb-4 px-1">
+                        <Info className="h-4 w-4 text-zinc-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Slots Preview</span>
                     </div>
                     {slotsPreview.length === 0 ? (
-                        <div className="text-xs text-gray-500 italic">
-                            Set start and end times to see generated slots.
+                        <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center bg-black/20">
+                            <p className="text-xs font-semibold text-zinc-500">
+                                Configure start and end times to see generated slots.
+                            </p>
                         </div>
                     ) : (
-                        <div className="flex flex-wrap gap-2">
-                            {slotsPreview.slice(0, 8).map((slot, idx) => (
-                                <span
+                        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            {slotsPreview.map((slot, idx) => (
+                                <div
                                     key={`${slot.startTime}-${idx}`}
-                                    className="inline-flex items-center rounded-md border border-indigo-500/20 bg-indigo-500/10 px-2 py-1 text-xs font-medium text-indigo-300"
+                                    className="flex items-center justify-between rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm font-semibold text-zinc-300"
                                 >
-                                    {slot.startTime} - {slot.endTime}
-                                </span>
+                                    <span>{slot.startTime}</span>
+                                    <span className="text-zinc-600">-</span>
+                                    <span>{slot.endTime}</span>
+                                </div>
                             ))}
-                            {slotsPreview.length > 8 && (
-                                <span className="text-xs text-gray-500 flex items-center self-center">
-                                    +{slotsPreview.length - 8} more
-                                </span>
-                            )}
                         </div>
                     )}
                 </div>
-
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full rounded-lg bg-linear-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Availability'}
-                </button>
-            </form>
+            </div>
         </div>
     );
 };

@@ -1,15 +1,8 @@
+import type { AdminUserListItemView } from "../../../shared/types/view/AdminUserListItemView";
 import type { Column } from "../../../shared/ui/DataTable";
 
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  isBlocked: boolean;
-}
 
-export const userColumns: readonly Column<User>[] = [
+export const userColumns: readonly Column<AdminUserListItemView>[] = [
   {
     header: "Name",
     key: "firstName",

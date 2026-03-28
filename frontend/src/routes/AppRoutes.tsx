@@ -43,6 +43,9 @@ const MySessionsPage = lazy(() => import("../features/session/pages/MySessionsPa
 const MentorDashboardPage = lazy(() => import("../features/session/pages/MentorDashboardPage"));
 const MentorSessionsPage = lazy(() => import("../features/session/pages/MentorSessionsPage"));
 
+// Layout
+const SessionsLayout = lazy(() => import("../features/session/components/SessionsLayout"));
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -79,16 +82,21 @@ export default function AppRoutes() {
             <Route path="/qna/saved" element={<SavedQuestionsPage />} />
             <Route path="/qna/ai-assist" element={<AiAssistPage />} />
 
-            {/* User Session Routes */}
-            <Route path="/sessions" element={<MentorListingPage />} />
-            <Route path="/sessions/booked" element={<MySessionsPage />} />
+            {/* Session Routes with Layout */}
+            <Route path="/sessions" element={<SessionsLayout />}>
+              <Route index element={<Navigate to="/sessions/discover" replace />} />
+              <Route path="discover" element={<MentorListingPage />} />
+              <Route path="my-sessions" element={<MySessionsPage />} />
+              <Route path="hosting" element={<MentorSessionsPage />} />
+              <Route path="availability" element={<MentorAvailabilityPage />} />
+            </Route>
+
+            {/* Other Session Routes (without sidebar) */}
             <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
             <Route path="/payment" element={<PaymentPage />} />
-
-            {/* Mentor Routes */}
+            
+            {/* Legacy/Other Mentor Routes */}
             <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
-            <Route path="/mentor/sessions" element={<MentorSessionsPage />} />
-            <Route path="/mentor/availability" element={<MentorAvailabilityPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
