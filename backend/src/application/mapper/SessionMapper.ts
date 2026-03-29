@@ -1,6 +1,7 @@
 import { SessionEntity } from '../../domain/session/SessionEntity';
-import { IBookedSessionResponseDTO, ISessionResponseDTO, IUserSummaryDTO } from '../dto/SessionDTO';
+import { IBookedSessionResponseDTO, IMentorProfileResponseDTO, ISessionResponseDTO, IUserSummaryDTO } from '../dto/SessionDTO';
 import { EssentialUserInfo } from '../../domain/types/EssentialUserInfo';
+import { UserEntity } from '../../domain/entities/UserEntity';
 
 export class SessionMapper {
   static toResponse(session: SessionEntity): ISessionResponseDTO {
@@ -51,6 +52,27 @@ export class SessionMapper {
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };
+  }
+
+  static toMentorProfile(
+    mentor : UserEntity
+  ): IMentorProfileResponseDTO {
+    return {
+        id: mentor.id,
+        firstName: mentor.firstName,
+        lastName: mentor.lastName,
+        email : mentor.email,
+        phone : mentor.phone,
+        about : mentor.about,
+        skills: mentor.skills,
+        experience: mentor.experience,
+        avatarUrl: mentor.avatarUrl,
+        githubUrl:  mentor.githubUrl,
+        linkedInUrl: mentor.linkedInUrl,
+        websiteUrl: mentor.websiteUrl,
+        primaryExpertise: mentor.primaryExpertise,
+        experienceLevel: mentor.experienceLevel,
+    }
   }
 
   static toResponseArray(

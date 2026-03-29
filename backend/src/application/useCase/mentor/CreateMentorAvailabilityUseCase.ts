@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { ICreateMentorAvailabilityUseCase } from '../interface/session/ICreateMentorAvailabilityUseCase';
+import { ICreateMentorAvailabilityUseCase } from '../interface/mentor/ICreateMentorAvailabilityUseCase';
 import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
 import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 import { CreateMentorAvailabilityDTO } from '../../dto/SessionDTO';

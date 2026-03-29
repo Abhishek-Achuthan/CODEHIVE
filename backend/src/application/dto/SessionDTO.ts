@@ -1,3 +1,5 @@
+import { Experience } from '../../domain/types/ExperienceType';
+import { MentorStatus } from '../../domain/types/MentorStatus';
 import { PaymentSource } from '../../domain/types/PaymentSource';
 import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
@@ -20,7 +22,7 @@ export interface BookSessionDTO {
   topic: string;
 }
 
-export interface MentorListinputDTO {
+export interface MentorListInputDTO {
   search?: string | undefined;
   page?: number | undefined;
   limit?: number | undefined;
@@ -70,5 +72,22 @@ export interface AvailableSlotDTO {
   startTime: string;
   endTime: string;
   price: number;
+}
+
+export interface IMentorProfileResponseDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone?: string | undefined;
+  about?: string | undefined;
+  skills: string[];
+  experience: Experience[];
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
+  email: string;
 }
 

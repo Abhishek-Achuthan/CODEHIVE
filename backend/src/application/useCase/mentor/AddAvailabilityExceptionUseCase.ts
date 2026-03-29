@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { IAddAvailabilityExceptionUseCase } from '../interface/session/IAddAvailabilityExceptionUseCase';
+import { IAddAvailabilityExceptionUseCase } from '../interface/mentor/IAddAvailabilityExceptionUseCase';
 import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
 import { MentorAvailabilityEntity } from '../../../domain/session/MentorAvailabilityEntity';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';

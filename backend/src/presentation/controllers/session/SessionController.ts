@@ -3,10 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import type { IBookSessionWithStripeUseCase } from '../../../application/useCase/interface/session/IBookSessionWithStripeUseCase';
 import type { IBookSessionWithWalletUseCase } from '../../../application/useCase/interface/session/IBookSessionWithWalletUseCase';
 import type { IGetBookedSessionsUseCase } from '../../../application/useCase/interface/session/IGetBookedSessionsUseCase';
-import { type ICancelSessionUseCase } from '../../../application/useCase/interface/session/ICancelSessionUseCase';
-import { HttpStatus } from '../../../shared/httpStatusCode';
-
-@injectable()
+import type { ICancelSessionUseCase } from '../../../application/useCase/interface/session/ICancelSessionUseCase';
+import { HttpStatus } from '../../../shared/httpStatusCode';@injectable()
 export class SessionController {
     constructor(
         @inject('IBookSessionWithStripeUseCase') private readonly _bookSessionWithStripe: IBookSessionWithStripeUseCase,
@@ -14,7 +12,6 @@ export class SessionController {
         @inject('IGetBookedSessionsUseCase') private readonly _getBookedSessions: IGetBookedSessionsUseCase,
         @inject('ICancelSessionUseCase') private readonly _cancelSession : ICancelSessionUseCase
     ) { }
-
 
     async handleBookSessionWithStripe(req: Request, res: Response, next: NextFunction) {
         try {

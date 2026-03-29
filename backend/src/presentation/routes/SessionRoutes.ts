@@ -1,16 +1,18 @@
 import { Router } from 'express';
-import { sessionController } from '../../config/di/resolver';
+import { sessionController, mentorController } from '../../config/di/resolver';
 import { authMiddleware } from '../../config/di/resolver';
 
 export class SessionRoutes {
     private _router: Router;
     private _sessionController;
     private _authMiddleware;
+    private _mentorController;
 
     constructor() {
         this._router = Router();
         this._sessionController = sessionController;
         this._authMiddleware = authMiddleware;
+        this._mentorController = mentorController;
         this._setRoutes();
     }
 
@@ -37,7 +39,13 @@ export class SessionRoutes {
             '/:id',
             this._authMiddleware.check,
             this._sessionController.handleCancelSession.bind(this._sessionController)
-        )
+        );
+
+        this._router.get(
+            '/profile/:id',
+            this._authMiddleware.check,
+            this._mentorController.handleViewMentorProfile.bind(this._mentorController)
+        );
 
     }
 

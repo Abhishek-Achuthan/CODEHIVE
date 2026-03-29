@@ -1,7 +1,7 @@
 import { UserEntity } from '../../../../domain/entities/UserEntity';
 import { PaginationResult } from '../../../../domain/types/PaginationResult';
-import { MentorListinputDTO } from '../../../dto/SessionDTO';
+import { MentorListInputDTO } from '../../../dto/SessionDTO';
 
 export interface IListMentorsUseCase {
-    execute(input: MentorListinputDTO,userId:string): Promise<PaginationResult<UserEntity>>;
+    execute(input: MentorListInputDTO,userId:string): Promise<PaginationResult<UserEntity>>;
 }

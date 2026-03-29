@@ -1,11 +1,13 @@
 import { injectable, inject } from 'tsyringe';
 import { NextFunction, Request, Response } from 'express';
-import { type IListMentorsUseCase } from '../../../application/useCase/interface/session/IListMentorsUseCase';
-import { type IGetMentorAvailabilityUseCase } from '../../../application/useCase/interface/session/IGetMentorAvailabilityUseCase';
-import { type ICreateMentorAvailabilityUseCase } from '../../../application/useCase/interface/session/ICreateMentorAvailabilityUseCase';
+import { type IListMentorsUseCase } from '../../../application/useCase/interface/mentor/IListMentorsUseCase';
+import { type IGetMentorAvailabilityUseCase } from '../../../application/useCase/interface/mentor/IGetMentorAvailabilityUseCase';
+import { type ICreateMentorAvailabilityUseCase } from '../../../application/useCase/interface/mentor/ICreateMentorAvailabilityUseCase';
 import { type IGetAvailableSlotsUseCase } from '../../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
-import { type IDeleteMentorAvailabilityUseCase } from '../../../application/useCase/interface/session/IDeleteMentorAvailabilityUseCase';
-import { type IAddAvailabilityExceptionUseCase } from '../../../application/useCase/interface/session/IAddAvailabilityExceptionUseCase';
+import { type IDeleteMentorAvailabilityUseCase } from '../../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase';
+import { type IAddAvailabilityExceptionUseCase } from '../../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
+import { type IViewMentorProfileUseCase } from '../../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
+import { HttpStatus } from '../../../shared/httpStatusCode';
 import {
   MentorListQuerySchema,
   MentorIdParamSchema,
@@ -28,7 +30,9 @@ export class MentorController {
     @inject('IDeleteMentorAvailabilityUseCase')
     private readonly _deleteAvailability: IDeleteMentorAvailabilityUseCase,
     @inject('IAddAvailabilityExceptionUseCase')
-    private readonly _addException: IAddAvailabilityExceptionUseCase
+    private readonly _addException: IAddAvailabilityExceptionUseCase,
+    @inject('IViewMentorProfileUseCase')
+    private readonly _viewMentorProfile: IViewMentorProfileUseCase
   ) { }
 
   async handleListMentors(req: Request, res: Response, next: NextFunction) {
@@ -109,6 +113,16 @@ export class MentorController {
 
       const result = await this._addException.execute(availabilityId, mentorId, date);
       res.status(200).json({ message: 'Exception date added', data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleViewMentorProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const result = await this._viewMentorProfile.execute(id as string);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }

@@ -95,14 +95,14 @@ import { IRemoveAcceptedAnswerUseCase } from '../../application/useCase/interfac
 import { RemoveAcceptedAnswerUseCase } from '../../application/useCase/qna/RemoveAcceptedAnswerUseCase';
 import { IUnsaveItemUseCase } from '../../application/useCase/interface/qna/IUnsaveItemUseCase';
 import { UnsaveItemUseCase } from '../../application/useCase/qna/UnsaveItemUseCase';
-import { IListMentorsUseCase } from '../../application/useCase/interface/session/IListMentorsUseCase';
-import { ListMentorsUseCase } from '../../application/useCase/session/ListMentorsUseCase';
+import { IListMentorsUseCase } from '../../application/useCase/interface/mentor/IListMentorsUseCase';
+import { ListMentorsUseCase } from '../../application/useCase/mentor/ListMentorsUseCase';
 import { IGetBookedSessionsUseCase } from '../../application/useCase/interface/session/IGetBookedSessionsUseCase';
 import { GetBookedSessionsUseCase } from '../../application/useCase/session/GetBookedSessionsUseCase';
-import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/interface/session/ICreateMentorAvailabilityUseCase';
-import { CreateMentorAvailabilityUseCase } from '../../application/useCase/session/CreateMentorAvailabilityUseCase';
-import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/session/IGetMentorAvailabilityUseCase';
-import { GetMentorAvailabilityUseCase } from '../../application/useCase/session/GetMentorAvailabilityUseCase';
+import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/ICreateMentorAvailabilityUseCase';
+import { CreateMentorAvailabilityUseCase } from '../../application/useCase/mentor/CreateMentorAvailabilityUseCase';
+import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IGetMentorAvailabilityUseCase';
+import { GetMentorAvailabilityUseCase } from '../../application/useCase/mentor/GetMentorAvailabilityUseCase';
 import { IGetAvailableSlotsUseCase } from '../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
 import { GetAvailableSlotsUseCase } from '../../application/useCase/session/GetAvailableSlotsUseCase';
 import { IBookSessionWithStripeUseCase } from '../../application/useCase/interface/session/IBookSessionWithStripeUseCase';
@@ -115,16 +115,18 @@ import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/
 import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
 import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
 import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
-import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/interface/session/IDeleteMentorAvailabilityUseCase';
-import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/session/DeleteMentorAvailabilityUseCase';
-import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/session/IAddAvailabilityExceptionUseCase';
-import { AddAvailabilityExceptionUseCase } from '../../application/useCase/session/AddAvailabilityExceptionUseCase';
+import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase';
+import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/mentor/DeleteMentorAvailabilityUseCase';
+import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
+import { AddAvailabilityExceptionUseCase } from '../../application/useCase/mentor/AddAvailabilityExceptionUseCase';
 import { IApplyForMentorUseCase } from '../../application/useCase/interface/user/IApplyForMentorUseCase';
 import { ApplyForMentorUseCase } from '../../application/useCase/user/ApplyForMentorUseCase';
 import { IListMentorApplicationUseCase } from '../../application/useCase/interface/admin/IListMentorApplicationUseCase';
 import { ListMentorApplicationUseCase } from '../../application/useCase/admin/ListMentorApplicationUseCase';
 import { IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
 import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
+import { IViewMentorProfileUseCase } from '../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
+import { ViewMentorProfileUseCase } from '../../application/useCase/mentor/ViewMentorProfileUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -383,6 +385,10 @@ export class UseCaseModule {
 
     container.register<IAddAvailabilityExceptionUseCase>('IAddAvailabilityExceptionUseCase', {
       useClass: AddAvailabilityExceptionUseCase
+    });
+
+    container.register<IViewMentorProfileUseCase>('IViewMentorProfileUseCase',{
+      useClass: ViewMentorProfileUseCase
     });
 
     //---------------------------------Payment---------------------------------------//
