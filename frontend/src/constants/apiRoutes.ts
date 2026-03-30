@@ -238,6 +238,7 @@ export const API_ROUTES = {
   },
 
   MENTOR: {
+    GET_PROFILE: (id: string) => `/mentors/${id}`,
     SET_AVAILABILITY: "/mentors/availability",
     GET_MY_AVAILABILITY: "/mentors/me/availability",
     DELETE_AVAILABILITY: (id: string) => `/mentors/availability/${id}`,

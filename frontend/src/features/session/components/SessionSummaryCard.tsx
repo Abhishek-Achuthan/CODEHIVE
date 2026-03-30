@@ -1,13 +1,8 @@
 import { User, Calendar, Clock, BookOpen, DollarSign } from 'lucide-react';
-import type { AvailableSlotResponse } from '../../../shared/types/api/mentor';
+import type { AvailableSlotResponse, MentorSummary } from '../../../shared/types/api/mentor';
 
 interface SessionSummaryCardProps {
-    mentor: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        title?: string;
-    };
+    mentor: MentorSummary;
     slot: AvailableSlotResponse;
     date: string;
     topic: string;

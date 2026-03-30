@@ -12,13 +12,15 @@ const EXPERIENCE_LEVELS = [
 export interface ExpertiseSectionProps {
     initialPrimaryExpertise?: string;
     initialExperienceLevel?: string;
-    onSave: (data: { primaryExpertise?: string; experienceLevel?: string }) => Promise<void>;
+    onSave?: (data: { primaryExpertise?: string; experienceLevel?: string }) => Promise<void>;
+    readonly?: boolean;
 }
 
 export default function ExpertiseSection({
     initialPrimaryExpertise,
     initialExperienceLevel,
     onSave,
+    readonly = false,
 }: ExpertiseSectionProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [primaryExpertise, setPrimaryExpertise] = useState(initialPrimaryExpertise || "");
@@ -35,7 +37,7 @@ export default function ExpertiseSection({
     const handleSave = async () => {
         try {
             setSaving(true);
-            await onSave({ primaryExpertise: primaryExpertise.trim(), experienceLevel });
+            await onSave?.({ primaryExpertise: primaryExpertise.trim(), experienceLevel });
             setIsEditing(false);
         } finally {
             setSaving(false);
@@ -54,15 +56,17 @@ export default function ExpertiseSection({
         <SectionCard
             title="Expertise"
             rightAction={
-                <button
-                    onClick={() => (isEditing ? handleCancel() : setIsEditing(true))}
-                    className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-                >
-                    <Pencil className="h-4 w-4" />
-                </button>
+                !readonly && (
+                    <button
+                        onClick={() => (isEditing ? handleCancel() : setIsEditing(true))}
+                        className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+                    >
+                        <Pencil className="h-4 w-4" />
+                    </button>
+                )
             }
         >
-            {!isEditing ? (
+            {!isEditing || readonly ? (
                 /* Display Mode */
                 !primaryExpertise && !experienceLevel ? (
                     <div className="rounded-lg border border-dashed border-gray-700 bg-gray-950/30 px-4 py-3">

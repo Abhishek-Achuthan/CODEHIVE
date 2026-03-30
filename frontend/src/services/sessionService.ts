@@ -38,14 +38,15 @@ export class SessionService {
         }
     }
 
-    static async cancelSession(sessionId : string): Promise<boolean>{
+    static async cancelSession(sessionId : string): Promise<boolean> {
         try {
             const response = await SessionAPI.cancelSession(sessionId);
-            return response as unknown as boolean 
+
+            return response.status >= 200 && response.status < 300;
         } catch (error) {
             throw this.handleError(error);
-       }
-   }
+        }
+    }
 
     private static handleError(error: unknown): never {
             if (error instanceof AxiosError) {

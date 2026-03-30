@@ -41,12 +41,6 @@ export class SessionRoutes {
             this._sessionController.handleCancelSession.bind(this._sessionController)
         );
 
-        this._router.get(
-            '/profile/:id',
-            this._authMiddleware.check,
-            this._mentorController.handleViewMentorProfile.bind(this._mentorController)
-        );
-
     }
 
     public getRoutes(): Router {

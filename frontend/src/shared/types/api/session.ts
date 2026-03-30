@@ -1,3 +1,8 @@
+import type {
+    AvailableSlotResponse,
+    MentorBookingFallback,
+} from "./mentor";
+
 export interface UserSummary {
     id: string;
     firstName: string;
@@ -40,3 +45,14 @@ export interface BookedSessionResponse extends SessionResponse {
     user: UserSummary;
 }
 
+export interface BookingPageLocationState {
+    mentor?: MentorBookingFallback;
+}
+
+export interface PaymentPageState {
+    mentorId: string;
+    mentor?: MentorBookingFallback;
+    slot: AvailableSlotResponse;
+    date: string;
+    topic: string;
+}

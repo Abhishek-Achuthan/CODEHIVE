@@ -1,17 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { User, Star, Sparkles, TrendingUp } from 'lucide-react';
+import type { MentorCardData } from '../../../shared/types/api/mentor';
 
 interface MentorCardProps {
-    mentor: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        avatarUrl?: string;
-        primaryExpertise?: string;
-        experienceLevel?: string;
-        rating?: number;
-    }
+    mentor: MentorCardData;
 }
 
 const LEVEL_LABELS: Record<string, string> = {
@@ -71,13 +64,21 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
                     </div>
                 </div>
 
-                <Link
-                    to={`/mentors/${mentor.id}/book`}
-                    state={{ mentor }}
-                    className="relative shrink-0 overflow-hidden rounded-xl bg-white px-5 py-2 text-xs font-bold text-black transition-all duration-300 hover:bg-indigo-500 hover:text-white hover:shadow-lg active:scale-95"
-                >
-                    Book
-                </Link>
+                <div className="flex shrink-0 flex-col gap-2">
+                    <Link
+                        to={`/mentors/${mentor.id}`}
+                        className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-white/10 hover:shadow-lg active:scale-95 text-center"
+                    >
+                        View Profile
+                    </Link>
+                    <Link
+                        to={`/mentors/${mentor.id}/book`}
+                        state={{ mentor }}
+                        className="relative shrink-0 overflow-hidden rounded-xl bg-white px-5 py-2 text-xs font-bold text-black transition-all duration-300 hover:bg-indigo-500 hover:text-white hover:shadow-lg active:scale-95 text-center"
+                    >
+                        Book
+                    </Link>
+                </div>
             </div>
         </div>
     );

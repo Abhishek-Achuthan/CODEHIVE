@@ -8,6 +8,7 @@ export type AvatarCropMode = "view" | "cropping";
 export interface ProfileAvatarCropperProps {
   onSave: (img: File) => Promise<void>;
   url?: string;
+  readonly?: boolean;
 }
 
 const DEFAULT_AVATAR =
@@ -16,6 +17,7 @@ const DEFAULT_AVATAR =
 export default function ProfileAvatarCropper({
   onSave,
   url,
+  readonly = false,
 }: ProfileAvatarCropperProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -144,22 +146,26 @@ export default function ProfileAvatarCropper({
           className="w-full h-full rounded-full object-cover border"
         />
 
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-1 right-1 rounded-full bg-black/70 p-2 text-white hover:bg-black"
-          disabled={saving}
-        >
-          <Pencil size={16} />
-        </button>
+        {!readonly && (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute bottom-1 right-1 rounded-full bg-black/70 p-2 text-white hover:bg-black"
+            disabled={saving}
+          >
+            <Pencil size={16} />
+          </button>
+        )}
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={onFileChange}
-        />
+        {!readonly && (
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={onFileChange}
+          />
+        )}
       </div>
 
       {/*crop modal */}

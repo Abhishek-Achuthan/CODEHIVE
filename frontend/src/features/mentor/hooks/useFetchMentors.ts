@@ -3,18 +3,15 @@ import { MentorshipService } from "../../../services/mentorService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import { useDebounce } from "../../admin/hooks/useDebounce";
 import { mapMentorListItemToView } from "../../../shared/mappers/mentor.mapper";
-import type { MentorListItemView } from "../../../shared/types/view/MentorListItemView";
-
-export interface MentorListingParams {
-  search?: string;
-  page?: number;
-  limit?: number;
-}
+import type {
+  MentorCardData,
+  MentorListingParams,
+} from "../../../shared/types/api/mentor";
 
 export function useFetchMentors(initialParams?: MentorListingParams) {
   const [loading, setLoading] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [mentors, setMentors] = useState<MentorListItemView[]>([]);
+  const [mentors, setMentors] = useState<MentorCardData[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [params, setParams] = useState<MentorListingParams>({
@@ -22,6 +19,7 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
     limit: 10,
     ...initialParams,
   });
+  const [retryCount, setRetryCount] = useState<number>(0);
 
   const debouncedSearch = useDebounce(params.search, 500);
 
@@ -57,7 +55,7 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
     fetchMentors();
 
     return () => controller.abort();
-  }, [debouncedSearch, params.page, params.limit]);
+  }, [debouncedSearch, params.page, params.limit, retryCount]);
 
   return {
     loading,
@@ -66,5 +64,6 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
     params,
     setParams,
     totalPages,
+    retry: () => setRetryCount((count) => count + 1),
   };
 }

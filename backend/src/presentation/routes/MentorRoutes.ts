@@ -61,6 +61,13 @@ export class MentorRoutes {
             this._authMiddleware.check,
             this._mentorController.handleGetAvailableSlots.bind(this._mentorController)
         );
+        
+
+        this._router.get(
+            '/:mentorId',
+            this._authMiddleware.check,
+            this._mentorController.handleViewMentorProfile.bind(this._mentorController)
+        )
     }
 
     public getRoutes() {

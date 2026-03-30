@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { BaseError } from '../../../shared/errors/BaseError';
 import { CalendarPlus, ListTodo } from 'lucide-react';
 import { ManageRulesSection } from '../components/ManageRulesSection';
-import { SessionPageHeader } from '../components/SessionPageHeader';
+import { PageHeader } from '../../../shared/ui/PageHeader';
 
 type TabType = 'create' | 'manage';
 
@@ -69,7 +69,7 @@ const MentorAvailabilityPage: React.FC = () => {
 
     return (
         <div className="flex flex-col">
-            <SessionPageHeader
+            <PageHeader
                 title="Availability"
                 description="Set up your schedule so students can book mentorship sessions with you. Create recurring schedules or add specific dates."
             />

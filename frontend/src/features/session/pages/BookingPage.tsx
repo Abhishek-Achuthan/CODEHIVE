@@ -1,45 +1,78 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import type { AvailableSlotResponse } from "../../../shared/types/api/mentor";
+import type {
+  AvailableSlotResponse,
+  MentorBookingFallback,
+  MentorProfileResponse,
+} from "../../../shared/types/api/mentor";
+import type { BookingPageLocationState } from "../../../shared/types/api/session";
 
 import { Loader2, ArrowLeft, Calendar as CalendarIcon, Clock, ArrowRight, User, MessageSquare } from "lucide-react";
 
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
-import { Calendar } from "../components/Calendar";
-import { useFetchSlots } from "../hooks/useFetchSlots";
+import { Calendar } from "../../../shared/components/Calendar";
+import { useFetchSlots } from "../../mentor/hooks/useFetchSlots";
+import { useMentorProfile } from "../../mentor/hooks/useMentorProfile";
+
+const PAYMENT_BOOKING_STORAGE_KEY = "session-booking-draft";
+
+type BookingMentor = MentorProfileResponse | MentorBookingFallback;
 
 const BookingPage: React.FC = () => {
   const { mentorId } = useParams<{ mentorId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const mentor = location.state?.mentor;
+  const locationState = location.state as BookingPageLocationState | null;
+  const fallbackMentor = locationState?.mentor;
+  const {
+    mentor: fetchedMentor,
+    isLoading: isMentorLoading,
+    error: mentorError,
+    isNotFound,
+  } = useMentorProfile(mentorId);
+  const mentor: BookingMentor | null = fetchedMentor ?? fallbackMentor ?? null;
+  const isMentorValid = Boolean(fetchedMentor) && !isNotFound;
+  const mentorSubtitle =
+    (mentor && "title" in mentor && typeof mentor.title === "string"
+      ? mentor.title
+      : mentor?.primaryExpertise) ?? "Expert Mentor";
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlotResponse | null>(null);
   const [topic, setTopic] = useState("");
 
-  const { slots, isLoading } = useFetchSlots(mentorId, selectedDate);
+  const {
+    slots,
+    isLoading,
+    error: slotsError,
+    retry: retrySlots,
+  } = useFetchSlots(mentorId, selectedDate, isMentorValid);
 
   useEffect(() => {
     setSelectedSlot(null);
   }, [slots]);
 
   const handleProceedToPayment = (): void => {
-    if (!selectedSlot || !topic.trim() || !mentorId || !selectedDate) return;
+    if (!selectedSlot || !topic.trim() || !mentorId || !selectedDate || !mentor) {
+      return;
+    }
 
     const offset = selectedDate.getTimezoneOffset();
     const date = new Date(selectedDate.getTime() - offset * 60 * 1000);
     const dateStr = date.toISOString().split("T")[0];
 
-    navigate("/payment", {
-      state: {
-        mentor,
+    sessionStorage.setItem(
+      PAYMENT_BOOKING_STORAGE_KEY,
+      JSON.stringify({
+        mentorId,
         slot: selectedSlot,
         date: dateStr,
         topic,
-      },
-    });
+      })
+    );
+
+    navigate(`/mentors/${mentorId}/book/payment`);
   };
 
   return (
@@ -55,6 +88,42 @@ const BookingPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back
           </button>
+
+          {isMentorLoading && !mentor ? (
+            <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/60">
+              <div className="flex flex-col items-center gap-4 text-zinc-400">
+                <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+                <p className="text-sm">Loading mentor profile...</p>
+              </div>
+            </div>
+          ) : null}
+
+          {!isMentorLoading && (isNotFound || (!mentor && mentorError)) ? (
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8 text-center">
+              <div className="mx-auto flex max-w-md flex-col items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-800 text-zinc-400">
+                  <User className="h-8 w-8" />
+                </div>
+                <h1 className="text-2xl font-bold text-white">
+                  {isNotFound ? "Mentor not found" : "Unable to load mentor"}
+                </h1>
+                <p className="text-sm text-zinc-400">
+                  {isNotFound
+                    ? "This mentor profile is unavailable or the link is invalid."
+                    : mentorError ?? "Something went wrong while loading this mentor profile."}
+                </p>
+                <button
+                  onClick={() => navigate("/sessions/discover")}
+                  className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-black transition-colors hover:bg-zinc-200"
+                >
+                  Browse mentors
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {!mentor || (isNotFound && !isMentorLoading) ? null : (
+            <>
 
           <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex items-start gap-6 shadow-lg shadow-black/20">
             <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20 overflow-hidden">
@@ -72,7 +141,7 @@ const BookingPage: React.FC = () => {
                 Book a session with {mentor?.firstName} {mentor?.lastName}
               </h1>
               <p className="text-zinc-400 text-lg">
-                {mentor?.title || "Expert Mentor"}
+                {mentorSubtitle}
               </p>
             </div>
           </div>
@@ -103,6 +172,17 @@ const BookingPage: React.FC = () => {
               {isLoading ? (
                 <div className="flex justify-center py-20">
                   <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+                </div>
+              ) : slotsError ? (
+                <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-zinc-400 border-2 border-dashed border-zinc-800 rounded-xl">
+                  <p>{slotsError}</p>
+                  <button
+                    type="button"
+                    onClick={retrySlots}
+                    className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-black transition-colors hover:bg-zinc-200"
+                  >
+                    Retry
+                  </button>
                 </div>
               ) : slots.length === 0 ? (
                 <div className="text-center py-20 text-zinc-500 border-2 border-dashed border-zinc-800 rounded-xl">
@@ -234,6 +314,8 @@ const BookingPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
       </main>

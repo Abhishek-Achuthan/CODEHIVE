@@ -2,6 +2,9 @@ import { API_ROUTES } from "../../constants/apiRoutes";
 import apiClient from "../apiClient";
 import type { CreateMentorAvailabilityRequest, MentorListingParams } from "../../shared/types/api/mentor";
 
+export const getMentorProfile = (id: string) =>
+    apiClient.get(API_ROUTES.MENTOR.GET_PROFILE(id));
+
 export const setAvailability = (data: Omit<CreateMentorAvailabilityRequest, 'mentorId'>) =>
     apiClient.post(API_ROUTES.MENTOR.SET_AVAILABILITY, data);
 

@@ -6,12 +6,14 @@ const ABOUT_MAX_CHARS = 200;
 
 export interface AboutSectionProps {
   initialText: string;
-  onSave: (text: string) => Promise<void>;
+  onSave?: (text: string) => Promise<void>;
+  readonly?: boolean;
 }
 
 export default function AboutSection({
   initialText,
   onSave,
+  readonly = false,
 }: AboutSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(initialText);
@@ -31,7 +33,7 @@ export default function AboutSection({
 
     try {
       setSaving(true);
-      await onSave(normalized);
+      await onSave?.(normalized);
       setIsEditing(false);
     } finally {
       setSaving(false);
@@ -47,28 +49,30 @@ export default function AboutSection({
     <SectionCard
       title="About Me"
       rightAction={
-        !isEditing ? (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Edit about"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-            aria-label="Cancel"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        !readonly && (
+          !isEditing ? (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+              aria-label="Edit about"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+              aria-label="Cancel"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )
         )
       }
     >
-      {!isEditing ? (
+      {!isEditing || readonly ? (
         <p className="text-xs leading-relaxed text-gray-300">
           {initialText || "No description provided."}
         </p>

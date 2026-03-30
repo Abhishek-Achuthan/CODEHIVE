@@ -6,7 +6,7 @@ import { SessionCard } from "../components/SessionCard";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
-import { SessionPageHeader } from "../components/SessionPageHeader";
+import { PageHeader } from "../../../shared/ui/PageHeader";
 
 export default function MySessionsPage() {
     const {loading,sessions,error,refetch} = useFetchSessions()
@@ -60,7 +60,7 @@ export default function MySessionsPage() {
 
     return (
         <div className="flex flex-col">
-            <SessionPageHeader
+            <PageHeader
                 title="My Sessions"
                 description="Sessions you've booked as a user"
             />

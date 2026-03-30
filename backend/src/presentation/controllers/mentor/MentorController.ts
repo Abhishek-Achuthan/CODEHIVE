@@ -120,8 +120,8 @@ export class MentorController {
 
   async handleViewMentorProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const result = await this._viewMentorProfile.execute(id as string);
+      const { mentorId } = req.params;
+      const result = await this._viewMentorProfile.execute(mentorId as string);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

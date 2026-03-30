@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { MentorCard } from '../components/MentorCard';
 import { Search, Loader2 } from 'lucide-react';
 import { useFetchMentors } from '../hooks/useFetchMentors';
-import { SessionPageHeader } from '../components/SessionPageHeader';
+import { PageHeader } from '../../../shared/ui/PageHeader';
 
 const MentorListingPage: React.FC = () => {
     const [search, setSearch] = useState('');
-    const { mentors, loading, setParams, totalPages, params } = useFetchMentors({ search });
+    const { mentors, loading, error, setParams, totalPages, params, retry } = useFetchMentors({ search });
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -17,7 +17,7 @@ const MentorListingPage: React.FC = () => {
     return (
         <div className="flex flex-col">
             {/* 1. Header + Actions */}
-            <SessionPageHeader
+            <PageHeader
                 title="Discover Sessions"
                 description="Find and book mentorship sessions with industry experts"
             >
@@ -35,7 +35,7 @@ const MentorListingPage: React.FC = () => {
                         Filter
                     </button>
                 </div>
-            </SessionPageHeader>
+            </PageHeader>
 
             {/* 2. Search Bar - Elevated Subsurface */}
             <div className="mb-10 flex">
@@ -56,6 +56,17 @@ const MentorListingPage: React.FC = () => {
             {loading ? (
                 <div className="flex min-h-[400px] items-center justify-center bg-white/[0.01] rounded-3xl border border-white/5">
                     <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+                </div>
+            ) : error ? (
+                <div className="flex min-h-[300px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-gray-800 text-sm text-gray-500">
+                    <p>{error}</p>
+                    <button
+                        type="button"
+                        onClick={retry}
+                        className="rounded-md border border-gray-700 bg-black px-4 py-2 text-xs font-semibold text-gray-200 transition-colors hover:bg-gray-900"
+                    >
+                        Retry
+                    </button>
                 </div>
             ) : mentors.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -5,11 +5,21 @@ import type {
     CreateMentorAvailabilityRequest,
     MentorAvailabilityResponse,
     MentorListingParams,
+    MentorProfileResponse,
     PaginatedMentorListResponse,
     AvailableSlotResponse
 } from '../shared/types/api/mentor';
 
 export class MentorshipService {
+    static async getMentorProfile(id: string): Promise<MentorProfileResponse> {
+        try {
+            const response = await MentorshipApi.getMentorProfile(id);
+            return response.data as MentorProfileResponse;
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
     static async setAvailability(data: Omit<CreateMentorAvailabilityRequest, 'mentorId'>): Promise<MentorAvailabilityResponse> {
         try {
             const response = await MentorshipApi.setAvailability(data);

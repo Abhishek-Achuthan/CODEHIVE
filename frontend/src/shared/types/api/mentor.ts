@@ -58,5 +58,37 @@ export interface MentorListItemAPI {
     experienceLevel?: string;
 }
 
-export type PaginatedMentorListResponse = PaginatedResponse<MentorListItemAPI>;
+export interface MentorProfileResponse {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    about?: string;
+    skills: string[];
+    experience: ExperienceApi[];
+    avatarUrl?: string;
+    githubUrl?: string;
+    linkedInUrl?: string;
+    websiteUrl?: string;
+    primaryExpertise?: string;
+    experienceLevel?: string;
+}
 
+export interface MentorSummary {
+    id: string;
+    firstName: string;
+    lastName: string;
+    title?: string;
+    avatarUrl?: string;
+    primaryExpertise?: string;
+}
+
+export interface MentorCardData extends MentorSummary {
+    experienceLevel?: string;
+    rating?: number;
+}
+
+export type MentorBookingFallback = Partial<MentorProfileResponse> & MentorSummary;
+
+export type PaginatedMentorListResponse = PaginatedResponse<MentorListItemAPI>;

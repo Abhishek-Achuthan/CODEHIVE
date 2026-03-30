@@ -6,7 +6,7 @@ import { Calendar, Loader2, Search } from "lucide-react";
 import { SessionCard } from "../components/SessionCard";
 import toast from "react-hot-toast";
 import { Pagination } from "../../../shared/ui/Pagination";
-import { SessionPageHeader } from "../components/SessionPageHeader";
+import { PageHeader } from "../../../shared/ui/PageHeader";
 
 export default function MentorSessionsPage() {
     const user = useAppSelector((state: RootState) => state.auth.user);
@@ -27,7 +27,7 @@ export default function MentorSessionsPage() {
 
     return (
         <div className="flex flex-col">
-            <SessionPageHeader
+            <PageHeader
                 title="Hosted Sessions"
                 description="Sessions you're conducting as a mentor"
             />

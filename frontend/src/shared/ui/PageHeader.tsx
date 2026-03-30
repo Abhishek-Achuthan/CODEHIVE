@@ -1,13 +1,13 @@
 import React from 'react';
 
-interface SessionPageHeaderProps {
+interface PageHeaderProps {
     label?: string;
     title: string;
     description: string;
     children?: React.ReactNode;
 }
 
-export const SessionPageHeader: React.FC<SessionPageHeaderProps> = ({
+export const PageHeader: React.FC<PageHeaderProps> = ({
     label = "Sessions",
     title,
     description,

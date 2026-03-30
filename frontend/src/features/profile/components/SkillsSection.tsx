@@ -6,12 +6,14 @@ const SKILL_MAX_CHARS = 40;
 
 export interface SkillsSectionProps {
   initialSkills: string[];
-  onSave: (skills: string[]) => Promise<void>;
+  onSave?: (skills: string[]) => Promise<void>;
+  readonly?: boolean;
 }
 
 export default function SkillsSection({
   initialSkills,
   onSave,
+  readonly = false,
 }: SkillsSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [skills, setSkills] = useState<string[]>(initialSkills);
@@ -48,7 +50,7 @@ export default function SkillsSection({
   const handleSave = async () => {
     try {
       setSaving(true);
-      await onSave(skills);
+      await onSave?.(skills);
       setIsEditing(false);
     } finally {
       setSaving(false);
@@ -68,20 +70,22 @@ export default function SkillsSection({
     <SectionCard
       title="Skills"
       rightAction={
-        !isEditing ? (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        ) : (
-          <button
-            onClick={handleCancel}
-            className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        !readonly && (
+          !isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleCancel}
+              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )
         )
       }
     >
@@ -107,7 +111,7 @@ export default function SkillsSection({
               className="inline-flex items-center gap-2 rounded-md border border-gray-700 bg-gray-950/60 px-3 py-1 text-xs text-gray-200"
             >
               {s}
-              {isEditing && (
+              {isEditing && !readonly && (
                 <button
                   type="button"
                   onClick={() => removeSkill(s)}

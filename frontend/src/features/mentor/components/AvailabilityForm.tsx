@@ -4,8 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Clock, Info } from 'lucide-react';
 import type { AvailabilityFormData } from '../types';
 import { availabilityFormSchema, type AvailabilityFormSchema } from '../validations/availabilityValidation';
-
-import { Calendar } from './Calendar';
+import { Calendar } from '../../../shared/components/Calendar';
 
 interface AvailabilityFormProps {
     onSubmit: (data: AvailabilityFormData) => Promise<void>;

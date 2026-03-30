@@ -7,19 +7,23 @@ interface UseFetchSlotsResult {
   slots: AvailableSlotResponse[];
   isLoading: boolean;
   error: string | null;
+  retry: () => void;
 }
 
 export const useFetchSlots = (
   mentorId: string | undefined,
-  selectedDate: Date | null
+  selectedDate: Date | null,
+  enabled = true
 ): UseFetchSlotsResult => {
   const [slots, setSlots] = useState<AvailableSlotResponse[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState<number>(0);
 
   useEffect(() => {
-    if (!mentorId || !selectedDate) {
+    if (!enabled || !mentorId || !selectedDate) {
       setSlots([]);
+      setError(null);
       return;
     }
 
@@ -52,8 +56,13 @@ export const useFetchSlots = (
       }
     };
 
-    fetchSlots();
-  }, [mentorId, selectedDate]);
+    void fetchSlots();
+  }, [enabled, mentorId, selectedDate, retryCount]);
 
-  return { slots, isLoading, error };
+  return {
+    slots,
+    isLoading,
+    error,
+    retry: () => setRetryCount((count) => count + 1),
+  };
 };

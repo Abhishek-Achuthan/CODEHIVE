@@ -9,8 +9,9 @@ import ProfileHeaderEditDialog from "./ProfileHeaderEditDialog";
 
 export interface ProfileHeaderProps {
   user: ProfileUser;
-  onSaveAvatar: (img: File) => Promise<void>;
-  onSaveProfileHeader: (values: {
+  readonly?: boolean;
+  onSaveAvatar?: (img: File) => Promise<void>;
+  onSaveProfileHeader?: (values: {
     firstName: string;
     lastName: string;
     phone?: string;
@@ -18,16 +19,17 @@ export interface ProfileHeaderProps {
     linkedInUrl?: string;
     websiteUrl?: string;
   }) => Promise<void>;
-  onClickMentor: () => void;
-  onClickDashboard: () => void;
-  onClickSessions: () => void;
-  onClickGitHub: () => void;
-  onClickLinkedIn: () => void;
-  onClickWebsite: () => void;
+  onClickMentor?: () => void;
+  onClickDashboard?: () => void;
+  onClickSessions?: () => void;
+  onClickGitHub?: () => void;
+  onClickLinkedIn?: () => void;
+  onClickWebsite?: () => void;
 }
 
 export default function ProfileHeader({
   user,
+  readonly = false,
   onSaveAvatar,
   onSaveProfileHeader,
   onClickMentor,
@@ -45,35 +47,40 @@ export default function ProfileHeader({
       className="mb-5 relative"
       contentClassName="py-4"
     >
-      <ProfileHeaderEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        initialValues={{
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          githubUrl: user.githubUrl,
-          linkedInUrl: user.linkedInUrl,
-          websiteUrl: user.websiteUrl,
-          avatarUrl: user.avatarUrl
-        }}
-        onSave={onSaveProfileHeader}
-      />
+      {!readonly && onSaveProfileHeader && (
+        <ProfileHeaderEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          initialValues={{
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            githubUrl: user.githubUrl,
+            linkedInUrl: user.linkedInUrl,
+            websiteUrl: user.websiteUrl,
+            avatarUrl: user.avatarUrl
+          }}
+          onSave={onSaveProfileHeader}
+        />
+      )}
 
-      <button
-        type="button"
-        onClick={() => setEditOpen(true)}
-        className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
-        aria-label="Edit profile"
-      >
-        <Pencil className="h-4 w-4" />
-      </button>
+      {!readonly && (
+        <button
+          type="button"
+          onClick={() => setEditOpen(true)}
+          className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900"
+          aria-label="Edit profile"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+      )}
 
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           <ProfileAvatarCropper
             url={user.avatarUrl}
-            onSave={onSaveAvatar}
+            onSave={onSaveAvatar ?? (async () => undefined)}
+            readonly={readonly}
           />
 
           <div>
@@ -86,29 +93,31 @@ export default function ProfileHeader({
               <div className="text-sm text-gray-400">{user.phone}</div>
             ) : null}
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={onClickMentor}
-                className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
-              >
-                Mentor
-              </button>
-              <button
-                type="button"
-                onClick={onClickDashboard}
-                className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
-              >
-                Dashboard
-              </button>
-              <button
-                type="button"
-                onClick={onClickSessions}
-                className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
-              >
-                Sessions
-              </button>
-            </div>
+            {!readonly && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={onClickMentor}
+                  className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
+                >
+                  Mentor
+                </button>
+                <button
+                  type="button"
+                  onClick={onClickDashboard}
+                  className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
+                >
+                  Dashboard
+                </button>
+                <button
+                  type="button"
+                  onClick={onClickSessions}
+                  className="rounded-md border border-gray-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-900"
+                >
+                  Sessions
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

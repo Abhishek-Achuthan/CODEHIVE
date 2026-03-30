@@ -32,7 +32,8 @@ const isValidYearMonth = (value: string) => {
 
 export interface ExperienceSectionProps {
   initialItems: ExperienceDraftItem[];
-  onSave: (items: ExperienceDraftItem[]) => Promise<void>;
+  onSave?: (items: ExperienceDraftItem[]) => Promise<void>;
+  readonly?: boolean;
 }
 
 const EMPTY_FORM: ExperienceDraftItem = {
@@ -58,6 +59,7 @@ const typeLabel: Record<ExperienceType, string> = {
 export default function ExperienceSection({
   initialItems,
   onSave,
+  readonly = false,
 }: ExperienceSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState<ExperienceDraftItem[]>(initialItems);
@@ -172,7 +174,7 @@ export default function ExperienceSection({
       setSaving(true);
 
       const cleaned = items.filter((i) => i.title.trim().length > 0);
-      await onSave(cleaned);
+      await onSave?.(cleaned);
 
       toast.success("Experience updated");
       setIsEditing(false);
@@ -202,20 +204,22 @@ export default function ExperienceSection({
     <SectionCard
       title="Experience"
       rightAction={
-        isEditing ? (
-          <button
-            onClick={() => setIsEditing(false)}
-            className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
+        !readonly && (
+          isEditing ? (
+            <button
+              onClick={() => setIsEditing(false)}
+              className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          )
         )
       }
     >
@@ -278,7 +282,7 @@ export default function ExperienceSection({
                         </div>
                       </div>
 
-                      {isEditing && (
+                      {isEditing && !readonly && (
                         <div className="flex gap-2">
                           <button type="button" onClick={() => openEdit(it.id)}>
                             <Pencil className="h-4 w-4" />
