@@ -1,8 +1,8 @@
-import { inject, injectable } from "tsyringe";
-import { IListMentorApplicationUseCase } from "../interface/admin/IListMentorApplicationUseCase";
-import { type IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { PaginationResult } from "../../../domain/types/PaginationResult";
-import { IMentorApplicationListResponseDTO } from "../../dto/AdminDTO";
+import { inject, injectable } from 'tsyringe';
+import { IListMentorApplicationUseCase } from '../interface/admin/IListMentorApplicationUseCase';
+import { type IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
+import { IMentorApplicationListResponseDTO } from '../../dto/AdminDTO';
 
 
 

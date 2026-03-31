@@ -3,6 +3,7 @@ import { type IPaymentService } from '../../../application/ports/payment/IPaymen
 import { NextFunction, Request, Response } from 'express';
 import { type IHandleStripeWebhookUseCase } from '../../../application/useCase/interface/payment/IHandleStripeWebhookUseCase';
 import { signatureSchema } from '../../validation/paymentValidation';
+import { HttpStatus } from '../../../shared/httpStatusCode';
 
 @injectable()
 export class WebhookController {
@@ -17,7 +18,7 @@ export class WebhookController {
 
             const result = signatureSchema.safeParse(signature);
             if (!result.success) {
-                return res.status(400).json({ message: result.error.message });
+                return res.status(HttpStatus.Unauthorized).json({ message: result.error.message });
             }
 
             const event = this._paymentService.verifyWebhookSignature(
@@ -26,7 +27,7 @@ export class WebhookController {
             );
 
             await this._handleStripeWebhook.execute(event)
-            return res.status(200).json({ received: true });
+            return res.status(HttpStatus.OK).json({ received: true });
         } catch (error) {
             next(error);
         }

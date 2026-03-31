@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 const ABOUT_MAX_CHARS = 200;
 const SKILL_MAX_CHARS = 40;

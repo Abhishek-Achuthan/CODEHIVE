@@ -41,7 +41,7 @@ export class MentorController {
       const params = MentorListQuerySchema.parse(req.query);
 
       const result = await this._listMentors.execute(params, userId);
-      res.status(200).json(result);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -52,7 +52,7 @@ export class MentorController {
       const { mentorId } = MentorIdParamSchema.parse(req.params);
 
       const result = await this._getAvailability.execute(mentorId);
-      res.status(200).json(result);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -64,7 +64,7 @@ export class MentorController {
       const { date } = GetAvailableSlotsQuerySchema.parse(req.query);
 
       const result = await this._getAvailableSlots.execute(mentorId, date);
-      res.status(200).json(result);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -87,7 +87,7 @@ export class MentorController {
     try {
       const { id } = req.user;
       const result = await this._getAvailability.execute(id);
-      res.status(200).json(result);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -99,7 +99,7 @@ export class MentorController {
       const { id: availabilityId } = AvailabilityIdParamSchema.parse(req.params);
 
       const result = await this._deleteAvailability.execute(availabilityId, mentorId);
-      res.status(200).json({ message: 'Availability rule deleted', data: result });
+      res.status(HttpStatus.OK).json({ message: 'Availability rule deleted', data: result });
     } catch (error) {
       next(error);
     }
@@ -112,7 +112,7 @@ export class MentorController {
       const { date } = AddExceptionBodySchema.parse(req.body);
 
       const result = await this._addException.execute(availabilityId, mentorId, date);
-      res.status(200).json({ message: 'Exception date added', data: result });
+      res.status(HttpStatus.OK).json({ message: 'Exception date added', data: result });
     } catch (error) {
       next(error);
     }

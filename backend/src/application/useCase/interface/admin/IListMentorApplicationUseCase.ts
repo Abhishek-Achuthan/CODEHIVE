@@ -1,5 +1,5 @@
-import { PaginationResult } from "../../../../domain/types/PaginationResult";
-import { IMentorApplicationListResponseDTO } from "../../../dto/AdminDTO";
+import { PaginationResult } from '../../../../domain/types/PaginationResult';
+import { IMentorApplicationListResponseDTO } from '../../../dto/AdminDTO';
 
 export interface IListMentorApplicationUseCase {
     execute(

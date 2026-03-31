@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { NextFunction, Request, Response } from 'express';
 import type { IGetMyWalletUseCase } from '../../../application/useCase/interface/wallet/IGetMyWalletUseCase';
+import { HttpStatus } from '../../../shared/httpStatusCode';
 
 @injectable()
 export class WalletController {
@@ -13,7 +14,7 @@ export class WalletController {
     try {
       const { id } = req.user;
       const result = await this._getMyWallet.execute(id);
-      res.status(200).json(result);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
