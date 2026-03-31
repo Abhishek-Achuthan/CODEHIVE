@@ -1,3 +1,13 @@
+function requireEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}
+
 export const env = {
   mongouri: process.env.MONGO_URI || '',
   frontendUrl: process.env.FRONTEND_URL,
@@ -20,6 +30,6 @@ export const env = {
   githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
   aiApiKey: process.env.GEMINI_API_KEY,
   aiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-  stripeSKY: process.env.STRIPE_SECRET_KEY,
-  stripeWebhookSKY: process.env.STRIPE_WEBHOOK_SECRET_KEY,
+  stripeSKY: requireEnv('STRIPE_SECRET_KEY'),
+  stripeWebhookSKY: requireEnv('STRIPE_WEBHOOK_SECRET_KEY'),
 };

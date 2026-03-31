@@ -46,7 +46,8 @@ const PaymentPage: React.FC = () => {
       storedBooking?.mentorId &&
       storedBooking.slot &&
       storedBooking.date &&
-      storedBooking.topic
+      storedBooking.topic &&
+      storedBooking.clientRequestId
   );
 
   const {
@@ -105,7 +106,11 @@ const PaymentPage: React.FC = () => {
   const {
     isBooking,
     clientSecret,
+    reservationId,
+    expiresAt,
     setClientSecret,
+    setReservationId,
+    setExpiresAt,
     bookWithWallet,
     bookWithStripe,
   } = useBookSession();
@@ -124,6 +129,7 @@ const PaymentPage: React.FC = () => {
           startTime: slot.startTime,
           endTime: slot.endTime,
           topic,
+          clientRequestId: storedBooking.clientRequestId,
         });
 
         sessionStorage.removeItem(PAYMENT_BOOKING_STORAGE_KEY);
@@ -143,6 +149,7 @@ const PaymentPage: React.FC = () => {
         startTime: slot.startTime,
         endTime: slot.endTime,
         topic,
+        clientRequestId: storedBooking.clientRequestId,
       });
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);
@@ -214,7 +221,7 @@ const PaymentPage: React.FC = () => {
 
       <Footer />
 
-      {clientSecret && (
+      {clientSecret && reservationId && expiresAt && (
         <Elements
           stripe={stripePromise}
           options={{
@@ -223,9 +230,17 @@ const PaymentPage: React.FC = () => {
           }}
         >
           <StripePaymentModal
-            onClose={() => setClientSecret(null)}
+            reservationId={reservationId}
+            expiresAt={expiresAt}
+            onClose={() => {
+              setClientSecret(null);
+              setReservationId(null);
+              setExpiresAt(null);
+            }}
             onPaid={() => {
               setClientSecret(null);
+              setReservationId(null);
+              setExpiresAt(null);
               sessionStorage.removeItem(PAYMENT_BOOKING_STORAGE_KEY);
               toast.success("Payment successful!");
               navigate("/my-sessions");

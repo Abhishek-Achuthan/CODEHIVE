@@ -28,6 +28,8 @@ import { IWalletRepository } from '../../domain/interfaces/IWalletRepository';
 import { WalletRepository } from '../../infrastructure/database/repository/WalletRepository';
 import { IStripeWebhookEventRepository } from '../../domain/interfaces/IStripeWebhookEventRepository';
 import { StripeWebhookEventRepository } from '../../infrastructure/database/repository/StripeWebhookEventRepository';
+import { IBookingReservationRepository } from '../../domain/interfaces/IBookingReservationRepository';
+import { BookingReservationRepository } from '../../infrastructure/database/repository/BookingReservationRepository';
 import { IMentorRepository } from '../../domain/interfaces/IMentorRepository';
 import { MentorRepository } from '../../infrastructure/database/repository/MentorRepository';
 
@@ -101,6 +103,10 @@ export class RepositoryModule {
 
         container.register<IStripeWebhookEventRepository>('IStripeWebhookEventRepository', {
             useClass: StripeWebhookEventRepository
+        });
+
+        container.register<IBookingReservationRepository>('IBookingReservationRepository', {
+            useClass: BookingReservationRepository
         });
 
         //-------------------------Mentor Repository--------------------------------------//

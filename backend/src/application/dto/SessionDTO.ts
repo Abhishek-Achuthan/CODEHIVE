@@ -3,6 +3,8 @@ import { MentorStatus } from '../../domain/types/MentorStatus';
 import { PaymentSource } from '../../domain/types/PaymentSource';
 import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
+import { BookingReservationStatus } from '../../domain/types/BookingReservationStatus';
+import { RefundStatus } from '../../domain/types/RefundStatus';
 
 export interface CreateMentorAvailabilityDTO {
   mentorId: string;
@@ -20,6 +22,7 @@ export interface BookSessionDTO {
   startTime: string;
   endTime: string;
   topic: string;
+  clientRequestId: string;
 }
 
 export interface MentorListInputDTO {
@@ -74,6 +77,14 @@ export interface AvailableSlotDTO {
   price: number;
 }
 
+export interface IBookingReservationResponseDTO {
+  id: string;
+  status: BookingReservationStatus;
+  expiresAt: string;
+  sessionId: string | null;
+  refundStatus: RefundStatus;
+}
+
 export interface IMentorProfileResponseDTO {
   id: string;
   firstName: string;
@@ -90,4 +101,3 @@ export interface IMentorProfileResponseDTO {
   experienceLevel?: string | undefined;
   email: string;
 }
-

@@ -6,13 +6,11 @@ export class SessionRoutes {
     private _router: Router;
     private _sessionController;
     private _authMiddleware;
-    private _mentorController;
 
     constructor() {
         this._router = Router();
         this._sessionController = sessionController;
         this._authMiddleware = authMiddleware;
-        this._mentorController = mentorController;
         this._setRoutes();
     }
 
@@ -33,6 +31,18 @@ export class SessionRoutes {
             '/',
             this._authMiddleware.check,
             this._sessionController.handleGetBookedSessions.bind(this._sessionController)
+        );
+
+        this._router.get(
+            '/reservations/:id',
+            this._authMiddleware.check,
+            this._sessionController.handleGetBookingReservationStatus.bind(this._sessionController)
+        );
+
+        this._router.delete(
+            '/reservations/:id',
+            this._authMiddleware.check,
+            this._sessionController.handleCancelBookingReservation.bind(this._sessionController)
         );
         
         this._router.delete(

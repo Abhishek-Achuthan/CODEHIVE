@@ -17,6 +17,14 @@ import { useMentorProfile } from "../../mentor/hooks/useMentorProfile";
 
 const PAYMENT_BOOKING_STORAGE_KEY = "session-booking-draft";
 
+const createClientRequestId = (): string => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
 type BookingMentor = MentorProfileResponse | MentorBookingFallback;
 
 const BookingPage: React.FC = () => {
@@ -69,6 +77,7 @@ const BookingPage: React.FC = () => {
         slot: selectedSlot,
         date: dateStr,
         topic,
+        clientRequestId: createClientRequestId(),
       })
     );
 

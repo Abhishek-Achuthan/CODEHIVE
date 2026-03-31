@@ -257,6 +257,7 @@ export const API_ROUTES = {
     BOOK_SESSION_STRIPE: "/sessions/stripe",
     BOOK_SESSION_WALLET: "/sessions/wallet",
     GET_BOOKED_SESSIONS: "/sessions",
+    GET_BOOKING_RESERVATION: (reservationId: string) => `/sessions/reservations/${reservationId}`,
     CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`
   },
 

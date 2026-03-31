@@ -17,7 +17,7 @@ import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
-import { socketService } from './config/di/resolver';
+import { socketService, stripeRefundRetryService } from './config/di/resolver';
 
 export class App {
   private readonly _app: Express;
@@ -86,7 +86,12 @@ export class App {
     socketService.initialize(this._io);
   }
 
+  private startBackgroundJobs() {
+    stripeRefundRetryService.start();
+  }
+
   public listen() {
+    this.startBackgroundJobs();
     this._httpServer.listen(env.port, () => {
       console.log(`server started at port ${env.port}`);
     });

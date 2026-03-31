@@ -115,6 +115,10 @@ import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/
 import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
 import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
 import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
+import { ICancelBookingReservationUseCase } from '../../application/useCase/interface/session/ICancelBookingReservationUseCase';
+import { CancelBookingReservationUseCase } from '../../application/useCase/session/CancelBookingReservationUseCase';
+import { IGetBookingReservationStatusUseCase } from '../../application/useCase/interface/session/IGetBookingReservationStatusUseCase';
+import { GetBookingReservationStatusUseCase } from '../../application/useCase/session/GetBookingReservationStatusUseCase';
 import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase';
 import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/mentor/DeleteMentorAvailabilityUseCase';
 import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
@@ -375,8 +379,16 @@ export class UseCaseModule {
       useClass: BookSessionWithWalletUseCase
     });
 
+    container.register<IGetBookingReservationStatusUseCase>('IGetBookingReservationStatusUseCase', {
+      useClass: GetBookingReservationStatusUseCase
+    });
+
     container.register<ICancelSessionUseCase>('ICancelSessionUseCase', {
       useClass: CancelSessionUseCase
+    });
+
+    container.register<ICancelBookingReservationUseCase>('ICancelBookingReservationUseCase', {
+      useClass: CancelBookingReservationUseCase
     });
 
     container.register<IDeleteMentorAvailabilityUseCase>('IDeleteMentorAvailabilityUseCase', {

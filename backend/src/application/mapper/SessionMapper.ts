@@ -1,7 +1,14 @@
 import { SessionEntity } from '../../domain/session/SessionEntity';
-import { IBookedSessionResponseDTO, IMentorProfileResponseDTO, ISessionResponseDTO, IUserSummaryDTO } from '../dto/SessionDTO';
+import {
+  IBookedSessionResponseDTO,
+  IBookingReservationResponseDTO,
+  IMentorProfileResponseDTO,
+  ISessionResponseDTO,
+  IUserSummaryDTO,
+} from '../dto/SessionDTO';
 import { EssentialUserInfo } from '../../domain/types/EssentialUserInfo';
 import { UserEntity } from '../../domain/entities/UserEntity';
+import { BookingReservationEntity } from '../../domain/entities/BookingReservationEntity';
 
 export class SessionMapper {
   static toResponse(session: SessionEntity): ISessionResponseDTO {
@@ -79,5 +86,17 @@ export class SessionMapper {
     sessions: SessionEntity[]
   ): ISessionResponseDTO[] {
     return sessions.map(this.toResponse);
+  }
+
+  static toBookingReservationResponse(
+    reservation: BookingReservationEntity
+  ): IBookingReservationResponseDTO {
+    return {
+      id: reservation.id,
+      status: reservation.status,
+      expiresAt: reservation.expiresAt.toISOString(),
+      sessionId: reservation.sessionId,
+      refundStatus: reservation.refundStatus,
+    };
   }
 }

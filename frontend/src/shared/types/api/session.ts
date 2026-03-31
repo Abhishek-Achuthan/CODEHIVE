@@ -32,12 +32,22 @@ export interface BookSessionRequest {
     startTime: string;
     endTime: string;
     topic: string;
+    clientRequestId: string;
+}
+
+export interface BookingReservationResponse {
+    id: string;
+    status: 'PENDING_PAYMENT' | 'PROCESSING' | 'FULFILLED' | 'FAILED' | 'EXPIRED';
+    expiresAt: string;
+    sessionId: string | null;
+    refundStatus: 'NONE' | 'REQUIRED' | 'PENDING' | 'REFUNDED' | 'FAILED';
 }
 
 export interface StripeBookSessionResponse {
-    session: SessionResponse;
+    reservation: BookingReservationResponse;
     clientSecret: string;
     paymentIntentId: string;
+    expiresAt: string;
 }
 
 export interface BookedSessionResponse extends SessionResponse {
@@ -55,4 +65,5 @@ export interface PaymentPageState {
     slot: AvailableSlotResponse;
     date: string;
     topic: string;
+    clientRequestId: string;
 }

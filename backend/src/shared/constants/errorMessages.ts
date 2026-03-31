@@ -103,5 +103,6 @@ export const ERROR_MESSAGES = {
     AVAILABILITY_MODIFY_FORBIDDEN: 'You can only modify your own availability rules',
     AVAILABILITY_DELETE_FORBIDDEN: 'You can only delete your own availability rules',
     ONLY_PAID_SESSIONS_CANCELLABLE: 'Only paid sessions can be cancelled',
+    ONLY_PENDING_RESERVATIONS_CANCELLABLE: 'Only pending reservations can be cancelled',
   },
 };

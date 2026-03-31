@@ -4,7 +4,7 @@ import { SessionEntity } from '../../../domain/session/SessionEntity';
 import { GenericRepository } from './GenericRepository';
 import { SessionModel } from '../models/session/SessionModel';
 import { SessionDoc, SessionLeanDoc } from '../schemas/session/SessionSchema';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { PopulatedSessionDoc } from '../types/PopulatedSessionDoc';
 import { UserLeanDoc } from '../schemas/UserSchema';
 import { EssentialUserInfo } from '../../../domain/types/EssentialUserInfo';
@@ -25,6 +25,14 @@ export class SessionRepository
   ): Promise<SessionEntity> {
     const session = await SessionModel.create(data);
     return this.toEntity(session);
+  }
+
+  async createWithSession(
+    data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt'>,
+    session: ClientSession
+  ): Promise<SessionEntity> {
+    const docs = await SessionModel.create([data], { session });
+    return this.toEntity(docs[0]!);
   }
 
   async findByMentorAndDate(

@@ -29,6 +29,9 @@ import { IPaymentService } from '../../application/ports/payment/IPaymentService
 import { PaymentService } from '../../infrastructure/adapters/payment/PaymentService';
 import { ISocketService } from '../../application/ports/socket/ISocketService';
 import { SocketService } from '../../infrastructure/adapters/socket/SocketService';
+import { StripeRefundRetryService } from '../../application/services/StripeRefundRetryService';
+import { ILoggerService } from '../../application/ports/logging/ILoggerService';
+import { LoggingService } from '../../infrastructure/adapters/logging/LoggingService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -88,6 +91,12 @@ export class ServiceModule {
       useClass: PaymentService,
     });
 
+    container.register<ILoggerService>('ILoggerService', {
+      useClass: LoggingService
+    })
+
     container.registerSingleton<ISocketService>('ISocketService', SocketService);
+    container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
+
   }
 }

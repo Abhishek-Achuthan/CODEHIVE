@@ -1,9 +1,13 @@
-import { BookSessionDTO, ISessionResponseDTO } from '../../../dto/SessionDTO';
+import {
+  BookSessionDTO,
+  IBookingReservationResponseDTO,
+} from '../../../dto/SessionDTO';
 
 export interface StripeCheckoutResponseDTO {
-  session: ISessionResponseDTO;
+  reservation: IBookingReservationResponseDTO;
   clientSecret: string;
   paymentIntentId: string;
+  expiresAt: string;
 }
 
 export interface IBookSessionWithStripeUseCase {

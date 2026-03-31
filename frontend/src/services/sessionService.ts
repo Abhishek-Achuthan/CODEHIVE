@@ -1,4 +1,5 @@
 import type {
+    BookingReservationResponse,
     BookedSessionResponse,
     BookSessionRequest,
     SessionResponse,
@@ -33,6 +34,15 @@ export class SessionService {
         try {
             const response = await SessionAPI.getBookedSessions();
             return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async getBookingReservation(reservationId: string): Promise<BookingReservationResponse> {
+        try {
+            const response = await SessionAPI.getBookingReservation(reservationId);
+            return response.data as BookingReservationResponse;
         } catch (error) {
             throw this.handleError(error);
         }

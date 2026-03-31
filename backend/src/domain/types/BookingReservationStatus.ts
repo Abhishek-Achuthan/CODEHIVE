@@ -1,0 +1,7 @@
+export enum BookingReservationStatus {
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+  PROCESSING = 'PROCESSING',
+  FULFILLED = 'FULFILLED',
+  FAILED = 'FAILED',
+  EXPIRED = 'EXPIRED',
+}

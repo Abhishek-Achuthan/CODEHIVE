@@ -1,4 +1,4 @@
 export type CreatePaymentIntentResult = {
-    clientSecret : string,
-    paymentIntentId:string
-}
+  clientSecret: string;
+  paymentIntentId: string;
+};
