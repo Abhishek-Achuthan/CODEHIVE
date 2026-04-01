@@ -1,6 +1,6 @@
 import type * as React from "react";
-
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, BookmarkX } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { Pagination } from "../../../shared/ui/Pagination";
 import { SearchInput } from "../components/SearchInput";
@@ -34,8 +34,6 @@ type Props = {
   totalPages: number;
   onPageChange: (p: number) => void;
 
-  onCreateList: () => void;
-
   onRemoveFromList: (questionId: string) => void;
   removingQuestionId: string | null;
 
@@ -58,7 +56,6 @@ export default function SavedQuestionsMain({
   currentPage,
   totalPages,
   onPageChange,
-  onCreateList,
   onRemoveFromList,
   removingQuestionId,
   onUnsaveQuestion,
@@ -107,32 +104,51 @@ export default function SavedQuestionsMain({
   }));
 
   return (
-    <section className="flex-1">
-      <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-foreground">{headerTitle}</h1>
-        <button
-          type="button"
-          onClick={onCreateList}
-          className="text-sm text-foreground/70 hover:text-foreground transition"
-        >
-          Create new list
-        </button>
+    <section className="flex-1 w-full flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-900/40 p-5 rounded-2xl border border-white/5 backdrop-blur-sm">
+        <div>
+          <h2 className="text-xl font-bold text-gray-200">{headerTitle}</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {totalQuestions} {headerCountLabel}{totalQuestions === 1 ? "" : "s"}
+          </p>
+        </div>
+
+        <div className="w-full sm:w-72">
+          <SearchInput
+            value={searchTerm}
+            onChange={(v) => {
+              onChangeSearchTerm(v);
+              onPageChange(1);
+            }}
+            className="w-full mb-0"
+          />
+        </div>
       </div>
 
-      <div className="text-sm text-foreground/60 mb-6">
-        {totalQuestions} {headerCountLabel}
-        {totalQuestions === 1 ? "" : "s"}
-      </div>
-
-      <SearchInput
-        value={searchTerm}
-        onChange={(v) => {
-          onChangeSearchTerm(v);
-          onPageChange(1);
-        }}
+      <QuestionContent 
+        loading={loading} 
+        questions={questionsWithActions} 
+        onSelect={onSelectQuestion}
+        emptyMessage={
+          <div className="flex flex-col items-center justify-center">
+            <motion.div
+               animate={{ y: [0, -10, 0] }}
+               transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+               className="w-20 h-20 mb-6 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.1)]"
+            >
+               <BookmarkX className="w-10 h-10 text-indigo-400 opacity-80" />
+            </motion.div>
+            <h3 className="text-xl font-bold text-gray-200 mb-2">
+               {searchTerm ? "No results found" : "No saved questions yet"}
+            </h3>
+            <p className="text-gray-500 max-w-sm">
+               {searchTerm 
+                 ? "Try adjusting your search terms." 
+                 : "Browse the Q&A section and click the save icon to add questions to this list."}
+            </p>
+          </div>
+        }
       />
-
-      <QuestionContent loading={loading} questions={questionsWithActions} onSelect={onSelectQuestion} />
 
       <div className="mt-8 h-10 flex items-center justify-center">
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />

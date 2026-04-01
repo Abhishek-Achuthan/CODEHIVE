@@ -9,6 +9,7 @@ import type { IWalletService } from '../../ports/wallet/IWalletService';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { UserRole } from '../../../domain/types/UserRole';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
@@ -49,7 +50,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
       mentor.role !== UserRole.MENTOR ||
       mentor.mentorStatus !== MentorStatus.APPROVED
     ) 
-      throw new NotFoundError(ERROR_MESSAGES.SESSION.MENTOR_NOT_FOUND);
+     throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
     
 
     const availabilities = await this._availabilityRepo.findByMentor(mentorId);

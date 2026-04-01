@@ -55,6 +55,8 @@ export interface BookedSessionResponse extends SessionResponse {
     user: UserSummary;
 }
 
+export type SessionPerspective = "user" | "mentor";
+
 export interface BookingPageLocationState {
     mentor?: MentorBookingFallback;
 }

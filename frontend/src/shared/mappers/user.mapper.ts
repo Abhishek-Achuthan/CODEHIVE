@@ -3,6 +3,7 @@ import type { UserApi } from "../types/api/auth";
 import type { AdminUserListItemView } from "../types/view/AdminUserListItemView";
 import type { CurrentUserView } from "../types/view/CurrentUserView";
 import type { MentorApplicationView } from "../types/view/MentorApplicationView";
+import type { MentorStatus, UserRole } from "../constants/auth";
 
 export function mapAdminUserListItemToView(
   user: AdminUserListItemApi
@@ -12,7 +13,7 @@ export function mapAdminUserListItemToView(
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    role: user.role,
+    role: user.role as UserRole,
     isBlocked: user.isBlocked,
   };
 }
@@ -25,7 +26,7 @@ export function mapMentorApplicationToView(
     firstName: application.firstName,
     lastName: application.lastName,
     email: application.email,
-    mentorStatus: application.mentorStatus,
+    mentorStatus: application.mentorStatus as MentorStatus,
     mentorAppliedAt: new Date(application.mentorAppliedAt),
   };
 }
@@ -37,7 +38,7 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     lastName: user.lastName,
     email: user.email,
     phone: user.phone,
-    role: user.role,
+    role: user.role as UserRole,
     isBlocked: user.isBlocked,
     avatarUrl: user.avatarUrl,
     about: user.about,
@@ -46,7 +47,7 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     githubUrl: user.githubUrl,
     linkedInUrl: user.linkedInUrl,
     websiteUrl: user.websiteUrl,
-    mentorStatus: user.mentorStatus,
+    mentorStatus: user.mentorStatus as MentorStatus,
     mentorAppliedAt: user.mentorAppliedAt,
     primaryExpertise: user.primaryExpertise,
     experienceLevel: user.experienceLevel,

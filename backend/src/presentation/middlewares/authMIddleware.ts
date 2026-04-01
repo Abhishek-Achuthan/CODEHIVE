@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
 import type { IJWTService } from '../../application/ports/security/IJWTService';
+import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
 import { JwtPayload } from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
@@ -10,7 +11,8 @@ import { UserRole } from '../../domain/types/UserRole';
 @injectable()
 export class AuthMiddleware {
   constructor(
-    @inject('IJWTService') private _jwtService: IJWTService
+    @inject('IJWTService') private _jwtService: IJWTService,
+    @inject('IUserRepository') private _userRepository: IUserRepository
   ) {}
 
   check = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,13 +35,20 @@ export class AuthMiddleware {
         return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
-      if (!decoded?.userRole || !decoded?.sub) {
-        return next(new NotFoundError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
+      if (!decoded?.sub) {
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
+      }
+
+      const user = await this._userRepository.find(decoded.sub);
+
+      if (!user || user.isBlocked) {
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED));
       }
 
       req.user = {
-        id: decoded.sub,
-        role: decoded.userRole as UserRole,
+        id: user.id,
+        role: user.role as UserRole,
+        mentorStatus: user.mentorStatus,
       };
 
       next();

@@ -99,11 +99,10 @@ export default function AiAssistPage() {
                           className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                         >
                           <div
-                            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed border ${
-                              m.role === "user"
-                                ? "bg-zinc-900 border-zinc-700 text-white"
-                                : "bg-purple-500/10 border-purple-500/30 text-zinc-100"
-                            }`}
+                            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed border ${m.role === "user"
+                              ? "bg-zinc-900 border-zinc-700 text-white"
+                              : "bg-purple-500/10 border-purple-500/30 text-zinc-100"
+                              }`}
                           >
                             {m.role === "assistant" ? (
                               <MarkdownMessage content={m.content} />
@@ -181,11 +180,10 @@ export default function AiAssistPage() {
                       <button
                         key={s.id}
                         onClick={() => controller.actions.selectSession(s.id)}
-                        className={`w-full text-left px-3 py-3 rounded-xl border transition-colors ${
-                          active
-                            ? "border-purple-500/50 bg-purple-500/10 text-white"
-                            : "border-zinc-800 bg-black/20 text-zinc-300 hover:bg-zinc-900"
-                        }`}
+                        className={`w-full text-left px-3 py-3 rounded-xl border transition-colors ${active
+                          ? "border-purple-500/50 bg-purple-500/10 text-white"
+                          : "border-zinc-800 bg-black/20 text-zinc-300 hover:bg-zinc-900"
+                          }`}
                         type="button"
                       >
                         <div className="text-sm font-medium truncate">{title}</div>

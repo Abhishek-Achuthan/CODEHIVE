@@ -7,11 +7,7 @@ import { useCancelSession } from "./useCancelSession";
 
 export type StatusFilter = "upcoming" | "completed" | "cancelled";
 
-interface UseMentorSessionsParams {
-    userId?: string;
-}
-
-export const useMentorSessions = ({ userId }: UseMentorSessionsParams) => {
+export const useMentorSessions = () => {
     const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
@@ -26,13 +22,8 @@ export const useMentorSessions = ({ userId }: UseMentorSessionsParams) => {
         try {
             setLoading(true);
 
-            const data = await SessionService.getBookedSessions();
-
-            const mentorSessions = data.filter(
-                (session) => session.mentor?.id === userId
-            );
-
-            setSessions(mentorSessions);
+            const data = await SessionService.getBookedSessions("mentor");
+            setSessions(data);
         } catch (error) {
             if (error instanceof BaseError) toast.error(error.message);
             else toast.error("Failed to load sessions");
@@ -42,10 +33,8 @@ export const useMentorSessions = ({ userId }: UseMentorSessionsParams) => {
     };
 
     useEffect(() => {
-        if (userId) {
-            fetchMentorSessions();
-        }
-    }, [userId]);
+        fetchMentorSessions();
+    }, []);
 
     const filteredSessions = useMemo(() => {
         return sessions.filter((s) => {

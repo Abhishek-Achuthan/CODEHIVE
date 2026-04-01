@@ -8,6 +8,7 @@ import type { ICancelBookingReservationUseCase } from '../../../application/useC
 import type { IGetBookingReservationStatusUseCase } from '../../../application/useCase/interface/session/IGetBookingReservationStatusUseCase';
 import {
   bookingReservationParamsSchema,
+  bookedSessionsQuerySchema,
   bookSessionWithStripeSchema,
 } from '../../validation/paymentValidation';
 import { HttpStatus } from '../../../shared/httpStatusCode';
@@ -71,7 +72,11 @@ export class SessionController {
   ) {
     try {
       const { id } = req.user;
-      const result = await this._getBookedSessions.execute(id);
+      const { perspective } = bookedSessionsQuerySchema.parse({
+        ...req.query,
+        perspective: req.query.perspective ?? 'user',
+      });
+      const result = await this._getBookedSessions.execute(id, perspective);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

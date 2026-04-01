@@ -8,6 +8,7 @@ import { loginSuccess } from "../../../store/slices/authSlice";
 import { BaseError } from "../../../shared/errors/BaseError";
 import type { UserApi } from "../../../shared/types/api/auth";
 import { mapCurrentUserToView } from "../../../shared/mappers/user.mapper";
+import { UserRole } from "../../../shared/constants/auth";
 
 export function useLogin() {
   const navigate = useNavigate();
@@ -29,8 +30,8 @@ export function useLogin() {
       dispatch(loginSuccess({ user: userView, accessToken }));
 
       if (response.success === true) {
-        if (userView.role === "user" || userView.role === "mentor") navigate("/home");
-        else if (userView.role === "admin") navigate("/admin/users");
+        if (userView.role === UserRole.ADMIN) navigate("/admin/users");
+        else navigate("/home");
       }
     } catch (error) {
       if (error instanceof BaseError) {

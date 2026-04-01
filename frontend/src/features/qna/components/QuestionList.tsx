@@ -56,13 +56,12 @@ export default function QuestionsList(props: QuestionsListProps): JSX.Element {
 
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <SearchInput value={searchTerm} onChange={onSearchChange} />
-
+    <div className="w-full">
       <QuestionHeader
         title={title}
         total={totalQuestions}
         onAsk={onAskQuestion}
+        search={<SearchInput value={searchTerm} onChange={onSearchChange} className="w-full" />}
         filters={
           <QuestionFilters
             activeFilter={activeFilter}

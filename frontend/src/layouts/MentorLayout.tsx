@@ -34,7 +34,7 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                             </NavLink>
 
                             <NavLink
-                                to="/mentor/sessions"
+                                to="/sessions/hosting"
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                                         ? "bg-indigo-500/10 text-indigo-400"
@@ -47,7 +47,7 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                             </NavLink>
 
                             <NavLink
-                                to="/mentor/availability"
+                                to="/sessions/availability"
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                                         ? "bg-indigo-500/10 text-indigo-400"

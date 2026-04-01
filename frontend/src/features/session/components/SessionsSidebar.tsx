@@ -2,10 +2,13 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Compass, Calendar, Video, Clock } from 'lucide-react';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
+import { MentorStatus, UserRole } from '../../../shared/constants/auth';
 
 export const SessionsSidebar: React.FC = () => {
     const user = useAppSelector((state) => state.auth.user);
-    const isMentor = user?.mentorStatus === 'approved';
+    const isMentor =
+        user?.role === UserRole.MENTOR &&
+        user.mentorStatus === MentorStatus.APPROVED;
 
     const navItems = [
         {

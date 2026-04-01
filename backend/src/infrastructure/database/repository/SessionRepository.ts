@@ -39,8 +39,12 @@ export class SessionRepository
     mentorId: string,
     date: string
   ): Promise<SessionEntity[]> {
-    const docs = await SessionModel.find({ mentorId, date,status:{$ne:SessionStatus.CANCELLED} });
-    return docs.map((doc) => this.toEntity(doc));
+    const docs = await SessionModel.find({
+      mentorId,
+      date,
+      status: { $in: [SessionStatus.UPCOMING, SessionStatus.COMPLETED] },
+    }).lean<SessionLeanDoc[]>();
+    return docs.map((doc) => this.leanToEntity(doc));
   }
 
   async findByMentor(mentorId: string): Promise<SessionWithParticipants[]> {
@@ -139,7 +143,7 @@ export class SessionRepository
     
     const doc = await SessionModel.findOne({paymentReferenceId: referenceId})
 
-    return doc ? this.leanToEntity(doc) : null
+    return doc ? this.toEntity(doc) : null
 
   }
 

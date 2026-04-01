@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import { RouteLoadingFallback } from "../shared/ui/RouteLoadingFallback";
+import { UserRole } from "../shared/constants/auth";
 
 // Auth pages
 const RegisterPage = lazy(() => import("../features/auth/pages/RegisterPage"));
@@ -60,19 +61,15 @@ export default function AppRoutes() {
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
-            {/*Landing page route*/}
+          <Route
+            element={
+              <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.MENTOR]} />
+            }
+          >
             <Route path="/home" element={<LandingPage />} />
-
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/wallet" element={<WalletPage />} />
 
-            {/*admin routes*/}
-            <Route path="/admin/users" element={<UserManagementPage />} />
-            <Route path="/admin/mentors" element={<MentorManagementPage />} />
-            <Route path="/admin/applications" element={<MentorApplicationsManagementPage />} />
-
-            {/*qna routes*/}
             <Route path="/qna" element={<QnaLandigPage />} />
             <Route path="/qna/ask-question" element={<AskQuestionPage />} />
             <Route path="/qna/question/:questionId" element={<QuestionDetailsPage />} />
@@ -83,22 +80,43 @@ export default function AppRoutes() {
             <Route path="/qna/saved" element={<SavedQuestionsPage />} />
             <Route path="/qna/ai-assist" element={<AiAssistPage />} />
 
-            {/* Session Routes with Layout */}
             <Route path="/sessions" element={<SessionsLayout />}>
               <Route index element={<Navigate to="/sessions/discover" replace />} />
               <Route path="discover" element={<MentorListingPage />} />
               <Route path="my-sessions" element={<MySessionsPage />} />
-              <Route path="hosting" element={<MentorSessionsPage />} />
-              <Route path="availability" element={<MentorAvailabilityPage />} />
+              <Route
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[UserRole.MENTOR]}
+                    requireApprovedMentor
+                  />
+                }
+              >
+                <Route path="hosting" element={<MentorSessionsPage />} />
+                <Route path="availability" element={<MentorAvailabilityPage />} />
+              </Route>
             </Route>
 
-            {/* Other Session Routes (without sidebar) */}
             <Route path="/mentors/:mentorId" element={<MentorProfilePage />} />
             <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
             <Route path="/mentors/:mentorId/book/payment" element={<PaymentPage />} />
-            
-            {/* Legacy/Other Mentor Routes */}
+          </Route>
+
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={[UserRole.MENTOR]}
+                requireApprovedMentor
+              />
+            }
+          >
             <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
+            <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/mentors" element={<MentorManagementPage />} />
+            <Route path="/admin/applications" element={<MentorApplicationsManagementPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

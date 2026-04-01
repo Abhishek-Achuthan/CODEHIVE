@@ -1,6 +1,4 @@
-import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useMentorSessions } from "../hooks/useMentorSessions";
-import type { RootState } from "../../../store";
 import { StatusTabs } from "../components/StatusTabs";
 import { Calendar, Loader2, Search } from "lucide-react";
 import { SessionCard } from "../components/SessionCard";
@@ -9,8 +7,6 @@ import { Pagination } from "../../../shared/ui/Pagination";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 
 export default function MentorSessionsPage() {
-    const user = useAppSelector((state: RootState) => state.auth.user);
-
     const {
         loading,
         sessions,
@@ -23,7 +19,7 @@ export default function MentorSessionsPage() {
         handleTabChange,
         handleSearchChange,
         handleCancelSession,
-    } = useMentorSessions({ userId: user?.id });
+    } = useMentorSessions();
 
     return (
         <div className="flex flex-col">
@@ -79,6 +75,7 @@ export default function MentorSessionsPage() {
                                 session={session}
                                 context="mentor"
                                 onCancel={() => handleCancelSession(session.id)}
+                                showCancelAction={false}
                                 onJoinRoom={() => {
                                     toast.success("Starting session...");
                                 }}

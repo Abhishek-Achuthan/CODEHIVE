@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { SessionService } from "../../../services/sessionService";
-import type { BookedSessionResponse } from "../../../shared/types/api/session";
+import type {
+  BookedSessionResponse,
+  SessionPerspective,
+} from "../../../shared/types/api/session";
 import { BaseError } from "../../../shared/errors/BaseError";
 
-export function useFetchSessions() {
+export function useFetchSessions(perspective: SessionPerspective = "user") {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
@@ -13,7 +16,7 @@ export function useFetchSessions() {
       setLoading(true);
       setError(null);
 
-      const res = await SessionService.getBookedSessions();
+      const res = await SessionService.getBookedSessions(perspective);
       setSessions(res);
     } catch (err: unknown) {
       const normalized =
@@ -29,7 +32,7 @@ export function useFetchSessions() {
 
   useEffect(() => {
     void fetchSessions();
-  }, []);
+  }, [perspective]);
 
   return {
     sessions,

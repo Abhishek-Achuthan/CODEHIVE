@@ -4,6 +4,7 @@ import MentorLayout from "../../../layouts/MentorLayout";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import type { RootState } from "../../../store";
 import { useNavigate } from "react-router-dom";
+import { MentorStatus, UserRole } from "../../../shared/constants/auth";
 
 interface DashboardStats {
     totalEarnings: number;
@@ -23,8 +24,10 @@ export default function MentorDashboardPage() {
     });
 
     useEffect(() => {
-        // Redirect if not an approved mentor
-        if (user?.mentorStatus !== "approved") {
+        if (
+            user?.role !== UserRole.MENTOR ||
+            user.mentorStatus !== MentorStatus.APPROVED
+        ) {
             navigate("/profile");
         }
     }, [user, navigate]);
@@ -109,7 +112,7 @@ export default function MentorDashboardPage() {
                     {/* Quick Actions */}
                     <div className="grid gap-6 md:grid-cols-2">
                         <button
-                            onClick={() => navigate("/mentor/sessions")}
+                            onClick={() => navigate("/sessions/hosting")}
                             className="group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 text-left transition-all hover:border-indigo-500/50 hover:bg-gray-900"
                         >
                             <div className="flex items-center gap-4">
@@ -128,7 +131,7 @@ export default function MentorDashboardPage() {
                         </button>
 
                         <button
-                            onClick={() => navigate("/mentor/availability")}
+                            onClick={() => navigate("/sessions/availability")}
                             className="group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 text-left transition-all hover:border-purple-500/50 hover:bg-gray-900"
                         >
                             <div className="flex items-center gap-4">

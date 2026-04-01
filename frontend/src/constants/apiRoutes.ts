@@ -1,4 +1,5 @@
-import type { MentorListingParams } from "../shared/types/api/mentor";
+import { type MentorListingParams } from "../shared/types/api/mentor";
+import { type SessionPerspective } from "../shared/types/api/session";
 import type { AnswerListParams, QuestionListParams } from "../shared/types/api/qna";
 
 export const API_ROUTES = {
@@ -256,7 +257,8 @@ export const API_ROUTES = {
   SESSION: {
     BOOK_SESSION_STRIPE: "/sessions/stripe",
     BOOK_SESSION_WALLET: "/sessions/wallet",
-    GET_BOOKED_SESSIONS: "/sessions",
+    GET_BOOKED_SESSIONS: (perspective: SessionPerspective) =>
+      `/sessions?${new URLSearchParams({ perspective }).toString()}`,
     GET_BOOKING_RESERVATION: (reservationId: string) => `/sessions/reservations/${reservationId}`,
     CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`
   },

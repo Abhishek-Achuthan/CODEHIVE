@@ -7,6 +7,7 @@ import { IMentorRepository } from '../../../domain/interfaces/IMentorRepository'
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { UserRole } from '../../../domain/types/UserRole';
 import { MentorListOptions } from '../../../domain/types/MentorListOptions';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
 
 
 export class MentorRepository extends GenericRepository<UserDocument, UserEntity> implements IMentorRepository {
@@ -21,6 +22,8 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
 
     const query: FilterQuery<UserDocument> = {
       role: UserRole.MENTOR,
+      mentorStatus: MentorStatus.APPROVED,
+      isBlocked: false,
       _id: { $ne: new mongoose.Types.ObjectId(userId) }
     };
 

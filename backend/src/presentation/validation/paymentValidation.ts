@@ -22,3 +22,7 @@ export const bookSessionWithStripeSchema = z.object({
 export const bookingReservationParamsSchema = z.object({
   id: z.string().regex(objectIdRegex, 'Invalid reservation ID'),
 });
+
+export const bookedSessionsQuerySchema = z.object({
+  perspective: z.enum(['user', 'mentor']).default('user'),
+});

@@ -10,7 +10,7 @@ return (
       <div className="flex flex-1">
         <Sidebar />
 
-        <main className="flex-1 px-8 py-8 ml-6 max-w-7xl">
+        <main className="flex-1 w-full max-w-7xl p-6">
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1">
               <div className="mb-8 flex gap-6">

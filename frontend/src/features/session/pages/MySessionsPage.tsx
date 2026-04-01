@@ -9,7 +9,7 @@ import { useCancelSession } from "../hooks/useCancelSession";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 
 export default function MySessionsPage() {
-    const {loading,sessions,error,refetch} = useFetchSessions()
+    const {loading,sessions,error,refetch} = useFetchSessions("user")
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,8 +27,8 @@ export default function MySessionsPage() {
             const matchesSearch =
                 !searchQuery ||
                 s.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.user.lastName.toLowerCase().includes(searchQuery.toLowerCase());
+                s.mentor.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                s.mentor.lastName.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesStatus && matchesSearch;
         });
     }, [sessions, activeTab, searchQuery]);

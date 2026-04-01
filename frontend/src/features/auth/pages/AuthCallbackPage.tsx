@@ -5,6 +5,7 @@ import { loginSuccess } from "../../../store/slices/authSlice";
 import toast from "react-hot-toast";
 import { mapCurrentUserToView } from "../../../shared/mappers/user.mapper";
 import type { UserApi } from "../../../shared/types/api/auth";
+import { UserRole } from "../../../shared/constants/auth";
 
 export default function AuthCallbackPage() {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function AuthCallbackPage() {
 
         toast.success(`Welcome back, ${userData.firstName}!`);
 
-        if (userData.role === "admin") {
+        if (userData.role === UserRole.ADMIN) {
           navigate("/admin/users", { replace: true });
         } else {
           navigate("/home", { replace: true });

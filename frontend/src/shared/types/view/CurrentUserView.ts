@@ -1,10 +1,12 @@
+import type { MentorStatus, UserRole } from "../../constants/auth";
+
 export interface CurrentUserView {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   phone?: string;
-  role: string;
+  role: UserRole;
   isBlocked: boolean;
   avatarUrl?: string;
   about?: string;
@@ -21,7 +23,7 @@ export interface CurrentUserView {
   githubUrl?: string;
   linkedInUrl?: string;
   websiteUrl?: string;
-  mentorStatus?: "none" | "pending" | "approved";
+  mentorStatus?: MentorStatus;
   mentorAppliedAt?: string;
   primaryExpertise?: string;
   experienceLevel?: string;

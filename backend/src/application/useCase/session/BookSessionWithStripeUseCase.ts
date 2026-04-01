@@ -7,8 +7,8 @@ import type { ISlotConflictService } from '../../ports/slot/ISlotConflictService
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import type { ILoggerService } from '../../ports/logging/ILoggerService';
 import type { IPaymentService } from '../../ports/payment/IPaymentService';
-import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ConflictError } from '../../../core/errors/ConflictError';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { UserRole } from '../../../domain/types/UserRole';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
@@ -58,7 +58,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       mentor.role !== UserRole.MENTOR ||
       mentor.mentorStatus !== MentorStatus.APPROVED
     ) {
-      throw new NotFoundError(ERROR_MESSAGES.SESSION.MENTOR_NOT_FOUND);
+      throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
     }
 
     const availabilities = await this._availabilityRepo.findByMentor(mentorId);

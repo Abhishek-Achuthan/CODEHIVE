@@ -7,6 +7,7 @@ import SavedQuestionsMain from "../components/SavedQuestionsMain";
 import CreateSavedListModal from "../components/CreateSavedListModal";
 import AddToSavedListModal from "../components/AddToSavedListModal";
 import ConfirmDeleteListModal from "../components/ConfirmDeleteListModal";
+import { QuestionHeader } from "../components/QuestionHeader";
 import { useSavedQuestionsPage } from "../hooks/useSavedQuestionsPage";
 
 export default function SavedQuestionsPage() {
@@ -70,10 +71,11 @@ export default function SavedQuestionsPage() {
   };
 
   return (
-    <QnaLayout
-      title="Saved Questions"
-      description="Organize questions into lists for quick access later."
-    >
+    <QnaLayout>
+      <QuestionHeader 
+        title="Saved Questions" 
+        description="Organize questions into lists for quick access later." 
+      />
       {/* Delete list confirmation */}
       <ConfirmDeleteListModal
         open={deleteListOpen}
@@ -108,7 +110,6 @@ export default function SavedQuestionsPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={(p) => setCurrentPage(Math.max(1, p))}
-          onCreateList={handleOpenCreateList}
           onRemoveFromList={handleRemoveFromCurrentList}
           removingQuestionId={removingQuestionId}
           onOpenAddToList={handleOpenAddToList}

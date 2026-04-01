@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import type { ReactNode } from "react";
 import QuestionCard, { type QuestionCardProps } from "./QuestionCard";
 
 type Question = QuestionCardProps & { id: string | number };
@@ -7,7 +8,7 @@ type Props = {
   loading: boolean;
   questions: Question[];
   onSelect: (id: string) => void;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 };
 
 export function QuestionContent({
@@ -18,17 +19,27 @@ export function QuestionContent({
 }: Props) {
   if (loading) {
     return (
-      <p className="text-foreground/60 text-center py-8">
-        Loading questions...
-      </p>
+      <div className="flex items-center justify-center py-16">
+        <p className="text-gray-400 font-medium">Loading questions...</p>
+      </div>
     );
   }
 
   if (questions.length === 0) {
     return (
-      <p className="text-foreground/60 text-center py-8">
-        {emptyMessage ?? "No questions found. Try adjusting your filters."}
-      </p>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-black/40 backdrop-blur-md rounded-2xl min-h-[300px]"
+      >
+        {typeof emptyMessage === 'string' || !emptyMessage ? (
+          <p className="text-gray-400 font-medium max-w-sm">
+            {emptyMessage ?? "No questions found. Try adjusting your filters."}
+          </p>
+        ) : (
+          emptyMessage
+        )}
+      </motion.div>
     );
   }
 

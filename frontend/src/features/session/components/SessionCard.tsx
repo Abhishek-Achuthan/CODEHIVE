@@ -7,9 +7,17 @@ interface SessionCardProps {
     onCancel: () => void;
     isCancelling?: boolean;
     context?: "user" | "mentor"; // Determines which perspective to show
+    showCancelAction?: boolean;
 }
 
-export function SessionCard({ session, onJoinRoom, onCancel, isCancelling, context = "user" }: SessionCardProps) {
+export function SessionCard({
+    session,
+    onJoinRoom,
+    onCancel,
+    isCancelling,
+    context = "user",
+    showCancelAction = context !== "mentor",
+}: SessionCardProps) {
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString("en-US", {
@@ -89,20 +97,22 @@ export function SessionCard({ session, onJoinRoom, onCancel, isCancelling, conte
                             >
                                 Join Room
                             </button>
-                            <button
-                                onClick={onCancel}
-                                disabled={isCancelling}
-                                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-red-500/20 transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isCancelling ? (
-                                    <>
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                        Cancelling...
-                                    </>
-                                ) : (
-                                    "Cancel"
-                                )}
-                            </button>
+                            {showCancelAction && (
+                                <button
+                                    onClick={onCancel}
+                                    disabled={isCancelling}
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-red-500/20 transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isCancelling ? (
+                                        <>
+                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                            Cancelling...
+                                        </>
+                                    ) : (
+                                        "Cancel"
+                                    )}
+                                </button>
+                            )}
                         </>
                     )}
                     {session.status === "completed" && (

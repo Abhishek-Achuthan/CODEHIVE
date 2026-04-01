@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import sanitizeHtml from 'sanitize-html';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import {
   CreateQuestionSchema,
   QuestionListSchema,
@@ -35,6 +36,7 @@ import type { IGetAiChatMessagesUseCase } from '../../../application/useCase/int
 import type { IDeleteQuestionUseCase } from '../../../application/useCase/interface/qna/IDeleteQuestionUseCase';
 import type { IRemoveAcceptedAnswerUseCase } from '../../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
 import type { IUnsaveItemUseCase } from '../../../application/useCase/interface/qna/IUnsaveItemUseCase';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 
 
 @injectable()
@@ -271,6 +273,11 @@ export class QuestionController {
   ) {
     try {
       const { userId } = UserIdParamSchema.parse({ userId: req.params.userId });
+      const requesterId = req.user.id;
+
+      if (requesterId !== userId) {
+        throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
+      }
 
       const parsedData = QuestionListSchema.parse({
         ...req.query,

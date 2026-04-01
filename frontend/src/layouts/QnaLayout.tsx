@@ -26,7 +26,7 @@ export default function QnaLayout({
         <Sidebar />
 
         <main className="flex-1">
-          <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="w-full max-w-7xl p-6">
             {(title || description) && (
               <div className="mb-8">
                 {title && (

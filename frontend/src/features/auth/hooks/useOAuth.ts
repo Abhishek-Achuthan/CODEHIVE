@@ -5,6 +5,7 @@ import { AuthService } from "../../../services/authService";
 import { loginSuccess } from "../../../store/slices/authSlice";
 import toast from "react-hot-toast";
 import { mapCurrentUserToView } from "../../../shared/mappers/user.mapper";
+import { UserRole } from "../../../shared/constants/auth";
 
 export function useOAuth() {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ export function useOAuth() {
         toast.success(message);
         dispatch(loginSuccess({ user: userView, accessToken }));
 
-        navigate(userView.role === "admin" ? "/admin/users" : "/home");
+        navigate(userView.role === UserRole.ADMIN ? "/admin/users" : "/home");
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);

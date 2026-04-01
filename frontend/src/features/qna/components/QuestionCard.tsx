@@ -25,42 +25,54 @@ export default function QuestionCard({
   actions,
 }: QuestionCardProps) {
 
-  const previousText =  useMemo(() => htmlToPlainText(contentHtml),[contentHtml]);
+  const previousText = useMemo(() => htmlToPlainText(contentHtml), [contentHtml]);
+  
   return (
-
-    <article className="group relative border border-border/30 hover:border-accent/50 bg-card/40 hover:bg-card/60 rounded-lg p-4 transition-all cursor-pointer " onClick={onclick}>
+    <article 
+      className="group relative border border-zinc-800 hover:border-indigo-500/50 bg-zinc-900/50 hover:bg-zinc-800/60 backdrop-blur-xl rounded-xl p-5 transition-all duration-300 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] hover:-translate-y-0.5" 
+      onClick={onclick}
+    >
       {actions ? (
-        <div className="absolute top-3 right-3 z-10" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
           {actions}
         </div>
       ) : null}
-      <div className="flex gap-4">
-        <div className="flex flex-col items-center gap-3 text-xs text-foreground/60 min-w-[72px]">
-          <div className="text-center">
-            <div className="font-semibold text-foreground">{voteCount}</div>
-            <div>votes</div>
+      
+      <div className="flex gap-5">
+        <div className="flex flex-col items-center justify-start gap-1.5 min-w-[80px] pt-1">
+          <div className="flex flex-col items-center justify-center w-full py-1 text-gray-400">
+            <span className="text-base font-semibold text-gray-300">{voteCount}</span>
+            <span className="text-xs font-medium">votes</span>
           </div>
-          <div className={`text-center ${answerCount > 0 ? "text-accent" : "text-foreground/60"}`}>
-            <div className="font-semibold text-foreground">{answerCount}</div>
-            <div>answers</div>
+          
+          <div className={`flex flex-col items-center justify-center w-full py-1.5 rounded-lg border transition-all duration-300 ${
+            answerCount > 0 
+              ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]" 
+              : "text-gray-500 border-transparent"
+          }`}>
+            <span className="text-base font-semibold">{answerCount}</span>
+            <span className="text-xs font-medium">answers</span>
           </div>
-          <div className="text-center">
-            <div className="font-semibold text-foreground">{views}</div>
-            <div>views</div>
+          
+          <div className="flex flex-col items-center justify-center w-full py-1 text-gray-500">
+            <span className="text-sm font-semibold">{views}</span>
+            <span className="text-xs font-medium">views</span>
           </div>
         </div>
 
-        <div className="flex-1">
-          <h3 className="text-base font-semibold text-accent group-hover:text-accent/90 mb-2 line-clamp-1 transition">
+        <div className="flex-1 min-w-0 pr-10">
+          <h3 className="text-lg font-semibold text-indigo-400 group-hover:text-indigo-300 mb-2.5 line-clamp-1 transition-colors duration-300">
             {title}
           </h3>
-          <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{previousText}</p>
+          <p className="text-sm text-gray-400/90 mb-4 line-clamp-2 leading-relaxed">
+            {previousText}
+          </p>
 
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, i) => (
               <span
                 key={i}
-                className="px-2 py-1 bg-primary/15 hover:bg-primary/25 text-primary rounded text-xs font-medium transition border border-white/30 hover:border-white"
+                className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 rounded-md text-xs font-medium transition-colors border border-indigo-500/20 hover:border-indigo-500/40"
               >
                 {tag}
               </span>

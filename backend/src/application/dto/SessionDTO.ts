@@ -1,5 +1,4 @@
 import { Experience } from '../../domain/types/ExperienceType';
-import { MentorStatus } from '../../domain/types/MentorStatus';
 import { PaymentSource } from '../../domain/types/PaymentSource';
 import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
@@ -70,6 +69,8 @@ export interface IBookedSessionResponseDTO {
   createdAt: string;
   updatedAt: string;
 }
+
+export type SessionPerspective = 'user' | 'mentor';
 
 export interface AvailableSlotDTO {
   startTime: string;
