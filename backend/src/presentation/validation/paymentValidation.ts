@@ -1,4 +1,6 @@
 import z from 'zod';
+import { SessionStatus } from '../../domain/types/SessionStatus';
+import { PaymentSource } from '../../domain/types/PaymentSource';
 
 export const signatureSchema = z
   .string()
@@ -24,5 +26,23 @@ export const bookingReservationParamsSchema = z.object({
 });
 
 export const bookedSessionsQuerySchema = z.object({
-  perspective: z.enum(['user', 'mentor']).default('user'),
-});
+  role: z.enum(['mentor', 'mentee', 'all']).optional(),
+  page: z.coerce.number().min(1).optional(),
+  limit: z.coerce.number().min(1).max(100).optional(),
+  'filter.status': z.nativeEnum(SessionStatus).optional(),
+  'filter.dateFrom': z.string().regex(dateFormatRegex, 'dateFrom must be YYYY-MM-DD').optional(),
+  'filter.dateTo': z.string().regex(dateFormatRegex, 'dateTo must be YYYY-MM-DD').optional(),
+  'filter.paymentSource': z.nativeEnum(PaymentSource).optional(),
+  'filter.refundableNow': z.coerce.boolean().optional(),
+}).transform((raw) => ({
+  role: raw.role,
+  page: raw.page,
+  limit: raw.limit,
+  filter: {
+    ...(raw['filter.status'] !== undefined && { status: raw['filter.status'] }),
+    ...(raw['filter.dateFrom'] !== undefined && { dateFrom: raw['filter.dateFrom'] }),
+    ...(raw['filter.dateTo'] !== undefined && { dateTo: raw['filter.dateTo'] }),
+    ...(raw['filter.paymentSource'] !== undefined && { paymentSource: raw['filter.paymentSource'] }),
+    ...(raw['filter.refundableNow'] !== undefined && { refundableNow: raw['filter.refundableNow'] }),
+  },
+}));

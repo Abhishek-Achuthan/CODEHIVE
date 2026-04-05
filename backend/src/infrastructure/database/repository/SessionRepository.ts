@@ -4,12 +4,14 @@ import { SessionEntity } from '../../../domain/session/SessionEntity';
 import { GenericRepository } from './GenericRepository';
 import { SessionModel } from '../models/session/SessionModel';
 import { SessionDoc, SessionLeanDoc } from '../schemas/session/SessionSchema';
-import { ClientSession, Model } from 'mongoose';
+import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
 import { PopulatedSessionDoc } from '../types/PopulatedSessionDoc';
 import { UserLeanDoc } from '../schemas/UserSchema';
 import { EssentialUserInfo } from '../../../domain/types/EssentialUserInfo';
 import { SessionWithParticipants } from '../../../domain/types/SessionWithParticipants';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
+import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
+import { PaymentSource } from '../../../domain/types/PaymentSource';
 
 @injectable()
 export class SessionRepository
@@ -128,6 +130,141 @@ export class SessionRepository
         paymentStatus:doc.paymentStatus,
         paymentSource:doc.paymentSource,
         paymentReferenceId:doc.paymentReferenceId,
+        amount: doc.amount,
+        status: doc.status,
+        topic: doc.topic,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt,
+      };
+
+      return { session, mentor, user };
+    });
+  }
+
+  async listByParticipant(
+    userId: string,
+    options: {
+      role?: 'mentor' | 'mentee' | 'all';
+      page?: number;
+      limit?: number;
+      filter?: {
+        status?: SessionStatus;
+        dateFrom?: string;
+        dateTo?: string;
+        paymentSource?: PaymentSource;
+        refundableNow?: boolean;
+        paymentStatus?: SessionPaymentStatus;
+      };
+    }
+  ): Promise<SessionWithParticipants[]> {
+    const query: FilterQuery<SessionDoc> = {};
+    const role = options.role ?? 'all';
+    const filter = options.filter;
+    const andConditions: FilterQuery<SessionDoc>[] = [];
+
+    if (role === 'mentor') {
+      query.mentorId = new Types.ObjectId(userId);
+    } else if (role === 'mentee') {
+      query.userId = new Types.ObjectId(userId);
+    } else {
+      andConditions.push({
+        $or: [
+          { mentorId: new Types.ObjectId(userId) },
+          { userId: new Types.ObjectId(userId) },
+        ],
+      });
+    }
+
+    if (filter?.status !== undefined) {
+      andConditions.push({ status: filter.status });
+    }
+
+    if (filter?.dateFrom !== undefined || filter?.dateTo !== undefined) {
+      const dateQuery: {
+        $gte?: string;
+        $lte?: string;
+      } = {};
+
+      if (filter.dateFrom !== undefined) {
+        dateQuery.$gte = filter.dateFrom;
+      }
+
+      if (filter.dateTo !== undefined) {
+        dateQuery.$lte = filter.dateTo;
+      }
+
+      andConditions.push({ date: dateQuery });
+    }
+
+    if (filter?.paymentSource !== undefined) {
+      andConditions.push({ paymentSource: filter.paymentSource });
+    }
+
+    if (filter?.paymentStatus !== undefined) {
+      andConditions.push({ paymentStatus: filter.paymentStatus });
+    }
+
+    if (filter?.refundableNow === true) {
+      andConditions.push({ status: SessionStatus.UPCOMING });
+      andConditions.push({ paymentStatus: SessionPaymentStatus.PAID });
+      andConditions.push({
+        startTime: {
+          $gt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
+    }
+
+    const page = options.page;
+    const limit = options.limit;
+    const skip =
+      page !== undefined && limit !== undefined
+        ? (page - 1) * limit
+        : 0;
+
+    const docsQuery = SessionModel.find(query)
+      .sort({ startTime: 1 })
+      .populate<{ mentorId: UserLeanDoc }>({
+        path: 'mentorId',
+        select: 'firstName lastName',
+      })
+      .populate<{ userId: UserLeanDoc }>({
+        path: 'userId',
+        select: 'firstName lastName',
+      });
+
+    if (page !== undefined && limit !== undefined) {
+      docsQuery.skip(skip).limit(limit);
+    }
+
+    const docs = await docsQuery.lean<PopulatedSessionDoc[]>();
+
+    return docs.map((doc) => {
+      const mentor: EssentialUserInfo = {
+        id: doc.mentorId._id.toString(),
+        firstName: doc.mentorId.firstName,
+        lastName: doc.mentorId.lastName,
+      };
+
+      const user: EssentialUserInfo = {
+        id: doc.userId._id.toString(),
+        firstName: doc.userId.firstName,
+        lastName: doc.userId.lastName,
+      };
+
+      const session: SessionEntity = {
+        id: doc._id.toString(),
+        mentorId: doc.mentorId._id.toString(),
+        userId: doc.userId._id.toString(),
+        date: doc.date,
+        startTime: doc.startTime,
+        endTime: doc.endTime,
+        paymentStatus: doc.paymentStatus,
+        paymentSource: doc.paymentSource,
+        paymentReferenceId: doc.paymentReferenceId,
         amount: doc.amount,
         status: doc.status,
         topic: doc.topic,

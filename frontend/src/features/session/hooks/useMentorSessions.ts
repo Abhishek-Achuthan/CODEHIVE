@@ -22,7 +22,7 @@ export const useMentorSessions = () => {
         try {
             setLoading(true);
 
-            const data = await SessionService.getBookedSessions("mentor");
+            const data = await SessionService.getBookedSessions({ role: "mentor" });
             setSessions(data);
         } catch (error) {
             if (error instanceof BaseError) toast.error(error.message);

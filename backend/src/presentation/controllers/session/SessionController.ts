@@ -72,11 +72,8 @@ export class SessionController {
   ) {
     try {
       const { id } = req.user;
-      const { perspective } = bookedSessionsQuerySchema.parse({
-        ...req.query,
-        perspective: req.query.perspective ?? 'user',
-      });
-      const result = await this._getBookedSessions.execute(id, perspective);
+      const params = bookedSessionsQuerySchema.parse(req.query);
+      const result = await this._getBookedSessions.execute(id, params);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

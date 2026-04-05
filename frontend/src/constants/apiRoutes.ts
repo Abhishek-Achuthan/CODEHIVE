@@ -1,5 +1,5 @@
 import { type MentorListingParams } from "../shared/types/api/mentor";
-import { type SessionPerspective } from "../shared/types/api/session";
+import { type BookedSessionsParams } from "../shared/types/api/session";
 import type { AnswerListParams, QuestionListParams } from "../shared/types/api/qna";
 
 export const API_ROUTES = {
@@ -250,6 +250,12 @@ export const API_ROUTES = {
       if (params?.search) qp.append('search', params.search);
       if (params?.page) qp.append('page', String(params.page));
       if (params?.limit) qp.append('limit', String(params.limit));
+      if (params?.filter?.primaryExpertise) qp.append('filter.primaryExpertise', params.filter.primaryExpertise);
+      if (params?.filter?.experienceLevel) qp.append('filter.experienceLevel', params.filter.experienceLevel);
+      if (params?.filter?.skillsAny && params.filter.skillsAny.length > 0) qp.append('filter.skillsAny', params.filter.skillsAny.join(','));
+      if (params?.filter?.slotPriceMin !== undefined) qp.append('filter.slotPriceMin', String(params.filter.slotPriceMin));
+      if (params?.filter?.slotPriceMax !== undefined) qp.append('filter.slotPriceMax', String(params.filter.slotPriceMax));
+      if (params?.filter?.hasActiveAvailability !== undefined) qp.append('filter.hasActiveAvailability', String(params.filter.hasActiveAvailability));
       const query = qp.toString();
       return query ? `/mentors?${query}` : `/mentors`;
     },
@@ -257,8 +263,19 @@ export const API_ROUTES = {
   SESSION: {
     BOOK_SESSION_STRIPE: "/sessions/stripe",
     BOOK_SESSION_WALLET: "/sessions/wallet",
-    GET_BOOKED_SESSIONS: (perspective: SessionPerspective) =>
-      `/sessions?${new URLSearchParams({ perspective }).toString()}`,
+    GET_BOOKED_SESSIONS: (params?: BookedSessionsParams) => {
+      const qp = new URLSearchParams();
+      if (params?.role) qp.append('role', params.role);
+      if (params?.page !== undefined) qp.append('page', String(params.page));
+      if (params?.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params?.filter?.status) qp.append('filter.status', params.filter.status);
+      if (params?.filter?.dateFrom) qp.append('filter.dateFrom', params.filter.dateFrom);
+      if (params?.filter?.dateTo) qp.append('filter.dateTo', params.filter.dateTo);
+      if (params?.filter?.paymentSource) qp.append('filter.paymentSource', params.filter.paymentSource);
+      if (params?.filter?.refundableNow !== undefined) qp.append('filter.refundableNow', String(params.filter.refundableNow));
+      const query = qp.toString();
+      return query ? `/sessions?${query}` : `/sessions`;
+    },
     GET_BOOKING_RESERVATION: (reservationId: string) => `/sessions/reservations/${reservationId}`,
     CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`
   },

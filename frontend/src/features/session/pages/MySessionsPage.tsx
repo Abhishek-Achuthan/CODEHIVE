@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
-import { Search, Loader2, Calendar } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Search, Loader2, Calendar, Filter, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useFetchSessions } from "../hooks/useFetchSessions";
 import { SessionCard } from "../components/SessionCard";
@@ -9,11 +10,25 @@ import { useCancelSession } from "../hooks/useCancelSession";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 
 export default function MySessionsPage() {
-    const {loading,sessions,error,refetch} = useFetchSessions("user")
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [paymentSource, setPaymentSource] = useState<"" | "STRIPE" | "WALLET">("");
+    const [refundableOnly, setRefundableOnly] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
     const itemsPerPage = 6;
+    const {loading,sessions,error,refetch} = useFetchSessions({
+        role: "mentee",
+        filter: {
+            status: activeTab,
+            ...(dateFrom && { dateFrom }),
+            ...(dateTo && { dateTo }),
+            ...(paymentSource && { paymentSource }),
+            ...(refundableOnly && { refundableNow: true }),
+        },
+    });
 
     useEffect(() => {
        if (error) toast.error(error);
@@ -21,20 +36,19 @@ export default function MySessionsPage() {
 
     const { cancelSession, loading: cancelLoading } = useCancelSession();
 
-    const filteredSessions = useMemo(() => {
+    const searchedSessions = useMemo(() => {
         return sessions.filter((s) => {
-            const matchesStatus = s.status === activeTab;
             const matchesSearch =
                 !searchQuery ||
                 s.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 s.mentor.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 s.mentor.lastName.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesStatus && matchesSearch;
+            return matchesSearch;
         });
-    }, [sessions, activeTab, searchQuery]);
+    }, [sessions, searchQuery]);
 
-    const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-    const paginatedSessions = filteredSessions.slice(
+    const totalPages = Math.ceil(searchedSessions.length / itemsPerPage);
+    const paginatedSessions = searchedSessions.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -48,6 +62,21 @@ export default function MySessionsPage() {
         setSearchQuery(value);
         setCurrentPage(1);
     };
+
+    const handleResetFilters = () => {
+        setDateFrom("");
+        setDateTo("");
+        setPaymentSource("");
+        setRefundableOnly(false);
+        setCurrentPage(1);
+    };
+
+    const activeFilterCount = [
+        dateFrom,
+        dateTo,
+        paymentSource,
+        refundableOnly ? "refundable" : "",
+    ].filter(Boolean).length;
 
     const handleCancelSession = async (sessionId: string) => {
         try {
@@ -63,27 +92,173 @@ export default function MySessionsPage() {
             <PageHeader
                 title="My Sessions"
                 description="Sessions you've booked as a user"
-            />
+            >
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold text-zinc-300">
+                    {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
+                </div>
+            </PageHeader>
 
-            {/* Tabs & Search */}
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-10">
+            <div className="relative z-40 mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                 <StatusTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-                {/* Search */}
-                <div className="relative group w-full sm:w-80">
-                    <div className="absolute inset-0 bg-indigo-500/5 blur-lg group-focus-within:bg-indigo-500/10 transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Search your sessions..."
-                        value={searchQuery}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="relative w-full rounded-xl border border-white/5 bg-white/[0.03] py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
-                    />
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" />
+                <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row">
+                    <div className="group relative w-full sm:w-80">
+                        <div className="absolute inset-0 bg-indigo-500/5 blur-lg transition-colors group-focus-within:bg-indigo-500/10" />
+                        <input
+                            type="text"
+                            placeholder="Search your sessions..."
+                            value={searchQuery}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            className="relative w-full rounded-xl border border-white/5 bg-white/[0.03] py-2.5 pl-10 pr-4 text-sm font-medium text-white transition-all placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600 transition-colors group-focus-within:text-indigo-400" />
+                    </div>
+                    
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`flex h-full w-full sm:w-auto items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
+                                showFilters || activeFilterCount > 0
+                                    ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
+                                    : "border-white/5 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.05]"
+                            }`}
+                        >
+                            <Filter className="h-4 w-4" />
+                            <span>Filters</span>
+                            {activeFilterCount > 0 && (
+                                <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500 text-[10px] font-bold text-white">
+                                    {activeFilterCount}
+                                </span>
+                            )}
+                        </button>
+
+                        <AnimatePresence>
+                            {showFilters && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                        onClick={() => setShowFilters(false)}
+                                    />
+
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl"
+                                    >
+                                        <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-6 py-5">
+                                            <h3 className="flex items-center gap-2 text-base font-semibold text-white">
+                                                <Filter className="h-5 w-5 text-indigo-400" />
+                                                Advanced Filters
+                                            </h3>
+                                            <button
+                                                onClick={() => setShowFilters(false)}
+                                                className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </button>
+                                        </div>
+
+                                        <div className="max-h-[70vh] overflow-y-auto px-6 py-6">
+                                            <div className="flex flex-col gap-6">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                                                            From
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            value={dateFrom}
+                                                            onChange={(e) => {
+                                                                setDateFrom(e.target.value);
+                                                                setCurrentPage(1);
+                                                            }}
+                                                            style={{ colorScheme: "dark" }}
+                                                            className="w-full rounded-xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                                                            To
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            value={dateTo}
+                                                            onChange={(e) => {
+                                                                setDateTo(e.target.value);
+                                                                setCurrentPage(1);
+                                                            }}
+                                                            style={{ colorScheme: "dark" }}
+                                                            className="w-full rounded-xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2.5">
+                                                    <label className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                                                        Payment Source
+                                                    </label>
+                                                    <select
+                                                        value={paymentSource}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value as "" | "STRIPE" | "WALLET";
+                                                            setPaymentSource(value);
+                                                            setCurrentPage(1);
+                                                        }}
+                                                        className="w-full rounded-xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                    >
+                                                        <option value="">All payment sources</option>
+                                                        <option value="STRIPE">Stripe</option>
+                                                        <option value="WALLET">Wallet</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="pt-2">
+                                                    <label className="group flex w-full cursor-pointer items-center justify-between rounded-xl border border-white/5 bg-zinc-900/50 px-4 py-4 transition-colors hover:bg-zinc-800/50">
+                                                        <span className="text-sm font-medium text-zinc-300 group-hover:text-white">Refundable now </span>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={refundableOnly}
+                                                            onChange={(e) => {
+                                                                setRefundableOnly(e.target.checked);
+                                                                setCurrentPage(1);
+                                                            }}
+                                                            className="h-5 w-5 rounded border-white/10 bg-zinc-950 text-indigo-500 transition-colors focus:ring-indigo-500/20 focus:ring-offset-0 focus:ring-offset-transparent"
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between border-t border-white/5 bg-white/[0.02] px-6 py-5">
+                                            <button
+                                                onClick={handleResetFilters}
+                                                disabled={activeFilterCount === 0}
+                                                className="text-sm font-medium text-zinc-400 transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-50"
+                                            >
+                                                Clear All
+                                            </button>
+                                            <button
+                                                onClick={() => setShowFilters(false)}
+                                                className="rounded-xl bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-colors hover:bg-indigo-600"
+                                            >
+                                                Show Results
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                </div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
             </div>
 
-            {/* Sessions Content */}
             {loading ? (
                 <div className="flex min-h-[400px] justify-center items-center bg-white/[0.01] rounded-3xl border border-white/5">
                     <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />

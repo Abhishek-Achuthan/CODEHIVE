@@ -1,5 +1,5 @@
-import { IBookedSessionResponseDTO, SessionPerspective } from '../../../dto/SessionDTO';
+import { IBookedSessionResponseDTO, SessionListInputDTO } from '../../../dto/SessionDTO';
 
 export interface IGetBookedSessionsUseCase {
-    execute(userId: string, perspective: SessionPerspective): Promise<IBookedSessionResponseDTO[]>;
+    execute(userId: string, input: SessionListInputDTO): Promise<IBookedSessionResponseDTO[]>;
 }

@@ -1,8 +1,8 @@
 import type {
     BookingReservationResponse,
+    BookedSessionsParams,
     BookedSessionResponse,
     BookSessionRequest,
-    SessionPerspective,
     SessionResponse,
     StripeBookSessionResponse
 } from "../shared/types/api/session";
@@ -31,9 +31,9 @@ export class SessionService {
         }
     }
 
-    static async getBookedSessions(perspective: SessionPerspective): Promise<BookedSessionResponse[]> {
+    static async getBookedSessions(params?: BookedSessionsParams): Promise<BookedSessionResponse[]> {
         try {
-            const response = await SessionAPI.getBookedSessions(perspective);
+            const response = await SessionAPI.getBookedSessions(params);
             return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
         } catch (error) {
             throw this.handleError(error);

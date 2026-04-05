@@ -5,7 +5,6 @@ import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
 import { JwtPayload } from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
-import { NotFoundError } from '../../core/errors/NotFoundError';
 import { UserRole } from '../../domain/types/UserRole';
 
 @injectable()

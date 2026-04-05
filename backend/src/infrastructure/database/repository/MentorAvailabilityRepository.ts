@@ -23,6 +23,48 @@ export class MentorAvailabilityRepository
     return doc.map((d) => this.toEntity(d));
   }
 
+  async findMentorIdsByFilters(filters: {
+    slotPriceMin?: number;
+    slotPriceMax?: number;
+    hasActiveAvailability?: boolean;
+  }): Promise<string[]> {
+    const shouldRequireActive =
+      filters.hasActiveAvailability === true ||
+      filters.slotPriceMin !== undefined ||
+      filters.slotPriceMax !== undefined;
+
+    const query: {
+      isActive?: boolean;
+      slotPrice?: {
+        $gte?: number;
+        $lte?: number;
+      };
+    } = {};
+
+    if (shouldRequireActive) {
+      query.isActive = true;
+    }
+
+    if (
+      filters.slotPriceMin !== undefined ||
+      filters.slotPriceMax !== undefined
+    ) {
+      query.slotPrice = {};
+
+      if (filters.slotPriceMin !== undefined) {
+        query.slotPrice.$gte = filters.slotPriceMin;
+      }
+
+      if (filters.slotPriceMax !== undefined) {
+        query.slotPrice.$lte = filters.slotPriceMax;
+      }
+    }
+
+    const docs = await this._model.distinct('mentorId', query);
+
+    return docs.map((mentorId) => mentorId.toString());
+  }
+
   async deactivate(id: string): Promise<MentorAvailabilityEntity | null> {
     const updated = await this._model.findByIdAndUpdate(
       id,

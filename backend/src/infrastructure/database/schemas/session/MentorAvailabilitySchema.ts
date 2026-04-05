@@ -30,4 +30,4 @@ export const MentorAvailabilitySchema = new Schema<MentorAvailabilityDoc>(
     { timestamps: true }
 );
 
-
+MentorAvailabilitySchema.index({ mentorId: 1, isActive: 1, slotPrice: 1 });

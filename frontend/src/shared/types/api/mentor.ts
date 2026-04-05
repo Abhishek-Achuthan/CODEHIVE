@@ -32,6 +32,14 @@ export interface MentorListingParams {
     search?: string;
     page?: number;
     limit?: number;
+    filter?: {
+        primaryExpertise?: string;
+        experienceLevel?: string;
+        skillsAny?: string[];
+        slotPriceMin?: number;
+        slotPriceMax?: number;
+        hasActiveAvailability?: boolean;
+    };
 }
 
 export interface AvailableSlotResponse {

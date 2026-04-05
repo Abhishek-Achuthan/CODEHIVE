@@ -65,3 +65,6 @@ SessionSchema.index(
         }
     }
 );
+
+SessionSchema.index({ userId: 1, status: 1, startTime: 1 });
+SessionSchema.index({ mentorId: 1, status: 1, startTime: 1 });

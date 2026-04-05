@@ -55,7 +55,20 @@ export interface BookedSessionResponse extends SessionResponse {
     user: UserSummary;
 }
 
-export type SessionPerspective = "user" | "mentor";
+export type SessionRole = "mentor" | "mentee" | "all";
+
+export interface BookedSessionsParams {
+    role?: SessionRole;
+    page?: number;
+    limit?: number;
+    filter?: {
+        status?: "upcoming" | "completed" | "cancelled";
+        dateFrom?: string;
+        dateTo?: string;
+        paymentSource?: "STRIPE" | "WALLET";
+        refundableNow?: boolean;
+    };
+}
 
 export interface BookingPageLocationState {
     mentor?: MentorBookingFallback;

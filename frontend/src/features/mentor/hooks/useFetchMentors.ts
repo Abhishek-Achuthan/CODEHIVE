@@ -55,7 +55,18 @@ export function useFetchMentors(initialParams?: MentorListingParams) {
     fetchMentors();
 
     return () => controller.abort();
-  }, [debouncedSearch, params.page, params.limit, retryCount]);
+  }, [
+    debouncedSearch,
+    params.page,
+    params.limit,
+    params.filter?.primaryExpertise,
+    params.filter?.experienceLevel,
+    params.filter?.skillsAny?.join(","),
+    params.filter?.slotPriceMin,
+    params.filter?.slotPriceMax,
+    params.filter?.hasActiveAvailability,
+    retryCount,
+  ]);
 
   return {
     loading,

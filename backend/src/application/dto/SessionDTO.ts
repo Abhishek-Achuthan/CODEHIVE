@@ -28,6 +28,29 @@ export interface MentorListInputDTO {
   search?: string | undefined;
   page?: number | undefined;
   limit?: number | undefined;
+  filter?: {
+    primaryExpertise?: string | undefined;
+    experienceLevel?: string | undefined;
+    skillsAny?: string[] | undefined;
+    slotPriceMin?: number | undefined;
+    slotPriceMax?: number | undefined;
+    hasActiveAvailability?: boolean | undefined;
+  } | undefined;
+}
+
+export type SessionListRole = 'mentor' | 'mentee' | 'all';
+
+export interface SessionListInputDTO {
+  role?: SessionListRole | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+  filter?: {
+    status?: SessionStatus | undefined;
+    dateFrom?: string | undefined;
+    dateTo?: string | undefined;
+    paymentSource?: PaymentSource | undefined;
+    refundableNow?: boolean | undefined;
+  } | undefined;
 }
 
 export interface ISessionResponseDTO {
@@ -69,8 +92,6 @@ export interface IBookedSessionResponseDTO {
   createdAt: string;
   updatedAt: string;
 }
-
-export type SessionPerspective = 'user' | 'mentor';
 
 export interface AvailableSlotDTO {
   startTime: string;

@@ -106,4 +106,7 @@ export const UserSchema = new Schema<UserDocument>(
   { timestamps: true }
 );
 
+UserSchema.index({ role: 1, mentorStatus: 1, isBlocked: 1 });
+UserSchema.index({ skills: 1 });
+UserSchema.index({ primaryExpertise: 1, experienceLevel: 1 });
 

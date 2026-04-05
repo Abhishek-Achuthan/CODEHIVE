@@ -16,7 +16,7 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
   }
 
   async findMentorsExcludeSelf(userId: string, options: MentorListOptions): Promise<PaginationResult<UserEntity>> {
-    const { limit = 10, page = 1, search } = options;
+    const { limit = 10, page = 1, search, filter } = options;
 
     const skip = (page - 1) * limit;
 
@@ -31,8 +31,37 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
       query.$or = [
         { firstName: { $regex: search, $options: 'i' } },
         { lastName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { primaryExpertise: { $regex: search, $options: 'i' } },
+        { skills: { $elemMatch: { $regex: search, $options: 'i' } } }
       ];
+    }
+
+    if (filter?.primaryExpertise !== undefined) {
+      query.primaryExpertise = filter.primaryExpertise;
+    }
+
+    if (filter?.experienceLevel !== undefined) {
+      query.experienceLevel = filter.experienceLevel;
+    }
+
+    if (filter?.skillsAny && filter.skillsAny.length > 0) {
+      query.skills = { $in: filter.skillsAny };
+    }
+
+    if (filter?.mentorIds !== undefined) {
+      if (filter.mentorIds.length === 0) {
+        return { items: [], totalItems: 0, totalPages: 0 };
+      }
+
+      const existingIdCondition =
+        query._id && typeof query._id === 'object' && !Array.isArray(query._id)
+          ? query._id
+          : {};
+
+      query._id = {
+        ...existingIdCondition,
+        $in: filter.mentorIds.map((mentorId) => new mongoose.Types.ObjectId(mentorId)),
+      };
     }
 
     const totalItems = await this._model.countDocuments(query);

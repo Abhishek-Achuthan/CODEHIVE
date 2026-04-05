@@ -10,7 +10,30 @@ export const MentorListQuerySchema = z.object({
     search: z.string().optional(),
     page: z.coerce.number().min(1).optional(),
     limit: z.coerce.number().min(1).max(100).optional(),
-});
+    'filter.primaryExpertise': z.string().optional(),
+    'filter.experienceLevel': z.string().optional(),
+    'filter.skillsAny': z.string().optional(),
+    'filter.slotPriceMin': z.coerce.number().min(0).optional(),
+    'filter.slotPriceMax': z.coerce.number().min(0).optional(),
+    'filter.hasActiveAvailability': z.coerce.boolean().optional(),
+}).transform((raw) => ({
+    search: raw.search,
+    page: raw.page,
+    limit: raw.limit,
+    filter: {
+        ...(raw['filter.primaryExpertise'] !== undefined && { primaryExpertise: raw['filter.primaryExpertise'] }),
+        ...(raw['filter.experienceLevel'] !== undefined && { experienceLevel: raw['filter.experienceLevel'] }),
+        ...(raw['filter.skillsAny'] !== undefined && {
+            skillsAny: raw['filter.skillsAny']
+                .split(',')
+                .map((skill) => skill.trim())
+                .filter((skill) => skill.length > 0),
+        }),
+        ...(raw['filter.slotPriceMin'] !== undefined && { slotPriceMin: raw['filter.slotPriceMin'] }),
+        ...(raw['filter.slotPriceMax'] !== undefined && { slotPriceMax: raw['filter.slotPriceMax'] }),
+        ...(raw['filter.hasActiveAvailability'] !== undefined && { hasActiveAvailability: raw['filter.hasActiveAvailability'] }),
+    },
+}));
 
 export const MentorIdParamSchema = z.object({
     mentorId: z.string().refine(
