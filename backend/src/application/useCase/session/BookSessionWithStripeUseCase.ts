@@ -14,16 +14,12 @@ import { UserRole } from '../../../domain/types/UserRole';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
 import { BookingReservationStatus } from '../../../domain/types/BookingReservationStatus';
 import { RefundStatus } from '../../../domain/types/RefundStatus';
-import { SessionStatus } from '../../../domain/types/SessionStatus';
-import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
-import { PaymentSource } from '../../../domain/types/PaymentSource';
 import { SessionMapper } from '../../mapper/SessionMapper';
 import { BookSessionDTO } from '../../dto/SessionDTO';
 import type {
   IBookSessionWithStripeUseCase,
   StripeCheckoutResponseDTO,
 } from '../interface/session/IBookSessionWithStripeUseCase';
-import type { SessionEntity } from '../../../domain/session/SessionEntity';
 import type { BookingReservationEntity } from '../../../domain/entities/BookingReservationEntity';
 
 @injectable()
@@ -126,7 +122,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       [
         ...existingSessions,
         ...activeReservations.map((reservation) =>
-          this.toSessionLikeLock(reservation)
+          SessionMapper.toSessionLikeLock(reservation)
         ),
       ]
     );
@@ -242,27 +238,6 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       expiresAt: updatedReservation.expiresAt.toISOString(),
     };
   }
-
-  private toSessionLikeLock(
-    reservation: BookingReservationEntity
-  ): SessionEntity {
-    return {
-      id: reservation.id,
-      mentorId: reservation.mentorId,
-      userId: reservation.userId,
-      date: reservation.date,
-      startTime: reservation.startTime,
-      endTime: reservation.endTime,
-            status: SessionStatus.UPCOMING,
-            topic: reservation.topic,
-            paymentStatus: SessionPaymentStatus.PENDING,
-            paymentSource: PaymentSource.STRIPE,
-            paymentReferenceId: reservation.stripePaymentIntentId ?? null,
-            amount: reservation.amount,
-            createdAt: reservation.createdAt,
-            updatedAt: reservation.updatedAt,
-        };
-    }
 
   private isDuplicateKeyError(error: unknown): error is { code: number } {
     return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;

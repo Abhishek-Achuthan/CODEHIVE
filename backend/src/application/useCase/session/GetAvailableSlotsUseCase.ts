@@ -7,13 +7,10 @@ import { type ISessionRepository } from "../../../domain/interfaces/ISessionRepo
 import { type ISlotConflictService } from "../../ports/slot/ISlotConflictService";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { type AvailableSlotDTO } from "../../dto/SessionDTO";
-import { type SessionEntity } from "../../../domain/session/SessionEntity";
+import { SessionMapper } from "../../mapper/SessionMapper";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
 import { ForbiddenError } from "../../../core/errors/ForbiddenError";
 import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { SessionStatus } from "../../../domain/types/SessionStatus";
-import { SessionPaymentStatus } from "../../../domain/types/SessionPaymentStatus";
-import { PaymentSource } from "../../../domain/types/PaymentSource";
 import { UserRole } from "../../../domain/types/UserRole";
 import { MentorStatus } from "../../../domain/types/MentorStatus";
 
@@ -79,7 +76,7 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase {
       [
         ...sessions,
         ...reservations.map((reservation) =>
-          this.toSessionLikeLock(reservation),
+          SessionMapper.toSessionLikeLock(reservation),
         ),
       ],
     );
@@ -89,36 +86,5 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase {
       endTime: slot.endTime,
       price: slot.price,
     }));
-  }
-
-  private toSessionLikeLock(reservation: {
-    id: string;
-    mentorId: string;
-    userId: string;
-    date: string;
-    startTime: Date;
-    endTime: Date;
-    topic: string;
-    amount: number;
-    stripePaymentIntentId?: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }): SessionEntity {
-    return {
-      id: reservation.id,
-      mentorId: reservation.mentorId,
-      userId: reservation.userId,
-      date: reservation.date,
-      startTime: reservation.startTime,
-      endTime: reservation.endTime,
-      status: SessionStatus.UPCOMING,
-      topic: reservation.topic,
-      paymentStatus: SessionPaymentStatus.PENDING,
-      paymentSource: PaymentSource.STRIPE,
-      paymentReferenceId: reservation.stripePaymentIntentId ?? null,
-      amount: reservation.amount,
-      createdAt: reservation.createdAt,
-      updatedAt: reservation.updatedAt,
-    };
   }
 }

@@ -24,6 +24,7 @@ import { useProfileUpdater } from "../hooks/useProfileUpdater";
 import type { MentorChecklist, ProfileUser } from "../types";
 import { MentorStatus } from "../types";
 import { BaseError } from "../../../shared/errors/BaseError";
+import { UserRole } from "../../../shared/constants/auth";
 
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
@@ -118,84 +119,78 @@ export default function ProfilePage() {
 
       <main>
         <div className="mx-auto max-w-6xl px-4 py-4">
-          {/* Header row */}
-          <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
-            <ProfileHeader
-              user={profileUser}
-              onSaveAvatar={uploadAvatar}
-              onSaveProfileHeader={(values) => updateProfile(values)}
-              onClickMentor={() => { }}
-              onClickDashboard={() => { }}
-              onClickSessions={() => { }}
-              onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
-              onClickGitHub={() => openUrl(authUser?.githubUrl)}
-              onClickWebsite={() => openUrl(authUser?.websiteUrl)}
-            />
+          <MainContent
+            left={
+              <LeftColumn>
+                <ProfileHeader
+                  user={profileUser}
+                  onSaveAvatar={uploadAvatar}
+                  onSaveProfileHeader={(values) => updateProfile(values)}
+                  onClickMentor={() => { }}
+                  onClickDashboard={() => { }}
+                  onClickSessions={() => { }}
+                  onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
+                  onClickGitHub={() => openUrl(authUser?.githubUrl)}
+                  onClickWebsite={() => openUrl(authUser?.websiteUrl)}
+                />
 
-            <ActivityCard
-              totalSessionsLabel="5"
-              joinedRoomsLabel="10"
-              qnaContributionsLabel="7"
-            />
-          </div>
-
-          {/* Main content */}
-          <div className="mt-3">
-            <MainContent
-              left={
-                <LeftColumn>
-                  <div ref={aboutRef}>
-                    <AboutSection
-                      initialText={authUser?.about ?? ""}
-                      onSave={(text) => updateProfile({ about: text })}
-                    />
-                  </div>
-
-                  <div ref={experienceRef}>
-                    <ExperienceSection
-                      initialItems={authUser?.experience ?? []}
-                      onSave={(items) => updateProfile({ experience: items })}
-                    />
-                  </div>
-
-                  <div ref={skillsRef}>
-                    <SkillsSection
-                      initialSkills={authUser?.skills ?? []}
-                      onSave={(skills) => updateProfile({ skills })}
-                    />
-                  </div>
-
-                  <ExpertiseSection
-                    initialPrimaryExpertise={authUser?.primaryExpertise}
-                    initialExperienceLevel={authUser?.experienceLevel}
-                    onSave={(data) => updateProfile(data)}
+                <div ref={aboutRef}>
+                  <AboutSection
+                    initialText={authUser?.about ?? ""}
+                    onSave={(text) => updateProfile({ about: text })}
                   />
-                </LeftColumn>
-              }
-              right={
-                <RightColumn>
-                  <PlanBillingCard
-                    currentPlanLabel="PRO"
-                    renewalDateLabel="11/10/2025"
-                    badgeLabel="PRO"
-                  />
+                </div>
 
-                  <AccountSecurityCard
-                    onChangePassword={() => setChangePasswordOpen(true)}
+                <div ref={experienceRef}>
+                  <ExperienceSection
+                    initialItems={authUser?.experience ?? []}
+                    onSave={(items) => updateProfile({ experience: items })}
                   />
+                </div>
 
-                  <MentorCard
-                    checklist={mentorChecklist}
-                    status={authUser?.mentorStatus ?? MentorStatus.NONE}
-                    rejectionReason={undefined}
-                    onApply={handleApplyForMentor}
-                    onScrollToSection={scrollToSection}
-                    isApplying={isApplyingForMentor}
+                <div ref={skillsRef}>
+                  <SkillsSection
+                    initialSkills={authUser?.skills ?? []}
+                    onSave={(skills) => updateProfile({ skills })}
                   />
-                </RightColumn>
-              }
-            />
-          </div>
+                </div>
+
+                <ExpertiseSection
+                  initialPrimaryExpertise={authUser?.primaryExpertise}
+                  initialExperienceLevel={authUser?.experienceLevel}
+                  onSave={(data) => updateProfile(data)}
+                />
+              </LeftColumn>
+            }
+            right={
+              <RightColumn>
+                <ActivityCard
+                  totalSessionsLabel="5"
+                  joinedRoomsLabel="10"
+                  qnaContributionsLabel="7"
+                />
+
+                <PlanBillingCard
+                  currentPlanLabel="PRO"
+                  renewalDateLabel="11/10/2025"
+                  badgeLabel="PRO"
+                />
+
+                <AccountSecurityCard
+                  onChangePassword={() => setChangePasswordOpen(true)}
+                />
+
+                {authUser && authUser.role !== UserRole.MENTOR && <MentorCard
+                  checklist={mentorChecklist}
+                  status={authUser?.mentorStatus ?? MentorStatus.NONE}
+                  rejectionReason={undefined}
+                  onApply={handleApplyForMentor}
+                  onScrollToSection={scrollToSection}
+                  isApplying={isApplyingForMentor}
+                />}
+              </RightColumn>
+            }
+          />
         </div>
       </main>
 

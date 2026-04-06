@@ -9,6 +9,9 @@ import {
 import { EssentialUserInfo } from '../../domain/types/EssentialUserInfo';
 import { UserEntity } from '../../domain/entities/UserEntity';
 import { BookingReservationEntity } from '../../domain/entities/BookingReservationEntity';
+import { SessionStatus } from '../../domain/types/SessionStatus';
+import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
+import { PaymentSource } from '../../domain/types/PaymentSource';
 
 export class SessionMapper {
   static toResponse(session: SessionEntity): ISessionResponseDTO {
@@ -97,6 +100,27 @@ export class SessionMapper {
       expiresAt: reservation.expiresAt.toISOString(),
       sessionId: reservation.sessionId,
       refundStatus: reservation.refundStatus,
+    };
+  }
+
+  static toSessionLikeLock(
+    reservation: BookingReservationEntity
+  ): SessionEntity {
+    return {
+      id: reservation.id,
+      mentorId: reservation.mentorId,
+      userId: reservation.userId,
+      date: reservation.date,
+      startTime: reservation.startTime,
+      endTime: reservation.endTime,
+      status: SessionStatus.UPCOMING,
+      topic: reservation.topic,
+      paymentStatus: SessionPaymentStatus.PENDING,
+      paymentSource: PaymentSource.STRIPE,
+      paymentReferenceId: reservation.stripePaymentIntentId ?? null,
+      amount: reservation.amount,
+      createdAt: reservation.createdAt,
+      updatedAt: reservation.updatedAt,
     };
   }
 }
