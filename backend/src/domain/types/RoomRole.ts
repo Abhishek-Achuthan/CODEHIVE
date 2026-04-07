@@ -1,0 +1,1 @@
+export type RoomRole = "HOST" | "PARTICIPANT"
