@@ -12,11 +12,13 @@ interface OTPModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onVerify: (otp: string) => void;
-  onResend?: () => void;
+  onResend?: () => Promise<void>;
   title?: string;
   description?: string;
   length?: number;
-  expiryTime?: number;
+  timeLeftSeconds: number;
+  sessionVersion: number;
+  isResending?: boolean;
 }
 
 export function OTPModal({
@@ -27,10 +29,11 @@ export function OTPModal({
   title = "Enter Verification Code",
   description = "We sent a verification code to your email",
   length = 6,
-  expiryTime = 300, 
+  timeLeftSeconds,
+  sessionVersion,
+  isResending = false,
 }: OTPModalProps) {
   const [otp, setOtp] = React.useState<string[]>(Array(length).fill(""));
-  const [timeLeft, setTimeLeft] = React.useState<number>(expiryTime);
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -76,39 +79,29 @@ export function OTPModal({
     }
   };
 
-  const handleResend = () => {
-    setOtp(Array(length).fill(""));
-    setTimeLeft(expiryTime); 
-    inputRefs.current[0]?.focus();
-
-    if (onResend) {
-      onResend();
+  const handleResend = async () => {
+    if (!onResend) return;
+    try {
+      await onResend();
+    } catch {
+      // Errors are surfaced by the resend handler's toast flow.
     }
   };
 
-  
   React.useEffect(() => {
     if (open) {
-      setOtp(Array(length).fill(""));
-      setTimeLeft(expiryTime);
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
+      window.setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }
-  }, [open, length, expiryTime]);
+  }, [open]);
 
   React.useEffect(() => {
-    if (!open || timeLeft <= 0) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [open, timeLeft]);
+    if (sessionVersion > 0) {
+      setOtp(Array(length).fill(""));
+      if (open) {
+        window.setTimeout(() => inputRefs.current[0]?.focus(), 100);
+      }
+    }
+  }, [length, open, sessionVersion]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -171,19 +164,20 @@ export function OTPModal({
             </button>
 
             <div className="flex flex-col items-center gap-2">
-              {timeLeft > 0 ? (
+              {timeLeftSeconds > 0 ? (
                 <p className="text-sm text-muted-foreground">
                   Resend code in{" "}
-                  <span className="font-medium text-primary">{formatTime(timeLeft)}</span>
+                  <span className="font-medium text-primary">{formatTime(timeLeftSeconds)}</span>
                 </p>
               ) : (
                 <button
-                  onClick={handleResend}
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  onClick={() => void handleResend()}
+                  disabled={isResending}
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Didn't receive the code?{" "}
+                  {isResending ? "Resending..." : "Didn't receive the code?"}{" "}
                   <span className="text-primary font-medium underline-offset-4 hover:underline">
-                    Resend
+                    {isResending ? "Please wait" : "Resend"}
                   </span>
                 </button>
               )}

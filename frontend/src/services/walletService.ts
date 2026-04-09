@@ -1,7 +1,10 @@
 import * as WalletAPI from "../api/endpoints/walletAPI";
 import { AxiosError } from "axios";
 import { BaseError } from "../shared/errors/BaseError";
-import type { MyWalletResponse } from "../shared/types/api/wallet";
+import type {
+  MyWalletResponse,
+  WalletTransactionsResponse,
+} from "../shared/types/api/wallet";
 import { APP_MESSAGES } from "../shared/constants/messages";
 
 export class WalletService {
@@ -9,6 +12,15 @@ export class WalletService {
     try {
       const response = await WalletAPI.getMyWallet();
       return response.data as MyWalletResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async getWalletTransactions(): Promise<WalletTransactionsResponse> {
+    try {
+      const response = await WalletAPI.getWalletTransactions();
+      return response.data as WalletTransactionsResponse;
     } catch (error) {
       throw this.handleError(error);
     }

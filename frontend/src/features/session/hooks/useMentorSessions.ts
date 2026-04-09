@@ -59,9 +59,12 @@ export const useMentorSessions = () => {
         currentPage * itemsPerPage
     );
 
-    const handleCancelSession = async (sessionId: string) => {
+    const handleCancelSession = async (
+        sessionId: string,
+        successMessage?: string
+    ) => {
         try {
-            await cancelSession(sessionId);
+            await cancelSession(sessionId, { successMessage });
             await fetchMentorSessions();
         } catch {
             // already handled

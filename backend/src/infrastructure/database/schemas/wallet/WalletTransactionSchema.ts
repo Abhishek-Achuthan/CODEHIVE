@@ -10,6 +10,7 @@ export interface WalletTransactionDoc extends Document {
   reason: WalletTransactionReason;
   referenceId: string;
   createdAt: Date;
+  affectsBalance: boolean;
 }
 
 export interface WalletTransactionLeanDoc {
@@ -20,6 +21,7 @@ export interface WalletTransactionLeanDoc {
   reason: WalletTransactionReason;
   referenceId: string;
   createdAt: Date;
+  affectsBalance: boolean;
 } 
 
 export const WalletTransactionSchema = new Schema<WalletTransactionDoc>(
@@ -38,6 +40,7 @@ export const WalletTransactionSchema = new Schema<WalletTransactionDoc>(
     },
     referenceId: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
+    affectsBalance: { type: Boolean, default: true },
   },
   { timestamps: false }
 );

@@ -6,6 +6,8 @@ interface SessionCardProps {
     onJoinRoom: () => void;
     onCancel: () => void;
     isCancelling?: boolean;
+    cancelDisabled?: boolean;
+    cancelDisabledReason?: string;
     context?: "user" | "mentor"; // Determines which perspective to show
     showCancelAction?: boolean;
 }
@@ -15,6 +17,8 @@ export function SessionCard({
     onJoinRoom,
     onCancel,
     isCancelling,
+    cancelDisabled,
+    cancelDisabledReason,
     context = "user",
     showCancelAction = context !== "mentor",
 }: SessionCardProps) {
@@ -100,7 +104,8 @@ export function SessionCard({
                             {showCancelAction && (
                                 <button
                                     onClick={onCancel}
-                                    disabled={isCancelling}
+                                    disabled={isCancelling || cancelDisabled}
+                                    title={cancelDisabled ? cancelDisabledReason : undefined}
                                     className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-red-500/20 transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isCancelling ? (

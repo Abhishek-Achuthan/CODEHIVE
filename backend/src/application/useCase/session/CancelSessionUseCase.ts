@@ -30,7 +30,10 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
       throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
     }
 
-    if (session.userId !== userId) {
+    const isMentorCancelling = session.mentorId === userId;
+    const isMenteeCancelling = session.userId === userId;
+
+    if (!isMentorCancelling && !isMenteeCancelling) {
       throw new BadRequestError(ERROR_MESSAGES.SESSION.NOT_ALLOWED_TO_CANCEL);
     }
 
@@ -49,39 +52,17 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
       throw new BadRequestError(ERROR_MESSAGES.SESSION.ALREADY_STARTED);
     }
 
-    const twentyFourHoursMs = 24 * 60 * 60 * 1000;
+    if (isMentorCancelling) {
+      await this._refundAndCancelSession(sessionId, session.userId, session.amount);
+      return true;
+    }
 
+    const twentyFourHoursMs = 24 * 60 * 60 * 1000;
     const isRefundEligible = startTimeMs - now >= twentyFourHoursMs;
 
     if (isRefundEligible) {
-      let wallet = await this._walletRepository.findByUserId(userId);
-
-      if (!wallet) {
-        wallet = await this._walletRepository.createWallet(userId);
-      }
-
-      const transaction: Credit = {
-        walletId: wallet.id,
-        amount: session.amount,
-        referenceId: session.id,
-        reason: WalletTransactionReason.SESSION_REFUND,
-      };
-
-      await this._sessionRepository.update(sessionId, {
-        paymentStatus: SessionPaymentStatus.REFUNDED,
-        status: SessionStatus.CANCELLED,
-      });
-
-      try {
-        await this._walletService.credit(transaction);
-        return true;
-      } catch (error) {
-        await this._sessionRepository.update(sessionId, {
-          paymentStatus: SessionPaymentStatus.PAID,
-          status: SessionStatus.UPCOMING,
-        });
-        throw error;
-      }
+      await this._refundAndCancelSession(sessionId, userId, session.amount);
+      return true;
     }
 
     await this._sessionRepository.update(sessionId, {
@@ -89,5 +70,39 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
     });
 
     return true;
+  }
+
+  private async _refundAndCancelSession(
+    sessionId: string,
+    refundUserId: string,
+    amount: number
+  ): Promise<void> {
+    let wallet = await this._walletRepository.findByUserId(refundUserId);
+
+    if (!wallet) {
+      wallet = await this._walletRepository.createWallet(refundUserId);
+    }
+
+    const transaction: Credit = {
+      walletId: wallet.id,
+      amount,
+      referenceId: sessionId,
+      reason: WalletTransactionReason.SESSION_REFUND,
+    };
+
+    await this._sessionRepository.update(sessionId, {
+      paymentStatus: SessionPaymentStatus.REFUNDED,
+      status: SessionStatus.CANCELLED,
+    });
+
+    try {
+      await this._walletService.credit(transaction);
+    } catch (error) {
+      await this._sessionRepository.update(sessionId, {
+        paymentStatus: SessionPaymentStatus.PAID,
+        status: SessionStatus.UPCOMING,
+      });
+      throw error;
+    }
   }
 }

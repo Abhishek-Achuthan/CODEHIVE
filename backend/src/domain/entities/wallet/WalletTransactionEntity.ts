@@ -9,4 +9,5 @@ export interface WalletTransactionEntity {
     reason:WalletTransactionReason;
     referenceId:string;
     createdAt:Date;
+    affectsBalance?: boolean;
 }

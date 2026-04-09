@@ -19,6 +19,12 @@ export class WalletRoutes {
       this._authMiddleware.check,
       this._walletController.handleGetMyWallet.bind(this._walletController)
     );
+
+    this._router.get(
+      '/transactions',
+      this._authMiddleware.check,
+      this._walletController.handleGetWalletTransactions.bind(this._walletController)
+    );
   }
 
   public getRoutes(): Router {

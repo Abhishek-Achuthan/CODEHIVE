@@ -8,7 +8,10 @@ export function useCancelSession() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function cancelSession(sessionId: string): Promise<void> {
+  async function cancelSession(
+    sessionId: string,
+    options?: { successMessage?: string }
+  ): Promise<void> {
     if (!sessionId) {
       throw new BaseError(APP_MESSAGES.SESSION.SESSION_ID_REQUIRED);
     }
@@ -23,7 +26,7 @@ export function useCancelSession() {
         throw new Error(APP_MESSAGES.SESSION.CANCEL_FAILED);
       }
 
-      toast.success(APP_MESSAGES.SESSION.CANCEL_SUCCESS);
+      toast.success(options?.successMessage ?? APP_MESSAGES.SESSION.CANCEL_SUCCESS);
     } catch (err) {
       const message =
         err instanceof BaseError

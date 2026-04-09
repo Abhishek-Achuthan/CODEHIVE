@@ -2,11 +2,23 @@ import { useMentorSessions } from "../hooks/useMentorSessions";
 import { StatusTabs } from "../components/StatusTabs";
 import { Calendar, Loader2, Search } from "lucide-react";
 import { SessionCard } from "../components/SessionCard";
+import { CancelSessionDialog } from "../components/CancelSessionDialog";
 import toast from "react-hot-toast";
+import { useState } from "react";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { PageHeader } from "../../../shared/ui/PageHeader";
+import type { BookedSessionResponse } from "../../../shared/types/api/session";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
+
+function getTimeDiffMs(startTime: string): number {
+    return new Date(startTime).getTime() - Date.now();
+}
 
 export default function MentorSessionsPage() {
+    const currentUserRole = useAppSelector((state) => state.auth.user?.role ?? state.auth.role);
+    const isMentor = currentUserRole === "mentor";
+    const [selectedSession, setSelectedSession] = useState<BookedSessionResponse | null>(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const {
         loading,
         sessions,
@@ -20,6 +32,38 @@ export default function MentorSessionsPage() {
         handleSearchChange,
         handleCancelSession,
     } = useMentorSessions();
+
+    const openCancelModal = (session: BookedSessionResponse) => {
+        if (!isMentor || cancelLoading || isCancelModalOpen) return;
+
+        if (getTimeDiffMs(session.startTime) <= 0) {
+            toast.error("This session has already started and cannot be cancelled");
+            return;
+        }
+
+        setSelectedSession(session);
+        setIsCancelModalOpen(true);
+    };
+
+    const closeCancelModal = () => {
+        if (cancelLoading) return;
+        setSelectedSession(null);
+        setIsCancelModalOpen(false);
+    };
+
+    const confirmCancel = async () => {
+        if (!selectedSession || cancelLoading || !isMentor) return;
+
+        try {
+            await handleCancelSession(
+                selectedSession.id,
+                "Session cancelled. Amount has been refunded to the user."
+            );
+            closeCancelModal();
+        } catch {
+            // Error already handled in hook
+        }
+    };
 
     return (
         <div className="flex flex-col">
@@ -74,12 +118,14 @@ export default function MentorSessionsPage() {
                                 key={session.id}
                                 session={session}
                                 context="mentor"
-                                onCancel={() => handleCancelSession(session.id)}
-                                showCancelAction={false}
+                                onCancel={() => openCancelModal(session)}
+                                showCancelAction={isMentor}
                                 onJoinRoom={() => {
                                     toast.success("Starting session...");
                                 }}
                                 isCancelling={cancelLoading}
+                                cancelDisabled={getTimeDiffMs(session.startTime) <= 0}
+                                cancelDisabledReason="This session has already started and cannot be cancelled"
                             />
                         ))}
                     </div>
@@ -93,6 +139,16 @@ export default function MentorSessionsPage() {
                     </div>
                 </>
             )}
+
+            <CancelSessionDialog
+                open={isCancelModalOpen}
+                description="Are you sure you want to cancel this session? The session amount will be refunded to the user."
+                confirmLabel="Confirm"
+                cancelLabel="Cancel"
+                loading={cancelLoading}
+                onConfirm={confirmCancel}
+                onClose={closeCancelModal}
+            />
         </div>
     );
 }

@@ -282,6 +282,7 @@ export const API_ROUTES = {
 
   WALLET: {
     GET_MY_WALLET: "/wallet/me",
+    GET_WALLET_TRANSACTIONS: "/wallet/transactions",
   },
 
   ROOM: {

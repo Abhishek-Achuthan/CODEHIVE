@@ -41,6 +41,7 @@ export class WalletRepository implements IWalletRepository {
       reason: transaction.reason,
       referenceId: transaction.referenceId,
       createdAt: transaction.createdAt,
+      affectsBalance: transaction.affectsBalance ?? true,
     });
 
     return this.toTransactionEntity(doc as WalletTransactionDoc);
@@ -61,6 +62,7 @@ export class WalletRepository implements IWalletRepository {
   async getBalance(walletId: string): Promise<number> {
     const docs = await WalletTransactionModel.find({
       walletId: new Types.ObjectId(walletId),
+      affectsBalance: true,
     }).lean<WalletTransactionLeanDoc[]>();
 
     let balance = 0;
@@ -91,6 +93,7 @@ export class WalletRepository implements IWalletRepository {
       reason: doc.reason,
       referenceId: doc.referenceId,
       createdAt: doc.createdAt,
+      affectsBalance: doc.affectsBalance,
     };
   }
 
@@ -105,6 +108,7 @@ export class WalletRepository implements IWalletRepository {
       reason: doc.reason,
       referenceId: doc.referenceId,
       createdAt: doc.createdAt,
+      affectsBalance: doc.affectsBalance,
     };
   }
 }

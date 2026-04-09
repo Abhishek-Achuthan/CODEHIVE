@@ -7,6 +7,9 @@ import type { ISessionRepository } from '../../../domain/interfaces/ISessionRepo
 import type { IBookingReservationRepository } from '../../../domain/interfaces/IBookingReservationRepository';
 import type { ILoggerService } from '../../ports/logging/ILoggerService';
 import type { IPaymentService } from '../../ports/payment/IPaymentService';
+import type { IWalletRepository } from '../../../domain/interfaces/IWalletRepository';
+import { WalletTransactionType } from '../../../domain/types/WalletTransactionType';
+import { WalletTransactionReason } from '../../../domain/types/WalletTransactionReason';
 import { BookingReservationStatus } from '../../../domain/types/BookingReservationStatus';
 import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
 import { PaymentSource } from '../../../domain/types/PaymentSource';
@@ -30,6 +33,8 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
     private readonly _bookingReservationRepository: IBookingReservationRepository,
     @inject('IPaymentService')
     private readonly _paymentService: IPaymentService,
+    @inject('IWalletRepository')
+    private readonly _walletRepository: IWalletRepository,
     @inject('ILoggerService')
     private readonly _logger: ILoggerService
   ) {}
@@ -144,6 +149,26 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               },
               dbSession
             );
+
+            let wallet = await this._walletRepository.findByUserId(
+              reservation.userId
+            );
+
+            if (!wallet) {
+              wallet = await this._walletRepository.createWallet(
+                reservation.userId
+              );
+            }
+
+            await this._walletRepository.addTransaction({
+              walletId: wallet.id,
+              type: WalletTransactionType.DEBIT,
+              amount: reservation.amount,
+              reason: WalletTransactionReason.SESSION_BOOKING,
+              referenceId: session.id,
+              createdAt: new Date(),
+              affectsBalance: false,
+            });
 
             await this.transitionReservation(
               reservation.id,

@@ -113,6 +113,8 @@ import { IHandleStripeWebhookUseCase } from '../../application/useCase/interface
 import { HandleStripeWebhookUseCase } from '../../application/useCase/payment/HandleStripeWebhookUseCase';
 import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/IGetMyWalletUseCase';
 import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
+import { IGetWalletTransactionsUseCase } from '../../application/useCase/interface/wallet/IGetWalletTransactionsUseCase';
+import { GetWalletTransactionsUseCase } from '../../application/useCase/wallet/GetWalletTransactionsUseCase';
 import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
 import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
 import { ICancelBookingReservationUseCase } from '../../application/useCase/interface/session/ICancelBookingReservationUseCase';
@@ -449,6 +451,13 @@ export class UseCaseModule {
     container.register<IGetMyWalletUseCase>('IGetMyWalletUseCase', {
       useClass: GetMyWalletUseCase,
     });
+
+    container.register<IGetWalletTransactionsUseCase>(
+      'IGetWalletTransactionsUseCase',
+      {
+        useClass: GetWalletTransactionsUseCase,
+      }
+    );
 
     //---------------------------------User---------------------------------------//
 

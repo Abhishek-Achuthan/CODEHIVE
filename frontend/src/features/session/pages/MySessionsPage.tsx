@@ -4,10 +4,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useFetchSessions } from "../hooks/useFetchSessions";
 import { SessionCard } from "../components/SessionCard";
+import { CancelSessionDialog } from "../components/CancelSessionDialog";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
 import { PageHeader } from "../../../shared/ui/PageHeader";
+import type { BookedSessionResponse } from "../../../shared/types/api/session";
+
+const REFUND_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function getTimeDiffMs(startTime: string): number {
+    return new Date(startTime).getTime() - Date.now();
+}
 
 export default function MySessionsPage() {
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
@@ -18,6 +26,9 @@ export default function MySessionsPage() {
     const [refundableOnly, setRefundableOnly] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedSession, setSelectedSession] = useState<BookedSessionResponse | null>(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isRefundEligible, setIsRefundEligible] = useState(false);
     const itemsPerPage = 6;
     const {loading,sessions,error,refetch} = useFetchSessions({
         role: "mentee",
@@ -78,9 +89,38 @@ export default function MySessionsPage() {
         refundableOnly ? "refundable" : "",
     ].filter(Boolean).length;
 
-    const handleCancelSession = async (sessionId: string) => {
+    const openCancelModal = (session: BookedSessionResponse) => {
+        if (cancelLoading || isCancelModalOpen) return;
+
+        const timeDiff = getTimeDiffMs(session.startTime);
+
+        if (timeDiff <= 0) {
+            toast.error("This session has already started and cannot be cancelled");
+            return;
+        }
+
+        setSelectedSession(session);
+        setIsRefundEligible(timeDiff >= REFUND_WINDOW_MS);
+        setIsCancelModalOpen(true);
+    };
+
+    const closeCancelModal = () => {
+        if (cancelLoading) return;
+        setIsCancelModalOpen(false);
+        setSelectedSession(null);
+        setIsRefundEligible(false);
+    };
+
+    const handleConfirmCancel = async () => {
+        if (!selectedSession || cancelLoading) return;
+
         try {
-            await cancelSession(sessionId);
+            await cancelSession(selectedSession.id, {
+                successMessage: isRefundEligible
+                    ? "Session cancelled. Refund will be processed."
+                    : "Session cancelled. No refund applicable.",
+            });
+            closeCancelModal();
             await refetch();
         } catch {
             // Error already handled in hook
@@ -285,11 +325,13 @@ export default function MySessionsPage() {
                             <SessionCard
                                 key={session.id}
                                 session={session}
-                                onCancel={() => handleCancelSession(session.id)}
+                                onCancel={() => openCancelModal(session)}
                                 onJoinRoom={() => {
                                     toast.success("Joining room...");
                                 }}
                                 isCancelling={cancelLoading}
+                                cancelDisabled={getTimeDiffMs(session.startTime) <= 0}
+                                cancelDisabledReason="This session has already started and cannot be cancelled"
                             />
                         ))}
                     </div>
@@ -303,6 +345,20 @@ export default function MySessionsPage() {
                     </div>
                 </>
             )}
+
+            <CancelSessionDialog
+                open={isCancelModalOpen}
+                description={
+                    isRefundEligible
+                        ? "Are you sure you want to cancel this session?"
+                        : "This session starts within the next 24 hours. If you cancel now, you will not receive a refund."
+                }
+                confirmLabel={isRefundEligible ? "Confirm" : "Confirm Cancel"}
+                cancelLabel={isRefundEligible ? "Cancel" : "Go Back"}
+                loading={cancelLoading}
+                onConfirm={handleConfirmCancel}
+                onClose={closeCancelModal}
+            />
         </div>
     );
 }

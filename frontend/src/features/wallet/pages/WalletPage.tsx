@@ -2,9 +2,19 @@ import { Wallet, ArrowUpRight, ArrowDownLeft, RefreshCw, TrendingUp } from "luci
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import { useWallet } from "../hooks/useWallet";
+import { useWalletTransactions } from "../hooks/useWalletTransactions";
+import type {
+  WalletTransaction,
+  WalletTransactionReason,
+} from "../../../shared/types/api/wallet";
 
 export default function WalletPage() {
   const { balance, loading, refreshing, refreshWallet } = useWallet();
+  const {
+    transactions,
+    loading: transactionsLoading,
+    refreshTransactions,
+  } = useWalletTransactions();
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("en-IN", {
@@ -13,6 +23,55 @@ export default function WalletPage() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(amount);
+  };
+
+  const formatTransactionDate = (value: string): string => {
+    return new Intl.DateTimeFormat("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(value));
+  };
+
+  const getTransactionLabel = (reason: WalletTransactionReason): string => {
+    switch (reason) {
+      case "SESSION_BOOKING":
+        return "Session Payment";
+      case "SESSION_REFUND":
+        return "Refund";
+      default:
+        return reason;
+    }
+  };
+
+  const handleRefresh = async (): Promise<void> => {
+    await Promise.all([refreshWallet(), refreshTransactions()]);
+  };
+
+  const renderTransaction = (transaction: WalletTransaction) => {
+    const isCredit = transaction.type === "CREDIT";
+
+    return (
+      <div
+        key={transaction.id ?? `${transaction.referenceId}-${transaction.createdAt}`}
+        className="flex items-center justify-between border-b border-gray-800 px-4 py-4 last:border-b-0"
+      >
+        <div>
+          <div className="text-sm font-medium text-white">
+            {getTransactionLabel(transaction.reason)}
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            {formatTransactionDate(transaction.createdAt)}
+          </div>
+        </div>
+
+        <div
+          className={`text-sm font-semibold ${isCredit ? "text-green-400" : "text-red-400"}`}
+        >
+          {isCredit ? "+" : "-"}
+          {formatCurrency(transaction.amount)}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -25,7 +84,7 @@ export default function WalletPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-white">My Wallet</h1>
             <button
-              onClick={refreshWallet}
+              onClick={handleRefresh}
               disabled={refreshing}
               className="inline-flex items-center gap-2 rounded-md border border-gray-700 bg-black px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-900 disabled:opacity-50"
             >
@@ -103,17 +162,20 @@ export default function WalletPage() {
             <h2 className="text-lg font-semibold text-white">Transaction History</h2>
 
             <div className="mt-4 rounded-xl border border-gray-800 bg-black">
-              <div className="flex flex-col items-center justify-center py-16 px-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-900">
-                  <Wallet className="h-8 w-8 text-gray-600" />
+              {transactionsLoading ? (
+                <div className="px-4 py-8 text-sm text-gray-500">Loading transactions...</div>
+              ) : transactions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-900">
+                    <Wallet className="h-8 w-8 text-gray-600" />
+                  </div>
+                  <div className="mt-4 text-sm font-medium text-gray-400">
+                    No transactions yet
+                  </div>
                 </div>
-                <div className="mt-4 text-sm font-medium text-gray-400">
-                  No transactions yet
-                </div>
-                <div className="mt-1 text-xs text-gray-500">
-                  Your transaction history will appear here
-                </div>
-              </div>
+              ) : (
+                <div>{transactions.map(renderTransaction)}</div>
+              )}
             </div>
           </div>
 

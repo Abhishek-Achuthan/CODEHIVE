@@ -34,25 +34,30 @@ export function SignUpForm({
 
   const {
     otpModalOpen,
-    setOtpModalOpen, 
+    timeLeftSeconds,
+    otpSessionVersion,
+    isResending,
+    setOtpModalOpen,
     handleSubmit: handleOtpSubmit,
+    handleResend,
     handleVerifyOtp,
   } = useOTP<"email", RegisterFormValues>(
     async (data) => {
-      await sendOTP(data);
+      return await sendOTP(data);
     },
     async (otp, values) => {
       return await verifyAndRegister(otp, values);
     },
-    'email'
+    'email',
+    'otp-signup-session'
   );
 
 
   const onSubmit = async (values: RegisterFormValues) => {
     try {
       await handleOtpSubmit(values);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // OTP send errors are surfaced through toast messages.
     }
   };
 
@@ -104,7 +109,10 @@ export function SignUpForm({
         open={otpModalOpen}
         onOpenChange={setOtpModalOpen}
         onVerify={(otp) => handleVerifyOtp(otp, getValues())}
-        onResend={() => sendOTP({ email: getValues('email') })}
+        onResend={() => handleResend(getValues())}
+        timeLeftSeconds={timeLeftSeconds}
+        sessionVersion={otpSessionVersion}
+        isResending={isResending}
       />
     </div>
   );

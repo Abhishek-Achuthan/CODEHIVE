@@ -28,23 +28,31 @@ export function ForgotPasswordForm({
 
   const {
     otpModalOpen,
+    timeLeftSeconds,
+    otpSessionVersion,
+    isResending,
     setOtpModalOpen,
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
     handleResend,
   } = useOTP<"email", OtpRequestValues>(
     async (data) => {
-      await sendOTP(data);
+      return await sendOTP(data);
     },
     async (otp, values) => {
       return await verifyOtp(otp, values);
     },
-    "email"
+    "email",
+    "otp-forgot-password-session"
   );
 
 
   const onSubmit = async (values: OtpRequestValues) => {
-    await handleOtpSubmit(values);
+    try {
+      await handleOtpSubmit(values);
+    } catch {
+      
+    }
   };
 
   return (
@@ -100,6 +108,9 @@ export function ForgotPasswordForm({
         onOpenChange={setOtpModalOpen}
         onVerify={(otp) => handleVerifyOtp(otp, getValues())}
         onResend={() => handleResend(getValues())}
+        timeLeftSeconds={timeLeftSeconds}
+        sessionVersion={otpSessionVersion}
+        isResending={isResending}
       />
       
       <footer className="mt-12 flex justify-center gap-5">
