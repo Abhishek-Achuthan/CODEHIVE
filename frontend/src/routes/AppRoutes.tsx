@@ -45,6 +45,10 @@ const MySessionsPage = lazy(() => import("../features/session/pages/MySessionsPa
 const MentorDashboardPage = lazy(() => import("../features/session/pages/MentorDashboardPage"));
 const MentorSessionsPage = lazy(() => import("../features/session/pages/MentorSessionsPage"));
 
+// Room pages
+const RoomsPage = lazy(() => import("../features/room/pages/RoomsPage"));
+const CollaborationRoom = lazy(() => import("../features/room/pages/CollaborationRoom"));
+
 // Layout
 const SessionsLayout = lazy(() => import("../features/session/components/SessionsLayout"));
 
@@ -100,6 +104,9 @@ export default function AppRoutes() {
             <Route path="/mentors/:mentorId" element={<MentorProfilePage />} />
             <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
             <Route path="/mentors/:mentorId/book/payment" element={<PaymentPage />} />
+
+            <Route path="/rooms" element={<RoomsPage />} />
+            <Route path="/room/:roomId" element={<CollaborationRoom />} />
           </Route>
 
           <Route

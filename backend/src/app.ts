@@ -17,7 +17,8 @@ import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
-import { socketService, stripeRefundRetryService } from './config/di/resolver';
+import { socketHandlers, socketService, stripeRefundRetryService } from './config/di/resolver';
+import { RoomRoutes } from './presentation/routes/RoomRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -68,6 +69,7 @@ export class App {
     const mentorRoutes = new MentorRoutes();
     const webhookRoutes = new WebhooksRoutes;
     const walletRoutes = new WalletRoutes();
+    const roomRoutes =new RoomRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -76,6 +78,7 @@ export class App {
     this._app.use('/api/mentors', mentorRoutes.getRoutes());
     this._app.use('/api/webhook', webhookRoutes.getRoutes());
     this._app.use('/api/wallet', walletRoutes.getRoutes());
+    this._app.use('/api/rooms',roomRoutes.getRoutes())
   }
 
   private configErrorHanldingMiddleWares() {
@@ -84,6 +87,10 @@ export class App {
 
   private configSocket() {
     socketService.initialize(this._io);
+
+    this._io.on('connection', (socket) => {
+      socketHandlers.forEach((handler) => handler.register(this._io, socket));
+    });
   }
 
   private startBackgroundJobs() {

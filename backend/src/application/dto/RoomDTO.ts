@@ -31,4 +31,38 @@ export interface JoinRoomResponseDTO {
     role:string;
     joinedAt:Date;
 }
+
+export interface ParticipantWithUserDTO {
+    userId: string;
+    name: string;
+    avatarUrl?: string;
+    role: string;
+}
+
+import { SendMessageResponseDTO } from "./MessageDTO";
+
+export interface JoinRoomSnapshotDTO {
+    roomId: string;
+    isNewParticipant: boolean;
+    participants: ParticipantWithUserDTO[];
+    messages: SendMessageResponseDTO[];
+}
+
+export interface GetPublicRoomsDTO {
+    page:number;
+    limit:number;
+}
+
+export interface GetPublicRoomsResponseDTO {
+    id:string;
+    title:string;
+    description?:string;
+    visibility:RoomVisibility;
+    hostId:string;
+    maxParticipants:number;
+    participantCount:number;
+    createdAt:Date;
+    updatedAt:Date;
+}
+
     

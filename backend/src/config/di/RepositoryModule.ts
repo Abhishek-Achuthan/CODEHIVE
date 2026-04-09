@@ -32,6 +32,12 @@ import { IBookingReservationRepository } from '../../domain/interfaces/IBookingR
 import { BookingReservationRepository } from '../../infrastructure/database/repository/BookingReservationRepository';
 import { IMentorRepository } from '../../domain/interfaces/IMentorRepository';
 import { MentorRepository } from '../../infrastructure/database/repository/MentorRepository';
+import { IRoomRepository } from '../../domain/interfaces/IRoomRepository';
+import { RoomRepository } from '../../infrastructure/database/repository/RoomRepository';
+import { IParticipantRepository } from '../../domain/interfaces/IParticipantRepository';
+import { ParticipantRepository } from '../../infrastructure/database/repository/ParticipantRepository';
+import { IMessageRepository } from '../../domain/interfaces/IMessageRepository';
+import { MessageRepository } from '../../infrastructure/database/repository/MessageRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -84,6 +90,20 @@ export class RepositoryModule {
 
         container.register<IAiChatMessageRepository>('IAiChatMessageRepository', {
             useClass: AiChatMessageRepository
+        });
+
+        //-------------------------Room Repository------------------------------//
+
+        container.register<IRoomRepository>('IRoomRepository', {
+            useClass: RoomRepository
+        });
+
+        container.register<IParticipantRepository>('IParticipantRepository', {
+            useClass: ParticipantRepository
+        });
+
+        container.register<IMessageRepository>('IMessageRepository', {
+            useClass: MessageRepository
         });
 
         //-------------------------Session Repository------------------------------//

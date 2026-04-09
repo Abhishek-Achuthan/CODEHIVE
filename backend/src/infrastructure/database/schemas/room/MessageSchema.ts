@@ -1,0 +1,49 @@
+import { Document, Schema, Types } from 'mongoose';
+
+export interface MessageDocument extends Document {
+  _id: Types.ObjectId;
+
+  roomId: Types.ObjectId;
+  senderId: Types.ObjectId;
+  content: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type MessageLeanDoc = {
+  _id: Types.ObjectId;
+
+  roomId: Types.ObjectId;
+  senderId: Types.ObjectId;
+  content: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export const MessageSchema = new Schema(
+  {
+    roomId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Room',
+      required: true,
+      index: true,
+    },
+    senderId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
+
+MessageSchema.index({ roomId: 1, createdAt: 1 });
+

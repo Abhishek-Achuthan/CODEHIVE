@@ -1,5 +1,5 @@
-import { JoinRoomDTO, JoinRoomResponseDTO } from "../../../dto/RoomDTO";
+import { JoinRoomDTO, JoinRoomSnapshotDTO } from "../../../dto/RoomDTO";
 
 export interface IJoinRoomUseCase{
-    execute(data:JoinRoomDTO):Promise<JoinRoomResponseDTO>
+    execute(data:JoinRoomDTO):Promise<JoinRoomSnapshotDTO>
 }

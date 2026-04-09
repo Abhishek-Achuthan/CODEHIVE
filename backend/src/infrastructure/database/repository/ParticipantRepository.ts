@@ -8,6 +8,7 @@ import {
 } from '../schemas/room/ParticipantSchema';
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import { ParticipantWithUser } from '../../../domain/types/ParticipantWithUser';
 
 export class ParticipantRepository
   extends GenericRepository<ParticipantDocument, ParticipantEntity>
@@ -42,6 +43,39 @@ export class ParticipantRepository
   async countByRoomId(roomId: string): Promise<number> {
     return this._model.countDocuments({ roomId: new Types.ObjectId(roomId) });
   }
+
+  async findByRoomIdWithUsers(roomId: string): Promise<ParticipantWithUser[]> {
+    const docs = await this._model
+      .find({ roomId: new Types.ObjectId(roomId) })
+      .populate<{ userId: { _id: Types.ObjectId; firstName: string; lastName: string; avatarUrl?: string } }>(
+        'userId',
+        'firstName lastName avatarUrl'
+      )
+      .lean();
+
+    return docs.map((doc: any) => ({
+      userId: doc.userId._id.toString(),
+      name: `${doc.userId.firstName} ${doc.userId.lastName}`,
+      avatarUrl: doc.userId.avatarUrl,
+      role: doc.role,
+    }));
+  }
+
+  async removeByRoomAndUser(roomId: string, userId: string): Promise<void> {
+    await this._model.deleteOne({
+      roomId: new Types.ObjectId(roomId),
+      userId: new Types.ObjectId(userId),
+    });
+  }
+
+  async removeAllByUser(userId: string): Promise<string[]> {
+    const participants = await this._model.find({ userId: new Types.ObjectId(userId) }).lean();
+    const roomIds = participants.map(p => p.roomId.toString());
+    await this._model.deleteMany({ userId: new Types.ObjectId(userId) });
+    return roomIds;
+  }
+
+
 
   protected toEntity(doc: ParticipantDocument): ParticipantEntity {
     return {

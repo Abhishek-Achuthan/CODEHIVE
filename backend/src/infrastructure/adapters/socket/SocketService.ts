@@ -1,9 +1,17 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
+import { JwtPayload } from 'jsonwebtoken';
 import { ISocketService } from '../../../application/ports/socket/ISocketService';
+import type { IJWTService } from '../../../application/ports/security/IJWTService';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 
 @injectable()
 export class SocketService implements ISocketService {
+  constructor(
+    @inject('IJWTService') private readonly _jwtService: IJWTService,
+    @inject('IUserRepository') private readonly _userRepository: IUserRepository,
+  ) {}
+
   private _io: SocketIOServer | null = null;
 
   private _userSockets: Map<string, Set<string>> = new Map();
@@ -13,24 +21,47 @@ export class SocketService implements ISocketService {
   initialize(io: SocketIOServer): void {
     this._io = io;
 
-    this._io.on('connection', (socket: Socket) => {
-      socket.on('register', (userId: string) => {
-        if (!this._userSockets.has(userId)) {
-          this._userSockets.set(userId, new Set());
+    this._io.use(async (socket, next) => {
+      try {
+        const token = socket.handshake.auth?.token;
+
+        if (!token || typeof token !== 'string') {
+          return next(new Error('Unauthorized'));
         }
 
-        this._userSockets.get(userId)!.add(socket.id);
-        this._socketUsers.set(socket.id, userId);
-      });
+        const decoded = this._jwtService.verifyAccessToken(token) as JwtPayload;
 
-      socket.on('join-room', (roomId: string) => {
-        socket.join(roomId);
-      });
+        if (!decoded?.sub) {
+          return next(new Error('Unauthorized'));
+        }
 
-      socket.on('leave-room', (roomId: string) => {
-        socket.leave(roomId);
-      });
+        const user = await this._userRepository.find(decoded.sub);
 
+        if (!user || user.isBlocked) {
+          return next(new Error('Unauthorized'));
+        }
+
+        socket.data.userId = user.id;
+        next();
+      } catch {
+        return next(new Error('Unauthorized'));
+      }
+    });
+
+    this._io.on('connection', (socket: Socket) => {
+      const userId = socket.data.userId as string | undefined;
+
+      if (!userId) {
+        socket.disconnect();
+        return;
+      }
+
+      if (!this._userSockets.has(userId)) {
+        this._userSockets.set(userId, new Set());
+      }
+
+      this._userSockets.get(userId)!.add(socket.id);
+      this._socketUsers.set(socket.id, userId);
       socket.on('disconnect', () => {
         const userId = this._socketUsers.get(socket.id);
         if (!userId) return;
@@ -53,26 +84,6 @@ export class SocketService implements ISocketService {
 
     for (const socketId of socketIds) {
       this._io.to(socketId).emit(event, payload);
-    }
-  }
-
-  joinRoom(userId: string, roomId: string): void {
-    const socketIds = this._userSockets.get(userId);
-    if (!socketIds || !this._io) return;
-
-    for (const socketId of socketIds) {
-      const socket = this._io.sockets.sockets.get(socketId);
-      socket?.join(roomId);
-    }
-  }
-
-  leaveRoom(userId: string, roomId: string): void {
-    const socketIds = this._userSockets.get(userId);
-    if (!socketIds || !this._io) return;
-
-    for (const socketId of socketIds) {
-      const socket = this._io.sockets.sockets.get(socketId);
-      socket?.leave(roomId);
     }
   }
 

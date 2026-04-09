@@ -15,6 +15,8 @@ import { WebhookController } from '../../presentation/controllers/webhooks/Webho
 import { WalletController } from '../../presentation/controllers/wallet/WalletController';
 import { SocketService } from '../../infrastructure/adapters/socket/SocketService';
 import { StripeRefundRetryService } from '../../application/services/StripeRefundRetryService';
+import type { ISocketHandler } from '../../application/ports/socket/ISocketHandler';
+import { RoomSocketHandler } from '../../presentation/socket/RoomSocketHandler';
 
 ContainerSetup.registerAll();
 
@@ -43,5 +45,9 @@ export const webhookController = container.resolve(WebhookController)
 export const walletController = container.resolve(WalletController);
 
 export const socketService = container.resolve(SocketService);
+
+export const socketHandlers: ISocketHandler[] = [
+  container.resolve(RoomSocketHandler),
+];
 
 export const stripeRefundRetryService = container.resolve(StripeRefundRetryService);

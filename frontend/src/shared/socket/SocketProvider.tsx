@@ -1,52 +1,68 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SocketContext } from './socketContext';
 import { useAppSelector } from '../hooks/storeHooks';
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-    const socketRef = useRef<Socket | null>(null);
+    const [socket,setSocket] = useState<Socket | null>(null)    
     const [isConnected, setIsConnected] = useState(false);
+    const [connectionError, setConnectionError] = useState<string | null>(null);
+
     const user = useAppSelector((state) => state.auth.user);
+    const accessToken = useAppSelector((state) => state.auth.accessToken);
 
     useEffect(() => {
-        if (!user) {
-            socketRef.current?.disconnect();
-            socketRef.current = null;
+        if (!user || !accessToken) {
             setIsConnected(false);
+            setConnectionError(null);
+            setSocket((current) => {
+                current?.disconnect();
+                return null;
+            })
             return;
         }
 
-        const socket = io(import.meta.env.VITE_SOCKET_URL, {
+        const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
             withCredentials: true,
             auth: {
-                userId: user.id,
+                token: accessToken,
             },
         });
 
-        socketRef.current = socket;
-
-        const onConnect = () => {
+        const handleConnect = () => {
             setIsConnected(true);
-            socket.emit('register', user.id);
-        };
+            setConnectionError(null);
+            console.log("Socket connected");
+        }
 
-        const onDisconnect = () => {
+        const handleDisconnect = () => {
             setIsConnected(false);
-        };
+            console.log("Socket is disconnected")
+        }
 
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
+        const handleConnectError =(error: Error) => {
+            setIsConnected(false);
+            setConnectionError(error.message);
+            console.log('Socket connectt error:',error.message);
+        }
+
+        newSocket.on('connect', handleConnect);
+        newSocket.on('disconnect', handleDisconnect);
+        newSocket.on('connect_error', handleConnectError);
+
+        setSocket(newSocket);
 
         return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.disconnect();
+            newSocket.off('connect', handleConnect);
+            newSocket.off('disconnect', handleDisconnect);
+            newSocket.off('connect_error', handleConnectError);
+            newSocket.disconnect();
         };
-    }, [user]);
+    }, [user?.id,accessToken]);
 
     return (
         <SocketContext.Provider
-            value={{ socket: socketRef.current, isConnected }}
+            value={{ socket, isConnected, connectionError }}
         >
             {children}
         </SocketContext.Provider>

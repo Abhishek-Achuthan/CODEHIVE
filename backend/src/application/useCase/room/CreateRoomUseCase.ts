@@ -8,8 +8,8 @@ import type { IParticipantRepository } from "../../../domain/interfaces/IPartici
 @injectable()
 export class CreateRoomUseCase implements ICreateRoomUseCase {
   constructor(
-    @inject("RoomRepository") private readonly roomRepository: IRoomRepository,
-    @inject("ParticipantRepository")
+    @inject("IRoomRepository") private readonly roomRepository: IRoomRepository,
+    @inject("IParticipantRepository")
     private readonly participantRepository: IParticipantRepository,
   ) {}
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {

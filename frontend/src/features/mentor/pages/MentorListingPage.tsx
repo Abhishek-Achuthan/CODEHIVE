@@ -90,9 +90,7 @@ const MentorListingPage: React.FC = () => {
                 title="Discover Sessions"
                 description="Find and book mentorship sessions with industry experts"
             >
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold text-zinc-300">
-                    {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
-                </div>
+
             </PageHeader>
 
             <div className="relative z-40 mb-6 flex flex-col gap-4 sm:flex-row">

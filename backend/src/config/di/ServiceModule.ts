@@ -32,6 +32,7 @@ import { SocketService } from '../../infrastructure/adapters/socket/SocketServic
 import { StripeRefundRetryService } from '../../application/services/StripeRefundRetryService';
 import { ILoggerService } from '../../application/ports/logging/ILoggerService';
 import { LoggingService } from '../../infrastructure/adapters/logging/LoggingService';
+import { RoomSocketHandler } from '../../presentation/socket/RoomSocketHandler';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -96,6 +97,10 @@ export class ServiceModule {
     })
 
     container.registerSingleton<ISocketService>('ISocketService', SocketService);
+    
+    container.register(RoomSocketHandler, {
+      useClass: RoomSocketHandler,
+    });
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
 
   }

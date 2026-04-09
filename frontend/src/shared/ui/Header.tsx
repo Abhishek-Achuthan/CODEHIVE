@@ -43,12 +43,12 @@ export default function Header() {
             >
               Product
             </a>
-            <a
-              href="#features"
+            <Link
+              to={"/rooms"}
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
             >
-              Features
-            </a>
+              Room
+            </Link>
             <Link
               to={"/qna"}
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"

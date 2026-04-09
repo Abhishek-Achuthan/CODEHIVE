@@ -131,6 +131,16 @@ import { IUpdateMentorStatusUseCase } from '../../application/useCase/interface/
 import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
 import { IViewMentorProfileUseCase } from '../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
 import { ViewMentorProfileUseCase } from '../../application/useCase/mentor/ViewMentorProfileUseCase';
+import { ICreateRoomUseCase } from '../../application/useCase/interface/room/ICreateRoomUseCase';
+import { CreateRoomUseCase } from '../../application/useCase/room/CreateRoomUseCase';
+import { IJoinRoomUseCase } from '../../application/useCase/interface/room/IJoinRoomUseCase';
+import { JoinRoomUseCase } from '../../application/useCase/room/JoinRoomUseCase';
+import { ISendMessageUseCase } from '../../application/useCase/interface/message/ISendMessageUseCase';
+import { SendMessageUseCase } from '../../application/useCase/message/SendMessageUseCase';
+import { IGetPublicRoomsUseCase } from '../../application/useCase/interface/room/IGetPublicRoomsUseCase';
+import { GetPublicRoomsUseCase } from '../../application/useCase/room/GetPublicRoomsUseCase';
+import { ILeaveRoomUseCase } from '../../application/useCase/interface/room/ILeaveRoomUseCase';
+import { LeaveRoomUseCase } from '../../application/useCase/room/LeaveRoomUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -348,6 +358,31 @@ export class UseCaseModule {
     container.register<IRemoveAcceptedAnswerUseCase>('IRemoveAcceptedAnswerUseCase', {
       useClass: RemoveAcceptedAnswerUseCase,
     });
+
+    //---------------------------------Room--------------------------------------//
+
+    container.register<ICreateRoomUseCase>('ICreateRoomUseCase', {
+      useClass: CreateRoomUseCase,
+    });
+
+    container.register<IJoinRoomUseCase>('IJoinRoomUseCase', {
+      useClass: JoinRoomUseCase,
+    });
+
+    container.register<IGetPublicRoomsUseCase>('IGetPublicRoomsUseCase', {
+      useClass: GetPublicRoomsUseCase,
+    });
+
+    container.register<ISendMessageUseCase>('ISendMessageUseCase', {
+      useClass: SendMessageUseCase,
+    });
+
+    container.register<ILeaveRoomUseCase>('ILeaveRoomUseCase', {
+      useClass: LeaveRoomUseCase,
+    });
+
+
+    
 
     //---------------------------------Session---------------------------------------//
 

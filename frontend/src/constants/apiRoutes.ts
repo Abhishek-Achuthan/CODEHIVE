@@ -282,5 +282,16 @@ export const API_ROUTES = {
 
   WALLET: {
     GET_MY_WALLET: "/wallet/me",
+  },
+
+  ROOM: {
+    CREATE_ROOM: "/rooms",
+    GET_PUBLIC_ROOMS: (params?: { page?: number; limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      const query = qp.toString();
+      return query ? `/rooms?${query}` : `/rooms`;
+    },
   }
 };
