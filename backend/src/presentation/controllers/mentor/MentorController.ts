@@ -8,6 +8,7 @@ import { type IDeleteMentorAvailabilityUseCase } from '../../../application/useC
 import { type IAddAvailabilityExceptionUseCase } from '../../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
 import { type IViewMentorProfileUseCase } from '../../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
 import { HttpStatus } from '../../../shared/httpStatusCode';
+import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import {
   MentorListQuerySchema,
   MentorIdParamSchema,
@@ -77,7 +78,7 @@ export class MentorController {
         mentorId: id,
         ...req.body,
       });
-      res.status(201).json(result);
+      res.status(HttpStatus.Created).json(result);
     } catch (error) {
       next(error);
     }
@@ -99,7 +100,10 @@ export class MentorController {
       const { id: availabilityId } = AvailabilityIdParamSchema.parse(req.params);
 
       const result = await this._deleteAvailability.execute(availabilityId, mentorId);
-      res.status(HttpStatus.OK).json({ message: 'Availability rule deleted', data: result });
+      res.status(HttpStatus.OK).json({
+        message: RESPONSE_MESSAGES.MENTOR.AVAILABILITY_RULE_DELETED,
+        data: result,
+      });
     } catch (error) {
       next(error);
     }
@@ -112,7 +116,10 @@ export class MentorController {
       const { date } = AddExceptionBodySchema.parse(req.body);
 
       const result = await this._addException.execute(availabilityId, mentorId, date);
-      res.status(HttpStatus.OK).json({ message: 'Exception date added', data: result });
+      res.status(HttpStatus.OK).json({
+        message: RESPONSE_MESSAGES.MENTOR.EXCEPTION_DATE_ADDED,
+        data: result,
+      });
     } catch (error) {
       next(error);
     }
@@ -128,4 +135,3 @@ export class MentorController {
     }
   }
 }
-

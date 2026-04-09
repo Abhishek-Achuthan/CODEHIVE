@@ -13,6 +13,7 @@ import { PaymentSource } from '../../../domain/types/PaymentSource';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
 import { RefundStatus } from '../../../domain/types/RefundStatus';
 import { ConflictError } from '../../../core/errors/ConflictError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 interface StripePaymentIntentObject {
   id: string;
@@ -208,7 +209,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Stripe webhook processing failed';
+        error instanceof Error
+          ? error.message
+          : ERROR_MESSAGES.SESSION.WEBHOOK_PROCESSING_FAILED;
       await this._stripeWebhookEventRepository.markFailed(event.id, message);
       throw error;
     } finally {
@@ -255,7 +258,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
     );
 
     if (!updated) {
-      throw new ConflictError('Booking reservation state transition failed');
+      throw new ConflictError(
+        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_TRANSITION_FAILED
+      );
     }
 
     this._logger.info('reservation.state_transition', {
@@ -290,7 +295,9 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
       }, session);
 
       const message =
-        error instanceof Error ? error.message : 'Refund trigger failed';
+        error instanceof Error
+          ? error.message
+          : ERROR_MESSAGES.SESSION.REFUND_TRIGGER_FAILED;
 
       this._logger.warn('refund.triggered', {
         reservationId,

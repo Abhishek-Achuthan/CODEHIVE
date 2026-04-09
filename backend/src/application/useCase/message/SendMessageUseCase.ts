@@ -6,6 +6,7 @@ import type { IParticipantRepository } from "../../../domain/interfaces/IPartici
 import { MessageEntity } from "../../../domain/entities/room/MessageEntity";
 import { ISendMessageUseCase } from "../interface/message/ISendMessageUseCase";
 import { SendMessageDTO, SendMessageResponseDTO } from "../../dto/MessageDTO";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class SendMessageUseCase implements ISendMessageUseCase {
@@ -24,11 +25,11 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     );
 
     if (!participant) {
-      throw new Error("User is not part of this room");
+      throw new Error(ERROR_MESSAGES.ROOM.USER_NOT_IN_ROOM);
     }
 
     if (!data.content || data.content.trim().length === 0) {
-      throw new Error("Message cannot be empty");
+      throw new Error(ERROR_MESSAGES.ROOM.MESSAGE_EMPTY);
     }
 
     const message: Omit<MessageEntity, 'createdAt' | 'updatedAt'> = {

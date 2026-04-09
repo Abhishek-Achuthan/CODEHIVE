@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { Pencil, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export type AvatarCropMode = "view" | "cropping";
 
@@ -47,12 +48,12 @@ export default function ProfileAvatarCropper({
     const maxBytes = 5 * 1024 * 1024;
 
     if (!allowed.includes(file.type)) {
-      toast.error("Please select a JPG, PNG, or WEBP image");
+      toast.error(APP_MESSAGES.PROFILE.INVALID_IMAGE_TYPE);
       return;
     }
 
     if (file.size > maxBytes) {
-      toast.error("Image must be 5MB or less");
+      toast.error(APP_MESSAGES.PROFILE.IMAGE_TOO_LARGE);
       return;
     }
 
@@ -62,7 +63,7 @@ export default function ProfileAvatarCropper({
 
     const reader = new FileReader();
     reader.onerror = () => {
-      toast.error("Failed to read image");
+      toast.error(APP_MESSAGES.PROFILE.IMAGE_UPLOAD_FAILED);
     };
     reader.onload = () => {
       setImageSrc(reader.result as string);
@@ -85,7 +86,7 @@ export default function ProfileAvatarCropper({
 
   const createCroppedImage = async (): Promise<File> => {
     if (!imageSrc || !croppedAreaPixels) {
-      throw new Error("Invalid crop state");
+      throw new Error(APP_MESSAGES.PROFILE.INVALID_CROP_STATE);
     }
 
     const image = new Image();
@@ -97,7 +98,7 @@ export default function ProfileAvatarCropper({
     canvas.height = croppedAreaPixels.height;
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas context missing");
+    if (!ctx) throw new Error(APP_MESSAGES.PROFILE.CANVAS_CONTEXT_MISSING);
 
     ctx.drawImage(
       image,
@@ -113,7 +114,7 @@ export default function ProfileAvatarCropper({
 
     return new Promise<File>((resolve) => {
       canvas.toBlob((blob) => {
-        if (!blob) throw new Error("Crop failed");
+        if (!blob) throw new Error(APP_MESSAGES.PROFILE.CROP_FAILED);
         resolve(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
       }, "image/jpeg", 0.92);
     });
@@ -130,7 +131,7 @@ export default function ProfileAvatarCropper({
       reset();
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
-      else toast.error("Failed to update avatar");
+      else toast.error(APP_MESSAGES.PROFILE.AVATAR_UPDATE_FAILED);
       setSaving(false);
     }
   };

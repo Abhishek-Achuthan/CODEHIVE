@@ -135,7 +135,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     );
 
     if (!matchedSlot) {
-      throw new ConflictError('Selected slot is no longer available');
+      throw new ConflictError(ERROR_MESSAGES.SESSION.SLOT_NOT_AVAILABLE);
     }
 
     await this._bookingReservationRepository.expirePendingForSlot(
@@ -182,7 +182,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
         );
 
         if (sameSlotConflict) {
-          throw new ConflictError('Selected slot is no longer available');
+          throw new ConflictError(ERROR_MESSAGES.SESSION.SLOT_NOT_AVAILABLE);
         }
       }
 
@@ -228,7 +228,9 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     );
 
     if (!updatedReservation) {
-      throw new ConflictError('Booking reservation could not be updated');
+      throw new ConflictError(
+        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_UPDATE_FAILED
+      );
     }
 
     return {

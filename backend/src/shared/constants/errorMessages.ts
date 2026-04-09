@@ -64,13 +64,24 @@ export const ERROR_MESSAGES = {
 
   // Server errors
   SERVER: {
+    VALIDATION_FAILED: 'Validation failed',
     INTERNAL_ERROR: 'Internal Server Error',
+    UNEXPECTED_ERROR: 'Unexpected error',
+    BAD_REQUEST: 'Bad Request',
+    NOT_FOUND: 'Not Found Error',
+    CONFLICT: 'Conflict Error',
+  },
+
+  ADMIN: {
+    INVALID_MENTOR_STATUS_REQUEST:
+      'Invalid request body. Status must be "approved" or "rejected"',
   },
 
   // Wallet errors
   WALLET: {
     NOT_FOUND: 'Wallet not found',
     INSUFFICIENT_BALANCE: 'Insufficient wallet balance',
+    INVALID_AMOUNT: 'Amount must be greater than zero',
   },
 
   //QnA errors
@@ -84,6 +95,12 @@ export const ERROR_MESSAGES = {
     ANSWER_VERSION_CONFLICT:
       'Answer has been modified. Please refresh and try again.',
     NOT_ALLOWED_TO_EDIT_ANSWER: 'You are not allowed to edit this answer',
+    ANSWER_QUESTION_MISMATCH: 'Answer is not of this question',
+    LIST_NOT_FOUND: 'List not found',
+    LIST_ALREADY_EXISTS: 'List already exists',
+    NO_ANSWERED_QUESTIONS: 'No answered Questions Found',
+    CHAT_SESSION_NOT_FOUND: 'Chat session not found',
+    AI_RESPONSE_EMPTY: 'Ai response was empty',
   },
 
   // Session errors
@@ -104,5 +121,32 @@ export const ERROR_MESSAGES = {
     AVAILABILITY_DELETE_FORBIDDEN: 'You can only delete your own availability rules',
     ONLY_PAID_SESSIONS_CANCELLABLE: 'Only paid sessions can be cancelled',
     ONLY_PENDING_RESERVATIONS_CANCELLABLE: 'Only pending reservations can be cancelled',
+    BOOKING_RESERVATION_CANCEL_FAILED:
+      'Booking reservation could not be cancelled',
+    BOOKING_RESERVATION_UPDATE_FAILED:
+      'Booking reservation could not be updated',
+    BOOKING_RESERVATION_TRANSITION_FAILED:
+      'Booking reservation state transition failed',
+    WEBHOOK_PROCESSING_FAILED: 'Stripe webhook processing failed',
+    REFUND_TRIGGER_FAILED: 'Refund trigger failed',
+  },
+
+  ROOM: {
+    UNAUTHORIZED: 'Unauthorized',
+    USER_NOT_IN_ROOM: 'User is not part of this room',
+    MESSAGE_EMPTY: 'Message cannot be empty',
+    ROOM_NOT_FOUND: 'Room not found',
+    ROOM_FULL: 'Room is full',
+  },
+
+  UTILITY: {
+    INVALID_UNIX_TIMESTAMP: 'Invalid Unix timestamp',
+  },
+
+  PAYMENT: {
+    PAYMENT_INTENT_CREATE_FAILED: 'Failed to create payment intent',
+    PAYMENT_INTENT_CLIENT_SECRET_FETCH_FAILED:
+      'Failed to retrieve payment intent client secret',
+    INVALID_STRIPE_WEBHOOK_SIGNATURE: 'Invalid Stripe webhook signature',
   },
 };

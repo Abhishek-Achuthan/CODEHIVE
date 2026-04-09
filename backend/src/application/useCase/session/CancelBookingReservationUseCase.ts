@@ -52,7 +52,9 @@ export class CancelBookingReservationUseCase
     );
 
     if (!cancelled) {
-      throw new ConflictError('Booking reservation could not be cancelled');
+      throw new ConflictError(
+        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_CANCEL_FAILED
+      );
     }
 
     return true;

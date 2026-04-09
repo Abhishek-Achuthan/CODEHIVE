@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SessionService } from "../../../services/sessionService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export function useCancelSession() {
   const [loading, setLoading] = useState(false);
@@ -9,7 +10,7 @@ export function useCancelSession() {
 
   async function cancelSession(sessionId: string): Promise<void> {
     if (!sessionId) {
-      throw new BaseError("sessionId is required");
+      throw new BaseError(APP_MESSAGES.SESSION.SESSION_ID_REQUIRED);
     }
 
     try {
@@ -19,15 +20,15 @@ export function useCancelSession() {
       const response = await SessionService.cancelSession(sessionId);
 
       if (!response) {
-        throw new Error("Failed to cancel session");
+        throw new Error(APP_MESSAGES.SESSION.CANCEL_FAILED);
       }
 
-      toast.success("Session cancelled successfully");
+      toast.success(APP_MESSAGES.SESSION.CANCEL_SUCCESS);
     } catch (err) {
       const message =
         err instanceof BaseError
           ? err.message
-          : "Something went wrong while cancelling the session";
+          : APP_MESSAGES.SESSION.CANCEL_ERROR;
 
       setError(message);
       toast.error(message);

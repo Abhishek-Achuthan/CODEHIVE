@@ -1,18 +1,20 @@
 import { AuthService } from "../../../services/authService";
 import { BaseError } from "../../../shared/errors/BaseError";
+import { HttpStatusCode } from "axios";
 import toast from "react-hot-toast";
 import type { RegisterFormValues, OtpRequestValues } from "../types";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export function useSignup() {
   const sendOTP = async (data: OtpRequestValues): Promise<void> => {
-    if (!data.email) throw new Error("Email is required");
+    if (!data.email) throw new Error(APP_MESSAGES.COMMON.EMAIL_REQUIRED);
 
     try {
       const res = await AuthService.sendOtp({ email: data.email });
       toast.success(res.data.message);
     } catch (error) {
       if (error instanceof BaseError) {
-        if (error.status === 409) {
+        if (error.status === HttpStatusCode.Conflict) {
           toast.error(error.message);
           throw error;
         }

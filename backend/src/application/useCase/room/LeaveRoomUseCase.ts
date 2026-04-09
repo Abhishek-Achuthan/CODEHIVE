@@ -3,6 +3,7 @@ import { ILeaveRoomUseCase } from "../interface/room/ILeaveRoomUseCase";
 import { JoinRoomDTO } from "../../dto/RoomDTO";
 import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
 import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class LeaveRoomUseCase implements ILeaveRoomUseCase {
@@ -14,7 +15,7 @@ export class LeaveRoomUseCase implements ILeaveRoomUseCase {
     async execute(data: JoinRoomDTO): Promise<void> {
         const room = await this.roomRepository.find(data.roomId);
         if (!room) {
-            throw new Error("Room not found");
+            throw new Error(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
         }
 
         const existing = await this.participantRepository.findByRoomAndUser(data.roomId, data.userId);

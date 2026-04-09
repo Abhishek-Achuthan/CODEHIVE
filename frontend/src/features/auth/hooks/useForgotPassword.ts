@@ -3,12 +3,13 @@ import { AuthService } from "../../../services/authService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import type { OtpRequestValues } from "../types";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export function useForgotPassword() {
   const navigate = useNavigate();
 
   const sendOTP = async (data: Pick<OtpRequestValues, "email">): Promise<void> => {
-    if (!data.email) throw new Error("Email is required");
+    if (!data.email) throw new Error(APP_MESSAGES.COMMON.EMAIL_REQUIRED);
 
     try {
       const res = await AuthService.forgotPasswordSendOtp({ email: data.email });

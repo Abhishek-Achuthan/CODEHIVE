@@ -23,7 +23,7 @@ export class GithubLoginUseCase implements IGithubLoginUseCase {
         
         const githubUser = await this._githubAuthService.getUserFromCode(code);
 
-        if(!githubUser.email) throw new BadRequestError('Invalid Github credentials');
+        if(!githubUser.email) throw new BadRequestError(ERROR_MESSAGES.GITHUB.INVALID_CREDENTIALS);
 
         let user = await this._userRepository.findByEmail(githubUser.email)
 

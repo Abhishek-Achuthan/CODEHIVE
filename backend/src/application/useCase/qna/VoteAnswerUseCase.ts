@@ -6,6 +6,7 @@ import { VoteTargetType } from '../../../domain/types/VoteTargetType';
 import { VoteValue } from '../../../domain/types/VoteValue';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { IVoteAnswerUseCase } from '../interface/qna/IVoteAnswerUseCase';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 export interface VoteAnswerResult {
   voteCount: number;
@@ -28,7 +29,7 @@ export class VoteAnswerUseCase implements IVoteAnswerUseCase {
   ): Promise<VoteAnswerResult> {
     const answer = await this._answerRepository.find(answerId);
 
-    if (!answer) throw new NotFoundError('Answer not found');
+    if (!answer) throw new NotFoundError(ERROR_MESSAGES.QnA.ANSWER_NOT_FOUND);
 
     const targetType = VoteTargetType.ANSWER;
 

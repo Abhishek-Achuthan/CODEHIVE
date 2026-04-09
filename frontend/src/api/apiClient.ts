@@ -2,6 +2,7 @@ import axios, { AxiosError, HttpStatusCode } from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 import { store } from '../store';
 import {setAccessToken,logout } from '../store/slices/authSlice';
+import { APP_MESSAGES } from '../shared/constants/messages';
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -41,7 +42,7 @@ apiClient.interceptors.response.use(
 
                 const newToken = refreshResponse.data?.access_token;
 
-                if(!newToken) throw new Error('No new Token returned from refresh endpoint');
+                if(!newToken) throw new Error(APP_MESSAGES.AUTH.REFRESH_TOKEN_MISSING);
 
                 store.dispatch(setAccessToken(newToken));
 

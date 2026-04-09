@@ -23,7 +23,7 @@ export class AddQuestionToSavedListUseCase implements IAddQuestionToSavedListUse
   async execute(userId: string, listId: string, questionId: string): Promise<void> {
     const list = await this._savedListRepository.find(listId);
 
-    if (!list || list.userId !== userId) throw new NotFoundError('List not found');
+    if (!list || list.userId !== userId) throw new NotFoundError(ERROR_MESSAGES.QnA.LIST_NOT_FOUND);
 
     const question = await this._questionRepository.find(questionId);
 

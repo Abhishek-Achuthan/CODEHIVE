@@ -4,6 +4,7 @@ import { type IWalletRepository } from '../../../domain/interfaces/IWalletReposi
 import { WalletTransactionEntity } from '../../../domain/entities/wallet/WalletTransactionEntity';
 import { WalletTransactionType } from '../../../domain/types/WalletTransactionType';
 import { Credit, Debit } from '../../../domain/types/WalletTransactionInput';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class WalletService implements IWalletService {
@@ -14,7 +15,7 @@ export class WalletService implements IWalletService {
     async credit(input: Credit): Promise<WalletTransactionEntity> {
         
         if(input.amount <=0 ) {
-            throw new Error('Amount must be greater than zero')
+            throw new Error(ERROR_MESSAGES.WALLET.INVALID_AMOUNT)
         }
         
         const transaction : WalletTransactionEntity = {
@@ -31,13 +32,13 @@ export class WalletService implements IWalletService {
 
     async debit(input: Debit): Promise<WalletTransactionEntity> {
         if(input.amount <=0 ) {
-            throw new Error('Amount must be greater than zero')
+            throw new Error(ERROR_MESSAGES.WALLET.INVALID_AMOUNT)
         }
 
         const balance = await this._walletRepository.getBalance(input.walletId);
 
         if(balance < input.amount) {
-            throw new Error('Insufficient wallet balance');
+            throw new Error(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
         }
 
         const transaction : WalletTransactionEntity = {

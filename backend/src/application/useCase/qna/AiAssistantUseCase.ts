@@ -6,6 +6,7 @@ import type { IAiChatSessionRepository } from '../../../domain/interfaces/IAiCha
 import type { IAiChatMessageRepository } from '../../../domain/interfaces/IAiChatMessageRepository';
 import type { AiAssistInputDTO, AiAssistOutputDTO } from '../../dto/AiChatDTO';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class AiAssistantUseCase implements IAiAssistantUseCase {
@@ -24,8 +25,8 @@ export class AiAssistantUseCase implements IAiAssistantUseCase {
 
         if (sessionId) {
             session = await this._sessionRepo.findById(sessionId);
-            if (!session) throw new NotFoundError('Chat session not found');
-            if (session.userId !== userId) throw new ForbiddenError('Forbidden');
+            if (!session) throw new NotFoundError(ERROR_MESSAGES.QnA.CHAT_SESSION_NOT_FOUND);
+            if (session.userId !== userId) throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
         } else {
             session = await this._sessionRepo.create(userId);
             createdNewSession = true;
@@ -41,7 +42,7 @@ export class AiAssistantUseCase implements IAiAssistantUseCase {
 
         const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        if(!text) throw new NotFoundError('Ai response was empty');
+        if(!text) throw new NotFoundError(ERROR_MESSAGES.QnA.AI_RESPONSE_EMPTY);
 
         await this._messageRepo.save({
             sessionId: session.id,

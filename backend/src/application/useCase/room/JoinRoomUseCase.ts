@@ -6,6 +6,7 @@ import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository
 import type { IMessageRepository } from "../../../domain/interfaces/IMessageRepository";
 import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { ParticipantEntity } from "../../../domain/entities/room/ParticipantEntity";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
@@ -20,7 +21,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const room = await this.roomRepository.find(data.roomId);
     if (!room) {
-      throw new Error("Room not found");
+      throw new Error(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
     }
 
     const existing = await this.participantRepository.findByRoomAndUser(
@@ -36,7 +37,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
         );
 
         if (currentCount >= room.maxParticipants) {
-          throw new Error("Room is full");
+          throw new Error(ERROR_MESSAGES.ROOM.ROOM_FULL);
         }
 
         const participant: ParticipantEntity = {

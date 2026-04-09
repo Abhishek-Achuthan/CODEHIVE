@@ -7,6 +7,7 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import type { SavedListView } from "../../../shared/types/view/SavedListView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 import { mapSavedListArrayToView } from "../../../shared/mappers/saved-list.mapper";
 
 const LIMIT = 5;
@@ -121,7 +122,7 @@ export function useSavedQuestionsPage() {
         setTotalQuestions(typeof res?.totalItems === "number" ? res.totalItems : 0);
       } catch {
         if (!cancelled) {
-          toast.error("Failed to load saved questions");
+          toast.error(APP_MESSAGES.QNA.SAVED_QUESTIONS_LOAD_FAILED);
           setQuestions([]);
           setTotalQuestions(0);
         }
@@ -156,8 +157,8 @@ export function useSavedQuestionsPage() {
         }
       }
     } catch {
-      toast.error("Failed to create list");
-      throw new BaseError("Failed to create list");
+      toast.error(APP_MESSAGES.QNA.SAVED_LIST_CREATE_FAILED);
+      throw new BaseError(APP_MESSAGES.QNA.SAVED_LIST_CREATE_FAILED);
     }
   };
 
@@ -173,11 +174,11 @@ export function useSavedQuestionsPage() {
     try {
       setAddingToListId(listId);
       await QnAService.addQuestionToSavedList(listId, activeQuestionId);
-      toast.success("Added to list");
+      toast.success(APP_MESSAGES.QNA.SAVED_LIST_ADD_SUCCESS);
       await refreshAddedListIds(activeQuestionId);
       setAddToListOpen(false);
     } catch {
-      toast.error("Failed to add to list");
+      toast.error(APP_MESSAGES.QNA.SAVED_LIST_ADD_FAILED);
     } finally {
       setAddingToListId(null);
     }
@@ -189,7 +190,7 @@ export function useSavedQuestionsPage() {
     try {
       setRemovingQuestionId(questionId);
       await QnAService.removeQuestionFromSavedList(selected.listId, questionId);
-      toast.success("Removed from list");
+      toast.success(APP_MESSAGES.QNA.SAVED_LIST_REMOVE_SUCCESS);
 
       const params: QuestionListParams = {
         page: currentPage,
@@ -206,7 +207,7 @@ export function useSavedQuestionsPage() {
       if (error instanceof BaseError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to remove from list");
+        toast.error(APP_MESSAGES.QNA.SAVED_LIST_REMOVE_FAILED);
       }
     } finally {
       setRemovingQuestionId(null);

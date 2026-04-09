@@ -7,8 +7,9 @@ import type {
     StripeBookSessionResponse
 } from "../shared/types/api/session";
 import * as SessionAPI from '../api/endpoints/sessionAPI'
-import { AxiosError } from "axios";
+import { AxiosError, HttpStatusCode } from "axios";
 import { BaseError } from "../shared/errors/BaseError";
+import { APP_MESSAGES } from "../shared/constants/messages";
 
 
 export class SessionService {
@@ -53,7 +54,10 @@ export class SessionService {
         try {
             const response = await SessionAPI.cancelSession(sessionId);
 
-            return response.status >= 200 && response.status < 300;
+            return (
+                response.status >= HttpStatusCode.Ok &&
+                response.status < HttpStatusCode.MultipleChoices
+            );
         } catch (error) {
             throw this.handleError(error);
         }
@@ -61,14 +65,15 @@ export class SessionService {
 
     private static handleError(error: unknown): never {
             if (error instanceof AxiosError) {
-                const msg = error.response?.data.message || 'Something went wrong';
+                const msg =
+                    error.response?.data.message || APP_MESSAGES.COMMON.SOMETHING_WENT_WRONG;
                 const status = error.response?.status;
                 throw new BaseError(msg, status);
             }
             if (error instanceof Error) {
                 throw new BaseError(error.message);
             }
-            throw new BaseError('Unexpected error');
+            throw new BaseError(APP_MESSAGES.COMMON.UNEXPECTED_ERROR);
         }
 
 }

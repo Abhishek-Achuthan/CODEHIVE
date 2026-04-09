@@ -5,6 +5,7 @@ import type {
   BookedSessionResponse,
 } from "../../../shared/types/api/session";
 import { BaseError } from "../../../shared/errors/BaseError";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export function useFetchSessions(params?: BookedSessionsParams) {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export function useFetchSessions(params?: BookedSessionsParams) {
       const normalized =
         err instanceof BaseError
           ? err
-          : new BaseError("Failed to load sessions");
+          : new BaseError(APP_MESSAGES.SESSION.LOAD_FAILED);
 
       setError(normalized.message);
     } finally {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { HttpStatusCode } from "axios";
 import toast from "react-hot-toast";
 import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";
@@ -10,6 +11,7 @@ import type {
 import { useDebounce } from "../../admin/hooks/useDebounce";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 const LIMIT = 5;
 const ANSWERED_BY_ME_ERROR_TOAST_ID = "answered-by-me-fetch-error";
@@ -59,7 +61,7 @@ export function useAnsweredQuestions() {
             if (seq !== requestSeq.current) return;
 
 
-            if (error instanceof BaseError && error.status === 404) {
+            if (error instanceof BaseError && error.status === HttpStatusCode.NotFound) {
                 setQuestions([]);
                 setTotalQuestions(0);
                 return;
@@ -68,7 +70,7 @@ export function useAnsweredQuestions() {
             const msg =
                 error instanceof BaseError
                     ? error.message
-                    : "Error fetching answered questions";
+                    : APP_MESSAGES.QNA.ANSWERED_QUESTIONS_FETCH_FAILED;
 
             toast.error(msg, { id: ANSWERED_BY_ME_ERROR_TOAST_ID });
             setQuestions([]);

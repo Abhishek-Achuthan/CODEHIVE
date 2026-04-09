@@ -7,6 +7,7 @@ import { BaseError } from '../../../shared/errors/BaseError';
 import { CalendarPlus, ListTodo } from 'lucide-react';
 import { ManageRulesSection } from '../components/ManageRulesSection';
 import { PageHeader } from '../../../shared/ui/PageHeader';
+import { APP_MESSAGES } from '../../../shared/constants/messages';
 
 type TabType = 'create' | 'manage';
 
@@ -39,7 +40,7 @@ const MentorAvailabilityPage: React.FC = () => {
                 }
             } else {
                 if (!data.date) {
-                    throw new Error('Date is required for one-time availability');
+                    throw new Error(APP_MESSAGES.MENTOR.ONE_TIME_DATE_REQUIRED);
                 }
                 const dt = data.date.replaceAll('-', '');
                 rrule = `DTSTART:${dt}`;

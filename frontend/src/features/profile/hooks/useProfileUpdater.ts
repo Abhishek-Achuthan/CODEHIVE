@@ -4,20 +4,21 @@ import { useAppDispatch, useAppSelector } from "../../../shared/hooks/storeHooks
 import type { UpdateMyProfileRequest } from "../../../shared/types/api/user";
 import { BaseError } from "../../../shared/errors/BaseError";
 import { setCurrentUser } from "../../../store/slices/authSlice";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 export function useProfileUpdater() {
     const dispatch = useAppDispatch();
     const authUser = useAppSelector(s => s.auth.user);
 
     const updateProfile = async (payload: UpdateMyProfileRequest) => {
-        if (!authUser) throw new Error('Not authenticated');
+        if (!authUser) throw new Error(APP_MESSAGES.COMMON.NOT_AUTHENTICATED);
 
         const updated = await UserService.updateMyProfile(payload);
         dispatch(setCurrentUser({ ...authUser, ...updated }));
     };
 
     const applyForMentor = async () => {
-        if (!authUser) throw new Error('Not authenticated');
+        if (!authUser) throw new Error(APP_MESSAGES.COMMON.NOT_AUTHENTICATED);
 
         const updated = await UserService.applyForMentor();
         dispatch(setCurrentUser({ ...authUser, ...updated }));
@@ -29,22 +30,21 @@ export function useProfileUpdater() {
             const maxBytes = 5 * 1024 * 1024;
 
             if (!allowedTypes.includes(imageFile.type)) {
-                throw new BaseError("Please select a JPG, PNG, or WEBP image");
+                throw new BaseError(APP_MESSAGES.PROFILE.INVALID_IMAGE_TYPE);
             }
             if (imageFile.size > maxBytes) {
-                throw new BaseError("Image must be 5MB or less");
+                throw new BaseError(APP_MESSAGES.PROFILE.IMAGE_TOO_LARGE);
             }
 
-            const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined;
             const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string | undefined;
 
-            if (!cloudName || !uploadPreset) {
+            if (!uploadPreset) {
                 throw new BaseError(
-                    "Cloudinary is not configured. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET"
+                    APP_MESSAGES.PROFILE.CLOUDINARY_NOT_CONFIGURED
                 );
             }
 
-            const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+            const endpoint = import.meta.env.VITE_CLOUDINARY_URL;
             const formData = new FormData();
             formData.append("file", imageFile);
             formData.append("upload_preset", uploadPreset);
@@ -69,7 +69,7 @@ export function useProfileUpdater() {
                         (json as { error?: unknown }).error &&
                         typeof (json as { error?: { message?: unknown } }).error?.message === "string"
                         ? ((json as { error: { message: string } }).error.message as string)
-                        : "Failed to upload image";
+                        : APP_MESSAGES.PROFILE.IMAGE_UPLOAD_FAILED;
 
                 throw new BaseError(message);
             }
@@ -84,15 +84,15 @@ export function useProfileUpdater() {
                     : "";
 
             if (!secureUrl) {
-                throw new BaseError("Cloudinary upload did not return a secure URL");
+                throw new BaseError(APP_MESSAGES.PROFILE.SECURE_URL_MISSING);
             }
 
             await updateProfile({ avatarUrl: secureUrl });
-            toast.success("Avatar updated");
+            toast.success(APP_MESSAGES.PROFILE.AVATAR_UPDATED);
         } catch (error) {
             if (error instanceof BaseError) toast.error(error.message);
             else if (error instanceof Error) toast.error(error.message);
-            else toast.error("Failed to update avatar");
+            else toast.error(APP_MESSAGES.PROFILE.AVATAR_UPDATE_FAILED);
             throw error;
         }
     };

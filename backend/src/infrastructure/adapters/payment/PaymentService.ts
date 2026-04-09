@@ -6,6 +6,7 @@ import { CreatePaymentIntentResult } from '../../../domain/types/CreatePaymentIn
 import { CreateRefundInput } from '../../../domain/types/CreateRefundInput';
 import { WebhookEvent } from '../../../domain/types/WebhookEvent';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 
 export class PaymentService implements IPaymentService {
@@ -29,7 +30,7 @@ export class PaymentService implements IPaymentService {
         });
 
         if (!intent.client_secret) {
-            throw new Error('Failed  to create payment intent');
+            throw new Error(ERROR_MESSAGES.PAYMENT.PAYMENT_INTENT_CREATE_FAILED);
         }
 
         return {
@@ -54,7 +55,7 @@ export class PaymentService implements IPaymentService {
         const intent = await this._stripe.paymentIntents.retrieve(paymentIntentId);
 
         if (!intent.client_secret) {
-            throw new Error('Failed to retrieve payment intent client secret');
+            throw new Error(ERROR_MESSAGES.PAYMENT.PAYMENT_INTENT_CLIENT_SECRET_FETCH_FAILED);
         }
 
         return intent.client_secret;
@@ -71,7 +72,7 @@ export class PaymentService implements IPaymentService {
             };
         } catch (error) {
             if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
-                throw new BadRequestError('Invalid Stripe webhook signature');
+                throw new BadRequestError(ERROR_MESSAGES.PAYMENT.INVALID_STRIPE_WEBHOOK_SIGNATURE);
             }
 
             throw error;

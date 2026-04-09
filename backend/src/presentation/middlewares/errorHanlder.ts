@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { BaseError } from '../../core/errors/BaseError';
+import { HttpStatus } from '../../shared/httpStatusCode';
+import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
 
 export function errorHandler(
   err: unknown,
@@ -24,9 +26,9 @@ export function errorHandler(
 
     console.error('Validation Error:', errorMessages);
 
-    return res.status(400).json({
+    return res.status(HttpStatus.BadRequest).json({
       success: false,
-      message: 'Validation failed',
+      message: ERROR_MESSAGES.SERVER.VALIDATION_FAILED,
       errors: errorDetails,
     });
   }
@@ -47,8 +49,8 @@ export function errorHandler(
 
   console.error('Internal Server Error:', err);
 
-  return res.status(500).json({
+  return res.status(HttpStatus.InternalServerError).json({
     success: false,
-    message: 'Internal Server Error',
+    message: ERROR_MESSAGES.SERVER.INTERNAL_ERROR,
   });
 }

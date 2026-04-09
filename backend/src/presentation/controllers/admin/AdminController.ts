@@ -5,6 +5,7 @@ import { UserRole } from '../../../domain/types/UserRole';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import type { IUpdateUserStatusUseCase } from '../../../application/useCase/interface/admin/IUpdateUserStatusUseCase';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { type IListMentorApplicationUseCase } from '../../../application/useCase/interface/admin/IListMentorApplicationUseCase';
 import { type IUpdateMentorStatusUseCase } from '../../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
 
@@ -81,14 +82,17 @@ export class AdminController {
       if (!id || !status || (status !== 'approved' && status !== 'rejected')) {
         return res
           .status(HttpStatus.OK)
-          .json({ message: 'Invalid request body. Status must be "approved" or "rejected"' });
+          .json({ message: ERROR_MESSAGES.ADMIN.INVALID_MENTOR_STATUS_REQUEST });
       }
 
       await this._updateMentorStatusUseCase.execute(id, status);
 
       res.status(HttpStatus.OK).json({
         success: true,
-        message: `Mentor application ${status} successfully`,
+        message:
+          status === 'approved'
+            ? RESPONSE_MESSAGES.ADMIN.MENTOR_APPLICATION_APPROVED
+            : RESPONSE_MESSAGES.ADMIN.MENTOR_APPLICATION_REJECTED,
       });
     } catch (error) {
       next(error);

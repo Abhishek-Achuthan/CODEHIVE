@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { HttpStatusCode } from "axios";
 import { MentorshipService } from "../../../services/mentorService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import type { MentorProfileResponse } from "../../../shared/types/api/mentor";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
 
 interface UseMentorProfileResult {
   mentor: MentorProfileResponse | null;
@@ -21,7 +23,7 @@ export function useMentorProfile(
   useEffect(() => {
     if (!mentorId) {
       setMentor(null);
-      setError("Invalid mentor ID");
+      setError(APP_MESSAGES.MENTOR.INVALID_MENTOR_ID);
       setIsNotFound(true);
       setIsLoading(false);
       return;
@@ -50,11 +52,11 @@ export function useMentorProfile(
         const normalized =
           err instanceof BaseError
             ? err
-            : new BaseError("Failed to load mentor profile");
+            : new BaseError(APP_MESSAGES.MENTOR.PROFILE_LOAD_FAILED);
 
         setMentor(null);
         setError(normalized.message);
-        setIsNotFound(normalized.status === 404);
+        setIsNotFound(normalized.status === HttpStatusCode.NotFound);
       } finally {
         if (isMounted) {
           setIsLoading(false);

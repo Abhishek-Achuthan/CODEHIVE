@@ -6,6 +6,7 @@ import type { IJoinRoomUseCase } from '../../application/useCase/interface/room/
 import type { ISendMessageUseCase } from '../../application/useCase/interface/message/ISendMessageUseCase';
 import type { ILeaveRoomUseCase } from '../../application/useCase/interface/room/ILeaveRoomUseCase';
 import type { ISocketService } from '../../application/ports/socket/ISocketService';
+import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
 
 interface JoinRoomPayload {
   roomId: string;
@@ -162,14 +163,15 @@ export class RoomSocketHandler implements ISocketHandler {
 
     if (!userId || typeof userId !== 'string') {
       if (quiet) return null;
-      throw new Error('Unauthorized');
+      throw new Error(ERROR_MESSAGES.ROOM.UNAUTHORIZED);
     }
 
     return userId;
   }
 
   private emitError(socket: Socket, error: unknown): void {
-    const message = error instanceof Error ? error.message : 'Something went wrong';
+    const message =
+      error instanceof Error ? error.message : ERROR_MESSAGES.SERVER.UNEXPECTED_ERROR;
     socket.emit('error', { message });
   }
 }

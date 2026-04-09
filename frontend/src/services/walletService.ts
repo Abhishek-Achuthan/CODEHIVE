@@ -2,6 +2,7 @@ import * as WalletAPI from "../api/endpoints/walletAPI";
 import { AxiosError } from "axios";
 import { BaseError } from "../shared/errors/BaseError";
 import type { MyWalletResponse } from "../shared/types/api/wallet";
+import { APP_MESSAGES } from "../shared/constants/messages";
 
 export class WalletService {
   static async getMyWallet(): Promise<MyWalletResponse> {
@@ -15,13 +16,13 @@ export class WalletService {
 
   private static handleError(error: unknown): never {
     if (error instanceof AxiosError) {
-      const msg = error.response?.data.message || 'Something went wrong';
+      const msg = error.response?.data.message || APP_MESSAGES.COMMON.SOMETHING_WENT_WRONG;
       const status = error.response?.status;
       throw new BaseError(msg, status);
     }
     if (error instanceof Error) {
       throw new BaseError(error.message);
     }
-    throw new BaseError('Unexpected error');
+    throw new BaseError(APP_MESSAGES.COMMON.UNEXPECTED_ERROR);
   }
 }

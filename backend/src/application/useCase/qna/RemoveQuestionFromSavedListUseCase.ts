@@ -3,6 +3,7 @@ import { IRemoveQuestionFromSavedListUseCase } from '../interface/qna/IRemoveQue
 import type { ISavedListRepository } from '../../../domain/interfaces/ISavedListRepository';
 import type { ISavedListItemRepository } from '../../../domain/interfaces/ISavedListItemRepository';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class RemoveQuestionFromSavedListUseCase
@@ -18,7 +19,7 @@ export class RemoveQuestionFromSavedListUseCase
   async execute(userId: string, listId: string, questionId: string): Promise<void> {
     const list = await this._savedListRepository.find(listId);
 
-    if (!list || list.userId !== userId) throw new NotFoundError('List not found');
+    if (!list || list.userId !== userId) throw new NotFoundError(ERROR_MESSAGES.QnA.LIST_NOT_FOUND);
 
     await this._savedListItemRepository.deleteByListAndQuestion(listId, questionId);
   }
