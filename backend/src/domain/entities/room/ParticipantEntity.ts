@@ -1,4 +1,4 @@
-import { RoomRole } from "../../types/RoomRole";
+import { RoomRole } from '../../types/RoomRole';
 
 export interface ParticipantEntity {
   id: string;

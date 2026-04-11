@@ -1,33 +1,33 @@
-import { inject, injectable } from "tsyringe";
-import { IGetAvailableSlotsUseCase } from "../interface/session/IGetAvailableSlotsUseCase";
-import { type IMentorAvailabilityRepository } from "../../../domain/interfaces/IMentorAvailabilityRepository";
-import type { IBookingReservationRepository } from "../../../domain/interfaces/IBookingReservationRepository";
-import { type IRRuleSlotService } from "../../ports/slot/IRRuleSlotService";
-import { type ISessionRepository } from "../../../domain/interfaces/ISessionReposiotry";
-import { type ISlotConflictService } from "../../ports/slot/ISlotConflictService";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { type AvailableSlotDTO } from "../../dto/SessionDTO";
-import { SessionMapper } from "../../mapper/SessionMapper";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ForbiddenError } from "../../../core/errors/ForbiddenError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { UserRole } from "../../../domain/types/UserRole";
-import { MentorStatus } from "../../../domain/types/MentorStatus";
+import { inject, injectable } from 'tsyringe';
+import { IGetAvailableSlotsUseCase } from '../interface/session/IGetAvailableSlotsUseCase';
+import { type IMentorAvailabilityRepository } from '../../../domain/interfaces/IMentorAvailabilityRepository';
+import type { IBookingReservationRepository } from '../../../domain/interfaces/IBookingReservationRepository';
+import { type IRRuleSlotService } from '../../ports/slot/IRRuleSlotService';
+import { type ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
+import { type ISlotConflictService } from '../../ports/slot/ISlotConflictService';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { type AvailableSlotDTO } from '../../dto/SessionDTO';
+import { SessionMapper } from '../../mapper/SessionMapper';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { UserRole } from '../../../domain/types/UserRole';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
 
 @injectable()
 export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase {
   constructor(
-    @inject("IMentorAvailabilityRepository")
+    @inject('IMentorAvailabilityRepository')
     private readonly _availabilityRepo: IMentorAvailabilityRepository,
-    @inject("IRRuleSlotService")
+    @inject('IRRuleSlotService')
     private readonly _rruleSlotService: IRRuleSlotService,
-    @inject("ISessionRepository")
+    @inject('ISessionRepository')
     private readonly _sessionRepository: ISessionRepository,
-    @inject("IBookingReservationRepository")
+    @inject('IBookingReservationRepository')
     private readonly _bookingReservationRepository: IBookingReservationRepository,
-    @inject("ISlotConflictService")
+    @inject('ISlotConflictService')
     private readonly _slotConflictService: ISlotConflictService,
-    @inject("IUserRepository")
+    @inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
   ) {}
 

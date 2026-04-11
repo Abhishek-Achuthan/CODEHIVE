@@ -1,15 +1,15 @@
-import { inject, injectable } from "tsyringe";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import { ICreateRoomUseCase } from "../interface/room/ICreateRoomUseCase";
-import { CreateRoomDTO, CreateRoomResponseDTO } from "../../dto/RoomDTO";
-import { ParticipantEntity } from "../../../domain/entities/room/ParticipantEntity";
-import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
+import { inject, injectable } from 'tsyringe';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { ICreateRoomUseCase } from '../interface/room/ICreateRoomUseCase';
+import { CreateRoomDTO, CreateRoomResponseDTO } from '../../dto/RoomDTO';
+import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
+import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 
 @injectable()
 export class CreateRoomUseCase implements ICreateRoomUseCase {
   constructor(
-    @inject("IRoomRepository") private readonly roomRepository: IRoomRepository,
-    @inject("IParticipantRepository")
+    @inject('IRoomRepository') private readonly roomRepository: IRoomRepository,
+    @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
   ) {}
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
@@ -17,17 +17,17 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       title: data.title,
       hostId: data.userId,
       visibility: data.visibility,
-      type: "CUSTOM",
+      type: 'CUSTOM',
       participantCount: 1,
       maxParticipants: 10,
       ...(data.description && { description: data.description }),
     });
     try {
       const participant: ParticipantEntity = {
-        id: "",
+        id: '',
         roomId: room.id,
         userId: data.userId,
-        role: "HOST",
+        role: 'HOST',
         joinedAt: new Date(),
       };
 

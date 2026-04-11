@@ -1,15 +1,15 @@
-import { inject, injectable } from "tsyringe";
-import { ILeaveRoomUseCase } from "../interface/room/ILeaveRoomUseCase";
-import { JoinRoomDTO } from "../../dto/RoomDTO";
-import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject, injectable } from 'tsyringe';
+import { ILeaveRoomUseCase } from '../interface/room/ILeaveRoomUseCase';
+import { JoinRoomDTO } from '../../dto/RoomDTO';
+import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class LeaveRoomUseCase implements ILeaveRoomUseCase {
     constructor(
-        @inject("IRoomRepository") private readonly roomRepository: IRoomRepository,
-        @inject("IParticipantRepository") private readonly participantRepository: IParticipantRepository,
+        @inject('IRoomRepository') private readonly roomRepository: IRoomRepository,
+        @inject('IParticipantRepository') private readonly participantRepository: IParticipantRepository,
     ) {}
 
     async execute(data: JoinRoomDTO): Promise<void> {

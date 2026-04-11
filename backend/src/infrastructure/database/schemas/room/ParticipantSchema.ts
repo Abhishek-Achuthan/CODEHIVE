@@ -1,6 +1,6 @@
-import { Document, Schema, Types } from "mongoose";
+import { Document, Schema, Types } from 'mongoose';
 
-export type RoomRole = "HOST" | "PARTICIPANT";
+export type RoomRole = 'HOST' | 'PARTICIPANT';
 
 export interface ParticipantDocument extends Document {
   _id: Types.ObjectId;
@@ -29,20 +29,20 @@ export type ParticipantLeanDoc = {
 export const ParticipantSchema = new Schema({
   roomId: {
     type: Schema.Types.ObjectId,
-    ref: "Room",
+    ref: 'Room',
     required: true,
     index: true,
   },
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
     index: true,
   },
   role: {
     type: String,
-    enum: ["HOST", "PARTICIPANT"],
-    default: "PARTICIPANT",
+    enum: ['HOST', 'PARTICIPANT'],
+    default: 'PARTICIPANT',
   },
 }, { timestamps: true });
 

@@ -1,1 +1,1 @@
-export type RoomType = "CUSTOM" | "SESSION";
+export type RoomType = 'CUSTOM' | 'SESSION';

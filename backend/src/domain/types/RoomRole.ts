@@ -1,1 +1,1 @@
-export type RoomRole = "HOST" | "PARTICIPANT"
+export type RoomRole = 'HOST' | 'PARTICIPANT'

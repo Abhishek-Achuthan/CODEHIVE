@@ -1,5 +1,5 @@
-import { RoomType } from "../../types/RoomType";
-import { RoomVisibility } from "../../types/RoomVisisblity";
+import { RoomType } from '../../types/RoomType';
+import { RoomVisibility } from '../../types/RoomVisisblity';
 
 export interface RoomEntity {
   id: string;

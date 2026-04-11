@@ -1,8 +1,8 @@
-import { inject, injectable } from "tsyringe";
-import { IGetPublicRoomsUseCase } from "../interface/room/IGetPublicRoomsUseCase";
-import { GetPublicRoomsDTO, GetPublicRoomsResponseDTO } from "../../dto/RoomDTO";
-import { PaginationResult } from "../../../domain/types/PaginationResult";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
+import { inject, injectable } from 'tsyringe';
+import { IGetPublicRoomsUseCase } from '../interface/room/IGetPublicRoomsUseCase';
+import { GetPublicRoomsDTO, GetPublicRoomsResponseDTO } from '../../dto/RoomDTO';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 
 @injectable()
 export class GetPublicRoomsUseCase implements IGetPublicRoomsUseCase {

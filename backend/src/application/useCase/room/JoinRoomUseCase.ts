@@ -1,22 +1,22 @@
-import { inject, injectable } from "tsyringe";
-import { IJoinRoomUseCase } from "../interface/room/IJoinRoomUseCase";
-import { JoinRoomDTO, JoinRoomSnapshotDTO } from "../../dto/RoomDTO";
-import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import type { IMessageRepository } from "../../../domain/interfaces/IMessageRepository";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { ParticipantEntity } from "../../../domain/entities/room/ParticipantEntity";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject, injectable } from 'tsyringe';
+import { IJoinRoomUseCase } from '../interface/room/IJoinRoomUseCase';
+import { JoinRoomDTO, JoinRoomSnapshotDTO } from '../../dto/RoomDTO';
+import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
   constructor(
-    @inject("IRoomRepository") private readonly roomRepository: IRoomRepository,
-    @inject("IParticipantRepository")
+    @inject('IRoomRepository') private readonly roomRepository: IRoomRepository,
+    @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
-    @inject("IMessageRepository")
+    @inject('IMessageRepository')
     private readonly messageRepository: IMessageRepository,
-    @inject("IUserRepository") private readonly userRepository: IUserRepository,
+    @inject('IUserRepository') private readonly userRepository: IUserRepository,
   ) {}
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const room = await this.roomRepository.find(data.roomId);
@@ -41,10 +41,10 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
         }
 
         const participant: ParticipantEntity = {
-          id: "",
+          id: '',
           roomId: data.roomId,
           userId: data.userId,
-          role: "PARTICIPANT",
+          role: 'PARTICIPANT',
           joinedAt: new Date(),
         };
 
@@ -57,9 +57,9 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       }
     } catch (error: unknown) {
       if (
-        typeof error === "object" &&
+        typeof error === 'object' &&
         error !== null &&
-        "code" in error &&
+        'code' in error &&
         (error as { code?: number }).code === 11000
       ) {
         isNewParticipant = false;
@@ -85,7 +85,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
           senderId: msg.senderId,
           senderName: sender
             ? `${sender.firstName} ${sender.lastName}`
-            : "Unknown User",
+            : 'Unknown User',
           content: msg.content,
           createdAt: msg.createdAt,
           ...(sender?.avatarUrl && { avatarUrl: sender.avatarUrl }),

@@ -1,20 +1,20 @@
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from 'tsyringe';
 
-import type { IMessageRepository } from "../../../domain/interfaces/IMessageRepository";
-import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
+import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
+import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 
-import { MessageEntity } from "../../../domain/entities/room/MessageEntity";
-import { ISendMessageUseCase } from "../interface/message/ISendMessageUseCase";
-import { SendMessageDTO, SendMessageResponseDTO } from "../../dto/MessageDTO";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { MessageEntity } from '../../../domain/entities/room/MessageEntity';
+import { ISendMessageUseCase } from '../interface/message/ISendMessageUseCase';
+import { SendMessageDTO, SendMessageResponseDTO } from '../../dto/MessageDTO';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(
-    @inject("IMessageRepository")
+    @inject('IMessageRepository')
     private readonly messageRepository: IMessageRepository,
 
-    @inject("IParticipantRepository")
+    @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
   ) {}
 
@@ -33,7 +33,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     }
 
     const message: Omit<MessageEntity, 'createdAt' | 'updatedAt'> = {
-      id: "",
+      id: '',
       roomId: data.roomId,
       senderId: data.senderId,
       content: data.content.trim(),
@@ -47,7 +47,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       id: created.id,
       roomId: created.roomId,
       senderId: created.senderId,
-      senderName: sender ? (sender as any).name || "Unknown User" : "Unknown User",
+      senderName: sender ? (sender as any).name || 'Unknown User' : 'Unknown User',
       content: created.content,
       createdAt: created.createdAt,
       avatarUrl: (sender as any).avatarUrl,

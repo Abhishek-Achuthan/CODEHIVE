@@ -1,4 +1,4 @@
-import { RoomVisibility } from "../../domain/types/RoomVisisblity";
+import { RoomVisibility } from '../../domain/types/RoomVisisblity';
 
 export interface CreateRoomDTO {
     title: string;
@@ -39,7 +39,7 @@ export interface ParticipantWithUserDTO {
     role: string;
 }
 
-import { SendMessageResponseDTO } from "./MessageDTO";
+import { SendMessageResponseDTO } from './MessageDTO';
 
 export interface JoinRoomSnapshotDTO {
     roomId: string;

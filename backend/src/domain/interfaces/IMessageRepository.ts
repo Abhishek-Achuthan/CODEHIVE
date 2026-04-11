@@ -1,5 +1,5 @@
-import { MessageEntity } from "../entities/room/MessageEntity";
-import { IGenericRepository } from "./IGenericRepository";
+import { MessageEntity } from '../entities/room/MessageEntity';
+import { IGenericRepository } from './IGenericRepository';
 
 export interface IMessageRepository extends IGenericRepository<MessageEntity> {
   findByRoomId(roomId: string): Promise<MessageEntity[]>;
