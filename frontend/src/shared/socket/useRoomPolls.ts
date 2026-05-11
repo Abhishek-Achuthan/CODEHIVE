@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { CreatePollRequest } from '../types/api/room';
 import * as RoomAPI from '../../api/endpoints/roomAPI';
 import { toErrorMessage } from './roomErrors';
@@ -9,6 +9,7 @@ interface UseRoomPollsOptions {
   roomId: string | null;
   socket: RoomSocket | null;
   isRealtimeReady: boolean;
+  initialPolls?: Poll[];
   onError?: (message: string) => void;
 }
 
@@ -16,15 +17,23 @@ interface UseRoomPollsResult {
   polls: Poll[];
   createPoll: (poll: CreatePollRequest) => void;
   votePoll: (pollId: string, optionIds: string[]) => void;
+  closePoll: (pollId:string) => void;
 }
 
 export const useRoomPolls = ({
   roomId,
   socket,
   isRealtimeReady,
+  initialPolls,
   onError,
 }: UseRoomPollsOptions): UseRoomPollsResult => {
-  const [polls, setPolls] = useState<Poll[]>([]);
+  const [polls, setPolls] = useState<Poll[]>(initialPolls ?? []);
+
+  useEffect(() => {
+    if (initialPolls) {
+      setPolls(initialPolls);
+    }
+  }, [initialPolls]);
 
   const handlePollCreated = useCallback(
     (poll: Poll) => {
@@ -53,6 +62,14 @@ export const useRoomPolls = ({
 
   useRoomSocketEvent(socket, 'poll:voted', handlePollVoted);
 
+  const handlePollClosed = useCallback((poll:Poll)=>{
+    if(poll.roomId !== roomId) return;
+
+    setPolls((current)=>current.map((existing)=> existing.id === poll.id? poll: existing));
+  },[roomId])
+
+  useRoomSocketEvent(socket, 'poll:closed', handlePollClosed);
+
   const createPoll = useCallback(
     (poll: CreatePollRequest) => {
       if (!roomId || !isRealtimeReady) return;
@@ -75,9 +92,21 @@ export const useRoomPolls = ({
     [isRealtimeReady, onError, roomId]
   );
 
+  const closePoll = useCallback(
+    (pollId:string)=>{
+      if (!roomId || !isRealtimeReady) return;
+
+      RoomAPI.closePoll(roomId, pollId).catch((pollError: unknown) => {
+        onError?.(toErrorMessage(pollError));
+      });
+    },
+    [isRealtimeReady, onError, roomId]
+    );
+
   return {
     polls,
     createPoll,
     votePoll,
+    closePoll,
   };
 };

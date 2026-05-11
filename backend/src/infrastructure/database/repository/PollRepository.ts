@@ -55,8 +55,9 @@ export class PollRepository extends GenericRepository<PollDocument, PollEntity> 
     return this.toEntity(updated as PollDocument);
   }
 
-  async closePoll(pollId: string): Promise<void> {
-    await this._model.findByIdAndUpdate(pollId, { isActive: false });
+  async closePoll(pollId: string): Promise<PollEntity | null> {
+    const updated = await this._model.findByIdAndUpdate(pollId, { isActive: false }, {new: true});
+    return updated ? this.toEntity(updated as PollDocument) : null;
   }
 
   protected toEntity(doc: PollDocument): PollEntity {

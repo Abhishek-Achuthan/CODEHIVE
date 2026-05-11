@@ -2,92 +2,94 @@ import type { PaginatedResponse } from "../core/api";
 export type RoomVisibility = "PUBLIC_REQUEST" | "PRIVATE";
 
 export interface CreateRoomRequest {
-    title: string;
-    description?: string;
-    visibility: RoomVisibility;
+  title: string;
+  description?: string;
+  visibility: RoomVisibility;
 }
 
 export interface CreateRoomResponse {
-    id: string;
-    title: string;
-    description?: string;
-    visibility: RoomVisibility;
-    hostId: string;
-    maxParticipants: number;
-    participantCount: number;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  title: string;
+  description?: string;
+  visibility: RoomVisibility;
+  hostId: string;
+  maxParticipants: number;
+  participantCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface GetPublicRoomsResponse {
-    id: string;
-    title: string;
-    description?: string;
-    visibility: RoomVisibility;
-    hostId: string;
-    maxParticipants: number;
-    participantCount: number;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  title: string;
+  description?: string;
+  visibility: RoomVisibility;
+  hostId: string;
+  maxParticipants: number;
+  participantCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type GetPublicRoomsPaginatedResponse = PaginatedResponse<GetPublicRoomsResponse>;
+export type GetPublicRoomsPaginatedResponse =
+  PaginatedResponse<GetPublicRoomsResponse>;
 
 export interface PublicRoomsListParams {
-    page?: number;
-    limit?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface RoomMessageResponse {
-    id: string;
-    roomId: string;
-    senderId: string;
-    senderName: string;
-    avatarUrl?: string;
-    parentMessageId?: string;
-    content: string;
-    createdAt: string;
-    isEdited?: boolean;
+  id: string;
+  roomId: string;
+  senderId: string;
+  senderName: string;
+  avatarUrl?: string;
+  parentMessageId?: string;
+  content: string;
+  createdAt: string;
+  isEdited?: boolean;
 }
 
 export interface RoomParticipantResponse {
-    userId: string;
-    name: string;
-    avatarUrl?: string;
-    role: string;
+  userId: string;
+  name: string;
+  avatarUrl?: string;
+  role: string;
 }
 
 export interface JoinRoomSnapshotResponse {
-    roomId: string;
-    isNewParticipant: boolean;
-    participants: RoomParticipantResponse[];
-    messages: RoomMessageResponse[];
-    onlineUserIds?: string[];
+  roomId: string;
+  isNewParticipant: boolean;
+  participants: RoomParticipantResponse[];
+  messages: RoomMessageResponse[];
+  onlineUserIds?: string[];
+  activePoll?: RoomPollResponse | null;
 }
 
 export interface CreateRoomMessageRequest {
-    content: string;
-    parentMessageId?: string;
+  content: string;
+  parentMessageId?: string;
 }
 
 export interface EditRoomMessageRequest {
-    content: string;
+  content: string;
 }
 
 export interface MessageEditedResponse {
-    messageId: string;
-    content: string;
+  messageId: string;
+  content: string;
 }
 
 export interface MessageDeletedResponse {
-    messageId: string;
+  messageId: string;
 }
 
 export interface CreatePollRequest {
-    question: string;
-    options: { text: string }[];
-    allowMultiple?: boolean;
-    expiresAt?: string;
+  question: string;
+  options: { text: string }[];
+  allowMultiple?: boolean;
+  expiresAt?: string;
 }
 
 export interface RoomPollResponse {
@@ -96,11 +98,12 @@ export interface RoomPollResponse {
     createdBy: string;
     roomId: string;
     options: {
-        id?: string;
+        id: string;
         text: string;
         votes: string[];
     }[];
-    allowMultiple?: boolean;
+    allowMultiple: boolean;
+    isActive: boolean;
     expiresAt?: string | null;
     createdAt: string;
     updatedAt?: string;

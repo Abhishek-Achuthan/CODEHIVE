@@ -135,13 +135,13 @@ export class RepositoryModule {
 
         container.register<IMentorRepository>('IMentorRepository', {
             useClass: MentorRepository
-        })
+        });
 
 
         //------------------------Poll Repository----------------------------------------//
-
+        
         container.register<IPollRepository>('IPollRepository', {
-            useClass: PollRepository
-        })
+            useClass : PollRepository
+        });
     }
 }

@@ -41,6 +41,7 @@ export const useRoomPresence = ({
         id: participant.userId,
         name: participant.name,
         avatar: participant.avatarUrl,
+        role: participant.role as any,
       }))
     );
     setOnlineUserIds(new Set(snapshot.onlineUserIds ?? []));
@@ -62,6 +63,7 @@ export const useRoomPresence = ({
                   ...participant,
                   name: payload.name,
                   avatar: payload.avatarUrl,
+                  role: payload.role,
                 }
               : participant
           );
@@ -73,6 +75,7 @@ export const useRoomPresence = ({
             id: payload.userId,
             name: payload.name,
             avatar: payload.avatarUrl,
+            role: payload.role,
           },
         ];
       });

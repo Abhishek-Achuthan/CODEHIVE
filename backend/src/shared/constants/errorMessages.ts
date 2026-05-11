@@ -149,6 +149,7 @@ export const ERROR_MESSAGES = {
     POLL_EXPIRED: 'Poll has expired',
     POLL_ONE_OPTION: 'This poll allows one option only',
     INVALID_POLL_OPTION: 'Invalid poll option',
+    POLL_CREATOR_ONLY: 'Only poll creator can close the poll',
   },
 
   COLLABORATION: {

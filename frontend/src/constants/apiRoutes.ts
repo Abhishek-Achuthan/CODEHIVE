@@ -304,5 +304,7 @@ export const API_ROUTES = {
     CREATE_POLL: (roomId: string) => `/rooms/${roomId}/polls`,
     VOTE_POLL: (roomId: string, pollId: string) =>
       `/rooms/${roomId}/polls/${pollId}/votes`,
+    CLOSE_POLL: (roomId: string, pollId: string) =>
+      `/rooms/${roomId}/polls/${pollId}/close`,
   }
 };

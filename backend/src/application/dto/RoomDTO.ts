@@ -40,12 +40,14 @@ export interface ParticipantWithUserDTO {
 }
 
 import { SendMessageResponseDTO } from './MessageDTO';
+import { ICreatePollOutputDTO } from './PollDTO';
 
 export interface JoinRoomSnapshotDTO {
     roomId: string;
     isNewParticipant: boolean;
     participants: ParticipantWithUserDTO[];
     messages: SendMessageResponseDTO[];
+    activePoll?: ICreatePollOutputDTO | null;
 }
 
 export interface GetPublicRoomsDTO {

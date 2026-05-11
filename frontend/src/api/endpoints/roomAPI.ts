@@ -37,3 +37,6 @@ export const createPoll = (roomId: string, data: CreatePollRequest) =>
 
 export const votePoll = (roomId: string, pollId: string, optionIds: string[]) =>
     apiClient.post(API_ROUTES.ROOM.VOTE_POLL(roomId, pollId), { optionIds });
+
+export const closePoll = (roomId: string, pollId: string) =>
+    apiClient.patch(API_ROUTES.ROOM.CLOSE_POLL(roomId, pollId));

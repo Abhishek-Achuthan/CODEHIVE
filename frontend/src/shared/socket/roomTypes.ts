@@ -4,7 +4,6 @@ import type {
   MessageDeletedResponse,
   MessageEditedResponse,
   RoomMessageResponse,
-  RoomPollResponse,
 } from '../types/api/room';
 
 export type RoomConnectionState =
@@ -22,9 +21,26 @@ export interface Participant {
   name: string;
   avatar?: string;
   status: 'online' | 'offline';
+  role?: 'HOST' | 'MENTOR' | 'PARTICIPANT';
 }
 
-export type Poll = RoomPollResponse;
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: string[]; // array of userIds
+}
+
+export interface Poll {
+  id: string;
+  roomId: string;
+  question: string;
+  options: PollOption[];
+  allowMultiple: boolean;
+  isActive: boolean;
+  createdBy: string;
+  expiresAt?: string;
+  createdAt: string;
+}
 
 export type RoomSnapshot = JoinRoomSnapshotResponse;
 
@@ -38,6 +54,7 @@ export interface RoomUserJoinedPayload {
   userId: string;
   name: string;
   avatarUrl?: string;
+  role?: 'HOST' | 'MENTOR' | 'PARTICIPANT';
 }
 
 export interface RoomUserLeftPayload {
@@ -71,6 +88,7 @@ export interface ServerToClientRoomEvents {
   'typing:stop': (payload: TypingStopPayload) => void;
   'poll:created': (payload: Poll) => void;
   'poll:voted': (payload: Poll) => void;
+  'poll:closed': (payload: Poll) => void;
   error: (payload: SocketErrorPayload) => void;
 }
 

@@ -1,3 +1,5 @@
+import { PollEntity } from "../../domain/entities/room/PollEntity";
+
 export interface ICreatePollInputDTO {
     question: string;
     options: {
@@ -23,3 +25,11 @@ export interface ICreatePollOutputDTO {
     createdAt: Date;
     updatedAt?: Date;
 }
+
+export interface IClosePollInputDTO {
+    roomId: string;
+    pollId: string;
+    userId: string;
+}
+
+export interface IClosePollOutputDTO extends PollEntity {}

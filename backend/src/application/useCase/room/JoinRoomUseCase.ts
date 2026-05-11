@@ -7,6 +7,7 @@ import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepo
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import type{ IPollRepository } from '../../../domain/interfaces/IPollRepository';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
@@ -17,6 +18,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     @inject('IMessageRepository')
     private readonly messageRepository: IMessageRepository,
     @inject('IUserRepository') private readonly userRepository: IUserRepository,
+    @inject('IPollRepository') private readonly pollRepository: IPollRepository
   ) {}
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const room = await this.roomRepository.find(data.roomId);
@@ -75,6 +77,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       data.roomId,
       50,
     );
+    const activePoll = await this.pollRepository.findActivePollByRoomId(data.roomId);
 
     const messagesWithSenders = await Promise.all(
       recentMessages.map(async (msg) => {
@@ -105,6 +108,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
         ...(p.avatarUrl && { avatarUrl: p.avatarUrl }),
       })),
       messages: messagesWithSenders,
+      activePoll,
     };
   }
 }

@@ -6,6 +6,7 @@ export interface Participant {
   name: string;
   avatar: string;
   status: ParticipantStatus;
+  role: 'HOST' | 'MENTOR' | 'PARTICIPANT';
   isCurrentUser?: boolean;
 }
 

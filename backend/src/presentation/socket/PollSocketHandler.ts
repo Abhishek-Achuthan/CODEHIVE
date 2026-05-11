@@ -2,7 +2,11 @@ import { injectable } from 'tsyringe';
 import type { Server as SocketIOServer, Socket } from 'socket.io';
 
 import type { ISocketHandler } from '../../application/ports/socket/ISocketHandler';
-import { getUserId } from './socketHandlerUtils';
+
+import {
+  emitSocketError,
+  getUserId,
+} from './socketHandlerUtils';
 
 interface PollAwarenessPayload {
   roomId: string;
@@ -10,16 +14,35 @@ interface PollAwarenessPayload {
 }
 
 @injectable()
-export class PollSocketHandler implements ISocketHandler {
-  register(_io: SocketIOServer, socket: Socket): void {
-    socket.on('poll:viewing', (payload: PollAwarenessPayload) => {
-      const userId = getUserId(socket, true);
-      if (!userId) return;
+export class PollSocketHandler
+  implements ISocketHandler
+{
+  register(
+    _io: SocketIOServer,
+    socket: Socket
+  ): void {
+    socket.on(
+      'poll:viewing',
+      (payload: PollAwarenessPayload) => {
+        try {
+          const userId = getUserId(
+            socket,
+            true
+          );
 
-      socket.to(payload.roomId).emit('poll:viewing', {
-        pollId: payload.pollId,
-        userId,
-      });
-    });
+          if (!userId) return;
+
+          socket.to(payload.roomId).emit(
+            'poll:viewing',
+            {
+              pollId: payload.pollId,
+              userId,
+            }
+          );
+        } catch (error) {
+          emitSocketError(socket, error);
+        }
+      }
+    );
   }
 }

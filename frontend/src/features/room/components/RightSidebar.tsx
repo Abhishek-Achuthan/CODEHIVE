@@ -5,6 +5,9 @@ import {
 } from 'lucide-react';
 import type { TabType, RoomMessage as Message, Participant } from '../types';
 import ChatPanel from './ChatPanel';
+import PollsPanel from './PollsPanel';
+import type { Poll } from '../../../shared/socket/roomTypes';
+import type { CreatePollRequest } from '../../../shared/types/api/room';
 
 interface RightSidebarProps {
   messages: Message[];
@@ -15,6 +18,10 @@ interface RightSidebarProps {
   typingUsers: string[];
   currentUser: Participant;
   isRealtimeReady: boolean;
+  polls: Poll[];
+  onCreatePoll: (poll: CreatePollRequest) => void;
+  onVotePoll: (pollId: string, optionIds: string[]) => void;
+  onClosePoll: (pollId: string) => void;
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -26,6 +33,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   typingUsers,
   currentUser,
   isRealtimeReady,
+  polls,
+  onCreatePoll,
+  onVotePoll,
+  onClosePoll,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('chat');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -67,10 +78,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         );
       case 'polls':
         return (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8 text-gray-500 space-y-4">
-            <BarChart2 className="w-10 h-10 text-gray-700" />
-            <h3 className="text-sm font-semibold text-gray-300">No active polls</h3>
-          </div>
+          <PollsPanel
+            polls={polls}
+            onCreatePoll={onCreatePoll}
+            onVotePoll={onVotePoll}
+            onClosePoll={onClosePoll}
+            currentUser={currentUser}
+          />
         );
       default:
         return null;

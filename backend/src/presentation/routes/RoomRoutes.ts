@@ -1,10 +1,10 @@
-import { Router } from 'express';
-import { container } from 'tsyringe';
+import { Router } from "express";
+import { container } from "tsyringe";
 
-import { RoomController } from '../controllers/room/RoomController';
-import { MessageController } from '../controllers/message/MessageController';
-import { PollController } from '../controllers/poll/PollController';
-import { AuthMiddleware } from '../middlewares/authMIddleware';
+import { RoomController } from "../controllers/room/RoomController";
+import { MessageController } from "../controllers/message/MessageController";
+import { PollController } from "../controllers/poll/PollController";
+import { AuthMiddleware } from "../middlewares/authMIddleware";
 
 export class RoomRoutes {
   private readonly _router: Router;
@@ -24,56 +24,62 @@ export class RoomRoutes {
 
   private _setRoutes() {
     this._router.post(
-      '/',
+      "/",
       this._authMiddleware.check,
-      this._roomController.handleCreateRoom.bind(this._roomController)
+      this._roomController.handleCreateRoom.bind(this._roomController),
     );
 
     this._router.get(
-      '/',
-      this._roomController.handleGetPublicRooms.bind(this._roomController)
+      "/",
+      this._roomController.handleGetPublicRooms.bind(this._roomController),
     );
 
     this._router.post(
-      '/:roomId/join',
+      "/:roomId/join",
       this._authMiddleware.check,
-      this._roomController.handleJoinRoom.bind(this._roomController)
+      this._roomController.handleJoinRoom.bind(this._roomController),
     );
 
     this._router.post(
-      '/:roomId/leave',
+      "/:roomId/leave",
       this._authMiddleware.check,
-      this._roomController.handleLeaveRoom.bind(this._roomController)
+      this._roomController.handleLeaveRoom.bind(this._roomController),
     );
 
     this._router.post(
-      '/:roomId/messages',
+      "/:roomId/messages",
       this._authMiddleware.check,
-      this._messageController.handleCreateMessage.bind(this._messageController)
+      this._messageController.handleCreateMessage.bind(this._messageController),
     );
 
     this._router.patch(
-      '/:roomId/messages/:messageId',
+      "/:roomId/messages/:messageId",
       this._authMiddleware.check,
-      this._messageController.handleEditMessage.bind(this._messageController)
+      this._messageController.handleEditMessage.bind(this._messageController),
     );
 
     this._router.delete(
-      '/:roomId/messages/:messageId',
+      "/:roomId/messages/:messageId",
       this._authMiddleware.check,
-      this._messageController.handleDeleteMessage.bind(this._messageController)
+      this._messageController.handleDeleteMessage.bind(this._messageController),
     );
 
     this._router.post(
-      '/:roomId/polls',
+      "/:roomId/polls",
       this._authMiddleware.check,
-      this._pollController.handleCreatePoll.bind(this._pollController)
+      this._pollController.handleCreatePoll.bind(this._pollController),
     );
 
     this._router.post(
-      '/:roomId/polls/:pollId/votes',
+      "/:roomId/polls/:pollId/votes",
       this._authMiddleware.check,
-      this._pollController.handleSubmitVote.bind(this._pollController)
+      this._pollController.handleSubmitVote.bind(this._pollController),
+    );
+
+    this._router.get(
+      "/:roomId/polls/active",
+      this._authMiddleware.check,
+      this._pollController.handleGetActivePoll.bind(this._pollController),
     );
   }
 

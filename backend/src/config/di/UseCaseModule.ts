@@ -155,6 +155,10 @@ import { ICreatePollUseCase } from '../../application/useCase/interface/poll/ICr
 import { CreatePollUseCase } from '../../application/useCase/poll/CreatePollUseCase';
 import { ISubmitPollVoteUseCase } from '../../application/useCase/interface/poll/ISubmitPollVoteUseCase';
 import { SubmitPollVoteUseCase } from '../../application/useCase/poll/SubmitPollVoteUseCase';
+import { IGetActivePollUseCase } from '../../application/useCase/interface/poll/IGetActivePollUseCase';
+import { GetActivePollUseCase } from '../../application/useCase/poll/GetActivePollUseCase';
+import { IClosePollUseCase } from '../../application/useCase/interface/poll/IClosePollUseCase';
+import { ClosePollUseCase } from '../../application/useCase/poll/ClosePollUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -511,6 +515,16 @@ export class UseCaseModule {
 
     container.register<IApplyForMentorUseCase>('IApplyForMentorUseCase', {
       useClass: ApplyForMentorUseCase,
+    });
+
+    //---------------------------------Poll---------------------------------------//
+
+    container.register<IGetActivePollUseCase>('IGetActivePollUseCase', {
+      useClass: GetActivePollUseCase
+    });
+
+    container.register<IClosePollUseCase>('IClosePollUseCase', {
+      useClass: ClosePollUseCase
     });
   }
 }
