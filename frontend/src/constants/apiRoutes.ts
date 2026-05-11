@@ -294,5 +294,15 @@ export const API_ROUTES = {
       const query = qp.toString();
       return query ? `/rooms?${query}` : `/rooms`;
     },
+    JOIN_ROOM: (roomId: string) => `/rooms/${roomId}/join`,
+    LEAVE_ROOM: (roomId: string) => `/rooms/${roomId}/leave`,
+    CREATE_MESSAGE: (roomId: string) => `/rooms/${roomId}/messages`,
+    EDIT_MESSAGE: (roomId: string, messageId: string) =>
+      `/rooms/${roomId}/messages/${messageId}`,
+    DELETE_MESSAGE: (roomId: string, messageId: string) =>
+      `/rooms/${roomId}/messages/${messageId}`,
+    CREATE_POLL: (roomId: string) => `/rooms/${roomId}/polls`,
+    VOTE_POLL: (roomId: string, pollId: string) =>
+      `/rooms/${roomId}/polls/${pollId}/votes`,
   }
 };

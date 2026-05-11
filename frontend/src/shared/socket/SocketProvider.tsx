@@ -22,6 +22,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             return;
         }
 
+        setIsConnected(false);
+        setConnectionError(null);
+
         const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
             withCredentials: true,
             auth: {
