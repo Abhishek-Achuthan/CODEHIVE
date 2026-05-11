@@ -1,15 +1,14 @@
-import { Server as SocketIOServer, Socket } from 'socket.io';
-import { inject, injectable } from 'tsyringe';
-import { JwtPayload } from 'jsonwebtoken';
-import { ISocketService } from '../../../application/ports/socket/ISocketService';
-import type { IJWTService } from '../../../application/ports/security/IJWTService';
-import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { Server as SocketIOServer, Socket } from "socket.io";
+import { inject, injectable } from "tsyringe";
+import { ISocketService } from "../../../application/ports/socket/ISocketService";
+import type { IAuthenticateRealtimeUserUseCase } from "../../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase";
+import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
 
 @injectable()
 export class SocketService implements ISocketService {
   constructor(
-    @inject('IJWTService') private readonly _jwtService: IJWTService,
-    @inject('IUserRepository') private readonly _userRepository: IUserRepository,
+    @inject("IAuthenticateRealtimeUserUseCase")
+    private readonly _authenticateRealtimeUserUseCase: IAuthenticateRealtimeUserUseCase,
   ) {}
 
   private _io: SocketIOServer | null = null;
@@ -25,30 +24,24 @@ export class SocketService implements ISocketService {
       try {
         const token = socket.handshake.auth?.token;
 
-        if (!token || typeof token !== 'string') {
-          return next(new Error('Unauthorized'));
+        if (!token || typeof token !== "string") {
+          return next(new UnauthorizedError());
         }
 
-        const decoded = this._jwtService.verifyAccessToken(token) as JwtPayload;
+        const user = await this._authenticateRealtimeUserUseCase.execute({
+          token,
+        });
 
-        if (!decoded?.sub) {
-          return next(new Error('Unauthorized'));
-        }
-
-        const user = await this._userRepository.find(decoded.sub);
-
-        if (!user || user.isBlocked) {
-          return next(new Error('Unauthorized'));
-        }
-
-        socket.data.userId = user.id;
+        socket.data.userId = user.userId;
+        socket.data.userRole = user.role;
+        socket.data.mentorStatus = user.mentorStatus;
         next();
-      } catch {
-        return next(new Error('Unauthorized'));
+      } catch (error) {
+        return next(new Error("Unauthorized"));
       }
     });
 
-    this._io.on('connection', (socket: Socket) => {
+    this._io.on("connection", (socket: Socket) => {
       const userId = socket.data.userId as string | undefined;
 
       if (!userId) {
@@ -62,7 +55,7 @@ export class SocketService implements ISocketService {
 
       this._userSockets.get(userId)!.add(socket.id);
       this._socketUsers.set(socket.id, userId);
-      socket.on('disconnect', () => {
+      socket.on("disconnect", () => {
         const userId = this._socketUsers.get(socket.id);
         if (!userId) return;
 
@@ -89,6 +82,15 @@ export class SocketService implements ISocketService {
 
   emitToRoom(roomId: string, event: string, payload: unknown): void {
     this._io?.to(roomId).emit(event, payload);
+  }
+
+  emitToRoomExcept(
+    roomId: string,
+    excludedSocketId: string,
+    event: string,
+    payload: unknown,
+  ): void {
+    this._io?.to(roomId).except(excludedSocketId).emit(event, payload);
   }
 
   broadcast(event: string, payload: unknown): void {

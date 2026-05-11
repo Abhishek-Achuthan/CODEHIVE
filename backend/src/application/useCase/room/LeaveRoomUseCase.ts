@@ -20,17 +20,7 @@ export class LeaveRoomUseCase implements ILeaveRoomUseCase {
 
         const existing = await this.participantRepository.findByRoomAndUser(data.roomId, data.userId);
         if (!existing) {
-            return; // Already left
+            return;
         }
-
-        await this.participantRepository.removeByRoomAndUser(data.roomId, data.userId);
-
-        // Fetch real count after removal to synchronize perfectly
-        const newCount = await this.participantRepository.countByRoomId(data.roomId);
-        
-        await this.roomRepository.update(room.id, {
-            participantCount: newCount,
-        });
-
     }
 }

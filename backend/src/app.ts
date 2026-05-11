@@ -17,7 +17,12 @@ import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
-import { socketHandlers, socketService, stripeRefundRetryService } from './config/di/resolver';
+import {
+  hocuspocusService,
+  socketHandlers,
+  socketService,
+  stripeRefundRetryService,
+} from './config/di/resolver';
 import { RoomRoutes } from './presentation/routes/RoomRoutes';
 
 export class App {
@@ -78,7 +83,7 @@ export class App {
     this._app.use('/api/mentors', mentorRoutes.getRoutes());
     this._app.use('/api/webhook', webhookRoutes.getRoutes());
     this._app.use('/api/wallet', walletRoutes.getRoutes());
-    this._app.use('/api/rooms',roomRoutes.getRoutes())
+    this._app.use('/api/rooms', roomRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {
@@ -99,6 +104,7 @@ export class App {
 
   public listen() {
     this.startBackgroundJobs();
+    hocuspocusService.listen();
     this._httpServer.listen(env.port, () => {
       console.log(`server started at port ${env.port}`);
     });

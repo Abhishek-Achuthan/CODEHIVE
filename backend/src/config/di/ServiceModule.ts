@@ -33,6 +33,15 @@ import { StripeRefundRetryService } from '../../application/services/StripeRefun
 import { ILoggerService } from '../../application/ports/logging/ILoggerService';
 import { LoggingService } from '../../infrastructure/adapters/logging/LoggingService';
 import { RoomSocketHandler } from '../../presentation/socket/RoomSocketHandler';
+import { IPresenceService } from '../../application/ports/presence/IPresenceService';
+import { PresenceService } from '../../infrastructure/adapters/socket/PresenceService';
+import { HocuspocusService } from '../../infrastructure/realtime/HocuspocusService';
+import { HocuspocusHookHandler } from '../../presentation/collaboration/HocuspocusHookHandler';
+import { ChatSocketHandler } from '../../presentation/socket/ChatSocketHandler';
+import { PollSocketHandler } from '../../presentation/socket/PollSocketHandler';
+import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketHandler';
+import { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
+import { RoomEventEmitter } from '../../infrastructure/realtime/RoomEventEmitter';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -97,10 +106,36 @@ export class ServiceModule {
     })
 
     container.registerSingleton<ISocketService>('ISocketService', SocketService);
+
+    container.registerSingleton<IRoomEventEmitter>(
+      'IRoomEventEmitter',
+      RoomEventEmitter,
+    );
+
+    container.registerSingleton<IPresenceService>('IPresenceService', PresenceService);
     
     container.register(RoomSocketHandler, {
       useClass: RoomSocketHandler,
     });
+
+    container.register(ChatSocketHandler, {
+      useClass: ChatSocketHandler,
+    });
+
+    container.register(PresenceSocketHandler, {
+      useClass: PresenceSocketHandler,
+    });
+
+    container.register(PollSocketHandler, {
+      useClass: PollSocketHandler,
+    });
+
+    container.register(HocuspocusHookHandler, {
+      useClass: HocuspocusHookHandler,
+    });
+
+    container.registerSingleton(HocuspocusService, HocuspocusService);
+
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
 
   }

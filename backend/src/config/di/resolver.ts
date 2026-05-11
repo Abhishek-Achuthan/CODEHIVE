@@ -13,10 +13,14 @@ import { SessionController } from '../../presentation/controllers/session/Sessio
 import { MentorController } from '../../presentation/controllers/mentor/MentorController';
 import { WebhookController } from '../../presentation/controllers/webhooks/WebhookController';
 import { WalletController } from '../../presentation/controllers/wallet/WalletController';
-import { SocketService } from '../../infrastructure/adapters/socket/SocketService';
 import { StripeRefundRetryService } from '../../application/services/StripeRefundRetryService';
 import type { ISocketHandler } from '../../application/ports/socket/ISocketHandler';
 import { RoomSocketHandler } from '../../presentation/socket/RoomSocketHandler';
+import { ChatSocketHandler } from '../../presentation/socket/ChatSocketHandler';
+import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketHandler';
+import { PollSocketHandler } from '../../presentation/socket/PollSocketHandler';
+import { HocuspocusService } from '../../infrastructure/realtime/HocuspocusService';
+import { ISocketService } from '../../application/ports/socket/ISocketService';
 
 ContainerSetup.registerAll();
 
@@ -44,10 +48,15 @@ export const webhookController = container.resolve(WebhookController)
 
 export const walletController = container.resolve(WalletController);
 
-export const socketService = container.resolve(SocketService);
+export const socketService = container.resolve<ISocketService>('ISocketService');
+
+export const hocuspocusService = container.resolve(HocuspocusService);
 
 export const socketHandlers: ISocketHandler[] = [
   container.resolve(RoomSocketHandler),
+  container.resolve(ChatSocketHandler),
+  container.resolve(PresenceSocketHandler),
+  container.resolve(PollSocketHandler),
 ];
 
 export const stripeRefundRetryService = container.resolve(StripeRefundRetryService);

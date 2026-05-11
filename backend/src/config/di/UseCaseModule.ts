@@ -139,10 +139,22 @@ import { IJoinRoomUseCase } from '../../application/useCase/interface/room/IJoin
 import { JoinRoomUseCase } from '../../application/useCase/room/JoinRoomUseCase';
 import { ISendMessageUseCase } from '../../application/useCase/interface/message/ISendMessageUseCase';
 import { SendMessageUseCase } from '../../application/useCase/message/SendMessageUseCase';
+import { IEditMessageUseCase } from '../../application/useCase/interface/message/IEditMessageUseCase';
+import { EditMessageUseCase } from '../../application/useCase/message/EditMessageUseCase';
+import { IDeleteMessageUseCase } from '../../application/useCase/interface/message/IDeleteMessageUseCase';
+import { DeleteMessageUseCase } from '../../application/useCase/message/DeleteMessageUseCase';
 import { IGetPublicRoomsUseCase } from '../../application/useCase/interface/room/IGetPublicRoomsUseCase';
 import { GetPublicRoomsUseCase } from '../../application/useCase/room/GetPublicRoomsUseCase';
 import { ILeaveRoomUseCase } from '../../application/useCase/interface/room/ILeaveRoomUseCase';
 import { LeaveRoomUseCase } from '../../application/useCase/room/LeaveRoomUseCase';
+import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
+import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
+import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
+import { AuthorizeCollaborationAccessUseCase } from '../../application/useCase/realtime/AuthorizeCollaborationAccessUseCase';
+import { ICreatePollUseCase } from '../../application/useCase/interface/poll/ICreatePollUseCase';
+import { CreatePollUseCase } from '../../application/useCase/poll/CreatePollUseCase';
+import { ISubmitPollVoteUseCase } from '../../application/useCase/interface/poll/ISubmitPollVoteUseCase';
+import { SubmitPollVoteUseCase } from '../../application/useCase/poll/SubmitPollVoteUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -379,9 +391,41 @@ export class UseCaseModule {
       useClass: SendMessageUseCase,
     });
 
+    container.register<IEditMessageUseCase>('IEditMessageUseCase', {
+      useClass: EditMessageUseCase,
+    });
+
+    container.register<IDeleteMessageUseCase>('IDeleteMessageUseCase', {
+      useClass: DeleteMessageUseCase,
+    });
+
     container.register<ILeaveRoomUseCase>('ILeaveRoomUseCase', {
       useClass: LeaveRoomUseCase,
     });
+
+    container.register<ICreatePollUseCase>('ICreatePollUseCase', {
+      useClass: CreatePollUseCase,
+    });
+
+    container.register<ISubmitPollVoteUseCase>('ISubmitPollVoteUseCase', {
+      useClass: SubmitPollVoteUseCase,
+    });
+
+    //---------------------------------Realtime--------------------------------------//
+
+    container.register<IAuthenticateRealtimeUserUseCase>(
+      'IAuthenticateRealtimeUserUseCase',
+      {
+        useClass: AuthenticateRealtimeUserUseCase,
+      }
+    );
+
+    container.register<IAuthorizeCollaborationAccessUseCase>(
+      'IAuthorizeCollaborationAccessUseCase',
+      {
+        useClass: AuthorizeCollaborationAccessUseCase,
+      }
+    );
 
 
     

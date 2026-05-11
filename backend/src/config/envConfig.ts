@@ -13,6 +13,7 @@ export const env = {
   frontendUrl: process.env.FRONTEND_URL,
   backendUrl: process.env.BACKEND_URL,
   port: process.env.PORT,
+  hocuspocusPort: Number(process.env.HOCUSPOCUS_PORT || 1234),
   loggerlvl: process.env.LOGGER_LEVEL,
   nodeEnv: process.env.NODE_ENV,
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',

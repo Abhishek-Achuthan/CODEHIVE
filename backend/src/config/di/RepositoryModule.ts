@@ -38,6 +38,8 @@ import { IParticipantRepository } from '../../domain/interfaces/IParticipantRepo
 import { ParticipantRepository } from '../../infrastructure/database/repository/ParticipantRepository';
 import { IMessageRepository } from '../../domain/interfaces/IMessageRepository';
 import { MessageRepository } from '../../infrastructure/database/repository/MessageRepository';
+import { IPollRepository } from '../../domain/interfaces/IPollRepository';
+import { PollRepository } from '../../infrastructure/database/repository/PollRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -133,6 +135,13 @@ export class RepositoryModule {
 
         container.register<IMentorRepository>('IMentorRepository', {
             useClass: MentorRepository
+        })
+
+
+        //------------------------Poll Repository----------------------------------------//
+
+        container.register<IPollRepository>('IPollRepository', {
+            useClass: PollRepository
         })
     }
 }
