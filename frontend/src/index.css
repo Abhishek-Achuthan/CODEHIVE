@@ -87,3 +87,41 @@ body,
  }
 
 
+.chat-input-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-input-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-input-scrollbar::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 10px;
+}
+
+.chat-input-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+.chat-input-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #30363d transparent;
+}
+
+textarea::placeholder {
+  line-height: 1.25rem;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 10px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}

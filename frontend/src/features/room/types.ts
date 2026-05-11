@@ -13,8 +13,10 @@ export interface RoomMessage {
   id: string;
   senderId: string;
   senderName: string;
+  parentMessageId?: string;
   content: string;
   timestamp: string;
+  isEdited?: boolean;
 }
 
 export type TabType = 'chat' | 'whiteboard' | 'notes' | 'polls';

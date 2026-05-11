@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRoomSocket } from '../../../shared/socket/useRoomSocket';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
@@ -13,30 +13,22 @@ const CollaborationRoom: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
-  const leaveRoomRef = useRef<() => void>(() => {});
   
   const { 
     messages: socketMessages, 
     participants: socketParticipants, 
     sendMessage, 
+    editMessage,
+    deleteMessage,
     emitTyping,
     leaveRoom,
     typingUsers,
-    isJoined, 
+    hasRoomSnapshot,
+    isRealtimeReady,
     error 
   } = useRoomSocket(roomId || null);
 
   const roomName = "Project Collaboration Room";
-
-  useEffect(() => {
-    leaveRoomRef.current = leaveRoom;
-  }, [leaveRoom]);
-
-  useEffect(() => {
-    return () => {
-      leaveRoomRef.current();
-    };
-  }, []);
 
   const handleLeaveRoom = () => {
     leaveRoom();
@@ -61,8 +53,10 @@ const CollaborationRoom: React.FC = () => {
       id: msg.id,
       senderId: msg.senderId,
       senderName: msg.senderName || (msg.senderId === user.id ? `${user.firstName} ${user.lastName}` : 'User'),
+      parentMessageId: msg.parentMessageId,
       content: msg.content,
       timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isEdited: msg.isEdited,
     }));
   }, [socketMessages, user]);
 
@@ -77,8 +71,8 @@ const CollaborationRoom: React.FC = () => {
       isCurrentUser: !!(p.id === user.id),
     }));
 
-    // If current user is not in the list but we are joined, add them
-    if (isJoined && currentUser && !list.find(p => p.id === currentUser.id)) {
+    // If current user is not in the list but we have the REST snapshot, add them
+    if (hasRoomSnapshot && currentUser && !list.find(p => p.id === currentUser.id)) {
       list.push({
         ...currentUser,
         isCurrentUser: true,
@@ -86,7 +80,7 @@ const CollaborationRoom: React.FC = () => {
     }
     
     return list;
-  }, [socketParticipants, user, isJoined, currentUser]);
+  }, [socketParticipants, user, hasRoomSnapshot, currentUser]);
 
   if (error) {
     return (
@@ -104,7 +98,7 @@ const CollaborationRoom: React.FC = () => {
     );
   }
 
-  if (!isJoined || !currentUser) {
+  if (!hasRoomSnapshot || !currentUser) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-[#010409] text-gray-300">
         <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
@@ -130,28 +124,15 @@ const CollaborationRoom: React.FC = () => {
         <RightSidebar
           messages={formattedMessages}
           onSendMessage={sendMessage}
+          onEditMessage={editMessage}
+          onDeleteMessage={deleteMessage}
           onTypingChange={emitTyping}
           typingUsers={typingUsers}
           currentUser={currentUser}
+          isRealtimeReady={isRealtimeReady}
         />
       </div>
-      
-      {/* Global CSS for scrollbars */}
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #0d1117;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #30363d;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #484f58;
-        }
-      `}</style>
+
     </div>
   );
 };
