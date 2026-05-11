@@ -5,6 +5,7 @@ export interface MessageDocument extends Document {
 
   roomId: Types.ObjectId;
   senderId: Types.ObjectId;
+  parentMessageId?: Types.ObjectId;
   content: string;
 
   createdAt: Date;
@@ -16,6 +17,7 @@ export type MessageLeanDoc = {
 
   roomId: Types.ObjectId;
   senderId: Types.ObjectId;
+  parentMessageId?: Types.ObjectId;
   content: string;
 
   createdAt: Date;
@@ -35,6 +37,11 @@ export const MessageSchema = new Schema(
       ref: 'User',
       required: true,
       index: true,
+    },
+    parentMessageId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Message',
+      required: false,
     },
     content: {
       type: String,

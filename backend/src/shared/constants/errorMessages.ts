@@ -135,8 +135,24 @@ export const ERROR_MESSAGES = {
     UNAUTHORIZED: 'Unauthorized',
     USER_NOT_IN_ROOM: 'User is not part of this room',
     MESSAGE_EMPTY: 'Message cannot be empty',
+    MESSAGE_NOT_FOUND: 'Message not found',
+    NOT_ALLOWED_TO_EDIT_MESSAGE: 'You are not allowed to edit this message',
+    NOT_ALLOWED_TO_DELETE_MESSAGE: 'You are not allowed to delete this message',
     ROOM_NOT_FOUND: 'Room not found',
     ROOM_FULL: 'Room is full',
+    ACCESS_DENIED: 'You are not allowed to access this room',
+  },
+
+  POLL:{
+    POLL_CLOSED : 'Poll is closed',
+    POLL_NOT_FOUND: 'Poll not found',
+    POLL_EXPIRED: 'Poll has expired',
+    POLL_ONE_OPTION: 'This poll allows one option only',
+    INVALID_POLL_OPTION: 'Invalid poll option',
+  },
+
+  COLLABORATION: {
+    INVALID_DOCUMENT_NAME: 'Invalid collaboration document name',
   },
 
   UTILITY: {

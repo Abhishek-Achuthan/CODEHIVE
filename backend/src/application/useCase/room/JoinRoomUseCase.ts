@@ -88,6 +88,8 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
             : 'Unknown User',
           content: msg.content,
           createdAt: msg.createdAt,
+          isEdited: msg.updatedAt && msg.createdAt && msg.updatedAt.getTime() > msg.createdAt.getTime(),
+          ...(msg.parentMessageId && { parentMessageId: msg.parentMessageId }),
           ...(sender?.avatarUrl && { avatarUrl: sender.avatarUrl }),
         };
       }),

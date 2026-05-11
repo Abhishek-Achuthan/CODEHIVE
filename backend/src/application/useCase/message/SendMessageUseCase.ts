@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
 import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 
 import { MessageEntity } from '../../../domain/entities/room/MessageEntity';
 import { ISendMessageUseCase } from '../interface/message/ISendMessageUseCase';
@@ -16,6 +17,9 @@ export class SendMessageUseCase implements ISendMessageUseCase {
 
     @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
+
+    @inject('IUserRepository')
+    private readonly userRepository: IUserRepository,
   ) {}
 
   async execute(data: SendMessageDTO): Promise<SendMessageResponseDTO> {
@@ -39,19 +43,32 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       content: data.content.trim(),
     };
 
+    if (data.parentMessageId) {
+      message.parentMessageId = data.parentMessageId;
+    }
+
     const created = await this.messageRepository.create(message);
 
-    const sender = await this.participantRepository.findByRoomAndUser(data.roomId, data.senderId);
+    const sender = await this.userRepository.find(data.senderId);
 
-    return {
+    const response: SendMessageResponseDTO = {
       id: created.id,
       roomId: created.roomId,
       senderId: created.senderId,
-      senderName: sender ? (sender as any).name || 'Unknown User' : 'Unknown User',
+      senderName: sender ? `${sender.firstName} ${sender.lastName}` : 'Unknown User',
       content: created.content,
       createdAt: created.createdAt,
-      avatarUrl: (sender as any).avatarUrl,
     };
+
+    if (sender?.avatarUrl) {
+      response.avatarUrl = sender.avatarUrl;
+    }
+
+    if (created.parentMessageId) {
+      response.parentMessageId = created.parentMessageId;
+    }
+
+    return response;
 
   }
 }
