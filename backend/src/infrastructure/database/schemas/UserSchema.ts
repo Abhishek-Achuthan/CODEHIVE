@@ -25,6 +25,8 @@ export interface UserDocument extends Document {
   isBlocked: boolean;
   primaryExpertise: string;
   experienceLevel: string;
+  /** Reference to the active subscription Plan. Null = no paid plan. */
+  planId?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +53,8 @@ export type UserLeanDoc = {
   isBlocked: boolean;
   primaryExpertise: string;
   experienceLevel: string;
+  /** Reference to the active subscription Plan. Null = no paid plan. */
+  planId?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -101,7 +105,8 @@ export const UserSchema = new Schema<UserDocument>(
     },
     isBlocked: { type: Boolean, default: false },
     primaryExpertise: { type: String, required: false },
-    experienceLevel: { type: String, required: false }
+    experienceLevel: { type: String, required: false },
+    planId: { type: Schema.Types.ObjectId, ref: 'Plan', required: false, default: null, index: true },
   },
   { timestamps: true }
 );

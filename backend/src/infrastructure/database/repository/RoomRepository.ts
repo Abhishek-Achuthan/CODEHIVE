@@ -46,6 +46,7 @@ export class RoomRepository
       visibility: doc.visibility,
       participantCount: doc.participantCount,
       maxParticipants: doc.maxParticipants,
+      featureSnapshot: doc.featureSnapshot ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -77,6 +78,7 @@ export class RoomRepository
       visibility: doc.visibility,
       participantCount: doc.participantCount,
       maxParticipants: doc.maxParticipants,
+      featureSnapshot: doc.featureSnapshot ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };

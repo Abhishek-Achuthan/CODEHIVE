@@ -83,6 +83,9 @@ export class ParticipantRepository
       roomId: doc.roomId.toString(),
       userId: doc.userId.toString(),
       role: doc.role,
+      overrides: Object.fromEntries(
+        Object.entries(doc.overrides ?? {})
+      ) as ParticipantEntity['overrides'],
       joinedAt: doc.createdAt,
     };
   }
@@ -96,6 +99,9 @@ export class ParticipantRepository
     if (data.userId !== undefined) doc.userId = new Types.ObjectId(data.userId);
     if (data.role !== undefined) doc.role = data.role;
     if (data.joinedAt !== undefined) doc.createdAt = data.joinedAt;
+    if (data.overrides !== undefined) {
+      doc.overrides = data.overrides as Record<string, boolean>;
+    }
 
     return doc;
   }
@@ -106,6 +112,9 @@ export class ParticipantRepository
       roomId: doc.roomId.toString(),
       userId: doc.userId.toString(),
       role: doc.role,
+      overrides: Object.fromEntries(
+        Object.entries(doc.overrides ?? {})
+      ) as ParticipantEntity['overrides'],
       joinedAt: doc.createdAt,
     };
   }

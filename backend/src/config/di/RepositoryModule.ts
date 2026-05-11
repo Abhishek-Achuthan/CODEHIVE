@@ -40,6 +40,8 @@ import { IMessageRepository } from '../../domain/interfaces/IMessageRepository';
 import { MessageRepository } from '../../infrastructure/database/repository/MessageRepository';
 import { IPollRepository } from '../../domain/interfaces/IPollRepository';
 import { PollRepository } from '../../infrastructure/database/repository/PollRepository';
+import { IPlanRepository } from '../../domain/interfaces/IPlanRepository';
+import { PlanRepository } from '../../infrastructure/database/repository/PlanRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -142,6 +144,12 @@ export class RepositoryModule {
         
         container.register<IPollRepository>('IPollRepository', {
             useClass : PollRepository
+        });
+
+        //------------------------Plan Repository----------------------------------------//
+
+        container.register<IPlanRepository>('IPlanRepository', {
+            useClass: PlanRepository,
         });
     }
 }

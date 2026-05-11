@@ -20,6 +20,7 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       type: 'CUSTOM',
       participantCount: 1,
       maxParticipants: 10,
+      featureSnapshot: null, 
       ...(data.description && { description: data.description }),
     });
     try {
@@ -28,6 +29,7 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
         roomId: room.id,
         userId: data.userId,
         role: 'HOST',
+        overrides: {}, 
         joinedAt: new Date(),
       };
 

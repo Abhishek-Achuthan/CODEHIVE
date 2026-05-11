@@ -1,6 +1,5 @@
 import { Document, Schema, Types } from 'mongoose';
-
-export type RoomRole = 'HOST' | 'PARTICIPANT';
+import { RoomRole } from '../../../../domain/types/RoomRole';
 
 export interface ParticipantDocument extends Document {
   _id: Types.ObjectId;
@@ -9,6 +8,8 @@ export interface ParticipantDocument extends Document {
   userId: Types.ObjectId;
 
   role: RoomRole;
+
+  overrides: Record<string, boolean>;
 
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +22,8 @@ export type ParticipantLeanDoc = {
   userId: Types.ObjectId;
 
   role: RoomRole;
+
+  overrides: Record<string, boolean>;
 
   createdAt: Date;
   updatedAt: Date;
@@ -41,8 +44,13 @@ export const ParticipantSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['HOST', 'PARTICIPANT'],
+    enum: ['HOST', 'MODERATOR', 'PARTICIPANT', 'VIEWER'],
     default: 'PARTICIPANT',
+  },
+  overrides: {
+    type: Map,
+    of: Boolean,
+    default: {},
   },
 }, { timestamps: true });
 

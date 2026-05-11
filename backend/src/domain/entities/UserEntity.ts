@@ -24,4 +24,10 @@ export interface UserEntity {
   mentorAppliedAt?: Date;
   mentorStatus: MentorStatus;
   role: UserRole;
+
+  /**
+   * Reference to the active subscription Plan.
+   * Null/undefined means no paid plan (default/free tier rules apply).
+   */
+  planId?: string | null;
 }

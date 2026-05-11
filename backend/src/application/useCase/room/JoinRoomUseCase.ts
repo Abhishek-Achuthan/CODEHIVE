@@ -47,6 +47,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
           roomId: data.roomId,
           userId: data.userId,
           role: 'PARTICIPANT',
+          overrides: {},
           joinedAt: new Date(),
         };
 

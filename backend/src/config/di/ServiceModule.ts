@@ -42,6 +42,7 @@ import { PollSocketHandler } from '../../presentation/socket/PollSocketHandler';
 import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketHandler';
 import { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
 import { RoomEventEmitter } from '../../infrastructure/realtime/RoomEventEmitter';
+import { PermissionService } from '../../domain/services/PermissionService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -137,6 +138,9 @@ export class ServiceModule {
     container.registerSingleton(HocuspocusService, HocuspocusService);
 
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
+
+    // ── Domain Services ────────────────────────────────────────────────────────
+    container.registerSingleton(PermissionService, PermissionService);
 
   }
 }
