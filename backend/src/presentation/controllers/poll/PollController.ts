@@ -1,37 +1,37 @@
-import { NextFunction, Request, Response } from "express";
-import { inject, injectable } from "tsyringe";
+import { NextFunction, Request, Response } from 'express';
+import { inject, injectable } from 'tsyringe';
 
-import type { IRoomEventEmitter } from "../../../application/ports/realtime/IRoomEventEmitter";
-import type { ICreatePollUseCase } from "../../../application/useCase/interface/poll/ICreatePollUseCase";
-import type { ISubmitPollVoteUseCase } from "../../../application/useCase/interface/poll/ISubmitPollVoteUseCase";
-import { BadRequestError } from "../../../core/errors/BadRequestError";
-import { HttpStatus } from "../../../shared/httpStatusCode";
+import type { IRoomEventEmitter } from '../../../application/ports/realtime/IRoomEventEmitter';
+import type { ICreatePollUseCase } from '../../../application/useCase/interface/poll/ICreatePollUseCase';
+import type { ISubmitPollVoteUseCase } from '../../../application/useCase/interface/poll/ISubmitPollVoteUseCase';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { HttpStatus } from '../../../shared/httpStatusCode';
 import {
   createPollSchema,
   submitPollVoteSchema,
-} from "../../validation/pollValidation";
-import type { IGetActivePollUseCase } from "../../../application/useCase/interface/poll/IGetActivePollUseCase";
-import type { IClosePollUseCase } from "../../../application/useCase/interface/poll/IClosePollUseCase";
-import { PollEntity } from "../../../domain/entities/room/PollEntity";
+} from '../../validation/pollValidation';
+import type { IGetActivePollUseCase } from '../../../application/useCase/interface/poll/IGetActivePollUseCase';
+import type { IClosePollUseCase } from '../../../application/useCase/interface/poll/IClosePollUseCase';
+import { PollEntity } from '../../../domain/entities/room/PollEntity';
 
 @injectable()
 export class PollController {
   constructor(
-    @inject("ICreatePollUseCase")
+    @inject('ICreatePollUseCase')
     private readonly _createPollUseCase: ICreatePollUseCase,
-    @inject("ISubmitPollVoteUseCase")
+    @inject('ISubmitPollVoteUseCase')
     private readonly _submitPollVoteUseCase: ISubmitPollVoteUseCase,
-    @inject("IRoomEventEmitter")
+    @inject('IRoomEventEmitter')
     private readonly _roomEventEmitter: IRoomEventEmitter,
-    @inject("IGetActivePollUseCase")
+    @inject('IGetActivePollUseCase')
     private readonly _getActivePollUseCase: IGetActivePollUseCase,
-    @inject("IClosePollUseCase")
+    @inject('IClosePollUseCase')
     private readonly _closePollUseCase: IClosePollUseCase,
   ) {}
 
   async handleCreatePoll(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, "roomId");
+      const roomId = this.getRequiredParam(req, 'roomId');
       const userId = req.user.id;
       const validated = createPollSchema.parse(req.body);
 
@@ -58,8 +58,8 @@ export class PollController {
 
   async handleSubmitVote(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, "roomId");
-      const pollId = this.getRequiredParam(req, "pollId");
+      const roomId = this.getRequiredParam(req, 'roomId');
+      const pollId = this.getRequiredParam(req, 'pollId');
       const userId = req.user.id;
       const { optionIds } = submitPollVoteSchema.parse(req.body);
 
@@ -79,7 +79,7 @@ export class PollController {
 
   async handleGetActivePoll(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, "roomId");
+      const roomId = this.getRequiredParam(req, 'roomId');
 
       const activePoll = await this._getActivePollUseCase.execute(roomId);
 
@@ -91,8 +91,8 @@ export class PollController {
 
   async handleClosePoll(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, "roomId");
-      const pollId = this.getRequiredParam(req, "pollId");
+      const roomId = this.getRequiredParam(req, 'roomId');
+      const pollId = this.getRequiredParam(req, 'pollId');
       const userId = req.user.id;
 
       const poll = await this._closePollUseCase.execute({

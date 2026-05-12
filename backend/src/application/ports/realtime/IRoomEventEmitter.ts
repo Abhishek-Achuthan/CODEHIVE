@@ -1,9 +1,8 @@
-import type { SendMessageResponseDTO } from "../../dto/MessageDTO";
+import type { SendMessageResponseDTO } from '../../dto/MessageDTO';
 import type {
-  IClosePollInputDTO,
   IClosePollOutputDTO,
   ICreatePollOutputDTO,
-} from "../../dto/PollDTO";
+} from '../../dto/PollDTO';
 
 export interface MessageEditedPayload {
   messageId: string;
@@ -43,7 +42,7 @@ export interface IRoomEventEmitter {
   ): void;
   emitUserLeft(
     roomId: string,
-    payload: Pick<RoomUserPresencePayload, "userId">,
+    payload: Pick<RoomUserPresencePayload, 'userId'>,
   ): void;
   emitTypingStarted(
     roomId: string,

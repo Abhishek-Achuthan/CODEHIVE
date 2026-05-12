@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const pollOptionSchema = z.object({
     text: z.string().min(1, 'Option text cannot be empty'),

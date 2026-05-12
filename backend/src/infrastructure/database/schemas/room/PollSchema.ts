@@ -1,4 +1,4 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema } from 'mongoose';
 
 interface PollOptionDocument {
   id: string;
@@ -66,7 +66,7 @@ export const PollSchema = new Schema<PollDocument>(
   {
     roomId: {
       type: Schema.Types.ObjectId,
-      ref: "Room",
+      ref: 'Room',
       required: true,
     },
 
@@ -79,7 +79,7 @@ export const PollSchema = new Schema<PollDocument>(
 
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
 

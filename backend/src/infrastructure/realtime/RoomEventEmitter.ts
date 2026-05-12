@@ -1,4 +1,4 @@
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from 'tsyringe';
 
 import type {
   IRoomEventEmitter,
@@ -7,43 +7,43 @@ import type {
   RoomUserPresencePayload,
   TypingStartedPayload,
   TypingStoppedPayload,
-} from "../../application/ports/realtime/IRoomEventEmitter";
-import type { ISocketService } from "../../application/ports/socket/ISocketService";
-import type { SendMessageResponseDTO } from "../../application/dto/MessageDTO";
+} from '../../application/ports/realtime/IRoomEventEmitter';
+import type { ISocketService } from '../../application/ports/socket/ISocketService';
+import type { SendMessageResponseDTO } from '../../application/dto/MessageDTO';
 import type {
   IClosePollOutputDTO,
   ICreatePollOutputDTO,
-} from "../../application/dto/PollDTO";
+} from '../../application/dto/PollDTO';
 
 @injectable()
 export class RoomEventEmitter implements IRoomEventEmitter {
   constructor(
-    @inject("ISocketService")
+    @inject('ISocketService')
     private readonly _socketService: ISocketService,
   ) {}
 
   emitMessageCreated(roomId: string, payload: SendMessageResponseDTO): void {
-    this._socketService.emitToRoom(roomId, "message:created", payload);
+    this._socketService.emitToRoom(roomId, 'message:created', payload);
   }
 
   emitMessageEdited(roomId: string, payload: MessageEditedPayload): void {
-    this._socketService.emitToRoom(roomId, "message:edited", payload);
+    this._socketService.emitToRoom(roomId, 'message:edited', payload);
   }
 
   emitMessageDeleted(roomId: string, payload: MessageDeletedPayload): void {
-    this._socketService.emitToRoom(roomId, "message:deleted", payload);
+    this._socketService.emitToRoom(roomId, 'message:deleted', payload);
   }
 
   emitPollCreated(roomId: string, payload: ICreatePollOutputDTO): void {
-    this._socketService.emitToRoom(roomId, "poll:created", payload);
+    this._socketService.emitToRoom(roomId, 'poll:created', payload);
   }
 
   emitPollVoted(roomId: string, payload: ICreatePollOutputDTO): void {
-    this._socketService.emitToRoom(roomId, "poll:voted", payload);
+    this._socketService.emitToRoom(roomId, 'poll:voted', payload);
   }
 
   emitPollEnded(roomId: string, payload: IClosePollOutputDTO): void {
-    this._socketService.emitToRoom(roomId, "poll:ended", payload);
+    this._socketService.emitToRoom(roomId, 'poll:ended', payload);
   }
 
   emitUserJoined(
@@ -55,20 +55,20 @@ export class RoomEventEmitter implements IRoomEventEmitter {
       this._socketService.emitToRoomExcept(
         roomId,
         excludedSocketId,
-        "room:user-joined",
+        'room:user-joined',
         payload,
       );
       return;
     }
 
-    this._socketService.emitToRoom(roomId, "room:user-joined", payload);
+    this._socketService.emitToRoom(roomId, 'room:user-joined', payload);
   }
 
   emitUserLeft(
     roomId: string,
-    payload: Pick<RoomUserPresencePayload, "userId">,
+    payload: Pick<RoomUserPresencePayload, 'userId'>,
   ): void {
-    this._socketService.emitToRoom(roomId, "room:user-left", {
+    this._socketService.emitToRoom(roomId, 'room:user-left', {
       roomId,
       ...payload,
     });
@@ -82,7 +82,7 @@ export class RoomEventEmitter implements IRoomEventEmitter {
     this._socketService.emitToRoomExcept(
       roomId,
       excludedSocketId,
-      "typing:start",
+      'typing:start',
       payload,
     );
   }
@@ -95,7 +95,7 @@ export class RoomEventEmitter implements IRoomEventEmitter {
     this._socketService.emitToRoomExcept(
       roomId,
       excludedSocketId,
-      "typing:stop",
+      'typing:stop',
       payload,
     );
   }

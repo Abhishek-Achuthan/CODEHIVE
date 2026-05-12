@@ -1,13 +1,13 @@
-import { Server as SocketIOServer, Socket } from "socket.io";
-import { inject, injectable } from "tsyringe";
-import { ISocketService } from "../../../application/ports/socket/ISocketService";
-import type { IAuthenticateRealtimeUserUseCase } from "../../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase";
-import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
+import { Server as SocketIOServer, Socket } from 'socket.io';
+import { inject, injectable } from 'tsyringe';
+import { ISocketService } from '../../../application/ports/socket/ISocketService';
+import type { IAuthenticateRealtimeUserUseCase } from '../../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
+import { UnauthorizedError } from '../../../core/errors/UnauthorizedError';
 
 @injectable()
 export class SocketService implements ISocketService {
   constructor(
-    @inject("IAuthenticateRealtimeUserUseCase")
+    @inject('IAuthenticateRealtimeUserUseCase')
     private readonly _authenticateRealtimeUserUseCase: IAuthenticateRealtimeUserUseCase,
   ) {}
 
@@ -24,7 +24,7 @@ export class SocketService implements ISocketService {
       try {
         const token = socket.handshake.auth?.token;
 
-        if (!token || typeof token !== "string") {
+        if (!token || typeof token !== 'string') {
           return next(new UnauthorizedError());
         }
 
@@ -37,11 +37,11 @@ export class SocketService implements ISocketService {
         socket.data.mentorStatus = user.mentorStatus;
         next();
       } catch (error) {
-        return next(new Error("Unauthorized"));
+        return next(new Error('Unauthorized'));
       }
     });
 
-    this._io.on("connection", (socket: Socket) => {
+    this._io.on('connection', (socket: Socket) => {
       const userId = socket.data.userId as string | undefined;
 
       if (!userId) {
@@ -55,7 +55,7 @@ export class SocketService implements ISocketService {
 
       this._userSockets.get(userId)!.add(socket.id);
       this._socketUsers.set(socket.id, userId);
-      socket.on("disconnect", () => {
+      socket.on('disconnect', () => {
         const userId = this._socketUsers.get(socket.id);
         if (!userId) return;
 

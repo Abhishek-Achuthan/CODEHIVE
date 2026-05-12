@@ -1,4 +1,4 @@
-import { PollOption } from "../../types/PollOption";
+import { PollOption } from '../../types/PollOption';
 
 export interface PollEntity {
   id: string;

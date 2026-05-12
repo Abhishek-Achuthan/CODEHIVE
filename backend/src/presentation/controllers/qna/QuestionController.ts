@@ -218,7 +218,7 @@ export class QuestionController {
       res.status(HttpStatus.OK).json(!!data);
       
     } catch (error) {
-      
+      next(error)
     }
   }
 

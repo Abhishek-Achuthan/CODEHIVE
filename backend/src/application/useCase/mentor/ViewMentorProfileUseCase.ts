@@ -8,7 +8,6 @@ import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { UserRole } from '../../../domain/types/UserRole';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
 import type { ICacheService } from '../../ports/cache/ICacheService';
-import { UserEntity } from '../../../domain/entities/UserEntity';
 
 
 @injectable()

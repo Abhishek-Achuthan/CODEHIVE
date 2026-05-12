@@ -1,9 +1,9 @@
-import { injectable } from "tsyringe";
+import { injectable } from 'tsyringe';
 
 import {
   IPresenceService,
   RoomPresenceChange,
-} from "../../../application/ports/presence/IPresenceService";
+} from '../../../application/ports/presence/IPresenceService';
 
 @injectable()
 export class PresenceService implements IPresenceService {

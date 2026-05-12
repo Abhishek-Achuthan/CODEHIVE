@@ -1,7 +1,7 @@
-import { inject,injectable } from "tsyringe";
-import { IGetActivePollUseCase } from "../interface/poll/IGetActivePollUseCase";
-import type { IPollRepository } from "../../../domain/interfaces/IPollRepository";
-import { PollEntity } from "../../../domain/entities/room/PollEntity";
+import { inject,injectable } from 'tsyringe';
+import { IGetActivePollUseCase } from '../interface/poll/IGetActivePollUseCase';
+import type { IPollRepository } from '../../../domain/interfaces/IPollRepository';
+import { PollEntity } from '../../../domain/entities/room/PollEntity';
 
 
 

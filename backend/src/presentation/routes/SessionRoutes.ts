@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sessionController, mentorController } from '../../config/di/resolver';
+import { sessionController } from '../../config/di/resolver';
 import { authMiddleware } from '../../config/di/resolver';
 
 export class SessionRoutes {

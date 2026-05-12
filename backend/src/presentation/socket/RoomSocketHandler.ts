@@ -1,14 +1,14 @@
-import { inject, injectable } from "tsyringe";
-import type { Server as SocketIOServer, Socket } from "socket.io";
+import { inject, injectable } from 'tsyringe';
+import type { Server as SocketIOServer, Socket } from 'socket.io';
 
-import type { ISocketHandler } from "../../application/ports/socket/ISocketHandler";
-import type { IPresenceService } from "../../application/ports/presence/IPresenceService";
-import type { IRoomEventEmitter } from "../../application/ports/realtime/IRoomEventEmitter";
+import type { ISocketHandler } from '../../application/ports/socket/ISocketHandler';
+import type { IPresenceService } from '../../application/ports/presence/IPresenceService';
+import type { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
 import {
   emitSocketError,
   getJoinedRoomIds,
   getUserId,
-} from "./socketHandlerUtils";
+} from './socketHandlerUtils';
 
 interface SubscribeRoomPayload {
   roomId: string;
@@ -21,15 +21,15 @@ interface SubscribeRoomPayload {
 @injectable()
 export class RoomSocketHandler implements ISocketHandler {
   constructor(
-    @inject("IPresenceService")
+    @inject('IPresenceService')
     private readonly presenceService: IPresenceService,
 
-    @inject("IRoomEventEmitter")
+    @inject('IRoomEventEmitter')
     private readonly roomEventEmitter: IRoomEventEmitter,
   ) {}
 
   register(_io: SocketIOServer, socket: Socket): void {
-    socket.on("room:subscribe", (payload: SubscribeRoomPayload) => {
+    socket.on('room:subscribe', (payload: SubscribeRoomPayload) => {
       try {
         const userId = getUserId(socket);
         if (!userId) return;
@@ -40,7 +40,7 @@ export class RoomSocketHandler implements ISocketHandler {
           userId,
         );
 
-        socket.emit("room:subscribed", {
+        socket.emit('room:subscribed', {
           roomId: payload.roomId,
           onlineUserIds: this.presenceService.getOnlineUserIds(payload.roomId),
         });
@@ -50,7 +50,7 @@ export class RoomSocketHandler implements ISocketHandler {
             payload.roomId,
             {
               userId,
-              name: payload.user?.name ?? "Unknown User",
+              name: payload.user?.name ?? 'Unknown User',
               ...(payload.user?.avatarUrl && {
                 avatarUrl: payload.user.avatarUrl,
               }),

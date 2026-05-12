@@ -1,20 +1,20 @@
-import { inject, injectable } from "tsyringe";
-import { IClosePollUseCase } from "../interface/poll/IClosePollUseCase";
-import type { IPollRepository } from "../../../domain/interfaces/IPollRepository";
-import { PollEntity } from "../../../domain/entities/room/PollEntity";
-import { IClosePollInputDTO } from "../../dto/PollDTO";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import type { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { ForbiddenError } from "../../../core/errors/ForbiddenError";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
+import { inject, injectable } from 'tsyringe';
+import { IClosePollUseCase } from '../interface/poll/IClosePollUseCase';
+import type { IPollRepository } from '../../../domain/interfaces/IPollRepository';
+import { PollEntity } from '../../../domain/entities/room/PollEntity';
+import { IClosePollInputDTO } from '../../dto/PollDTO';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 
 @injectable()
 export class ClosePollUseCase implements IClosePollUseCase {
   constructor(
-    @inject("IPollRepository") private readonly pollRepo: IPollRepository,
-    @inject("IUserRepository") private readonly userRepo: IUserRepository,
-    @inject("IRoomRepository") private readonly roomRepo: IRoomRepository,
+    @inject('IPollRepository') private readonly pollRepo: IPollRepository,
+    @inject('IUserRepository') private readonly userRepo: IUserRepository,
+    @inject('IRoomRepository') private readonly roomRepo: IRoomRepository,
   ) {}
 
   async execute(data: IClosePollInputDTO): Promise<PollEntity | null> {

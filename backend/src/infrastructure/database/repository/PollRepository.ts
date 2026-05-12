@@ -1,10 +1,10 @@
-import { Model, Types } from "mongoose";
-import PollModel from "../models/room/PollModel";
-import { GenericRepository } from "./GenericRepository";
-import { leanPollDocument, PollDocument } from "../schemas/room/PollSchema";
-import { PollEntity } from "../../../domain/entities/room/PollEntity";
-import { IPollRepository } from "../../../domain/interfaces/IPollRepository";
-import { SubmitPollVote } from "../../../domain/types/SubmitPollVote";
+import { Model, Types } from 'mongoose';
+import PollModel from '../models/room/PollModel';
+import { GenericRepository } from './GenericRepository';
+import { leanPollDocument, PollDocument } from '../schemas/room/PollSchema';
+import { PollEntity } from '../../../domain/entities/room/PollEntity';
+import { IPollRepository } from '../../../domain/interfaces/IPollRepository';
+import { SubmitPollVote } from '../../../domain/types/SubmitPollVote';
 
 type PollOptionPersistence = {
   id: string;
@@ -34,22 +34,22 @@ export class PollRepository extends GenericRepository<PollDocument, PollEntity> 
   async submitVote(data: SubmitPollVote): Promise<PollEntity> {
     await this._model.updateOne(
       { _id: new Types.ObjectId(data.pollId) },
-      { $pull: { "options.$[].votedUserIds": data.userId } }
+      { $pull: { 'options.$[].votedUserIds': data.userId } }
     );
 
     const updated = await this._model.findByIdAndUpdate(
       data.pollId,
       {
-        $addToSet: { "options.$[elem].votedUserIds": data.userId }
+        $addToSet: { 'options.$[elem].votedUserIds': data.userId }
       },
       {
-        arrayFilters: [{ "elem.id": { $in: data.optionIds } }],
+        arrayFilters: [{ 'elem.id': { $in: data.optionIds } }],
         new: true
       }
     );
 
     if (!updated) {
-      throw new Error("Poll not found");
+      throw new Error('Poll not found');
     }
 
     return this.toEntity(updated as PollDocument);
