@@ -1,5 +1,4 @@
 import { container } from 'tsyringe';
-
 import { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { UserRepository } from '../../infrastructure/database/repository/UserRepository';
 import { IQuestionRepository } from '../../domain/interfaces/IQuestionRepository';
@@ -42,6 +41,8 @@ import { IPollRepository } from '../../domain/interfaces/IPollRepository';
 import { PollRepository } from '../../infrastructure/database/repository/PollRepository';
 import { IPlanRepository } from '../../domain/interfaces/IPlanRepository';
 import { PlanRepository } from '../../infrastructure/database/repository/PlanRepository';
+import { IPrivateNoteRepository } from '../../domain/interfaces/IPrivateNoteRepository';
+import { PrivateNoteRepository } from '../../infrastructure/database/repository/PrivateNoteRepository';
 
 export class RepositoryModule {
     static registerModules(): void {
@@ -150,6 +151,13 @@ export class RepositoryModule {
 
         container.register<IPlanRepository>('IPlanRepository', {
             useClass: PlanRepository,
+        });
+
+
+        //-----------------------Note Repository-----------------------------------//
+
+        container.register<IPrivateNoteRepository>('IPrivateNoteRepository', {
+            useClass: PrivateNoteRepository,
         });
     }
 }

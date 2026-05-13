@@ -1,7 +1,7 @@
 import React from 'react';
-import { BarChart2, Clock, CheckCircle2, Lock, MoreVertical, Trash2 } from 'lucide-react';
+import { BarChart2, Clock, CheckCircle2, Lock } from 'lucide-react';
 import type { Poll } from '../../../shared/socket/roomTypes';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface PollCardProps {
   poll: Poll;
@@ -21,7 +21,6 @@ const PollCard: React.FC<PollCardProps> = ({ poll, onVote, onClose, currentUserI
     if (isClosed) return;
     
     if (poll.allowMultiple) {
-      // Toggle logic for multiple choice
       const currentVotes = poll.options
         .filter(opt => opt.votes.includes(currentUserId))
         .map(opt => opt.id!);
@@ -32,7 +31,6 @@ const PollCard: React.FC<PollCardProps> = ({ poll, onVote, onClose, currentUserI
       
       onVote(poll.id, newVotes);
     } else {
-      // Single choice logic
       onVote(poll.id, [optionId]);
     }
   };

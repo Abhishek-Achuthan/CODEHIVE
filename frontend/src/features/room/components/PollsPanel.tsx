@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, BarChart2, Inbox, History } from 'lucide-react';
+import { Plus, BarChart2, History } from 'lucide-react';
 import type {  Participant } from '../types';
 import type { CreatePollRequest } from '../../../shared/types/api/room';
 import type { Poll as SocketPoll } from '../../../shared/socket/roomTypes';
