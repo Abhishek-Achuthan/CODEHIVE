@@ -40,3 +40,9 @@ export const votePoll = (roomId: string, pollId: string, optionIds: string[]) =>
 
 export const closePoll = (roomId: string, pollId: string) =>
     apiClient.patch(API_ROUTES.ROOM.CLOSE_POLL(roomId, pollId));
+
+export const getPrivateNote = (roomId: string) =>
+    apiClient.get(API_ROUTES.ROOM.GET_PRIVATE_NOTE(roomId));
+
+export const savePrivateNote = (roomId: string, content: Record<string, unknown>) =>
+    apiClient.put(API_ROUTES.ROOM.SAVE_PRIVATE_NOTE(roomId), { roomId, content });

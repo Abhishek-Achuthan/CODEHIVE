@@ -198,6 +198,7 @@ const CollaborationRoom: React.FC = () => {
           onCreatePoll={createPoll}
           onVotePoll={votePoll}
           onClosePoll={closePoll}
+          roomId={roomId || ''}
         />
       </div>
     </div>

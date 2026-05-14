@@ -6,8 +6,10 @@ import {
 import type { TabType, RoomMessage as Message, Participant } from '../types';
 import ChatPanel from './ChatPanel';
 import PollsPanel from './PollsPanel';
+import NotesPanel from './notes/NotesPanel';
 import type { Poll } from '../../../shared/socket/roomTypes';
 import type { CreatePollRequest } from '../../../shared/types/api/room';
+
 
 interface RightSidebarProps {
   messages: Message[];
@@ -22,7 +24,9 @@ interface RightSidebarProps {
   onCreatePoll: (poll: CreatePollRequest) => void;
   onVotePoll: (pollId: string, optionIds: string[]) => void;
   onClosePoll: (pollId: string) => void;
+  roomId: string;
 }
+
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
   messages,
@@ -37,7 +41,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   onCreatePoll,
   onVotePoll,
   onClosePoll,
+  roomId,
 }) => {
+
   const [activeTab, setActiveTab] = useState<TabType>('chat');
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -70,12 +76,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         );
       case 'notes':
-        return (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8 text-gray-500 space-y-4">
-            <StickyNote className="w-10 h-10 text-gray-700" />
-            <h3 className="text-sm font-semibold text-gray-300">No active notes</h3>
-          </div>
-        );
+        return <NotesPanel roomId={roomId} />;
+
       case 'polls':
         return (
           <PollsPanel

@@ -92,6 +92,7 @@ export interface CreatePollRequest {
   expiresAt?: string;
 }
 
+
 export interface RoomPollResponse {
     id: string;
     question: string;
@@ -108,3 +109,22 @@ export interface RoomPollResponse {
     createdAt: string;
     updatedAt?: string;
 }
+
+export interface SavePrivateNoteRequest {
+  content: Record<string, unknown>;
+  roomId: string;
+}
+
+export interface PrivateNoteResponse {
+  id: string;
+  roomId: string;
+  userId: string;
+  content: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+export type GetPrivateNoteResponse = PrivateNoteResponse | null;
+export type SavePrivateNoteResponse = PrivateNoteResponse;
+

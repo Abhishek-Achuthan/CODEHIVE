@@ -1,7 +1,14 @@
 import { AxiosError } from "axios";
 import * as RoomAPI from "../api/endpoints/roomAPI";
 import { BaseError } from "../shared/errors/BaseError";
-import type { CreateRoomRequest, CreateRoomResponse, GetPublicRoomsPaginatedResponse, PublicRoomsListParams } from "../shared/types/api/room";
+import type {
+    CreateRoomRequest,
+    CreateRoomResponse,
+    GetPrivateNoteResponse,
+    GetPublicRoomsPaginatedResponse,
+    PublicRoomsListParams,
+    SavePrivateNoteResponse,
+} from "../shared/types/api/room";
 import { APP_MESSAGES } from "../shared/constants/messages";
 
 export class RoomService {
@@ -18,6 +25,24 @@ export class RoomService {
         try {
             const response = await RoomAPI.getPublicRooms(params);
             return response.data as GetPublicRoomsPaginatedResponse;
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async getPrivateNote(roomId: string): Promise<GetPrivateNoteResponse> {
+        try {
+            const response = await RoomAPI.getPrivateNote(roomId);
+            return response.data as GetPrivateNoteResponse;
+        } catch (error) {
+            throw this.handleError(error);
+        }
+    }
+
+    static async savePrivateNote(roomId: string, content: Record<string, unknown>): Promise<SavePrivateNoteResponse> {
+        try {
+            const response = await RoomAPI.savePrivateNote(roomId, content);
+            return response.data as SavePrivateNoteResponse;
         } catch (error) {
             throw this.handleError(error);
         }

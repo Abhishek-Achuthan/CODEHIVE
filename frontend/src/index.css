@@ -125,3 +125,126 @@ textarea::placeholder {
 .thin-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #484f58;
 }
+
+/* ── TipTap Private Notes Editor ────────────────────────────────────────────── */
+
+.ProseMirror {
+  outline: none;
+  min-height: 100%;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: #e2e8f0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #4b5563;
+  pointer-events: none;
+  float: left;
+  height: 0;
+  font-style: normal;
+}
+
+.ProseMirror strong {
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+.ProseMirror em {
+  color: #cbd5e1;
+}
+
+.ProseMirror s {
+  color: #6b7280;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.ProseMirror ul {
+  list-style: disc;
+}
+
+.ProseMirror ol {
+  list-style: decimal;
+}
+
+.ProseMirror li {
+  margin-top: 0.15rem;
+}
+
+.ProseMirror code {
+  background: rgba(30, 215, 96, 0.08);
+  color: #7ee787;
+  border: 1px solid rgba(126, 231, 135, 0.15);
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+}
+
+.ProseMirror pre {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #7ee787;
+  font-size: 0.75rem;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid #3b82f6;
+  padding-left: 0.75rem;
+  color: #9ca3af;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid #21262d;
+  margin: 0.75rem 0;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3 {
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.3;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.ProseMirror h1 { font-size: 1.1rem; }
+.ProseMirror h2 { font-size: 1rem; }
+.ProseMirror h3 { font-size: 0.9rem; }
+
+/* custom scrollbar shared utility */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #21262d;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #30363d;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #21262d transparent;
+}
+

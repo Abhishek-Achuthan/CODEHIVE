@@ -161,6 +161,8 @@ import { IClosePollUseCase } from '../../application/useCase/interface/poll/IClo
 import { ClosePollUseCase } from '../../application/useCase/poll/ClosePollUseCase';
 import { ISavePrivateNoteUseCase } from '../../application/useCase/interface/notes/privateNote/ISavePrivateNoteUseCase';
 import { SavePrivateNoteUseCase } from '../../application/useCase/notes/privateNote/SavePrivateNoteUseCase';
+import { IGetPrivateNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPrivateNoteUseCase';
+import { GetPrivateNoteUseCase } from '../../application/useCase/notes/privateNote/GetPrivateNoteUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -533,6 +535,10 @@ export class UseCaseModule {
 
     container.register<ISavePrivateNoteUseCase>('ISavePrivateNoteUseCase', {
       useClass: SavePrivateNoteUseCase
+    });
+
+    container.register<IGetPrivateNoteUseCase>('IGetPrivateNoteUseCase', {
+      useClass: GetPrivateNoteUseCase
     });
   }
 }
