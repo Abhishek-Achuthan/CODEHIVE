@@ -7,7 +7,7 @@ export const ERROR_MESSAGES = {
     ACCOUNT_BLOCKED: 'Your account is blocked',
     PASSWORD_NOT_SET:
       'This account does not have a password. Please sign in using Google or set a password first.',
-    
+
 
     // Token errors
     MISSING_REFRESH_TOKEN: 'Missing refresh token',
@@ -141,10 +141,12 @@ export const ERROR_MESSAGES = {
     ROOM_NOT_FOUND: 'Room not found',
     ROOM_FULL: 'Room is full',
     ACCESS_DENIED: 'You are not allowed to access this room',
+    PARTICIPANT_NOT_FOUND: 'Participant not found in this room',
+    FORBIDDEN: 'You are not allowed to view these notes',
   },
 
-  POLL:{
-    POLL_CLOSED : 'Poll is closed',
+  POLL: {
+    POLL_CLOSED: 'Poll is closed',
     POLL_NOT_FOUND: 'Poll not found',
     POLL_EXPIRED: 'Poll has expired',
     POLL_ONE_OPTION: 'This poll allows one option only',

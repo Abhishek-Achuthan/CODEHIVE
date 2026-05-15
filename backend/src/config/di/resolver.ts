@@ -21,6 +21,10 @@ import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketH
 import { PollSocketHandler } from '../../presentation/socket/PollSocketHandler';
 import { HocuspocusService } from '../../infrastructure/realtime/HocuspocusService';
 import { ISocketService } from '../../application/ports/socket/ISocketService';
+import { RoomController } from '../../presentation/controllers/room/RoomController';
+import { PublicNoteController } from '../../presentation/controllers/note/PublicNoteController';
+import { MessageController } from '../../presentation/controllers/message/MessageController';
+import { PollController } from '../../presentation/controllers/poll/PollController';
 
 ContainerSetup.registerAll();
 
@@ -51,6 +55,14 @@ export const walletController = container.resolve(WalletController);
 export const socketService = container.resolve<ISocketService>('ISocketService');
 
 export const hocuspocusService = container.resolve(HocuspocusService);
+
+export const roomController = container.resolve(RoomController);
+
+export const publicNoteController = container.resolve(PublicNoteController);
+
+export const messageController = container.resolve(MessageController);
+
+export const pollController = container.resolve(PollController);
 
 export const socketHandlers: ISocketHandler[] = [
   container.resolve(RoomSocketHandler),

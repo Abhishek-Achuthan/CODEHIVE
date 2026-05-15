@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { PrivateNoteEntity } from "../../../domain/entities/room/PrivateNoteEntity";
 import { IPrivateNoteRepository } from "../../../domain/interfaces/IPrivateNoteRepository";
-import { PrivateNoteDocument } from "../schemas/room/PrivateNoteSchema";
+import { PrivateNoteLeanDoc } from "../schemas/room/PrivateNoteSchema";
 import PrivateNoteModel from "../models/room/PrivateNoteModel";
 
 @injectable()
@@ -13,7 +13,7 @@ export class PrivateNoteRepository implements IPrivateNoteRepository {
     const note = await PrivateNoteModel.findOne({
       roomId,
       userId,
-    }).lean<PrivateNoteDocument | null>();
+    }).lean<PrivateNoteLeanDoc | null>();
 
     if (!note) {
       return null;
@@ -44,12 +44,12 @@ export class PrivateNoteRepository implements IPrivateNoteRepository {
         upsert: true,
         new: true,
       },
-    ).lean<PrivateNoteDocument>();
+    ).lean<PrivateNoteLeanDoc>();
 
     return this.toEntity(updatedNote);
   }
 
-  private toEntity(note: PrivateNoteDocument): PrivateNoteEntity {
+  private toEntity(note: PrivateNoteLeanDoc): PrivateNoteEntity {
     return {
       id: note._id.toString(),
       roomId: note.roomId.toString(),
@@ -59,4 +59,5 @@ export class PrivateNoteRepository implements IPrivateNoteRepository {
       updatedAt: note.updatedAt,
     };
   }
+
 }

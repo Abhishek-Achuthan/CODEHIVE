@@ -1,4 +1,4 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema } from "mongoose";
 
 export interface PrivateNoteDocument extends Document {
   _id: Schema.Types.ObjectId;
@@ -9,17 +9,26 @@ export interface PrivateNoteDocument extends Document {
   updatedAt: Date;
 }
 
+export type PrivateNoteLeanDoc = {
+  _id: Schema.Types.ObjectId;
+  roomId: Schema.Types.ObjectId;
+  userId: Schema.Types.ObjectId;
+  content: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const privateNoteSchema = new Schema<PrivateNoteDocument>(
   {
     roomId: {
       type: Schema.Types.ObjectId,
-      ref: 'Room',
+      ref: "Room",
       required: true,
     },
 
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
 
@@ -27,14 +36,14 @@ export const privateNoteSchema = new Schema<PrivateNoteDocument>(
       type: Schema.Types.Mixed,
       required: true,
       default: {
-        type: 'doc',
+        type: "doc",
         content: [],
       },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 privateNoteSchema.index(
@@ -44,8 +53,5 @@ privateNoteSchema.index(
   },
   {
     unique: true,
-  }
+  },
 );
-
-
-

@@ -43,121 +43,127 @@ import { IPlanRepository } from '../../domain/interfaces/IPlanRepository';
 import { PlanRepository } from '../../infrastructure/database/repository/PlanRepository';
 import { IPrivateNoteRepository } from '../../domain/interfaces/IPrivateNoteRepository';
 import { PrivateNoteRepository } from '../../infrastructure/database/repository/PrivateNoteRepository';
+import { PublicNoteRepository } from '../../infrastructure/database/repository/PublicNoteRepository';
+import { IPublicNoteRepository } from '../../domain/interfaces/IPublicNoteRepository';
 
 export class RepositoryModule {
-    static registerModules(): void {
+  static registerModules(): void {
 
-        //-------------------------------UserRepo--------------------------------------//
+    //-------------------------------UserRepo--------------------------------------//
 
-        container.register<IUserRepository>('IUserRepository', {
-            useClass: UserRepository
-        });
+    container.register<IUserRepository>('IUserRepository', {
+      useClass: UserRepository
+    });
 
-        //-------------------------------QuestionRepo----------------------------------//
+    //-------------------------------QuestionRepo----------------------------------//
 
-        container.register<IQuestionRepository>('IQuestionRepository', {
-            useClass: QuestionRepository
-        });
+    container.register<IQuestionRepository>('IQuestionRepository', {
+      useClass: QuestionRepository
+    });
 
-        //------------------------------AnswerRepo------------------------------------//
+    //------------------------------AnswerRepo------------------------------------//
 
-        container.register<IAnswerRepository>('IAnswerRepository', {
-            useClass: AnswerRepository
-        });
+    container.register<IAnswerRepository>('IAnswerRepository', {
+      useClass: AnswerRepository
+    });
 
-        //-------------------------Saved Question Repository------------------------//
+    //-------------------------Saved Question Repository------------------------//
 
-        container.register<ISavedQuestionRepository>('ISavedQuestionRepository', {
-            useClass: SavedQuestionRepository
-        });
+    container.register<ISavedQuestionRepository>('ISavedQuestionRepository', {
+      useClass: SavedQuestionRepository
+    });
 
-        container.register<ISavedListRepository>('ISavedListRepository', {
-            useClass: SavedListRepository
-        });
+    container.register<ISavedListRepository>('ISavedListRepository', {
+      useClass: SavedListRepository
+    });
 
-        container.register<ISavedListItemRepository>('ISavedListItemRepository', {
-            useClass: SavedListItemRepository
-        });
+    container.register<ISavedListItemRepository>('ISavedListItemRepository', {
+      useClass: SavedListItemRepository
+    });
 
-        //-------------------------Question View Repository------------------------//
+    //-------------------------Question View Repository------------------------//
 
-        container.register<IQuestionViewRepository>('IQuestionViewRepository', {
-            useClass: QuestionViewRepository
-        });
+    container.register<IQuestionViewRepository>('IQuestionViewRepository', {
+      useClass: QuestionViewRepository
+    });
 
-        container.register<IVoteRepository>('IVoteRepository', {
-            useClass: VoteRepository
-        });
+    container.register<IVoteRepository>('IVoteRepository', {
+      useClass: VoteRepository
+    });
 
-        container.register<IAiChatSessionRepository>('IAiChatSessionRepository', {
-            useClass: AiChatSessionRepository
-        });
+    container.register<IAiChatSessionRepository>('IAiChatSessionRepository', {
+      useClass: AiChatSessionRepository
+    });
 
-        container.register<IAiChatMessageRepository>('IAiChatMessageRepository', {
-            useClass: AiChatMessageRepository
-        });
+    container.register<IAiChatMessageRepository>('IAiChatMessageRepository', {
+      useClass: AiChatMessageRepository
+    });
 
-        //-------------------------Room Repository------------------------------//
+    //-------------------------Room Repository------------------------------//
 
-        container.register<IRoomRepository>('IRoomRepository', {
-            useClass: RoomRepository
-        });
+    container.register<IRoomRepository>('IRoomRepository', {
+      useClass: RoomRepository
+    });
 
-        container.register<IParticipantRepository>('IParticipantRepository', {
-            useClass: ParticipantRepository
-        });
+    container.register<IParticipantRepository>('IParticipantRepository', {
+      useClass: ParticipantRepository
+    });
 
-        container.register<IMessageRepository>('IMessageRepository', {
-            useClass: MessageRepository
-        });
+    container.register<IMessageRepository>('IMessageRepository', {
+      useClass: MessageRepository
+    });
 
-        //-------------------------Session Repository------------------------------//
+    //-------------------------Session Repository------------------------------//
 
-        container.register<IMentorAvailabilityRepository>('IMentorAvailabilityRepository', {
-            useClass: MentorAvailabilityRepository
-        });
-        
-
-        container.register<ISessionRepository>('ISessionRepository', {
-            useClass: SessionRepository
-        });
-
-        container.register<IWalletRepository>('IWalletRepository', {
-            useClass: WalletRepository
-        });
-
-        container.register<IStripeWebhookEventRepository>('IStripeWebhookEventRepository', {
-            useClass: StripeWebhookEventRepository
-        });
-
-        container.register<IBookingReservationRepository>('IBookingReservationRepository', {
-            useClass: BookingReservationRepository
-        });
-
-        //-------------------------Mentor Repository--------------------------------------//
-
-        container.register<IMentorRepository>('IMentorRepository', {
-            useClass: MentorRepository
-        });
+    container.register<IMentorAvailabilityRepository>('IMentorAvailabilityRepository', {
+      useClass: MentorAvailabilityRepository
+    });
 
 
-        //------------------------Poll Repository----------------------------------------//
-        
-        container.register<IPollRepository>('IPollRepository', {
-            useClass : PollRepository
-        });
+    container.register<ISessionRepository>('ISessionRepository', {
+      useClass: SessionRepository
+    });
 
-        //------------------------Plan Repository----------------------------------------//
+    container.register<IWalletRepository>('IWalletRepository', {
+      useClass: WalletRepository
+    });
 
-        container.register<IPlanRepository>('IPlanRepository', {
-            useClass: PlanRepository,
-        });
+    container.register<IStripeWebhookEventRepository>('IStripeWebhookEventRepository', {
+      useClass: StripeWebhookEventRepository
+    });
+
+    container.register<IBookingReservationRepository>('IBookingReservationRepository', {
+      useClass: BookingReservationRepository
+    });
+
+    //-------------------------Mentor Repository--------------------------------------//
+
+    container.register<IMentorRepository>('IMentorRepository', {
+      useClass: MentorRepository
+    });
 
 
-        //-----------------------Note Repository-----------------------------------//
+    //------------------------Poll Repository----------------------------------------//
 
-        container.register<IPrivateNoteRepository>('IPrivateNoteRepository', {
-            useClass: PrivateNoteRepository,
-        });
-    }
+    container.register<IPollRepository>('IPollRepository', {
+      useClass: PollRepository
+    });
+
+    //------------------------Plan Repository----------------------------------------//
+
+    container.register<IPlanRepository>('IPlanRepository', {
+      useClass: PlanRepository,
+    });
+
+
+    //-----------------------Note Repository-----------------------------------//
+
+    container.register<IPrivateNoteRepository>('IPrivateNoteRepository', {
+      useClass: PrivateNoteRepository,
+    });
+
+    container.register<IPublicNoteRepository>('IPublicNoteRepository', {
+      useClass: PublicNoteRepository
+    });
+  }
 }

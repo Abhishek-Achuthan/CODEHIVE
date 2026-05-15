@@ -32,7 +32,6 @@ export class MentorRoutes {
             this._mentorController.handleSetAvailability.bind(this._mentorController)
         );
 
-        // Get mentor's own availability rules
         this._router.get(
             '/me/availability',
             this._authMiddleware.check,
@@ -40,7 +39,6 @@ export class MentorRoutes {
             this._mentorController.handleGetMyAvailability.bind(this._mentorController)
         );
 
-        // Delete/deactivate an availability rule
         this._router.delete(
             '/availability/:id',
             this._authMiddleware.check,
@@ -48,7 +46,6 @@ export class MentorRoutes {
             this._mentorController.handleDeleteAvailability.bind(this._mentorController)
         );
 
-        // Add exception date to an availability rule
         this._router.patch(
             '/availability/:id/exceptions',
             this._authMiddleware.check,

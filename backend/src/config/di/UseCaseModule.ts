@@ -163,6 +163,10 @@ import { ISavePrivateNoteUseCase } from '../../application/useCase/interface/not
 import { SavePrivateNoteUseCase } from '../../application/useCase/notes/privateNote/SavePrivateNoteUseCase';
 import { IGetPrivateNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPrivateNoteUseCase';
 import { GetPrivateNoteUseCase } from '../../application/useCase/notes/privateNote/GetPrivateNoteUseCase';
+import { GetPublicNoteUseCase } from '../../application/useCase/notes/publicNote/GetPublicNoteUseCase';
+import { IGetPublicNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPublicNoteUseCase';
+import { ISavePublicNoteUseCase } from '../../application/useCase/interface/notes/ISavePublicNoteUseCase';
+import { SavePublicNoteUseCase } from '../../application/useCase/notes/publicNote/SavePublicNoteUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -436,7 +440,7 @@ export class UseCaseModule {
     );
 
 
-    
+
 
     //---------------------------------Session---------------------------------------//
 
@@ -488,7 +492,7 @@ export class UseCaseModule {
       useClass: AddAvailabilityExceptionUseCase
     });
 
-    container.register<IViewMentorProfileUseCase>('IViewMentorProfileUseCase',{
+    container.register<IViewMentorProfileUseCase>('IViewMentorProfileUseCase', {
       useClass: ViewMentorProfileUseCase
     });
 
@@ -539,6 +543,14 @@ export class UseCaseModule {
 
     container.register<IGetPrivateNoteUseCase>('IGetPrivateNoteUseCase', {
       useClass: GetPrivateNoteUseCase
+    });
+
+    container.register<IGetPublicNoteUseCase>('IGetPublicNoteUseCase', {
+      useClass: GetPublicNoteUseCase
+    });
+
+    container.register<ISavePublicNoteUseCase>('ISavePublicNoteUseCase', {
+      useClass: SavePublicNoteUseCase
     });
   }
 }

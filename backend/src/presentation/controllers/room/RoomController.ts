@@ -8,8 +8,6 @@ import type { IJoinRoomUseCase } from '../../../application/useCase/interface/ro
 import type { ILeaveRoomUseCase } from '../../../application/useCase/interface/room/ILeaveRoomUseCase';
 import type { IPresenceService } from '../../../application/ports/presence/IPresenceService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
-import type { IGetPrivateNoteUseCase } from '../../../application/useCase/interface/notes/privateNote/IGetPrivateNoteUseCase';
-import type { ISavePrivateNoteUseCase } from '../../../application/useCase/interface/notes/privateNote/ISavePrivateNoteUseCase';
 
 @injectable()
 export class RoomController {
@@ -24,10 +22,6 @@ export class RoomController {
     private readonly _leaveRoomUseCase: ILeaveRoomUseCase,
     @inject('IPresenceService')
     private readonly _presenceService: IPresenceService,
-    @inject('IGetPrivateNoteUseCase')
-    private readonly _getPrivateNoteUseCase : IGetPrivateNoteUseCase,
-    @inject('ISavePrivateNoteUseCase')
-    private readonly _savePrivateNoteUseCase : ISavePrivateNoteUseCase,
   ) {}
 
   async handleCreateRoom(req: Request, res: Response, next: NextFunction) {

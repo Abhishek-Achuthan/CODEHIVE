@@ -37,7 +37,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
     if (!isLoading && editor && !editor.isDestroyed) {
       const hasContent = content && Object.keys(content).length > 0;
       if (hasContent) {
-        editor.commands.setContent(content, false);
+        editor.commands.setContent(content, { emitUpdate: false });
       }
     }
   }, [isLoading, editor]); // eslint-disable-line react-hooks/exhaustive-deps
