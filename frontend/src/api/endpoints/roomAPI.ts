@@ -46,3 +46,10 @@ export const getPrivateNote = (roomId: string) =>
 
 export const savePrivateNote = (roomId: string, content: Record<string, unknown>) =>
     apiClient.put(API_ROUTES.ROOM.SAVE_PRIVATE_NOTE(roomId), { content });
+
+export const getPublicNote = (roomId: string) => 
+    apiClient.get(API_ROUTES.ROOM.GET_PUBLIC_NOTE(roomId));
+
+export const savePublicNote = (roomId: string, content: string) =>
+    apiClient.put(API_ROUTES.ROOM.SAVE_PUBLIC_NOTE(roomId), { content });
+

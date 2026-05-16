@@ -135,6 +135,10 @@ export class ServiceModule {
       useClass: HocuspocusHookHandler,
     });
 
+    container.register('PermissionService', {
+      useClass : PermissionService
+    })
+
     container.registerSingleton(HocuspocusService, HocuspocusService);
 
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);

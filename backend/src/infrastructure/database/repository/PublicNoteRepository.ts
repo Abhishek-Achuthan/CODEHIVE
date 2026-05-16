@@ -17,8 +17,9 @@ export class PublicNoteRepository
   }
 
   async findByRoomId(roomId: string): Promise<PublicNoteEntity | null> {
-    const doc = await this._model.findById(roomId);
-    return this.toEntity(doc as PublicNoteDoc);
+    const doc = await this._model.findOne({ roomId }).lean<PublicNoteLeanDoc | null>();
+    if (!doc) return null;
+    return this.leanToEntity(doc);
   }
 
   async upsert(
@@ -27,7 +28,7 @@ export class PublicNoteRepository
     updatedBy: string,
   ): Promise<PublicNoteEntity> {
     const doc = await this._model
-      .updateOne(
+      .findOneAndUpdate(
         {
           roomId: roomId,
         },
@@ -38,13 +39,14 @@ export class PublicNoteRepository
           },
         },
         {
+          new: true,
           upsert: true,
           setDefaultsOnInsert: true,
         },
       )
-      .lean<PublicNoteLeanDoc>();
-
-    return this.leanToEntity(doc);
+      .lean<PublicNoteLeanDoc | null>();
+    
+    return this.leanToEntity(doc!);
   }
 
   protected toEntity(doc: PublicNoteDoc): PublicNoteEntity {

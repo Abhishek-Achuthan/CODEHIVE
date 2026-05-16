@@ -36,7 +36,7 @@ export class SavePublicNoteUseCase implements ISavePublicNoteUseCase {
     const canEdit = this._permissionService.canPerform(
       participant,
       room.featureSnapshot,
-      CapabilityKey.ROOM_CODE_EDIT,
+      CapabilityKey.ROOM_NOTES_EDIT,
     );
 
     if (!canEdit) throw new ForbiddenError(ERROR_MESSAGES.ROOM.FORBIDDEN);

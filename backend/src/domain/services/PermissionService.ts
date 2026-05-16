@@ -14,8 +14,8 @@ export class PermissionService {
     capability: CapabilityKey,
   ): boolean {
     const parentFeature = CapabilityFeatureMap.get(capability);
-    if (parentFeature) {
-      const featuresEnabled = snapshot?.enabledFeatures ?? [];
+    if (parentFeature && snapshot) {
+      const featuresEnabled = snapshot.enabledFeatures ?? [];
       if (!featuresEnabled.includes(parentFeature)) {
         return false;
       }

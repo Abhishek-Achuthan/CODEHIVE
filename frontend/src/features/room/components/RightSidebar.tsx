@@ -76,7 +76,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         );
       case 'notes':
-        return <NotesPanel roomId={roomId} />;
+        return <NotesPanel roomId={roomId} currentUserRole={currentUser.role} />;
 
       case 'polls':
         return (

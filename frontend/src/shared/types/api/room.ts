@@ -124,6 +124,27 @@ export interface PrivateNoteResponse {
   updatedAt: string;
 }
 
+export interface SavePublicNoteRequest {
+  content : string;
+  roomId : string;
+}
+
+export interface GetPublicNoteRequest {
+  roomId:string;
+}
+
+export interface PublicNoteResponse {
+  id:string;
+  roomId:string;
+  userId:string;
+  content:string;
+  createdAt:string;
+  updatedAt:string;
+}
+
+export type GetPublicNoteResponse = PublicNoteResponse | null
+export type SavePublicNoteResponse = PublicNoteResponse;
+
 
 export type GetPrivateNoteResponse = PrivateNoteResponse | null;
 export type SavePrivateNoteResponse = PrivateNoteResponse;

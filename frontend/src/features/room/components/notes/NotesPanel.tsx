@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { Lock, Users } from 'lucide-react';
 import PrivateNotes from './PrivateNotes';
+import PublicNotes from './PublicNotes';
+import type { Participant } from '../../types';
 
 interface NotesPanelProps {
   roomId: string;
+  currentUserRole: Participant['role'];
 }
 
 type NoteTab = 'private' | 'public';
 
-const NotesPanel: React.FC<NotesPanelProps> = ({ roomId }) => {
+const NotesPanel: React.FC<NotesPanelProps> = ({ roomId, currentUserRole }) => {
   const [activeTab, setActiveTab] = useState<NoteTab>('private');
+
+  // HOST and MENTOR can edit the shared note; PARTICIPANTs are read-only.
+  const canEdit = currentUserRole === 'HOST' || currentUserRole === 'MENTOR';
 
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">
@@ -38,7 +44,7 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ roomId }) => {
         {activeTab === 'private' ? (
           <PrivateNotes roomId={roomId} />
         ) : (
-          <PublicNotesPlaceholder />
+          <PublicNotes roomId={roomId} canEdit={canEdit} />
         )}
       </div>
     </div>
@@ -65,23 +71,6 @@ const TabButton: React.FC<TabButtonProps> = ({ icon, label, isActive, onClick })
     {icon}
     {label}
   </button>
-);
-
-const PublicNotesPlaceholder: React.FC = () => (
-  <div className="flex flex-col items-center justify-center h-full gap-4 p-8 text-center">
-    <div className="w-14 h-14 bg-[#161b22] rounded-full flex items-center justify-center border border-gray-800">
-      <Users className="w-7 h-7 text-gray-700" />
-    </div>
-    <div>
-      <h3 className="text-sm font-semibold text-gray-300">Collaborative notes</h3>
-      <p className="text-xs text-gray-600 mt-1.5 leading-relaxed max-w-[180px]">
-        Shared notes with real-time collaboration are coming soon.
-      </p>
-    </div>
-    <span className="px-2.5 py-1 bg-[#161b22] border border-gray-800 text-gray-600 text-[10px] font-bold uppercase tracking-widest rounded-full">
-      Coming Soon
-    </span>
-  </div>
 );
 
 export default NotesPanel;

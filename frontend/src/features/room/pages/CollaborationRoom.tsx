@@ -182,7 +182,7 @@ const CollaborationRoom: React.FC = () => {
         />
 
         {/* Editor */}
-        <EditorArea />
+        <EditorArea currentUserRole={finalCurrentUser.role} />
 
         {/* Right Sidebar */}
         <RightSidebar

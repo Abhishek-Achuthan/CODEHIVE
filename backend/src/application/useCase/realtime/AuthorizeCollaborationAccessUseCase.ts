@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-
 import { AuthorizeCollaborationAccessDTO } from '../../dto/CollaborationDTO';
 import { IAuthorizeCollaborationAccessUseCase } from '../interface/realtime/IAuthorizeCollaborationAccessUseCase';
 import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
@@ -53,12 +52,30 @@ export class AuthorizeCollaborationAccessUseCase
     type: string;
     resourceId: string;
   } {
-    const [type, resourceId] = documentName.split(':');
+    // Support room:{id}
+    if (documentName.includes(':')) {
 
-    if (!type || !resourceId) {
-      throw new BadRequestError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME);
+      const [type, resourceId] = documentName.split(':');
+      
+      if(!type || !resourceId) {
+        throw new BadRequestError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME)
+      }
+
+      return { type, resourceId };
     }
 
-    return { type, resourceId };
+    // Support room-{id}-suffix
+    if (documentName.startsWith('room-')) {
+      const parts = documentName.split('-');
+      if (parts.length >= 2) {
+
+        if(!parts[1]) {
+          throw new BadRequestError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME);
+        }
+        return { type: 'room', resourceId: parts[1] };
+      }
+    }
+
+    throw new BadRequestError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME);
   }
 }
