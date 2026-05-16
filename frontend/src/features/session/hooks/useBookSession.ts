@@ -20,7 +20,8 @@ export const useBookSession = () => {
   const bookWithWallet = async (params: BookSessionParams) => {
     setIsBooking(true);
     try {
-      await SessionService.bookSessionWithWallet(params);
+      const result = await SessionService.bookSessionWithWallet(params);
+      return result;
     } catch (error) {
       throw error instanceof BaseError ? error : new Error("Unexpected error");
     } finally {

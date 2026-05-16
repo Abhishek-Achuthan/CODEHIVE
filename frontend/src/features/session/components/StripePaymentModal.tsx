@@ -8,7 +8,7 @@ interface StripePaymentModalProps {
     reservationId: string;
     expiresAt: string;
     onClose: () => void;
-    onPaid: () => void;
+    onPaid: (sessionId: string) => void;
 }
 
 const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
@@ -53,9 +53,9 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
                     return;
                 }
 
-                if (reservation.status === 'FULFILLED') {
+                if (reservation.status === 'FULFILLED' && reservation.sessionId) {
                     clearInterval(interval);
-                    onPaid();
+                    onPaid(reservation.sessionId);
                     return;
                 }
 

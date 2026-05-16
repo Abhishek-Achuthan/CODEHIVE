@@ -115,6 +115,17 @@ const PaymentPage: React.FC = () => {
     bookWithStripe,
   } = useBookSession();
 
+  const sessionDuration = useMemo(() => {
+    try {
+      const [startH, startM] = slot.startTime.split(':').map(Number);
+      const [endH, endM] = slot.endTime.split(':').map(Number);
+      const diffMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+      return `${diffMinutes} mins`;
+    } catch {
+      return '60 mins';
+    }
+  }, [slot.startTime, slot.endTime]);
+
   const handleBook = async (): Promise<void> => {
     try {
       if (!mentorId) {
@@ -123,7 +134,7 @@ const PaymentPage: React.FC = () => {
       }
 
       if (paymentMethod === "WALLET") {
-        await bookWithWallet({
+        const session = await bookWithWallet({
           mentorId,
           date,
           startTime: slot.startTime,
@@ -134,7 +145,20 @@ const PaymentPage: React.FC = () => {
 
         sessionStorage.removeItem(PAYMENT_BOOKING_STORAGE_KEY);
         toast.success("Session booked successfully!");
-        navigate("/my-sessions");
+        
+        navigate(`/mentors/${mentorId}/book/success`, {
+          state: {
+            sessionId: session.id,
+            mentorName: `${mentorSummary?.firstName} ${mentorSummary?.lastName}`,
+            mentorAvatar: mentorSummary?.avatarUrl,
+            topic: topic,
+            date: date,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            duration: sessionDuration,
+            category: mentorSummary?.primaryExpertise
+          }
+        });
         return;
       }
 
@@ -237,13 +261,26 @@ const PaymentPage: React.FC = () => {
               setReservationId(null);
               setExpiresAt(null);
             }}
-            onPaid={() => {
+            onPaid={(sessionId) => {
               setClientSecret(null);
               setReservationId(null);
               setExpiresAt(null);
               sessionStorage.removeItem(PAYMENT_BOOKING_STORAGE_KEY);
               toast.success("Payment successful!");
-              navigate("/my-sessions");
+              
+              navigate(`/mentors/${mentorId}/book/success`, {
+                state: {
+                  sessionId: sessionId,
+                  mentorName: `${mentorSummary?.firstName} ${mentorSummary?.lastName}`,
+                  mentorAvatar: mentorSummary?.avatarUrl,
+                  topic: topic,
+                  date: date,
+                  startTime: slot.startTime,
+                  endTime: slot.endTime,
+                  duration: sessionDuration,
+                  category: mentorSummary?.primaryExpertise
+                }
+              });
             }}
           />
         </Elements>

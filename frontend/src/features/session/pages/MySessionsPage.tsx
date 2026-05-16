@@ -133,9 +133,6 @@ export default function MySessionsPage() {
                 title="My Sessions"
                 description="Sessions you've booked as a user"
             >
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold text-zinc-300">
-                    {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
-                </div>
             </PageHeader>
 
             <div className="relative z-40 mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">

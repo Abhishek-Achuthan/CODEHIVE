@@ -1,1 +1,0 @@
-export type WhiteboardType = "line" | "rectangle" | "circle" | "text" | "arrow" | "sticky-note";
