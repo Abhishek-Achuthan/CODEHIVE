@@ -3,6 +3,8 @@ import { RoomVisibility } from '../../../../domain/types/RoomVisisblity';
 import { RoomType } from '../../../../domain/types/RoomType';
 import { FeatureKey } from '../../../../domain/types/FeatureKey';
 import { LimitKey } from '../../../../domain/types/LimitKey';
+import { RoomAdmissionPolicy } from '../../../../domain/types/RoomAdmissionPolicy';
+import { RoomLifeCycleStatus } from '../../../../domain/types/RoomLifeCycleStatus';
 
 export interface RoomDocument extends Document {
   _id: Types.ObjectId;
@@ -24,6 +26,16 @@ export interface RoomDocument extends Document {
     enabledFeatures: FeatureKey[];
     limits: Partial<Record<LimitKey, number>>;
   } | null;
+
+  admissionPolicy : RoomAdmissionPolicy,
+
+  lifecycleStatus: RoomLifeCycleStatus
+
+  readonlyAt ?: Date;
+
+  archivedAt ?: Date;
+
+  purgedAt? : Date;
 
   createdAt: Date;
   updatedAt: Date;
@@ -84,6 +96,13 @@ export const RoomSchema = new Schema(
     },
     maxParticipants: { type: Number, required: true, default: 10 },
     featureSnapshot: { type: FeatureSnapshotSchema, default: null },
+    admissionPolicy : {type:String ,enum:Object.values(RoomAdmissionPolicy),default:'CLOSED'},
+    lifecycleStatus: { 
+      type: String, 
+      enum: Object.values(RoomLifeCycleStatus), 
+      default: RoomLifeCycleStatus.SCHEDULED 
+    }
+    
   },
   { timestamps: true },
 );

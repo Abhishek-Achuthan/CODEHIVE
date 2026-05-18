@@ -1,0 +1,7 @@
+export enum RoomLifeCycleStatus {
+  SCHEDULED = 'SCHEDULED',
+  ACTIVE = 'ACTIVE',
+  READONLY = 'READONLY',
+  ARCHIVED = 'ARCHIVED',
+  PURGED = 'PURGED',
+}

@@ -17,4 +17,5 @@ export interface SessionEntity {
     amount:number;
     createdAt:Date;
     updatedAt:Date;
+    roomId?:string;
 }

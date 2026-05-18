@@ -2,12 +2,10 @@ import { RoomType } from '../../types/RoomType';
 import { RoomVisibility } from '../../types/RoomVisisblity';
 import { FeatureKey } from '../../types/FeatureKey';
 import { LimitKey } from '../../types/LimitKey';
+import { RoomLifeCycleStatus } from '../../types/RoomLifeCycleStatus';
+import { RoomAdmissionPolicy } from '../../types/RoomAdmissionPolicy';
 
-/**
- * RoomFeatureSnapshot — An immutable snapshot of the host's subscription plan
- * taken at room creation. Governs which features are available for the life of
- * the room, regardless of subsequent plan changes.
- */
+
 export interface RoomFeatureSnapshot {
   planId: string;
   planName: string;
@@ -24,15 +22,25 @@ export interface RoomEntity {
   hostId: string;
 
   type: RoomType;
+
   visibility: RoomVisibility;
 
   maxParticipants: number;
+  
   participantCount: number;
+  
+  admissionPolicy: RoomAdmissionPolicy;
 
-  /**
-   * Snapshot of the plan active at room creation.
-   * Null for rooms created before subscription system was introduced.
-   */
+  sessionID?:string;
+
+  readonlyAt?:Date;
+
+  archivedAt?:Date;
+
+  purgedAt?:Date;
+
+  lifecycleStatus:RoomLifeCycleStatus
+
   featureSnapshot: RoomFeatureSnapshot | null;
 
   createdAt: Date;
