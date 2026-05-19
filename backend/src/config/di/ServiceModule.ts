@@ -43,6 +43,7 @@ import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketH
 import { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
 import { RoomEventEmitter } from '../../infrastructure/realtime/RoomEventEmitter';
 import { PermissionService } from '../../domain/services/PermissionService';
+import { RoomLifeSchedulerService } from '../../infrastructure/adapters/scheduler/RoomLifecycleSchedulerService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -114,7 +115,7 @@ export class ServiceModule {
     );
 
     container.registerSingleton<IPresenceService>('IPresenceService', PresenceService);
-    
+
     container.register(RoomSocketHandler, {
       useClass: RoomSocketHandler,
     });
@@ -136,12 +137,14 @@ export class ServiceModule {
     });
 
     container.register('PermissionService', {
-      useClass : PermissionService
+      useClass: PermissionService
     })
 
     container.registerSingleton(HocuspocusService, HocuspocusService);
 
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
+
+    container.registerSingleton(RoomLifeSchedulerService);
 
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);

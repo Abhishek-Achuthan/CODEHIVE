@@ -19,6 +19,7 @@ import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
 import {
   hocuspocusService,
+  scheduler,
   socketHandlers,
   socketService,
   stripeRefundRetryService,
@@ -41,13 +42,12 @@ export class App {
     });
     this.configMiddlewares();
     this.configRoutes();
-    this.configDb();
     this.configSocket();
     this.configErrorHanldingMiddleWares();
   }
 
-  private configDb() {
-    MongodbConfig.connectDB();
+  private async configDb() {
+    await MongodbConfig.connectDB();
   }
 
   private configMiddlewares() {
@@ -74,7 +74,7 @@ export class App {
     const mentorRoutes = new MentorRoutes();
     const webhookRoutes = new WebhooksRoutes;
     const walletRoutes = new WalletRoutes();
-    const roomRoutes =new RoomRoutes();
+    const roomRoutes = new RoomRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -100,9 +100,11 @@ export class App {
 
   private startBackgroundJobs() {
     stripeRefundRetryService.start();
+    scheduler.start();
   }
 
-  public listen() {
+  public async listen() {
+    await this.configDb();
     this.startBackgroundJobs();
     hocuspocusService.listen();
     this._httpServer.listen(env.port, () => {

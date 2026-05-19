@@ -1,5 +1,5 @@
 import { RoomType } from '../../types/RoomType';
-import { RoomVisibility } from '../../types/RoomVisisblity';
+import { RoomVisibility } from '../../types/RoomVisibility';
 import { FeatureKey } from '../../types/FeatureKey';
 import { LimitKey } from '../../types/LimitKey';
 import { RoomLifeCycleStatus } from '../../types/RoomLifeCycleStatus';
@@ -26,20 +26,20 @@ export interface RoomEntity {
   visibility: RoomVisibility;
 
   maxParticipants: number;
-  
+
   participantCount: number;
-  
+
   admissionPolicy: RoomAdmissionPolicy;
 
-  sessionID?:string;
+  sessionId?: string;
 
-  readonlyAt?:Date;
+  readonlyAt?: Date;
 
-  archivedAt?:Date;
+  archivedAt?: Date;
 
-  purgedAt?:Date;
+  purgedAt?: Date;
 
-  lifecycleStatus:RoomLifeCycleStatus
+  lifecycleStatus: RoomLifeCycleStatus
 
   featureSnapshot: RoomFeatureSnapshot | null;
 

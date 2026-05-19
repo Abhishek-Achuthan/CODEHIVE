@@ -1,4 +1,4 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema } from 'mongoose';
 
 export interface PrivateNoteDocument extends Document {
   _id: Schema.Types.ObjectId;
@@ -22,13 +22,13 @@ export const privateNoteSchema = new Schema<PrivateNoteDocument>(
   {
     roomId: {
       type: Schema.Types.ObjectId,
-      ref: "Room",
+      ref: 'Room',
       required: true,
     },
 
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
 
@@ -36,7 +36,7 @@ export const privateNoteSchema = new Schema<PrivateNoteDocument>(
       type: Schema.Types.Mixed,
       required: true,
       default: {
-        type: "doc",
+        type: 'doc',
         content: [],
       },
     },

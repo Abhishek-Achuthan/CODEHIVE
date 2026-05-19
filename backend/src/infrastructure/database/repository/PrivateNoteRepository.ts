@@ -1,8 +1,8 @@
-import { injectable } from "tsyringe";
-import { PrivateNoteEntity } from "../../../domain/entities/room/PrivateNoteEntity";
-import { IPrivateNoteRepository } from "../../../domain/interfaces/IPrivateNoteRepository";
-import { PrivateNoteLeanDoc } from "../schemas/room/PrivateNoteSchema";
-import PrivateNoteModel from "../models/room/PrivateNoteModel";
+import { injectable } from 'tsyringe';
+import { PrivateNoteEntity } from '../../../domain/entities/room/PrivateNoteEntity';
+import { IPrivateNoteRepository } from '../../../domain/interfaces/IPrivateNoteRepository';
+import { PrivateNoteLeanDoc } from '../schemas/room/PrivateNoteSchema';
+import PrivateNoteModel from '../models/room/PrivateNoteModel';
 
 @injectable()
 export class PrivateNoteRepository implements IPrivateNoteRepository {

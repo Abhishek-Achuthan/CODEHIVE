@@ -1,6 +1,5 @@
-import { PublicNoteDoc } from "../../infrastructure/database/schemas/room/PublicNoteSchema";
-import { PublicNoteEntity } from "../entities/room/PublicNoteEntity";
-import { IGenericRepository } from "./IGenericRepository";
+import { PublicNoteEntity } from '../entities/room/PublicNoteEntity';
+import { IGenericRepository } from './IGenericRepository';
 
 
 export interface IPublicNoteRepository extends IGenericRepository<PublicNoteEntity> {

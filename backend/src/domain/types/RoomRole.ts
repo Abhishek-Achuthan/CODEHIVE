@@ -1,1 +1,6 @@
-export type RoomRole = 'HOST' | 'MODERATOR' | 'PARTICIPANT' | 'VIEWER';
+export enum RoomRole {
+  HOST = 'HOST',
+  MODERATOR = 'MODERATOR',
+  PARTICIPANT = 'PARTICIPANT',
+  VIEWER = 'VIEWER'
+}

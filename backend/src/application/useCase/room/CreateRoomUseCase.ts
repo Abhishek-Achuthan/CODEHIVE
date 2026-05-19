@@ -4,6 +4,10 @@ import { ICreateRoomUseCase } from '../interface/room/ICreateRoomUseCase';
 import { CreateRoomDTO, CreateRoomResponseDTO } from '../../dto/RoomDTO';
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
+import { RoomAdmissionPolicy } from '../../../domain/types/RoomAdmissionPolicy';
+import { RoomType } from '../../../domain/types/RoomType';
+import { RoomRole } from '../../../domain/types/RoomRole';
 
 @injectable()
 export class CreateRoomUseCase implements ICreateRoomUseCase {
@@ -11,16 +15,18 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
     @inject('IRoomRepository') private readonly roomRepository: IRoomRepository,
     @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
-  ) {}
+  ) { }
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
     const room = await this.roomRepository.create({
       title: data.title,
       hostId: data.userId,
       visibility: data.visibility,
-      type: 'CUSTOM',
+      type: RoomType.CUSTOM,
       participantCount: 1,
       maxParticipants: 10,
-      featureSnapshot: null, 
+      featureSnapshot: null,
+      lifecycleStatus: RoomLifeCycleStatus.ACTIVE,
+      admissionPolicy: RoomAdmissionPolicy.REQUEST_TO_JOIN,
       ...(data.description && { description: data.description }),
     });
     try {
@@ -28,8 +34,8 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
         id: '',
         roomId: room.id,
         userId: data.userId,
-        role: 'HOST',
-        overrides: {}, 
+        role: RoomRole.HOST,
+        overrides: {},
         joinedAt: new Date(),
       };
 

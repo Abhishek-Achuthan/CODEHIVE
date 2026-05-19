@@ -1,12 +1,12 @@
-import mongoose, { Model, Mongoose } from "mongoose";
-import { PublicNoteEntity } from "../../../domain/entities/room/PublicNoteEntity";
-import { IPublicNoteRepository } from "../../../domain/interfaces/IPublicNoteRepository";
-import PublicNoteModel from "../models/room/PublicNoteModel";
-import { GenericRepository } from "./GenericRepository";
+import mongoose, { Model, Mongoose } from 'mongoose';
+import { PublicNoteEntity } from '../../../domain/entities/room/PublicNoteEntity';
+import { IPublicNoteRepository } from '../../../domain/interfaces/IPublicNoteRepository';
+import PublicNoteModel from '../models/room/PublicNoteModel';
+import { GenericRepository } from './GenericRepository';
 import {
   PublicNoteDoc,
   PublicNoteLeanDoc,
-} from "../schemas/room/PublicNoteSchema";
+} from '../schemas/room/PublicNoteSchema';
 
 export class PublicNoteRepository
   extends GenericRepository<PublicNoteDoc, PublicNoteEntity>

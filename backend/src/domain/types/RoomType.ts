@@ -1,1 +1,4 @@
-export type RoomType = 'CUSTOM' | 'SESSION';
+export enum RoomType {
+  CUSTOM = "CUSTOM",
+  SESSION = "SESSION"
+}

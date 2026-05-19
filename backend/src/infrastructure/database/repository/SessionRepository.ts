@@ -12,12 +12,13 @@ import { SessionWithParticipants } from '../../../domain/types/SessionWithPartic
 import { SessionStatus } from '../../../domain/types/SessionStatus';
 import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
 import { PaymentSource } from '../../../domain/types/PaymentSource';
+import { SessionSchema } from '../../database/schemas/session/SessionSchema'
+
 
 @injectable()
 export class SessionRepository
   extends GenericRepository<SessionDoc, SessionEntity>
-  implements ISessionRepository
-{
+  implements ISessionRepository {
   constructor() {
     super(SessionModel as Model<SessionDoc>);
   }
@@ -81,10 +82,10 @@ export class SessionRepository
         date: doc.date,
         startTime: doc.startTime,
         endTime: doc.endTime,
-        paymentStatus:doc.paymentStatus,
-        paymentSource:doc.paymentSource,
-        paymentReferenceId:doc.paymentReferenceId,
-        amount:doc.amount,
+        paymentStatus: doc.paymentStatus,
+        paymentSource: doc.paymentSource,
+        paymentReferenceId: doc.paymentReferenceId,
+        amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
         createdAt: doc.createdAt,
@@ -127,9 +128,9 @@ export class SessionRepository
         date: doc.date,
         startTime: doc.startTime,
         endTime: doc.endTime,
-        paymentStatus:doc.paymentStatus,
-        paymentSource:doc.paymentSource,
-        paymentReferenceId:doc.paymentReferenceId,
+        paymentStatus: doc.paymentStatus,
+        paymentSource: doc.paymentSource,
+        paymentReferenceId: doc.paymentReferenceId,
         amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
@@ -277,13 +278,29 @@ export class SessionRepository
   }
 
   async findByPaymentReference(referenceId: string): Promise<SessionEntity | null> {
-    
-    const doc = await SessionModel.findOne({paymentReferenceId: referenceId})
+
+    const doc = await SessionModel.findOne({ paymentReferenceId: referenceId })
 
     return doc ? this.toEntity(doc) : null
 
   }
 
+  async findUpcomingSessions(): Promise<SessionEntity[]> {
+    const now = new Date()
+    const activationWindow = new Date(now.getTime() + 15 * 60 * 1000);
+
+    const doc = await SessionModel.find({
+      status: SessionStatus.UPCOMING,
+      paymentStatus: SessionPaymentStatus.PAID,
+      roomId: null,
+      startTime: {
+        $gte: now,
+        $lte: activationWindow,
+      },
+    }).lean();
+
+    return doc.map((doc) => this.leanToEntity(doc))
+  }
   protected toEntity(doc: SessionDoc): SessionEntity {
     return {
       id: doc._id.toString(),
@@ -296,7 +313,7 @@ export class SessionRepository
       paymentStatus: doc.paymentStatus,
       paymentSource: doc.paymentSource,
       paymentReferenceId: doc.paymentReferenceId,
-      amount:doc.amount,
+      amount: doc.amount,
       topic: doc.topic,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -312,10 +329,10 @@ export class SessionRepository
       startTime: doc.startTime,
       endTime: doc.endTime,
       status: doc.status,
-      paymentStatus:doc.paymentStatus,
+      paymentStatus: doc.paymentStatus,
       paymentSource: doc.paymentSource,
       paymentReferenceId: doc.paymentReferenceId,
-      amount:doc.amount,
+      amount: doc.amount,
       topic: doc.topic,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -333,10 +350,17 @@ export class SessionRepository
     if (data.paymentSource !== undefined) doc.paymentSource = data.paymentSource;
     if (data.paymentStatus !== undefined) doc.paymentStatus = data.paymentStatus;
     if (data.paymentReferenceId !== undefined) doc.paymentReferenceId = data.paymentReferenceId;
-    if (data.amount !== undefined) doc.amount = data.amount; 
+    if (data.amount !== undefined) doc.amount = data.amount;
     if (data.topic !== undefined) doc.topic = data.topic;
     if (data.date !== undefined) doc.date = data.date;
 
     return doc;
   }
 }
+
+SessionSchema.index({
+  status: 1,
+  paymentStatus: 1,
+  roomId: 1,
+  startTime: 1,
+});

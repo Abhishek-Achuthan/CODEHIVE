@@ -37,6 +37,7 @@
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.10",
     "redis": "^5.9.0",
     "reflect-metadata": "^0.2.2",

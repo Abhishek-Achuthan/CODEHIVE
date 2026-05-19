@@ -25,6 +25,7 @@ import { RoomController } from '../../presentation/controllers/room/RoomControll
 import { PublicNoteController } from '../../presentation/controllers/note/PublicNoteController';
 import { MessageController } from '../../presentation/controllers/message/MessageController';
 import { PollController } from '../../presentation/controllers/poll/PollController';
+import { RoomLifeSchedulerService } from '../../infrastructure/adapters/scheduler/RoomLifecycleSchedulerService';
 
 ContainerSetup.registerAll();
 
@@ -72,3 +73,5 @@ export const socketHandlers: ISocketHandler[] = [
 ];
 
 export const stripeRefundRetryService = container.resolve(StripeRefundRetryService);
+
+export const scheduler = container.resolve(RoomLifeSchedulerService)

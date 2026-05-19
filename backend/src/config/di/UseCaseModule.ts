@@ -167,6 +167,9 @@ import { GetPublicNoteUseCase } from '../../application/useCase/notes/publicNote
 import { IGetPublicNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPublicNoteUseCase';
 import { ISavePublicNoteUseCase } from '../../application/useCase/interface/notes/ISavePublicNoteUseCase';
 import { SavePublicNoteUseCase } from '../../application/useCase/notes/publicNote/SavePublicNoteUseCase';
+import { IActivateUpcomingSessionUseCase } from '../../application/useCase/interface/room/IActivateUpcomingSessionRoomsUseCase';
+import { ActivateUpcomingSessionUseCase } from '../../application/useCase/session/ActivateUpcomingSessionUseCase';
+
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -495,6 +498,10 @@ export class UseCaseModule {
     container.register<IViewMentorProfileUseCase>('IViewMentorProfileUseCase', {
       useClass: ViewMentorProfileUseCase
     });
+
+    container.register<IActivateUpcomingSessionUseCase>('IActivateUpcomingSessionUseCase', {
+      useClass: ActivateUpcomingSessionUseCase
+    })
 
     //---------------------------------Payment---------------------------------------//
 

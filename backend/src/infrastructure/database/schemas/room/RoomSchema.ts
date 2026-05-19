@@ -1,5 +1,5 @@
 import { Schema, Types, Document } from 'mongoose';
-import { RoomVisibility } from '../../../../domain/types/RoomVisisblity';
+import { RoomVisibility } from '../../../../domain/types/RoomVisibility';
 import { RoomType } from '../../../../domain/types/RoomType';
 import { FeatureKey } from '../../../../domain/types/FeatureKey';
 import { LimitKey } from '../../../../domain/types/LimitKey';
@@ -27,17 +27,18 @@ export interface RoomDocument extends Document {
     limits: Partial<Record<LimitKey, number>>;
   } | null;
 
-  admissionPolicy : RoomAdmissionPolicy,
+  admissionPolicy: RoomAdmissionPolicy,
 
   lifecycleStatus: RoomLifeCycleStatus
 
-  readonlyAt ?: Date;
+  readonlyAt?: Date;
 
-  archivedAt ?: Date;
+  archivedAt?: Date;
 
-  purgedAt? : Date;
+  purgedAt?: Date;
 
   createdAt: Date;
+
   updatedAt: Date;
 }
 
@@ -62,7 +63,18 @@ export type RoomLeanDoc = {
     limits: Partial<Record<LimitKey, number>>;
   } | null;
 
+  lifecycleStatus: RoomLifeCycleStatus;
+
+  admissionPolicy: RoomAdmissionPolicy;
+
+  readonlyAt?: Date;
+
+  archivedAt?: Date;
+
+  purgedAt?: Date;
+
   createdAt: Date;
+
   updatedAt: Date;
 };
 
@@ -86,24 +98,30 @@ export const RoomSchema = new Schema(
       required: true,
       index: true,
     },
-    type: { type: String, enum: ['CUSTOM', 'SESSION'], default: 'CUSTOM' },
+    type: { type: String, enum: Object.values(RoomType), default: RoomType.CUSTOM },
     participantCount: { type: Number, required: true, default: 1 },
     visibility: {
       type: String,
-      enum: ['PRIVATE', 'PUBLIC_REQUEST'],
-      default: 'PRIVATE',
+      enum: Object.values(RoomVisibility),
+      default: RoomVisibility.PUBLIC_REQUEST,
       index: true,
     },
     maxParticipants: { type: Number, required: true, default: 10 },
     featureSnapshot: { type: FeatureSnapshotSchema, default: null },
-    admissionPolicy : {type:String ,enum:Object.values(RoomAdmissionPolicy),default:'CLOSED'},
-    lifecycleStatus: { 
-      type: String, 
-      enum: Object.values(RoomLifeCycleStatus), 
-      default: RoomLifeCycleStatus.SCHEDULED 
-    }
-    
+    admissionPolicy: { type: String, enum: Object.values(RoomAdmissionPolicy), default: RoomAdmissionPolicy.CLOSED },
+    lifecycleStatus: {
+      type: String,
+      enum: Object.values(RoomLifeCycleStatus),
+      default: RoomLifeCycleStatus.SCHEDULED
+    },
+    readonlyAt: { type: Date, required: false },
+    archivedAt: { type: Date, required: false },
+    purgedAt: { type: Date, required: false },
   },
   { timestamps: true },
 );
 
+RoomSchema.index(
+  { sessionId: 1 },
+  { unique: true }
+)

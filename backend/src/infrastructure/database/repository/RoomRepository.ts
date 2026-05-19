@@ -5,18 +5,17 @@ import RoomModel from '../models/room/RoomModel';
 import { RoomEntity } from '../../../domain/entities/room/RoomEntity';
 import { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
-import { RoomVisibility } from '../../../domain/types/RoomVisisblity';
+import { RoomVisibility } from '../../../domain/types/RoomVisibility';
 import { RoomDocument, RoomLeanDoc } from '../schemas/room/RoomSchema';
 
 export class RoomRepository
   extends GenericRepository<RoomDocument, RoomEntity>
-  implements IRoomRepository
-{
+  implements IRoomRepository {
   constructor() {
     super(RoomModel as Model<RoomDocument>);
   }
 
-  async findAllPublic(page:number,limit:number): Promise<PaginationResult<RoomEntity>> {
+  async findAllPublic(page: number, limit: number): Promise<PaginationResult<RoomEntity>> {
     const query = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
 
     const [docs, totalItems] = await Promise.all([
@@ -47,6 +46,8 @@ export class RoomRepository
       participantCount: doc.participantCount,
       maxParticipants: doc.maxParticipants,
       featureSnapshot: doc.featureSnapshot ?? null,
+      lifecycleStatus: doc.lifecycleStatus,
+      admissionPolicy: doc.admissionPolicy,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -79,6 +80,8 @@ export class RoomRepository
       participantCount: doc.participantCount,
       maxParticipants: doc.maxParticipants,
       featureSnapshot: doc.featureSnapshot ?? null,
+      lifecycleStatus: doc.lifecycleStatus,
+      admissionPolicy: doc.admissionPolicy,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
