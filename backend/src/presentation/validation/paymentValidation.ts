@@ -34,10 +34,12 @@ export const bookedSessionsQuerySchema = z.object({
   'filter.dateTo': z.string().regex(dateFormatRegex, 'dateTo must be YYYY-MM-DD').optional(),
   'filter.paymentSource': z.nativeEnum(PaymentSource).optional(),
   'filter.refundableNow': z.coerce.boolean().optional(),
+  search: z.string().optional(),
 }).transform((raw) => ({
   role: raw.role,
   page: raw.page,
   limit: raw.limit,
+  search: raw.search,
   filter: {
     ...(raw['filter.status'] !== undefined && { status: raw['filter.status'] }),
     ...(raw['filter.dateFrom'] !== undefined && { dateFrom: raw['filter.dateFrom'] }),

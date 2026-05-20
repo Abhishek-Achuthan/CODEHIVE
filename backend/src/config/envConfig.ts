@@ -33,4 +33,5 @@ export const env = {
   aiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   stripeSKY: requireEnv('STRIPE_SECRET_KEY'),
   stripeWebhookSKY: requireEnv('STRIPE_WEBHOOK_SECRET_KEY'),
+  cloudAMQPUrl: process.env.CLOUDAMQP_URL || 'amqp://localhost',
 };

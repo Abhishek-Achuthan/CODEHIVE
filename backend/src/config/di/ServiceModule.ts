@@ -43,7 +43,12 @@ import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketH
 import { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
 import { RoomEventEmitter } from '../../infrastructure/realtime/RoomEventEmitter';
 import { PermissionService } from '../../domain/services/PermissionService';
-import { RoomLifeSchedulerService } from '../../infrastructure/adapters/scheduler/RoomLifecycleSchedulerService';
+import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
+import { RabbitMQService } from '../../infrastructure/adapters/queue/RabbitMQService';
+import { ISessionActivationPublisher } from '../../application/ports/queue/ISessionActivationPublisher';
+import { SessionActivationPublisher } from '../../infrastructure/queue/publisher/SessionActivationPublisher';
+import { SessionActivationConsumer } from '../../infrastructure/queue/consumer/SessionActivationConsumer';
+import { SessionActivationDlqConsumer } from '../../infrastructure/queue/consumer/SessionActivationDlqConsumer';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -144,7 +149,10 @@ export class ServiceModule {
 
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
 
-    container.registerSingleton(RoomLifeSchedulerService);
+    container.registerSingleton<IMessageQueueService>('IMessageQueueService', RabbitMQService);
+    container.registerSingleton<ISessionActivationPublisher>('ISessionActivationPublisher', SessionActivationPublisher);
+    container.registerSingleton(SessionActivationConsumer);
+    container.registerSingleton(SessionActivationDlqConsumer);
 
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);

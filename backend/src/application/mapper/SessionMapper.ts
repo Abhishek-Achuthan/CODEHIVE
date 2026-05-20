@@ -19,6 +19,7 @@ export class SessionMapper {
       id: session.id,
       mentorId: session.mentorId,
       userId: session.userId,
+      ...(session.roomId && {roomId : session.roomId}),
       date: session.date,
       startTime: session.startTime.toISOString(),
       endTime: session.endTime.toISOString(),

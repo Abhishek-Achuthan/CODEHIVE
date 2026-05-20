@@ -11,6 +11,8 @@ export function useFetchSessions(params?: BookedSessionsParams) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<BookedSessionResponse[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchSessions = async () => {
     try {
@@ -18,7 +20,9 @@ export function useFetchSessions(params?: BookedSessionsParams) {
       setError(null);
 
       const res = await SessionService.getBookedSessions(params);
-      setSessions(res);
+      setSessions(res.items || []);
+      setTotalPages(res.totalPages || 1);
+      setTotalItems(res.totalItems || 0);
     } catch (err: unknown) {
       const normalized =
         err instanceof BaseError
@@ -42,10 +46,13 @@ export function useFetchSessions(params?: BookedSessionsParams) {
     params?.filter?.dateTo,
     params?.filter?.paymentSource,
     params?.filter?.refundableNow,
+    params?.search,
   ]);
 
   return {
     sessions,
+    totalPages,
+    totalItems,
     loading,
     error,
     refetch: fetchSessions,

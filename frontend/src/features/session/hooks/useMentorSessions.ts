@@ -13,6 +13,7 @@ export const useMentorSessions = () => {
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const itemsPerPage = 6;
 
@@ -22,8 +23,15 @@ export const useMentorSessions = () => {
         try {
             setLoading(true);
 
-            const data = await SessionService.getBookedSessions({ role: "mentor" });
-            setSessions(data);
+            const data = await SessionService.getBookedSessions({
+                role: "mentor",
+                page: currentPage,
+                limit: itemsPerPage,
+                search: searchQuery,
+                filter: { status: activeTab }
+            });
+            setSessions(data.items || []);
+            setTotalPages(data.totalPages || 1);
         } catch (error) {
             if (error instanceof BaseError) toast.error(error.message);
             else toast.error("Failed to load sessions");
@@ -34,30 +42,9 @@ export const useMentorSessions = () => {
 
     useEffect(() => {
         fetchMentorSessions();
-    }, []);
+    }, [currentPage, activeTab, searchQuery]);
 
-    const filteredSessions = useMemo(() => {
-        return sessions.filter((s) => {
-            const matchesStatus = s.status === activeTab;
-
-            const query = searchQuery.toLowerCase();
-
-            const matchesSearch =
-                !query ||
-                s.topic.toLowerCase().includes(query) ||
-                s.user.firstName.toLowerCase().includes(query) ||
-                s.user.lastName.toLowerCase().includes(query);
-
-            return matchesStatus && matchesSearch;
-        });
-    }, [sessions, activeTab, searchQuery]);
-
-    const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-
-    const paginatedSessions = filteredSessions.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const paginatedSessions = sessions;
 
     const handleCancelSession = async (
         sessionId: string,

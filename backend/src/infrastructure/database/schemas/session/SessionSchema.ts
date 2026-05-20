@@ -8,6 +8,7 @@ export interface SessionDoc extends Document {
     _id: Schema.Types.ObjectId,
     userId: Schema.Types.ObjectId;
     mentorId: Schema.Types.ObjectId;
+    roomId?: Schema.Types.ObjectId | null | undefined;
     date: string;
     startTime: Date;
     endTime: Date;
@@ -25,6 +26,7 @@ export interface SessionLeanDoc {
     _id: Schema.Types.ObjectId,
     userId: Schema.Types.ObjectId;
     mentorId: Schema.Types.ObjectId;
+    roomId?: Schema.Types.ObjectId | null | undefined;
     date: string;
     startTime: Date;
     endTime: Date;
@@ -42,6 +44,7 @@ export interface SessionLeanDoc {
 export const SessionSchema = new Schema({
     mentorId: { type: Types.ObjectId, ref: 'User', required: true },
     userId: { type: Types.ObjectId, ref: 'User', required: true },
+    roomId: { type: Types.ObjectId, ref: 'Room', default: null },
     date: { type: String, required: true },
     startTime: { type: Date, required: true },
     amount: { type: Number, required: true },

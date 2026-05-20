@@ -8,23 +8,27 @@ import type { IUserRepository } from '../../../domain/interfaces/IUserRepository
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import type{ IPollRepository } from '../../../domain/interfaces/IPollRepository';
+import { RoomRole } from '../../../domain/types/RoomRole';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
   constructor(
-    @inject('IRoomRepository') private readonly roomRepository: IRoomRepository,
+    @inject('IRoomRepository') 
+    private readonly roomRepository: IRoomRepository,
     @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
     @inject('IMessageRepository')
     private readonly messageRepository: IMessageRepository,
-    @inject('IUserRepository') private readonly userRepository: IUserRepository,
-    @inject('IPollRepository') private readonly pollRepository: IPollRepository
+    @inject('IUserRepository') 
+    private readonly userRepository: IUserRepository,
+    @inject('IPollRepository') 
+    private readonly pollRepository: IPollRepository
   ) {}
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const room = await this.roomRepository.find(data.roomId);
-    if (!room) {
-      throw new Error(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
-    }
+
+    if (!room) throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND)
 
     const existing = await this.participantRepository.findByRoomAndUser(
       data.roomId,
@@ -46,7 +50,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
           id: '',
           roomId: data.roomId,
           userId: data.userId,
-          role: 'PARTICIPANT',
+          role: RoomRole.PARTICIPANT,
           overrides: {},
           joinedAt: new Date(),
         };

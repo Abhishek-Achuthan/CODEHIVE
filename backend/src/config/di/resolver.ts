@@ -25,7 +25,7 @@ import { RoomController } from '../../presentation/controllers/room/RoomControll
 import { PublicNoteController } from '../../presentation/controllers/note/PublicNoteController';
 import { MessageController } from '../../presentation/controllers/message/MessageController';
 import { PollController } from '../../presentation/controllers/poll/PollController';
-import { RoomLifeSchedulerService } from '../../infrastructure/adapters/scheduler/RoomLifecycleSchedulerService';
+import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
 
 ContainerSetup.registerAll();
 
@@ -53,8 +53,6 @@ export const webhookController = container.resolve(WebhookController)
 
 export const walletController = container.resolve(WalletController);
 
-export const socketService = container.resolve<ISocketService>('ISocketService');
-
 export const hocuspocusService = container.resolve(HocuspocusService);
 
 export const roomController = container.resolve(RoomController);
@@ -71,7 +69,9 @@ export const socketHandlers: ISocketHandler[] = [
   container.resolve(PresenceSocketHandler),
   container.resolve(PollSocketHandler),
 ];
+  export const socketService = container.resolve<ISocketService>('ISocketService');
+
+export const messageQueueService = container.resolve<IMessageQueueService>('IMessageQueueService');
 
 export const stripeRefundRetryService = container.resolve(StripeRefundRetryService);
 
-export const scheduler = container.resolve(RoomLifeSchedulerService)

@@ -30,8 +30,11 @@ export default function MySessionsPage() {
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [isRefundEligible, setIsRefundEligible] = useState(false);
     const itemsPerPage = 6;
-    const {loading,sessions,error,refetch} = useFetchSessions({
+    const { loading, sessions, totalPages, error, refetch } = useFetchSessions({
         role: "mentee",
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
         filter: {
             status: activeTab,
             ...(dateFrom && { dateFrom }),
@@ -46,23 +49,6 @@ export default function MySessionsPage() {
     }, [error]);
 
     const { cancelSession, loading: cancelLoading } = useCancelSession();
-
-    const searchedSessions = useMemo(() => {
-        return sessions.filter((s) => {
-            const matchesSearch =
-                !searchQuery ||
-                s.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.mentor.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.mentor.lastName.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesSearch;
-        });
-    }, [sessions, searchQuery]);
-
-    const totalPages = Math.ceil(searchedSessions.length / itemsPerPage);
-    const paginatedSessions = searchedSessions.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
 
     const handleTabChange = (tab: StatusFilter) => {
         setActiveTab(tab);
@@ -300,7 +286,7 @@ export default function MySessionsPage() {
                 <div className="flex min-h-[400px] justify-center items-center bg-white/[0.01] rounded-3xl border border-white/5">
                     <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
                 </div>
-            ) : paginatedSessions.length === 0 ? (
+            ) : sessions.length === 0 ? (
                 <div className="flex min-h-[400px] flex-col items-center justify-center py-16 bg-white/[0.01] rounded-3xl border border-dashed border-white/10">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-900 border border-white/5 shadow-2xl relative">
                         <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full" />
@@ -318,7 +304,7 @@ export default function MySessionsPage() {
             ) : (
                 <>
                     <div className="mt-10 grid gap-6 sm:grid-cols-2">
-                        {paginatedSessions.map((session) => (
+                        {sessions.map((session) => (
                             <SessionCard
                                 key={session.id}
                                 session={session}

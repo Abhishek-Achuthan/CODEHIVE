@@ -1,4 +1,5 @@
 import { ClientSession } from 'mongoose';
+import { PaginationResult } from '../types/PaginationResult';
 import { SessionEntity } from '../session/SessionEntity';
 import { SessionWithParticipants } from '../types/SessionWithParticipants';
 import { IGenericRepository } from './IGenericRepository';
@@ -21,6 +22,7 @@ export interface ISessionRepository extends IGenericRepository<SessionEntity> {
     role?: 'mentor' | 'mentee' | 'all';
     page?: number;
     limit?: number;
+    search?: string;
     filter?: {
       status?: SessionStatus;
       dateFrom?: string;
@@ -29,7 +31,7 @@ export interface ISessionRepository extends IGenericRepository<SessionEntity> {
       refundableNow?: boolean;
       paymentStatus?: SessionPaymentStatus;
     };
-  }): Promise<SessionWithParticipants[]>;
+  }): Promise<PaginationResult<SessionWithParticipants>>;
   findByPaymentReference(referenceId: string): Promise<SessionEntity | null>
   findUpcomingSessions(): Promise<SessionEntity[]>
 }

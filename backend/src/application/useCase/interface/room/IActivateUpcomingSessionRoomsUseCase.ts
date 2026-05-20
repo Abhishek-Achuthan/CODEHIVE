@@ -1,3 +1,3 @@
 export interface IActivateUpcomingSessionUseCase {
-  execute(): Promise<void>
+  execute(sessionId: string): Promise<void>
 }

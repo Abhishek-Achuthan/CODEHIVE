@@ -4,7 +4,8 @@ import type {
     BookedSessionResponse,
     BookSessionRequest,
     SessionResponse,
-    StripeBookSessionResponse
+    StripeBookSessionResponse,
+    PaginatedBookedSessionResponse
 } from "../shared/types/api/session";
 import * as SessionAPI from '../api/endpoints/sessionAPI'
 import { AxiosError, HttpStatusCode } from "axios";
@@ -32,10 +33,10 @@ export class SessionService {
         }
     }
 
-    static async getBookedSessions(params?: BookedSessionsParams): Promise<BookedSessionResponse[]> {
+    static async getBookedSessions(params?: BookedSessionsParams): Promise<PaginatedBookedSessionResponse> {
         try {
             const response = await SessionAPI.getBookedSessions(params);
-            return (Array.isArray(response.data) ? response.data : []) as BookedSessionResponse[];
+            return response.data as PaginatedBookedSessionResponse;
         } catch (error) {
             throw this.handleError(error);
         }

@@ -53,14 +53,20 @@ export interface StripeBookSessionResponse {
 export interface BookedSessionResponse extends SessionResponse {
     mentor: UserSummary;
     user: UserSummary;
+    roomId?: string;
 }
 
 export type SessionRole = "mentor" | "mentee" | "all";
+
+import type { PaginatedResponse } from "../core/api";
+
+export type PaginatedBookedSessionResponse = PaginatedResponse<BookedSessionResponse>;
 
 export interface BookedSessionsParams {
     role?: SessionRole;
     page?: number;
     limit?: number;
+    search?: string;
     filter?: {
         status?: "upcoming" | "completed" | "cancelled";
         dateFrom?: string;

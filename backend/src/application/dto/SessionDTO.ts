@@ -44,6 +44,7 @@ export interface SessionListInputDTO {
   role?: SessionListRole | undefined;
   page?: number | undefined;
   limit?: number | undefined;
+  search?: string | undefined;
   filter?: {
     status?: SessionStatus | undefined;
     dateFrom?: string | undefined;
@@ -57,6 +58,7 @@ export interface ISessionResponseDTO {
   id: string;
   mentorId: string;
   userId: string;
+  roomId?: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -81,6 +83,7 @@ export interface IBookedSessionResponseDTO {
   userId: string;
   mentor: IUserSummaryDTO;
   user: IUserSummaryDTO;
+  roomId?: string;
   date: string;
   startTime: string;
   endTime: string;

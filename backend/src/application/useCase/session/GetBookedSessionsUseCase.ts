@@ -3,6 +3,7 @@ import type { IGetBookedSessionsUseCase } from '../interface/session/IGetBookedS
 import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
 import type { IBookedSessionResponseDTO, SessionListInputDTO } from '../../dto/SessionDTO';
 import { SessionMapper } from '../../mapper/SessionMapper';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
 
 @injectable()
 export class GetBookedSessionsUseCase implements IGetBookedSessionsUseCase {
@@ -10,11 +11,12 @@ export class GetBookedSessionsUseCase implements IGetBookedSessionsUseCase {
         @inject('ISessionRepository') private readonly _sessionRepository: ISessionRepository
     ) { }
 
-    async execute(userId: string, input: SessionListInputDTO): Promise<IBookedSessionResponseDTO[]> {
-        const sessions = await this._sessionRepository.listByParticipant(userId, {
+    async execute(userId: string, input: SessionListInputDTO): Promise<PaginationResult<IBookedSessionResponseDTO>> {
+        const result = await this._sessionRepository.listByParticipant(userId, {
             ...(input.role !== undefined && { role: input.role }),
             ...(input.page !== undefined && { page: input.page }),
             ...(input.limit !== undefined && { limit: input.limit }),
+            ...(input.search !== undefined && { search: input.search }),
             filter: {
                 ...(input.filter?.status !== undefined && { status: input.filter.status }),
                 ...(input.filter?.dateFrom !== undefined && { dateFrom: input.filter.dateFrom }),
@@ -24,8 +26,12 @@ export class GetBookedSessionsUseCase implements IGetBookedSessionsUseCase {
             },
         });
 
-        return sessions.map(({ session, mentor, user }) =>
-            SessionMapper.toBookedResponse(session, mentor, user)
-        );
+        return {
+            items: result.items.map(({ session, mentor, user }) =>
+                SessionMapper.toBookedResponse(session, mentor, user)
+            ),
+            totalItems: result.totalItems,
+            totalPages: result.totalPages
+        };
     }
 }

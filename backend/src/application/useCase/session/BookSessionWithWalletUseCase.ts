@@ -20,6 +20,8 @@ import { MentorStatus } from '../../../domain/types/MentorStatus';
 import { SessionMapper } from '../../mapper/SessionMapper';
 import { BookSessionDTO, ISessionResponseDTO } from '../../dto/SessionDTO';
 import type { IBookSessionWithWalletUseCase } from '../interface/session/IBookSessionWithWalletUseCase';
+import type { ISessionActivationPublisher } from '../../ports/queue/ISessionActivationPublisher';
+import type { ILoggerService } from '../../ports/logging/ILoggerService';
 
 @injectable()
 export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCase {
@@ -37,7 +39,11 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     @inject('IWalletRepository')
     private readonly _walletRepository: IWalletRepository,
     @inject('IWalletService')
-    private readonly _walletService: IWalletService
+    private readonly _walletService: IWalletService,
+    @inject('ISessionActivationPublisher')
+    private readonly _sessionActivationPublisher: ISessionActivationPublisher,
+    @inject('ILoggerService')
+    private readonly _logger: ILoggerService
   ) { }
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
@@ -52,7 +58,6 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     ) 
      throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
     
-
     const availabilities = await this._availabilityRepo.findByMentor(mentorId);
 
     if (availabilities.length === 0)
@@ -90,24 +95,17 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
         slot.endTime === endTime
     );
 
-    if (!matchedSlot) {
-      throw new ConflictError(ERROR_MESSAGES.SESSION.SLOT_NOT_AVAILABLE);
-    }
+    if(!matchedSlot) throw new ConflictError(ERROR_MESSAGES.SESSION.SLOT_NOT_AVAILABLE);
 
     const amount = matchedSlot.price;
 
     const wallet = await this._walletRepository.findByUserId(userId);
 
-    if (!wallet) 
-      throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
+    if(!wallet) throw new BadRequestError(ERROR_MESSAGES.WALLET.NOT_FOUND);
     
-
     const balance = await this._walletRepository.getBalance(wallet.id);
 
-    if (balance < amount) 
-      throw new BadRequestError(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
-    
-
+    if (balance < amount) throw new BadRequestError(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
 
     let session;
     try {
@@ -138,9 +136,21 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
       const updated = await this._sessionRepo.find(session.id);
 
-      if (!updated) 
-        throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
-      
+      if (!updated) throw new NotFoundError(ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND);
+
+      try {
+        const leadTimeOffset = 15 * 60 * 1000;
+        const delayMs = Math.max(0, updated.startTime.getTime() - leadTimeOffset - Date.now());
+        this._logger.info(`[Wallet Booking Usecase] Session starts at: ${updated.startTime.toISOString()}. Lead time offset: 15 minutes. Computed publishing delay: ${delayMs}ms (${(delayMs / 1000 / 60).toFixed(2)} minutes)`);
+        await this._sessionActivationPublisher.publish(updated.id, delayMs);
+      } catch (queueError) {
+        if(queueError instanceof Error) {
+          this._logger.error("Failed to publish session activation delayed event to RabbitMQ", 
+            {error :queueError.message,
+             stack : queueError.stack
+            });
+        }
+      }
 
       return SessionMapper.toResponse(updated);
     } catch (error) {

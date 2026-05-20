@@ -1,15 +1,11 @@
 import { z } from 'zod';
 
-/**
- * Zod schema for Availability Form validation
- * Handles both one-time and recurring availability scenarios
- */
 export const availabilityFormSchema = z.object({
     startTime: z.string().min(1, 'Start time is required'),
     endTime: z.string().min(1, 'End time is required'),
     slotDurationMinutes: z.coerce
         .number()
-        .min(15, 'Minimum 15 minutes')
+        .min(1, 'Minimum 1 minute')
         .max(180, 'Maximum 180 minutes'),
     bufferMinutes: z.coerce
         .number()
@@ -19,13 +15,11 @@ export const availabilityFormSchema = z.object({
     date: z.string().optional(),
     slotPrice: z.coerce.number().min(0, 'Price must be positive'),
 
-    // Recurring-specific fields
     selectedDays: z.array(z.string()).optional().default([]),
     durationType: z.enum(['forever', 'until', 'count']).optional().default('forever'),
     endDate: z.string().optional(),
     occurrenceCount: z.coerce.number().min(1).max(52).optional().default(12),
 }).superRefine((data, ctx) => {
-    // Validate end time > start time
     if (data.startTime && data.endTime) {
         const [startH, startM] = data.startTime.split(':').map(Number);
         const [endH, endM] = data.endTime.split(':').map(Number);
@@ -41,7 +35,6 @@ export const availabilityFormSchema = z.object({
         }
     }
 
-    // Validate recurring days required when recurring
     if (data.isRecurring && (!data.selectedDays || data.selectedDays.length === 0)) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -50,7 +43,6 @@ export const availabilityFormSchema = z.object({
         });
     }
 
-    // Validate end date required when "until" type selected
     if (data.isRecurring && data.durationType === 'until' && !data.endDate) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,

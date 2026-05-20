@@ -1,22 +1,24 @@
-import { inject, injectable } from 'tsyringe';
-import mongoose from 'mongoose';
-import type { WebhookEvent } from '../../../domain/types/WebhookEvent';
-import type { IHandleStripeWebhookUseCase } from '../interface/payment/IHandleStripeWebhookUseCase';
-import type { IStripeWebhookEventRepository } from '../../../domain/interfaces/IStripeWebhookEventRepository';
-import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
-import type { IBookingReservationRepository } from '../../../domain/interfaces/IBookingReservationRepository';
-import type { ILoggerService } from '../../ports/logging/ILoggerService';
-import type { IPaymentService } from '../../ports/payment/IPaymentService';
-import type { IWalletRepository } from '../../../domain/interfaces/IWalletRepository';
-import { WalletTransactionType } from '../../../domain/types/WalletTransactionType';
-import { WalletTransactionReason } from '../../../domain/types/WalletTransactionReason';
-import { BookingReservationStatus } from '../../../domain/types/BookingReservationStatus';
-import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
-import { PaymentSource } from '../../../domain/types/PaymentSource';
-import { SessionStatus } from '../../../domain/types/SessionStatus';
-import { RefundStatus } from '../../../domain/types/RefundStatus';
-import { ConflictError } from '../../../core/errors/ConflictError';
-import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { inject, injectable } from "tsyringe";
+import mongoose from "mongoose";
+import type { WebhookEvent } from "../../../domain/types/WebhookEvent";
+import type { IHandleStripeWebhookUseCase } from "../interface/payment/IHandleStripeWebhookUseCase";
+import type { IStripeWebhookEventRepository } from "../../../domain/interfaces/IStripeWebhookEventRepository";
+import type { ISessionRepository } from "../../../domain/interfaces/ISessionReposiotry";
+import type { IBookingReservationRepository } from "../../../domain/interfaces/IBookingReservationRepository";
+import type { ILoggerService } from "../../ports/logging/ILoggerService";
+import type { IPaymentService } from "../../ports/payment/IPaymentService";
+import type { IWalletRepository } from "../../../domain/interfaces/IWalletRepository";
+import { WalletTransactionType } from "../../../domain/types/WalletTransactionType";
+import { WalletTransactionReason } from "../../../domain/types/WalletTransactionReason";
+import { BookingReservationStatus } from "../../../domain/types/BookingReservationStatus";
+import { SessionPaymentStatus } from "../../../domain/types/SessionPaymentStatus";
+import { PaymentSource } from "../../../domain/types/PaymentSource";
+import { SessionStatus } from "../../../domain/types/SessionStatus";
+import { RefundStatus } from "../../../domain/types/RefundStatus";
+import { ConflictError } from "../../../core/errors/ConflictError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+
+import type { ISessionActivationPublisher } from "../../ports/queue/ISessionActivationPublisher";
 
 interface StripePaymentIntentObject {
   id: string;
@@ -25,18 +27,20 @@ interface StripePaymentIntentObject {
 @injectable()
 export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
   constructor(
-    @inject('IStripeWebhookEventRepository')
+    @inject("IStripeWebhookEventRepository")
     private readonly _stripeWebhookEventRepository: IStripeWebhookEventRepository,
-    @inject('ISessionRepository')
+    @inject("ISessionRepository")
     private readonly _sessionRepository: ISessionRepository,
-    @inject('IBookingReservationRepository')
+    @inject("IBookingReservationRepository")
     private readonly _bookingReservationRepository: IBookingReservationRepository,
-    @inject('IPaymentService')
+    @inject("IPaymentService")
     private readonly _paymentService: IPaymentService,
-    @inject('IWalletRepository')
+    @inject("IWalletRepository")
     private readonly _walletRepository: IWalletRepository,
-    @inject('ILoggerService')
-    private readonly _logger: ILoggerService
+    @inject("ILoggerService")
+    private readonly _logger: ILoggerService,
+    @inject("ISessionActivationPublisher")
+    private readonly _sessionActivationPublisher: ISessionActivationPublisher,
   ) {}
 
   async execute(event: WebhookEvent): Promise<void> {
@@ -46,7 +50,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
       return;
     }
 
-    this._logger.info('webhook.received', {
+    this._logger.info("webhook.received", {
       eventId: event.id,
       type: event.type,
     });
@@ -59,28 +63,30 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
           await this._stripeWebhookEventRepository.beginProcessing(
             event.id,
             event.type,
-            dbSession
+            dbSession,
           );
 
-        if (beginResult === 'processed') {
-          this._logger.info('webhook.duplicate_suppressed', { eventId: event.id });
+        if (beginResult === "processed") {
+          this._logger.info("webhook.duplicate_suppressed", {
+            eventId: event.id,
+          });
           return;
         }
 
-        if (beginResult === 'processing') {
+        if (beginResult === "processing") {
           return;
         }
 
         const reservation =
           await this._bookingReservationRepository.findByStripePaymentIntentId(
             paymentIntent.id,
-            dbSession
+            dbSession,
           );
 
         if (!reservation) {
           await this._stripeWebhookEventRepository.markProcessed(
             event.id,
-            dbSession
+            dbSession,
           );
           return;
         }
@@ -92,12 +98,12 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         ) {
           await this._stripeWebhookEventRepository.markProcessed(
             event.id,
-            dbSession
+            dbSession,
           );
           return;
         }
 
-        if (event.type === 'payment_intent.succeeded') {
+        if (event.type === "payment_intent.succeeded") {
           if (reservation.expiresAt.getTime() < Date.now()) {
             await this.transitionReservation(
               reservation.id,
@@ -107,17 +113,17 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               {
                 refundStatus: RefundStatus.REQUIRED,
                 lastStripeEventId: event.id,
-              }
+              },
             );
 
             await this.handleRefundRequirement(
               reservation.id,
               paymentIntent.id,
-              dbSession
+              dbSession,
             );
             await this._stripeWebhookEventRepository.markProcessed(
               event.id,
-              dbSession
+              dbSession,
             );
             return;
           }
@@ -129,7 +135,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             dbSession,
             {
               lastStripeEventId: event.id,
-            }
+            },
           );
 
           try {
@@ -147,16 +153,16 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
                 topic: reservation.topic,
                 amount: reservation.amount,
               },
-              dbSession
+              dbSession,
             );
 
             let wallet = await this._walletRepository.findByUserId(
-              reservation.userId
+              reservation.userId,
             );
 
             if (!wallet) {
               wallet = await this._walletRepository.createWallet(
-                reservation.userId
+                reservation.userId,
               );
             }
 
@@ -178,10 +184,37 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
               {
                 sessionId: session.id,
                 lastStripeEventId: event.id,
-              }
+              },
             );
 
-            this._logger.info('fulfillment.success', {
+            try {
+              const leadTimeOffset = 15 * 60 * 1000;
+              const delayMs = Math.max(
+                0,
+                session.startTime.getTime() - leadTimeOffset - Date.now(),
+              );
+              this._logger.info("session.activation_scheduled", {
+                sessionId: session.id,
+                delayMs,
+                startTime: session.startTime.toISOString(),
+              });
+              await this._sessionActivationPublisher.publish(
+                session.id,
+                delayMs,
+              );
+            } catch (queueError) {
+              this._logger.error(
+                "Failed to publish session activation delayed event to RabbitMQ:",
+                {
+                  error:
+                    queueError instanceof Error
+                      ? queueError.message
+                      : "Unknown error",
+                },
+              );
+            }
+
+            this._logger.info("fulfillment.success", {
               reservationId: reservation.id,
               sessionId: session.id,
             });
@@ -195,18 +228,18 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
                 {
                   refundStatus: RefundStatus.REQUIRED,
                   lastStripeEventId: event.id,
-                }
+                },
               );
 
-              this._logger.warn('fulfillment.conflict', {
+              this._logger.warn("fulfillment.conflict", {
                 reservationId: reservation.id,
-                reason: 'SLOT_ALREADY_TAKEN',
+                reason: "SLOT_ALREADY_TAKEN",
               });
 
               await this.handleRefundRequirement(
                 reservation.id,
                 paymentIntent.id,
-                dbSession
+                dbSession,
               );
             } else {
               throw error;
@@ -215,7 +248,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         }
 
         if (
-          event.type === 'payment_intent.payment_failed' &&
+          event.type === "payment_intent.payment_failed" &&
           (reservation.status === BookingReservationStatus.PENDING_PAYMENT ||
             reservation.status === BookingReservationStatus.PROCESSING)
         ) {
@@ -226,11 +259,14 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
             dbSession,
             {
               lastStripeEventId: event.id,
-            }
+            },
           );
         }
 
-        await this._stripeWebhookEventRepository.markProcessed(event.id, dbSession);
+        await this._stripeWebhookEventRepository.markProcessed(
+          event.id,
+          dbSession,
+        );
       });
     } catch (error) {
       const message =
@@ -253,7 +289,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
       sessionId?: string;
       refundStatus?: RefundStatus;
       lastStripeEventId?: string;
-    }
+    },
   ): Promise<void> {
     const data: {
       status: BookingReservationStatus;
@@ -279,16 +315,16 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
     const updated = await this._bookingReservationRepository.update(
       reservationId,
       data,
-      session
+      session,
     );
 
     if (!updated) {
       throw new ConflictError(
-        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_TRANSITION_FAILED
+        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_TRANSITION_FAILED,
       );
     }
 
-    this._logger.info('reservation.state_transition', {
+    this._logger.info("reservation.state_transition", {
       reservationId,
       from,
       to,
@@ -298,7 +334,7 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
   private async handleRefundRequirement(
     reservationId: string,
     paymentIntentId: string,
-    session: mongoose.ClientSession
+    session: mongoose.ClientSession,
   ): Promise<void> {
     try {
       await this._paymentService.createRefund({
@@ -306,25 +342,33 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
         idempotencyKey: `refund:${reservationId}`,
       });
 
-      await this._bookingReservationRepository.update(reservationId, {
-        refundStatus: RefundStatus.REFUNDED,
-      }, session);
+      await this._bookingReservationRepository.update(
+        reservationId,
+        {
+          refundStatus: RefundStatus.REFUNDED,
+        },
+        session,
+      );
 
-      this._logger.info('refund.triggered', {
+      this._logger.info("refund.triggered", {
         reservationId,
         refundStatus: RefundStatus.REFUNDED,
       });
     } catch (error) {
-      await this._bookingReservationRepository.update(reservationId, {
-        refundStatus: RefundStatus.PENDING,
-      }, session);
+      await this._bookingReservationRepository.update(
+        reservationId,
+        {
+          refundStatus: RefundStatus.PENDING,
+        },
+        session,
+      );
 
       const message =
         error instanceof Error
           ? error.message
           : ERROR_MESSAGES.SESSION.REFUND_TRIGGER_FAILED;
 
-      this._logger.warn('refund.triggered', {
+      this._logger.warn("refund.triggered", {
         reservationId,
         refundStatus: RefundStatus.PENDING,
         reason: message,
@@ -334,13 +378,13 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
 
   private getPaymentIntent(data: unknown): StripePaymentIntentObject | null {
     if (
-      typeof data !== 'object' ||
+      typeof data !== "object" ||
       data === null ||
-      !('object' in data) ||
-      typeof data.object !== 'object' ||
+      !("object" in data) ||
+      typeof data.object !== "object" ||
       data.object === null ||
-      !('id' in data.object) ||
-      typeof data.object.id !== 'string'
+      !("id" in data.object) ||
+      typeof data.object.id !== "string"
     ) {
       return null;
     }
@@ -349,6 +393,11 @@ export class HandleStripeWebhookUseCase implements IHandleStripeWebhookUseCase {
   }
 
   private isDuplicateKeyError(error: unknown): error is { code: number } {
-    return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    );
   }
 }
