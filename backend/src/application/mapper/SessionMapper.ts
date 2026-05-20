@@ -19,7 +19,6 @@ export class SessionMapper {
       id: session.id,
       mentorId: session.mentorId,
       userId: session.userId,
-      ...(session.roomId && {roomId : session.roomId}),
       date: session.date,
       startTime: session.startTime.toISOString(),
       endTime: session.endTime.toISOString(),
@@ -60,6 +59,7 @@ export class SessionMapper {
       amount: session.amount,
       paymentSource:session.paymentSource,
       paymentStatus:session.paymentStatus,
+      ...(session.roomId && {roomId : session.roomId}),
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };

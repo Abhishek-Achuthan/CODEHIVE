@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Search, Loader2, Calendar, Filter, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
+import { useNavigate } from "react-router-dom";
 
 const REFUND_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -29,6 +30,8 @@ export default function MySessionsPage() {
     const [selectedSession, setSelectedSession] = useState<BookedSessionResponse | null>(null);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [isRefundEligible, setIsRefundEligible] = useState(false);
+    const navigate = useNavigate();
+
     const itemsPerPage = 6;
     const { loading, sessions, totalPages, error, refetch } = useFetchSessions({
         role: "mentee",
@@ -310,7 +313,7 @@ export default function MySessionsPage() {
                                 session={session}
                                 onCancel={() => openCancelModal(session)}
                                 onJoinRoom={() => {
-                                    toast.success("Joining room...");
+                                    navigate(`/room/${session.roomId}`);
                                 }}
                                 isCancelling={cancelLoading}
                                 cancelDisabled={getTimeDiffMs(session.startTime) <= 0}

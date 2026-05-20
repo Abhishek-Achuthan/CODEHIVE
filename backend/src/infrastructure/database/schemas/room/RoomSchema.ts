@@ -29,7 +29,9 @@ export interface RoomDocument extends Document {
 
   admissionPolicy: RoomAdmissionPolicy,
 
-  lifecycleStatus: RoomLifeCycleStatus
+  lifecycleStatus: RoomLifeCycleStatus,
+
+  sessionId? : Types.ObjectId,
 
   readonlyAt?: Date;
 
@@ -66,6 +68,8 @@ export type RoomLeanDoc = {
   lifecycleStatus: RoomLifeCycleStatus;
 
   admissionPolicy: RoomAdmissionPolicy;
+
+  sessionId? : Types.ObjectId;
 
   readonlyAt?: Date;
 
@@ -114,6 +118,7 @@ export const RoomSchema = new Schema(
       enum: Object.values(RoomLifeCycleStatus),
       default: RoomLifeCycleStatus.SCHEDULED
     },
+    sessionId: { type: Schema.Types.ObjectId, ref: 'Session', required: false,sparse: true},
     readonlyAt: { type: Date, required: false },
     archivedAt: { type: Date, required: false },
     purgedAt: { type: Date, required: false },
@@ -123,5 +128,5 @@ export const RoomSchema = new Schema(
 
 RoomSchema.index(
   { sessionId: 1 },
-  { unique: true }
+  { unique: true, sparse: true },
 )
