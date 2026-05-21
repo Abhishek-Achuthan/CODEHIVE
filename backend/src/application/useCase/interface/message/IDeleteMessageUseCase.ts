@@ -1,8 +1,5 @@
-export interface DeleteMessageDTO {
-  messageId: string;
-  userId: string;
-}
+import { DeleteMessageDTO, DeleteMessageResultDTO } from "../../../dto/MessageDTO";
 
 export interface IDeleteMessageUseCase {
-  execute(data: DeleteMessageDTO): Promise<void>;
+  execute(data: DeleteMessageDTO): Promise<DeleteMessageResultDTO>;
 }

@@ -1,9 +1,5 @@
-export interface EditMessageDTO {
-  messageId: string;
-  senderId: string;
-  content: string;
-}
+import { EditMessageDTO, EditMessageResultDTO } from "../../../dto/MessageDTO";
 
 export interface IEditMessageUseCase {
-  execute(data: EditMessageDTO): Promise<void>;
+  execute(data: EditMessageDTO): Promise<EditMessageResultDTO>;
 }

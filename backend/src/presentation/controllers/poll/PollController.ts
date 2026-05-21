@@ -69,7 +69,7 @@ export class PollController {
         optionIds,
       });
 
-      this._roomEventEmitter.emitPollVoted(roomId, poll);
+      this._roomEventEmitter.emitPollVoted(poll.roomId, poll);
 
       res.status(HttpStatus.OK).json(poll);
     } catch (error) {
@@ -80,8 +80,9 @@ export class PollController {
   async handleGetActivePoll(req: Request, res: Response, next: NextFunction) {
     try {
       const roomId = this.getRequiredParam(req, 'roomId');
+      const userId = req.user.id;
 
-      const activePoll = await this._getActivePollUseCase.execute(roomId);
+      const activePoll = await this._getActivePollUseCase.execute({ roomId, userId });
 
       res.status(HttpStatus.OK).json(activePoll);
     } catch (error) {
@@ -101,7 +102,7 @@ export class PollController {
         roomId,
       });
 
-      this._roomEventEmitter.emitPollEnded(roomId,poll as PollEntity);
+      this._roomEventEmitter.emitPollEnded((poll as PollEntity).roomId,poll as PollEntity);
 
       res.status(HttpStatus.OK).json(poll);
     } catch (error) {

@@ -9,7 +9,7 @@ import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEnti
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import type{ IPollRepository } from '../../../domain/interfaces/IPollRepository';
 import { RoomRole } from '../../../domain/types/RoomRole';
-import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
@@ -23,21 +23,22 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     @inject('IUserRepository') 
     private readonly userRepository: IUserRepository,
     @inject('IPollRepository') 
-    private readonly pollRepository: IPollRepository
+    private readonly pollRepository: IPollRepository,
+    @inject(RoomAuthorizationService)
+    private readonly roomAuthorizationService: RoomAuthorizationService,
   ) {}
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
-    const room = await this.roomRepository.find(data.roomId);
-
-    if (!room) throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND)
-
-    const existing = await this.participantRepository.findByRoomAndUser(
+    const joinAuthorization = await this.roomAuthorizationService.assertCanJoinRoom(
       data.roomId,
       data.userId,
     );
+    const room = joinAuthorization.room;
+
+    const existing = joinAuthorization.existingParticipant;
     let isNewParticipant = false;
 
     try {
-      if (!existing) {
+      if (joinAuthorization.shouldCreateParticipant) {
         const currentCount = await this.participantRepository.countByRoomId(
           data.roomId,
         );
@@ -103,8 +104,14 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       }),
     );
 
+    const authorizationContext = await this.roomAuthorizationService.assertParticipant(
+      room.id,
+      data.userId,
+      'read',
+    );
+
     return {
-      roomId: data.roomId,
+      roomId: room.id,
       isNewParticipant,
       participants: participants.map((p) => ({
         userId: p.userId,
@@ -114,6 +121,9 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       })),
       messages: messagesWithSenders,
       activePoll,
+      capabilities: authorizationContext.capabilities,
+      lifecycleStatus: room.lifecycleStatus,
+      featureSnapshot: room.featureSnapshot,
     };
   }
 }

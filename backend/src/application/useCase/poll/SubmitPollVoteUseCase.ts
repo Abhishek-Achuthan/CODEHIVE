@@ -2,7 +2,6 @@ import { inject, injectable } from 'tsyringe';
 
 import type { ICreatePollOutputDTO } from '../../dto/PollDTO';
 import type { IPollRepository } from '../../../domain/interfaces/IPollRepository';
-import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 import type {
   ISubmitPollVoteUseCase,
   SubmitPollVoteInputDTO,
@@ -10,14 +9,16 @@ import type {
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
+import { CapabilityKey } from '../../../domain/types/CapabilityKey';
 
 @injectable()
 export class SubmitPollVoteUseCase implements ISubmitPollVoteUseCase {
   constructor(
     @inject('IPollRepository')
     private readonly _pollRepository: IPollRepository,
-    @inject('IParticipantRepository')
-    private readonly _participantRepository: IParticipantRepository,
+    @inject(RoomAuthorizationService)
+    private readonly _roomAuthorizationService: RoomAuthorizationService,
   ) {}
 
   async execute(data: SubmitPollVoteInputDTO): Promise<ICreatePollOutputDTO> {
@@ -34,13 +35,11 @@ export class SubmitPollVoteUseCase implements ISubmitPollVoteUseCase {
       throw new BadRequestError(ERROR_MESSAGES.POLL.POLL_EXPIRED);
     }
 
-    const participant = await this._participantRepository.findByRoomAndUser(
+    await this._roomAuthorizationService.assertCapability(
       poll.roomId,
       data.userId,
+      CapabilityKey.ROOM_POLLS_VOTE,
     );
-    if (!participant) {
-      throw new BadRequestError(ERROR_MESSAGES.ROOM.USER_NOT_IN_ROOM);
-    }
 
     if (!poll.allowMultiple && data.optionIds.length > 1) {
       throw new BadRequestError(ERROR_MESSAGES.POLL.POLL_ONE_OPTION);

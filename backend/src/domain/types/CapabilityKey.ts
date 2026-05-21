@@ -1,9 +1,3 @@
-/**
- * CapabilityKey — Represents a granular action a participant can perform inside
- * a room. These are the fine-grained units the PermissionService resolves.
- *
- * Naming convention:  FEATURE_AREA_ACTION
- */
 export enum CapabilityKey {
   // ── Chat ─────────────────────────────────────────────
   ROOM_CHAT_READ = 'room.chat.read',
@@ -32,12 +26,12 @@ export enum CapabilityKey {
   // ── Screen Share ─────────────────────────────────────
   ROOM_SCREENSHARE_START = 'room.screenshare.start',
 
-  // ── Moderation (host/moderator only by role default) ──
+  // ── Moderation 
   ROOM_PARTICIPANT_MUTE = 'room.participant.mute',
   ROOM_PARTICIPANT_KICK = 'room.participant.kick',
   ROOM_PARTICIPANT_PROMOTE = 'room.participant.promote',
 
-  // ── Room Management (host only by role default) ───────
+  // ── Room Management 
   ROOM_MANAGE_PERMISSIONS = 'room.manage.permissions',
   ROOM_MANAGE_SETTINGS = 'room.manage.settings',
 }

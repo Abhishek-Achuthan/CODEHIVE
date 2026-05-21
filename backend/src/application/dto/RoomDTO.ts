@@ -1,6 +1,8 @@
 import { RoomAdmissionPolicy } from '../../domain/types/RoomAdmissionPolicy';
 import { RoomLifeCycleStatus } from '../../domain/types/RoomLifeCycleStatus';
 import { RoomVisibility } from '../../domain/types/RoomVisibility';
+import { CapabilityKey } from '../../domain/types/CapabilityKey';
+import { RoomFeatureSnapshot } from '../../domain/entities/room/RoomEntity';
 
 export interface CreateRoomDTO {
   title: string;
@@ -52,6 +54,9 @@ export interface JoinRoomSnapshotDTO {
   participants: ParticipantWithUserDTO[];
   messages: SendMessageResponseDTO[];
   activePoll?: ICreatePollOutputDTO | null;
+  capabilities: Partial<Record<CapabilityKey, boolean>>;
+  lifecycleStatus: RoomLifeCycleStatus;
+  featureSnapshot: RoomFeatureSnapshot | null;
 }
 
 export interface GetPublicRoomsDTO {
@@ -70,5 +75,3 @@ export interface GetPublicRoomsResponseDTO {
   createdAt: Date;
   updatedAt: Date;
 }
-
-

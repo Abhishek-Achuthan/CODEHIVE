@@ -47,26 +47,20 @@ export class MessageController {
 
   async handleEditMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, 'roomId');
       const messageId = this.getRequiredParam(req, 'messageId');
       const userId = req.user.id;
       const { content } = req.body as { content?: string };
       const trimmedContent = content?.trim() ?? '';
 
-      await this._editMessageUseCase.execute({
+      const result = await this._editMessageUseCase.execute({
         messageId,
         senderId: userId,
         content: trimmedContent,
       });
 
-      const payload = {
-        messageId,
-        content: trimmedContent,
-      };
+      this._roomEventEmitter.emitMessageEdited(result.roomId, result);
 
-      this._roomEventEmitter.emitMessageEdited(roomId, payload);
-
-      res.status(HttpStatus.OK).json(payload);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -74,20 +68,19 @@ export class MessageController {
 
   async handleDeleteMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      const roomId = this.getRequiredParam(req, 'roomId');
       const messageId = this.getRequiredParam(req, 'messageId');
       const userId = req.user.id;
 
-      await this._deleteMessageUseCase.execute({
+      const result = await this._deleteMessageUseCase.execute({
         messageId,
         userId,
       });
 
-      const payload = { messageId };
+      this._roomEventEmitter.emitMessageDeleted(result.roomId, {
+        messageId: result.messageId,
+      });
 
-      this._roomEventEmitter.emitMessageDeleted(roomId, payload);
-
-      res.status(HttpStatus.OK).json(payload);
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }

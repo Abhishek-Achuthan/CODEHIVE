@@ -118,7 +118,7 @@ export const RoomSchema = new Schema(
       enum: Object.values(RoomLifeCycleStatus),
       default: RoomLifeCycleStatus.SCHEDULED
     },
-    sessionId: { type: Schema.Types.ObjectId, ref: 'Session', required: false,sparse: true},
+    sessionId: { type: Schema.Types.ObjectId, ref: 'Session', required: false},
     readonlyAt: { type: Date, required: false },
     archivedAt: { type: Date, required: false },
     purgedAt: { type: Date, required: false },

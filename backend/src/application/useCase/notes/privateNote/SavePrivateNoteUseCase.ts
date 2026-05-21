@@ -5,10 +5,9 @@ import {
   SavePrivateNoteDTO,
 } from '../../interface/notes/privateNote/ISavePrivateNoteUseCase';
 import { PrivateNoteEntity } from '../../../../domain/entities/room/PrivateNoteEntity';
-import { NotFoundError } from '../../../../core/errors/NotFoundError';
-import { ERROR_MESSAGES } from '../../../../shared/constants/errorMessages';
 import type { IPrivateNoteRepository } from '../../../../domain/interfaces/IPrivateNoteRepository';
-import type { IRoomRepository } from '../../../../domain/interfaces/IRoomRepository';
+import { RoomAuthorizationService } from '../../../services/RoomAuthorizationService';
+import { CapabilityKey } from '../../../../domain/types/CapabilityKey';
 
 @injectable()
 export class SavePrivateNoteUseCase implements ISavePrivateNoteUseCase {
@@ -16,17 +15,17 @@ export class SavePrivateNoteUseCase implements ISavePrivateNoteUseCase {
     @inject('IPrivateNoteRepository')
     private readonly _noteRepo: IPrivateNoteRepository,
 
-    @inject('IRoomRepository')
-    private readonly _roomRepo: IRoomRepository,
+    @inject(RoomAuthorizationService)
+    private readonly _roomAuthorizationService: RoomAuthorizationService,
   ) {}
 
   async execute(data: SavePrivateNoteDTO): Promise<PrivateNoteEntity> {
     const { userId, roomId, content } = data;
-    const room = await this._roomRepo.find(roomId);
-
-    if (!room) {
-      throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
-    }
+    await this._roomAuthorizationService.assertCapability(
+      roomId,
+      userId,
+      CapabilityKey.ROOM_NOTES_EDIT,
+    );
 
     const existingNote = await this._noteRepo.findByRoomAndUser(roomId, userId);
 

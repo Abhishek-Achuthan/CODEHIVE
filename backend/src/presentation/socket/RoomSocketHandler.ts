@@ -9,6 +9,7 @@ import {
   getJoinedRoomIds,
   getUserId,
 } from './socketHandlerUtils';
+import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
 
 interface SubscribeRoomPayload {
   roomId: string;
@@ -26,28 +27,40 @@ export class RoomSocketHandler implements ISocketHandler {
 
     @inject('IRoomEventEmitter')
     private readonly roomEventEmitter: IRoomEventEmitter,
+
+    @inject(RoomAuthorizationService)
+    private readonly roomAuthorizationService: RoomAuthorizationService,
   ) {}
 
   register(_io: SocketIOServer, socket: Socket): void {
-    socket.on('room:subscribe', (payload: SubscribeRoomPayload) => {
+    socket.on('room:subscribe', async (payload: SubscribeRoomPayload) => {
       try {
         const userId = getUserId(socket);
         if (!userId) return;
 
+        const authorizationContext = await this.roomAuthorizationService.assertParticipant(
+          payload.roomId,
+          userId,
+          'read',
+        );
+
         const isFirstPresenceInRoom = this.subscribeSocketToRoom(
           socket,
-          payload.roomId,
+          authorizationContext.room.id,
           userId,
         );
 
         socket.emit('room:subscribed', {
-          roomId: payload.roomId,
-          onlineUserIds: this.presenceService.getOnlineUserIds(payload.roomId),
+          roomId: authorizationContext.room.id,
+          onlineUserIds: this.presenceService.getOnlineUserIds(authorizationContext.room.id),
+          capabilities: authorizationContext.capabilities,
+          lifecycleStatus: authorizationContext.room.lifecycleStatus,
+          featureSnapshot: authorizationContext.room.featureSnapshot,
         });
 
         if (isFirstPresenceInRoom) {
           this.roomEventEmitter.emitUserJoined(
-            payload.roomId,
+            authorizationContext.room.id,
             {
               userId,
               name: payload.user?.name ?? 'Unknown User',

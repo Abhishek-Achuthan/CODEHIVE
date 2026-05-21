@@ -21,14 +21,11 @@ export class PermissionService {
       }
     }
 
-    if (participant.role === 'HOST' && HOST_IMMUTABLE_CAPABILITIES.has(capability)) {
-      return true;
-    }
+    if (participant.role === 'HOST' && HOST_IMMUTABLE_CAPABILITIES.has(capability)) return true;
 
     const override = participant.overrides[capability];
-    if (override !== undefined) {
-      return override;
-    }
+
+    if (override !== undefined) return override;
 
     return RoleDefaults[participant.role].includes(capability);
   }

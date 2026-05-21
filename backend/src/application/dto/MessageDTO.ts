@@ -15,3 +15,26 @@ export interface SendMessageResponseDTO {
     content:string;
     createdAt:Date;
 }
+
+
+export interface DeleteMessageDTO {
+  messageId: string;
+  userId: string;
+}
+
+export interface DeleteMessageResultDTO {
+  roomId: string;
+  messageId: string;
+}
+
+export interface EditMessageDTO {
+  messageId: string;
+  senderId: string;
+  content: string;
+}
+
+export interface EditMessageResultDTO {
+  roomId: string;
+  messageId: string;
+  content: string;
+}

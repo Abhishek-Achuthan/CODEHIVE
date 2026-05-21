@@ -1,20 +1,22 @@
 import { inject,injectable } from 'tsyringe';
 import { type IPollRepository } from '../../../domain/interfaces/IPollRepository';
 import { type IUserRepository } from '../../../domain/interfaces/IUserRepository';
-import { type IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 import { ICreatePollInputDTO, ICreatePollOutputDTO } from '../../dto/PollDTO';
 import { ICreatePollUseCase } from '../interface/poll/ICreatePollUseCase';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { randomUUID } from 'crypto';
+import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
+import { CapabilityKey } from '../../../domain/types/CapabilityKey';
 
 
 @injectable()
 export class CreatePollUseCase implements ICreatePollUseCase {
     constructor(
         @inject('IPollRepository') private readonly _pollRepo : IPollRepository,
-        @inject('IRoomRepository') private readonly _roomRepo : IRoomRepository,
-        @inject('IUserRepository') private readonly _userRepo : IUserRepository
+        @inject('IUserRepository') private readonly _userRepo : IUserRepository,
+        @inject(RoomAuthorizationService)
+        private readonly _roomAuthorizationService: RoomAuthorizationService,
     ){}
 
     async execute(data: ICreatePollInputDTO): Promise<ICreatePollOutputDTO> {
@@ -22,12 +24,14 @@ export class CreatePollUseCase implements ICreatePollUseCase {
 
         if(!user) throw new NotFoundError(ERROR_MESSAGES.USER.NOT_FOUND);
 
-        const room = await this._roomRepo.find(data.roomId);
-
-        if(!room) throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
+        const authorizationContext = await this._roomAuthorizationService.assertCapability(
+            data.roomId,
+            data.createdBy,
+            CapabilityKey.ROOM_POLLS_CREATE,
+        );
 
         const poll = await this._pollRepo.create({
-            roomId : room.id,
+            roomId : authorizationContext.room.id,
             createdBy : user.id,
             question: data.question.trim(),
             options : data.options.map((option) => ({

@@ -6,15 +6,16 @@ import { IClosePollInputDTO } from '../../dto/PollDTO';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
-import { ForbiddenError } from '../../../core/errors/ForbiddenError';
-import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
+import { CapabilityKey } from '../../../domain/types/CapabilityKey';
 
 @injectable()
 export class ClosePollUseCase implements IClosePollUseCase {
   constructor(
     @inject('IPollRepository') private readonly pollRepo: IPollRepository,
     @inject('IUserRepository') private readonly userRepo: IUserRepository,
-    @inject('IRoomRepository') private readonly roomRepo: IRoomRepository,
+    @inject(RoomAuthorizationService)
+    private readonly roomAuthorizationService: RoomAuthorizationService,
   ) {}
 
   async execute(data: IClosePollInputDTO): Promise<PollEntity | null> {
@@ -28,12 +29,11 @@ export class ClosePollUseCase implements IClosePollUseCase {
 
     if(poll.id !== data.pollId) throw new NotFoundError(ERROR_MESSAGES.POLL.POLL_NOT_FOUND);
 
-    const room = await this.roomRepo.find(data.roomId);
-
-    if (!room) throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
-
-    if (data.userId !== poll.createdBy && room.hostId !== data.userId)
-      throw new ForbiddenError(ERROR_MESSAGES.POLL.POLL_CREATOR_ONLY);
+    await this.roomAuthorizationService.assertCapability(
+      poll.roomId,
+      data.userId,
+      CapabilityKey.ROOM_POLLS_CLOSE,
+    );
 
     const closedPoll = await this.pollRepo.closePoll(data.pollId);
 
