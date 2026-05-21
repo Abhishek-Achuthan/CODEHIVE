@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Calendar, 
@@ -10,8 +10,7 @@ import {
   CalendarPlus, 
   Info,
   ExternalLink,
-  ChevronRight,
-  User as UserIcon
+  ChevronRight
 } from 'lucide-react';
 import Header from '../../../shared/ui/Header';
 import Footer from '../../../shared/ui/Footer';
@@ -33,7 +32,6 @@ interface BookingSuccessState {
 const BookingSuccessPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { mentorId } = useParams<{ mentorId: string }>();
   
   const state = location.state as BookingSuccessState | null;
 

@@ -1,7 +1,6 @@
 import type {
     BookingReservationResponse,
     BookedSessionsParams,
-    BookedSessionResponse,
     BookSessionRequest,
     SessionResponse,
     StripeBookSessionResponse,

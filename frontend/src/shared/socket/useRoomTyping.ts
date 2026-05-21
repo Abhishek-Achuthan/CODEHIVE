@@ -14,6 +14,7 @@ interface UseRoomTypingOptions {
   roomId: string | null;
   socket: RoomSocket | null;
   isRealtimeReady: boolean;
+  canWriteChat: boolean;
 }
 
 interface UseRoomTypingResult {
@@ -25,6 +26,7 @@ export const useRoomTyping = ({
   roomId,
   socket,
   isRealtimeReady,
+  canWriteChat,
 }: UseRoomTypingOptions): UseRoomTypingResult => {
   const currentUser = useAppSelector((state) => state.auth.user);
   const currentUserId = currentUser?.id ?? null;
@@ -49,7 +51,7 @@ export const useRoomTyping = ({
 
   const emitTyping = useCallback(
     (isTyping: boolean) => {
-      if (!socket || !roomId || !isRealtimeReady) return;
+      if (!socket || !roomId || !isRealtimeReady || !canWriteChat) return;
 
       if (!isTyping) {
         stopTyping();
@@ -65,6 +67,7 @@ export const useRoomTyping = ({
     },
     [
       currentUserName,
+      canWriteChat,
       isRealtimeReady,
       localTyping,
       roomId,
@@ -85,12 +88,12 @@ export const useRoomTyping = ({
   }, [stopTyping, typingDeadline]);
 
   useEffect(() => {
-    if (isRealtimeReady) return;
+    if (isRealtimeReady && canWriteChat) return;
 
     setTypingUsersById({});
     setTypingDeadline(null);
     setLocalTyping(false);
-  }, [isRealtimeReady, roomId]);
+  }, [canWriteChat, isRealtimeReady, roomId]);
 
   const handleTypingStart = useCallback(
     (payload: TypingStartPayload) => {

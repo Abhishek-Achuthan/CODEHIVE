@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { MessageContextMenu } from './MessageContextMenu';
+import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 
 interface ChatPanelProps {
   messages: Message[];
@@ -47,6 +48,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   isRealtimeReady,
   theme = 'dark',
 }) => {
+  const authorization = useRoomAuthorization();
   const [inputValue, setInputValue] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -243,8 +245,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
         {messages.map((m) => {
-          const isMe =
-            m.senderId === currentUser.id;
+          const isMe = m.senderId === currentUser.id;
+          const canDeleteMessage = isMe
+            ? authorization.canDeleteOwnChat
+            : authorization.canModerateParticipants;
+          const canEditMessage = isMe && authorization.canWriteChat;
 
           const parentMsg =
             m.parentMessageId
@@ -379,7 +384,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                   {contextMenuMessageId ===
                     m.id && (
                     <MessageContextMenu
-                      canEditDelete={isMe}
+                      canEdit={canEditMessage}
+                      canDelete={canDeleteMessage}
                       onEdit={() => {
                         handleEditInit(m);
 
@@ -566,6 +572,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 );
 
                 if (isRealtimeReady) {
+                  if (!authorization.canWriteChat) {
+                    return;
+                  }
                   onTypingChange(
                     e.target.value
                       .length > 0
@@ -585,11 +594,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               placeholder={
                 !isRealtimeReady
                   ? 'Reconnecting...'
+                  : !authorization.canWriteChat
+                  ? 'You do not have permission to chat in this room.'
                   : editingMessageId
                   ? 'Edit your message...'
                   : 'Message team...'
               }
-              disabled={!isRealtimeReady}
+              disabled={!isRealtimeReady || !authorization.canWriteChat}
               rows={1}
               className={`flex-1 bg-transparent border-none text-sm resize-none outline-none focus:ring-0 py-1.5 px-1 ${
                 isDark
@@ -601,9 +612,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             <button
               type="submit"
               disabled={
-                !inputValue.trim() || !isRealtimeReady
+                !inputValue.trim() || !isRealtimeReady || !authorization.canWriteChat
               }
-              className="p-2 rounded-lg bg-blue-600 text-white self-end shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+              className={`p-2 rounded-lg self-end transition-all ${
+                !inputValue.trim() || !isRealtimeReady || !authorization.canWriteChat
+                  ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95'
+              }`}
             >
               <Send className="w-4 h-4" />
             </button>

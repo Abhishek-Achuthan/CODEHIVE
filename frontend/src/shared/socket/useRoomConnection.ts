@@ -115,6 +115,9 @@ export const useRoomConnection = (
           ? {
               ...current,
               onlineUserIds: payload.onlineUserIds ?? current.onlineUserIds,
+              capabilities: payload.capabilities ?? current.capabilities,
+              lifecycleStatus: payload.lifecycleStatus ?? current.lifecycleStatus,
+              featureSnapshot: payload.featureSnapshot ?? current.featureSnapshot,
             }
           : current,
       );

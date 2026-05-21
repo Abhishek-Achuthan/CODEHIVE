@@ -1,5 +1,54 @@
 import type { PaginatedResponse } from "../core/api";
 export type RoomVisibility = "PUBLIC_REQUEST" | "PRIVATE";
+export type RoomLifecycleStatus =
+  | "SCHEDULED"
+  | "ACTIVE"
+  | "READONLY"
+  | "ARCHIVED"
+  | "PURGED";
+export type RoomRole = "HOST" | "MODERATOR" | "PARTICIPANT" | "VIEWER";
+export type FeatureKey =
+  | "chat"
+  | "notes"
+  | "polls"
+  | "whiteboard"
+  | "screen_share"
+  | "code_editor"
+  | "video_audio"
+  | "private_rooms"
+  | "session_booking";
+export type LimitKey =
+  | "max_participants"
+  | "max_active_rooms"
+  | "max_session_hours";
+export type CapabilityKey =
+  | "room.chat.read"
+  | "room.chat.write"
+  | "room.chat.delete_own"
+  | "room.notes.view"
+  | "room.notes.edit"
+  | "room.polls.create"
+  | "room.polls.vote"
+  | "room.polls.close"
+  | "room.whiteboard.view"
+  | "room.whiteboard.draw"
+  | "room.whiteboard.clear"
+  | "room.code.view"
+  | "room.code.edit"
+  | "room.code.run"
+  | "room.screenshare.start"
+  | "room.participant.mute"
+  | "room.participant.kick"
+  | "room.participant.promote"
+  | "room.manage.permissions"
+  | "room.manage.settings";
+
+export interface RoomFeatureSnapshotResponse {
+  planId: string;
+  planName: string;
+  enabledFeatures: FeatureKey[];
+  limits: Partial<Record<LimitKey, number>>;
+}
 
 export interface CreateRoomRequest {
   title: string;
@@ -55,7 +104,7 @@ export interface RoomParticipantResponse {
   userId: string;
   name: string;
   avatarUrl?: string;
-  role: string;
+  role: RoomRole;
 }
 
 export interface JoinRoomSnapshotResponse {
@@ -65,6 +114,9 @@ export interface JoinRoomSnapshotResponse {
   messages: RoomMessageResponse[];
   onlineUserIds?: string[];
   activePoll?: RoomPollResponse | null;
+  capabilities: Partial<Record<CapabilityKey, boolean>>;
+  lifecycleStatus: RoomLifecycleStatus;
+  featureSnapshot: RoomFeatureSnapshotResponse | null;
 }
 
 export interface CreateRoomMessageRequest {
@@ -77,11 +129,13 @@ export interface EditRoomMessageRequest {
 }
 
 export interface MessageEditedResponse {
+  roomId: string;
   messageId: string;
   content: string;
 }
 
 export interface MessageDeletedResponse {
+  roomId: string;
   messageId: string;
 }
 
@@ -148,4 +202,3 @@ export type SavePublicNoteResponse = PublicNoteResponse;
 
 export type GetPrivateNoteResponse = PrivateNoteResponse | null;
 export type SavePrivateNoteResponse = PrivateNoteResponse;
-

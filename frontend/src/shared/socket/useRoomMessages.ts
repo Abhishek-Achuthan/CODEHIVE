@@ -9,6 +9,9 @@ interface UseRoomMessagesOptions {
   socket: RoomSocket | null;
   snapshot: RoomSnapshot | null;
   isRealtimeReady: boolean;
+  canWriteChat: boolean;
+  canDeleteOwnChat: boolean;
+  canModerateMessages: boolean;
   onError?: (message: string) => void;
   stopTyping?: () => void;
 }
@@ -25,6 +28,9 @@ export const useRoomMessages = ({
   socket,
   snapshot,
   isRealtimeReady,
+  canWriteChat,
+  canDeleteOwnChat,
+  canModerateMessages,
   onError,
   stopTyping,
 }: UseRoomMessagesOptions): UseRoomMessagesResult => {
@@ -48,29 +54,33 @@ export const useRoomMessages = ({
 
   useRoomSocketEvent(socket, 'message:created', handleMessage);
 
-  const handleMessageEdited = useCallback((payload: { messageId: string; content: string }) => {
+  const handleMessageEdited = useCallback((payload: { roomId: string; messageId: string; content: string }) => {
+    if (payload.roomId !== roomId) return;
+
     setMessages((current) =>
       current.map((message) =>
         message.id === payload.messageId
           ? { ...message, content: payload.content, isEdited: true }
-        : message
+          : message
       )
     );
-  }, []);
+  }, [roomId]);
 
   useRoomSocketEvent(socket, 'message:edited', handleMessageEdited);
 
-  const handleMessageDeleted = useCallback((payload: { messageId: string }) => {
+  const handleMessageDeleted = useCallback((payload: { roomId: string; messageId: string }) => {
+    if (payload.roomId !== roomId) return;
+
     setMessages((current) =>
       current.filter((message) => message.id !== payload.messageId)
     );
-  }, []);
+  }, [roomId]);
 
   useRoomSocketEvent(socket, 'message:deleted', handleMessageDeleted);
 
   const sendMessage = useCallback(
     (content: string, parentMessageId?: string) => {
-      if (!roomId || !isRealtimeReady) {
+      if (!roomId || !isRealtimeReady || !canWriteChat) {
         return;
       }
 
@@ -95,12 +105,12 @@ export const useRoomMessages = ({
           onError?.(toErrorMessage(messageError));
         });
     },
-    [isRealtimeReady, onError, roomId, stopTyping]
+    [canWriteChat, isRealtimeReady, onError, roomId, stopTyping]
   );
 
   const editMessage = useCallback(
     (messageId: string, content: string) => {
-      if (!roomId || !isRealtimeReady) return;
+      if (!roomId || !isRealtimeReady || !canWriteChat) return;
 
       RoomAPI.editMessage(roomId, messageId, { content })
         .then(() => {
@@ -116,12 +126,12 @@ export const useRoomMessages = ({
           onError?.(toErrorMessage(messageError));
         });
     },
-    [isRealtimeReady, onError, roomId]
+    [canWriteChat, isRealtimeReady, onError, roomId]
   );
 
   const deleteMessage = useCallback(
     (messageId: string) => {
-      if (!roomId || !isRealtimeReady) return;
+      if (!roomId || !isRealtimeReady || (!canDeleteOwnChat && !canModerateMessages)) return;
 
       RoomAPI.deleteMessage(roomId, messageId)
         .then(() => {
@@ -133,7 +143,7 @@ export const useRoomMessages = ({
           onError?.(toErrorMessage(messageError));
         });
     },
-    [isRealtimeReady, onError, roomId]
+    [canDeleteOwnChat, canModerateMessages, isRealtimeReady, onError, roomId]
   );
 
   return {

@@ -6,6 +6,7 @@ import type { Poll as SocketPoll } from '../../../shared/socket/roomTypes';
 import PollCard from './PollCard';
 import CreatePollModal from './CreatePollModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 
 interface PollsPanelProps {
   polls: SocketPoll[];
@@ -24,14 +25,14 @@ const PollsPanel: React.FC<PollsPanelProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<'active' | 'closed'>('active');
+  const authorization = useRoomAuthorization();
 
   const activePolls = polls.filter(p => p.isActive && (!p.expiresAt || new Date(p.expiresAt) > new Date()));
   const closedPolls = polls.filter(p => !p.isActive || (p.expiresAt && new Date(p.expiresAt) <= new Date()));
 
   const currentPolls = filter === 'active' ? activePolls : closedPolls;
 
-  const role = currentUser.role?.toUpperCase();
-  const canCreate = role === 'MENTOR' || role === 'HOST' || role === 'PARTICIPANT';
+  const canCreate = authorization.canCreatePolls;
 
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">
@@ -78,6 +79,8 @@ const PollsPanel: React.FC<PollsPanelProps> = ({
                 onVote={onVotePoll}
                 onClose={onClosePoll}
                 currentUserId={currentUser.id}
+                canVote={authorization.canVotePolls}
+                canClose={authorization.canClosePolls}
               />
             ))
           ) : (

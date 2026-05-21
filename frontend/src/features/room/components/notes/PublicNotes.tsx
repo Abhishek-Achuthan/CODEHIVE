@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { Loader2, AlertCircle, RefreshCw, FileText, Lock } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -12,55 +13,89 @@ interface PublicNotesProps {
   canEdit: boolean;
 }
 
-/**
- * Collaborative shared room note backed by TipTap + Yjs + Hocuspocus.
- *
- * One note per room — all participants can view, only those with edit
- * capability (HOST / MENTOR) can write. Autosaves via debounced REST PUT.
- *
- * Design mirrors PrivateNotes for structural consistency.
- */
 const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canEdit }) => {
-  const { ydoc, provider, persistedHTML, isLoading, loadError, saveStatus, triggerSave } =
-    usePublicNotes(roomId);
+  const {
+    ydoc,
+    persistedHTML,
+    isLoading,
+    loadError,
+    collaborationError,
+    saveStatus,
+    triggerSave,
+  } = usePublicNotes(roomId, canEdit);
 
-  const editor = useEditor({
-    extensions: [
-      // history: false — Yjs manages undo/redo for collaborative editing
-      StarterKit.configure({ history: false }),
-      Placeholder.configure({
-        placeholder: canEdit
-          ? 'Start typing shared room notes...'
-          : 'No notes yet for this room.',
-      }),
-      Collaboration.configure({ document: ydoc }),
-    ],
-    editable: canEdit,
-    editorProps: {
-      attributes: {
-        class:
-          'prose prose-invert prose-sm max-w-none focus:outline-none min-h-full text-gray-200 leading-relaxed',
-      },
+
+const editor = useEditor({
+  immediatelyRender: false,
+
+  extensions: [
+    StarterKit.configure({
+      undoRedo: false,
+    }),
+
+    Placeholder.configure({
+      placeholder: canEdit
+        ? 'Start typing shared room notes...'
+        : 'No notes yet for this room.',
+    }),
+
+    ...(ydoc
+      ? [
+          Collaboration.configure({
+            document: ydoc,
+          }),
+        ]
+      : []),
+  ],
+
+  editable: canEdit && !!ydoc,
+
+  editorProps: {
+    attributes: {
+      class:
+        'prose prose-invert prose-sm max-w-none focus:outline-none min-h-full text-gray-200 leading-relaxed',
     },
-    onUpdate: ({ editor }) => {
-      if (canEdit) {
-        triggerSave(editor.getHTML());
-      }
-    },
-  });
+  },
+
+  onCreate: ({ editor }) => {
+    console.log('EDITOR CREATED');
+
+    if (!ydoc) return;
+
+    const fragment = ydoc.getXmlFragment('default');
+
+    const isYjsDocEmpty = fragment.length === 0;
+
+    console.log('IS YJS EMPTY:', isYjsDocEmpty);
+
+    if (isYjsDocEmpty && persistedHTML) {
+      editor.commands.setContent(persistedHTML, {
+        emitUpdate: false,
+      });
+    }
+  },
+
+  onUpdate: ({ editor }) => {
+    console.log('EDITOR UPDATED');
+
+    if (canEdit) {
+      triggerSave(editor.getHTML());
+    }
+  },
+});
 
   // ── Seed editor with persisted content when Yjs doc is still empty ─────────
   // This prevents overwriting collaborative state on reconnects while still
   // loading the last-saved snapshot for brand-new Yjs sessions.
   useEffect(() => {
-    if (isLoading || !editor || editor.isDestroyed) return;
+    if (isLoading || !editor || editor.isDestroyed || !ydoc) return;
 
     const fragment = ydoc.getXmlFragment('default');
     const isYjsDocEmpty = fragment.length === 0;
 
     if (isYjsDocEmpty && persistedHTML) {
       // emitUpdate: false prevents triggering the autosave on initial load
-      editor.commands.setContent(persistedHTML, false);
+      editor.commands.setContent(persistedHTML, { emitUpdate: false });
     }
   }, [isLoading, editor, ydoc, persistedHTML]);
 
@@ -68,8 +103,6 @@ const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canEdit }) => {
   useEffect(() => {
     return () => {
       editor?.destroy();
-      provider.disconnect();
-      ydoc.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -102,6 +135,65 @@ const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canEdit }) => {
           <RefreshCw className="w-3 h-3" />
           Retry
         </button>
+      </div>
+    );
+  }
+
+  if (canEdit && !ydoc && !collaborationError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-500">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500/60" />
+        <span className="text-xs font-medium">Starting shared notes...</span>
+      </div>
+    );
+  }
+
+  if (!canEdit) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
+          <Lock className="w-3 h-3 text-gray-600" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
+            View Only
+          </span>
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3">
+          {persistedHTML ? (
+            <article
+              className="prose prose-invert prose-sm max-w-none text-gray-200"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(persistedHTML) }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full gap-2 text-gray-600">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs">No shared notes available.</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (collaborationError) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
+          <Lock className="w-3 h-3 text-red-400" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">
+            Collaboration denied
+          </span>
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3 space-y-4">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-300">
+            {collaborationError}
+          </div>
+          {persistedHTML ? (
+            <article
+              className="prose prose-invert prose-sm max-w-none text-gray-200"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(persistedHTML) }}
+            />
+          ) : null}
+        </div>
       </div>
     );
   }

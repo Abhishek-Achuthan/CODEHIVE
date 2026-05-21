@@ -1,19 +1,18 @@
-import * as Y from 'yjs';
-import { HocuspocusProvider } from '@hocuspocus/provider';
-import { store } from '../../../store';
+import * as Y from "yjs";
+import { HocuspocusProvider } from "@hocuspocus/provider";
+import { store } from "../../../store";
 
-/**
- * Creates a Yjs document + Hocuspocus provider specifically for the
- * room-level shared public note.
- *
- * Document naming convention: `room-{roomId}-public-note`
- * This is intentionally separate from the Monaco code-editor provider
- * (which uses `room:{roomId}`) to avoid document-name collisions.
- */
-export const createPublicNoteProvider = (roomId: string) => {
+interface PublicNoteProviderOptions {
+  onAuthenticationFailed?: (reason: string) => void;
+}
+
+export const createPublicNoteProvider = (
+  roomId: string,
+  options?: PublicNoteProviderOptions,
+) => {
   const doc = new Y.Doc();
 
-  const url = import.meta.env.VITE_HOCUSPOCUS_URL || 'ws://localhost:1234';
+  const url = import.meta.env.VITE_HOCUSPOCUS_URL || "ws://localhost:1234";
   const normalizedRoomId = roomId.trim();
   const documentName = `room-${normalizedRoomId}-public-note`;
 
@@ -21,9 +20,12 @@ export const createPublicNoteProvider = (roomId: string) => {
     url,
     name: documentName,
     document: doc,
-    token: () => store.getState().auth.accessToken || '',
+    token: () => store.getState().auth.accessToken || "",
     onAuthenticationFailed: ({ reason }) => {
-      console.error('[Hocuspocus:PublicNote] authentication failed', {
+      options?.onAuthenticationFailed?.(
+        String(reason ?? "Authorization failed"),
+      );
+      console.error("[Hocuspocus:PublicNote] authentication failed", {
         documentName,
         reason,
       });

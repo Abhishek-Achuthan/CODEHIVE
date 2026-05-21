@@ -1,4 +1,6 @@
 
+import type { RoomRole } from "../../shared/types/api/room";
+
 export type ParticipantStatus = 'online' | 'offline';
 
 export interface Participant {
@@ -6,7 +8,7 @@ export interface Participant {
   name: string;
   avatar: string;
   status: ParticipantStatus;
-  role: 'HOST' | 'MENTOR' | 'PARTICIPANT';
+  role: RoomRole;
   isCurrentUser?: boolean;
 }
 

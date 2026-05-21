@@ -10,6 +10,9 @@ interface UseRoomPollsOptions {
   socket: RoomSocket | null;
   isRealtimeReady: boolean;
   initialPolls?: Poll[];
+  canCreatePolls: boolean;
+  canVotePolls: boolean;
+  canClosePolls: boolean;
   onError?: (message: string) => void;
 }
 
@@ -25,6 +28,9 @@ export const useRoomPolls = ({
   socket,
   isRealtimeReady,
   initialPolls,
+  canCreatePolls,
+  canVotePolls,
+  canClosePolls,
   onError,
 }: UseRoomPollsOptions): UseRoomPollsResult => {
   const [polls, setPolls] = useState<Poll[]>(initialPolls ?? []);
@@ -68,39 +74,39 @@ export const useRoomPolls = ({
     setPolls((current)=>current.map((existing)=> existing.id === poll.id? poll: existing));
   },[roomId])
 
-  useRoomSocketEvent(socket, 'poll:closed', handlePollClosed);
+  useRoomSocketEvent(socket, 'poll:ended', handlePollClosed);
 
   const createPoll = useCallback(
     (poll: CreatePollRequest) => {
-      if (!roomId || !isRealtimeReady) return;
+      if (!roomId || !isRealtimeReady || !canCreatePolls) return;
 
       RoomAPI.createPoll(roomId, poll).catch((pollError: unknown) => {
         onError?.(toErrorMessage(pollError));
       });
     },
-    [isRealtimeReady, onError, roomId]
+    [canCreatePolls, isRealtimeReady, onError, roomId]
   );
 
   const votePoll = useCallback(
     (pollId: string, optionIds: string[]) => {
-      if (!roomId || !isRealtimeReady) return;
+      if (!roomId || !isRealtimeReady || !canVotePolls) return;
 
       RoomAPI.votePoll(roomId, pollId, optionIds).catch((pollError: unknown) => {
         onError?.(toErrorMessage(pollError));
       });
     },
-    [isRealtimeReady, onError, roomId]
+    [canVotePolls, isRealtimeReady, onError, roomId]
   );
 
   const closePoll = useCallback(
     (pollId:string)=>{
-      if (!roomId || !isRealtimeReady) return;
+      if (!roomId || !isRealtimeReady || !canClosePolls) return;
 
       RoomAPI.closePoll(roomId, pollId).catch((pollError: unknown) => {
         onError?.(toErrorMessage(pollError));
       });
     },
-    [isRealtimeReady, onError, roomId]
+    [canClosePolls, isRealtimeReady, onError, roomId]
     );
 
   return {

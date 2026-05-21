@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Mic, Video, LogOut, Settings, Monitor, Share2 } from 'lucide-react';
+import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 
 interface TopBarProps {
   roomName: string;
@@ -8,6 +8,8 @@ interface TopBarProps {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ roomName, onLeave }) => {
+  const authorization = useRoomAuthorization();
+  const canUseVideoAudio = authorization.hasFeature('video_audio') && authorization.isActive;
   return (
     <header className="h-14 border-b border-gray-800 bg-[#0d1117] flex items-center justify-between px-4 text-white">
       <div className="flex items-center gap-4">
@@ -17,25 +19,59 @@ const TopBar: React.FC<TopBarProps> = ({ roomName, onLeave }) => {
         <div>
           <h1 className="text-sm font-semibold text-gray-100">{roomName}</h1>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Live Collaboration</span>
+            <span className={`w-2 h-2 rounded-full ${authorization.isActive ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`}></span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
+              {authorization.lifecycleLabel}
+            </span>
           </div>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         <div className="flex items-center bg-[#161b22] rounded-lg p-1 mr-2 border border-gray-800">
-          <button className="p-2 hover:bg-gray-700 rounded-md transition-colors text-gray-400 hover:text-white" title="Mute Mic">
+          <button
+            disabled={!canUseVideoAudio}
+            className={`p-2 rounded-md transition-colors ${
+              canUseVideoAudio
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-700 cursor-not-allowed'
+            }`}
+            title={canUseVideoAudio ? 'Mute Mic' : 'Video/audio unavailable'}
+          >
             <Mic className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-700 rounded-md transition-colors text-gray-400 hover:text-white" title="Toggle Video">
+          <button
+            disabled={!canUseVideoAudio}
+            className={`p-2 rounded-md transition-colors ${
+              canUseVideoAudio
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-700 cursor-not-allowed'
+            }`}
+            title={canUseVideoAudio ? 'Toggle Video' : 'Video/audio unavailable'}
+          >
             <Video className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-700 rounded-md transition-colors text-gray-400 hover:text-white" title="Screen Share">
+          <button
+            disabled={!authorization.canStartScreenshare}
+            className={`p-2 rounded-md transition-colors ${
+              authorization.canStartScreenshare
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-700 cursor-not-allowed'
+            }`}
+            title={authorization.canStartScreenshare ? 'Screen Share' : 'Screen sharing unavailable'}
+          >
             <Monitor className="w-4 h-4" />
           </button>
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
-          <button className="p-2 hover:bg-gray-700 rounded-md transition-colors text-gray-400 hover:text-white" title="Settings">
+          <button
+            disabled={!authorization.canManageRoomSettings}
+            className={`p-2 rounded-md transition-colors ${
+              authorization.canManageRoomSettings
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-700 cursor-not-allowed'
+            }`}
+            title={authorization.canManageRoomSettings ? 'Settings' : 'Room settings unavailable'}
+          >
             <Settings className="w-4 h-4" />
           </button>
         </div>

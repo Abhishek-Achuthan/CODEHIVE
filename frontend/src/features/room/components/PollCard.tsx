@@ -8,17 +8,25 @@ interface PollCardProps {
   onVote: (pollId: string, optionIds: string[]) => void;
   onClose: (pollId: string) => void;
   currentUserId: string;
+  canVote: boolean;
+  canClose: boolean;
 }
 
-const PollCard: React.FC<PollCardProps> = ({ poll, onVote, onClose, currentUserId }) => {
+const PollCard: React.FC<PollCardProps> = ({
+  poll,
+  onVote,
+  onClose,
+  currentUserId,
+  canVote,
+  canClose,
+}) => {
   const hasVoted = poll.options.some(opt => opt.votes.includes(currentUserId));
   const totalVotes = poll.options.reduce((acc, opt) => acc + opt.votes.length, 0);
-  const isCreator = poll.createdBy === currentUserId;
   const isExpired = !!(poll.expiresAt && new Date(poll.expiresAt) < new Date());
   const isClosed = !poll.isActive || isExpired;
 
   const handleVote = (optionId: string) => {
-    if (isClosed) return;
+    if (isClosed || !canVote) return;
     
     if (poll.allowMultiple) {
       const currentVotes = poll.options
@@ -60,7 +68,7 @@ const PollCard: React.FC<PollCardProps> = ({ poll, onVote, onClose, currentUserI
           )}
         </div>
         
-        {isCreator && !isClosed && (
+        {canClose && !isClosed && (
           <button 
             onClick={() => onClose(poll.id)}
             className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-all opacity-0 group-hover:opacity-100"
@@ -84,13 +92,13 @@ const PollCard: React.FC<PollCardProps> = ({ poll, onVote, onClose, currentUserI
           return (
             <div key={option.id} className="relative">
               <button
-                disabled={isClosed}
+                disabled={isClosed || !canVote}
                 onClick={() => handleVote(option.id!)}
                 className={`w-full relative z-10 flex items-center justify-between p-3 rounded-lg border transition-all duration-300 ${
                   isSelected 
                     ? 'border-blue-500/50 bg-blue-500/5' 
                     : 'border-gray-800 hover:border-gray-700 bg-gray-900/40'
-                } ${isClosed ? 'cursor-default' : 'cursor-pointer'}`}
+                } ${isClosed || !canVote ? 'cursor-default opacity-80' : 'cursor-pointer'}`}
               >
                 <div className="flex items-center gap-3 w-full pr-12">
                   <div className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${

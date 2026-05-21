@@ -8,6 +8,7 @@ import type {
   Participant,
   ParticipantStatus,
 } from '../types';
+import { RoomAuthorizationProvider } from '../authorization/RoomAuthorizationContext';
 
 import TopBar from '../components/TopBar';
 import ParticipantsSidebar from '../components/ParticipantsSidebar';
@@ -24,6 +25,8 @@ const CollaborationRoom: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   const {
+    snapshot,
+    authorization,
     messages: socketMessages,
     participants: socketParticipants,
     sendMessage,
@@ -64,7 +67,7 @@ const CollaborationRoom: React.FC = () => {
         user.avatarUrl ||
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
       status: 'online' as ParticipantStatus,
-      role: (snapshotParticipant?.role as any) || 'PARTICIPANT',
+      role: snapshotParticipant?.role || 'PARTICIPANT',
       isCurrentUser: true,
     };
   }, [user, hasRoomSnapshot, socketParticipants]);
@@ -102,7 +105,7 @@ const CollaborationRoom: React.FC = () => {
         p.avatar ||
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.id}`,
       status: p.status as ParticipantStatus,
-      role: p.role as Participant['role'],
+      role: p.role || 'PARTICIPANT',
       isCurrentUser: p.id === user.id,
     }));
 
@@ -167,41 +170,55 @@ const CollaborationRoom: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#010409] text-gray-300 font-sans selection:bg-blue-600/30 selection:text-blue-200">
-      {/* Top Bar */}
-      <TopBar
-        roomName={roomName}
-        onLeave={handleLeaveRoom}
-      />
-
-      {/* Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Participants */}
-        <ParticipantsSidebar
-          participants={formattedParticipants}
+    <RoomAuthorizationProvider snapshot={snapshot}>
+      <div className="flex flex-col h-screen w-full bg-[#010409] text-gray-300 font-sans selection:bg-blue-600/30 selection:text-blue-200">
+        {/* Top Bar */}
+        <TopBar
+          roomName={roomName}
+          onLeave={handleLeaveRoom}
         />
 
-        {/* Editor */}
-        <EditorArea currentUserRole={finalCurrentUser.role} />
+        {(authorization.isReadonly || authorization.isArchived || authorization.isScheduled || authorization.isPurged) && (
+          <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-200">
+            {authorization.isReadonly
+              ? 'This room is currently read-only. Editing and live collaboration actions are disabled.'
+              : authorization.isArchived
+                ? 'This room is archived. Interactive tools are no longer available.'
+                : authorization.isScheduled
+                  ? 'This room is scheduled and not yet active.'
+                  : 'This room is no longer available.'}
+          </div>
+        )}
 
-        {/* Right Sidebar */}
-        <RightSidebar
-          messages={formattedMessages}
-          onSendMessage={sendMessage}
-          onEditMessage={editMessage}
-          onDeleteMessage={deleteMessage}
-          onTypingChange={emitTyping}
-          typingUsers={typingUsers}
-          currentUser={finalCurrentUser}
-          isRealtimeReady={isRealtimeReady}
-          polls={polls}
-          onCreatePoll={createPoll}
-          onVotePoll={votePoll}
-          onClosePoll={closePoll}
-          roomId={roomId || ''}
-        />
+        {/* Layout */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Participants */}
+          <ParticipantsSidebar
+            participants={formattedParticipants}
+          />
+
+          {/* Editor */}
+          <EditorArea roomId={roomId || ''} />
+
+          {/* Right Sidebar */}
+          <RightSidebar
+            messages={formattedMessages}
+            onSendMessage={sendMessage}
+            onEditMessage={editMessage}
+            onDeleteMessage={deleteMessage}
+            onTypingChange={emitTyping}
+            typingUsers={typingUsers}
+            currentUser={finalCurrentUser}
+            isRealtimeReady={isRealtimeReady}
+            polls={polls}
+            onCreatePoll={createPoll}
+            onVotePoll={votePoll}
+            onClosePoll={closePoll}
+            roomId={roomId || ''}
+          />
+        </div>
       </div>
-    </div>
+    </RoomAuthorizationProvider>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { AlertCircle } from "lucide-react";
 import {
   Tldraw,
   Editor,
@@ -50,7 +51,21 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
   user,
   canEdit,
 }) => {
-  const { doc, provider } = useWhiteboardContext();
+  const { doc, provider, error: whiteboardError } = useWhiteboardContext();
+
+  if (whiteboardError) {
+    return (
+      <div className="flex items-center justify-center h-full bg-[#0d1117] text-red-400">
+        <div className="flex flex-col items-center gap-3 text-center px-6">
+          <AlertCircle className="w-8 h-8" />
+          <div>
+            <p className="text-sm font-semibold text-gray-100">Whiteboard access denied</p>
+            <p className="text-xs text-gray-500 mt-1">{whiteboardError}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const loadingState = useYjsStore({
     roomId,

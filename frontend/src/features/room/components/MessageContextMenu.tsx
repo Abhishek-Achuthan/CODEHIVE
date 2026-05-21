@@ -7,7 +7,8 @@ interface MessageContextMenuProps {
   onCopy: () => void;
   onReply: () => void;
   onClose: () => void;
-  canEditDelete: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
@@ -16,7 +17,8 @@ export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   onCopy,
   onReply,
   onClose,
-  canEditDelete,
+  canEdit,
+  canDelete,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -54,24 +56,28 @@ export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
         Copy
       </button>
 
-      {canEditDelete && (
+      {(canEdit || canDelete) && (
         <>
           <div className="h-px bg-[#3e3e42] my-1 mx-2" />
-          <button
-            onClick={onEdit}
-            className="w-full flex items-center px-4 py-2 hover:bg-[#3e3e42] hover:text-white transition-colors"
-          >
-            <Pencil className="w-4 h-4 mr-2" />
-            Edit
-          </button>
+          {canEdit && (
+            <button
+              onClick={onEdit}
+              className="w-full flex items-center px-4 py-2 hover:bg-[#3e3e42] hover:text-white transition-colors"
+            >
+              <Pencil className="w-4 h-4 mr-2" />
+              Edit
+            </button>
+          )}
 
-          <button
-            onClick={onDelete}
-            className="w-full flex items-center px-4 py-2 hover:bg-red-500/10 hover:text-red-400 text-red-500 transition-colors"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </button>
+          {canDelete && (
+            <button
+              onClick={onDelete}
+              className="w-full flex items-center px-4 py-2 hover:bg-red-500/10 hover:text-red-400 text-red-500 transition-colors"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </button>
+          )}
         </>
       )}
     </div>

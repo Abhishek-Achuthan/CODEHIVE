@@ -7,6 +7,7 @@ import type {
   RoomUserJoinedPayload,
   RoomUserLeftPayload,
 } from './roomTypes';
+import type { RoomRole } from '../types/api/room';
 
 type RoomParticipant = Omit<Participant, 'status'>;
 
@@ -41,7 +42,7 @@ export const useRoomPresence = ({
         id: participant.userId,
         name: participant.name,
         avatar: participant.avatarUrl,
-        role: participant.role as any,
+        role: participant.role as RoomRole,
       }))
     );
     setOnlineUserIds(new Set(snapshot.onlineUserIds ?? []));

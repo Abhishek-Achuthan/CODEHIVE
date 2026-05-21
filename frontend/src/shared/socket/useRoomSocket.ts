@@ -6,6 +6,7 @@ import { useRoomPolls } from "./useRoomPolls";
 import { useRoomPresence } from "./useRoomPresence";
 import { useRoomTyping } from "./useRoomTyping";
 import type { Message, Participant, Poll, RoomSocket } from "./roomTypes";
+import { buildRoomAuthorization } from "../../features/room/authorization/roomAuthorization";
 
 export type { Message, Participant, Poll };
 
@@ -20,6 +21,7 @@ export const useRoomSocket = (roomId: string | null) => {
     error: connectionError,
     leaveRoom,
   } = useRoomConnection(roomId);
+  const authorization = useMemo(() => buildRoomAuthorization(snapshot), [snapshot]);
 
   const isRealtimeReady = connectionState === "ready";
   const hasRoomSnapshot = snapshot !== null;
@@ -42,6 +44,7 @@ export const useRoomSocket = (roomId: string | null) => {
     roomId,
     socket: roomSocket,
     isRealtimeReady,
+    canWriteChat: authorization.canWriteChat,
   });
 
   const stopTyping = useCallback(() => {
@@ -54,6 +57,9 @@ export const useRoomSocket = (roomId: string | null) => {
       socket: roomSocket,
       snapshot,
       isRealtimeReady,
+      canWriteChat: authorization.canWriteChat,
+      canDeleteOwnChat: authorization.canDeleteOwnChat,
+      canModerateMessages: authorization.canModerateParticipants,
       onError: handleFeatureError,
       stopTyping,
     },
@@ -69,11 +75,16 @@ export const useRoomSocket = (roomId: string | null) => {
     socket: roomSocket,
     isRealtimeReady,
     initialPolls,
+    canCreatePolls: authorization.canCreatePolls,
+    canVotePolls: authorization.canVotePolls,
+    canClosePolls: authorization.canClosePolls,
     onError: handleFeatureError,
   });
 
   return {
     connectionState,
+    snapshot,
+    authorization,
     messages,
     participants,
     polls,

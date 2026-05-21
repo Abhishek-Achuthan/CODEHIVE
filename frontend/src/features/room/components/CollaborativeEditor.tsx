@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import { AlertCircle, Lock } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import type * as monaco from 'monaco-editor';
 import { MonacoBinding } from 'y-monaco';
@@ -6,12 +7,15 @@ import { createCollabProvider } from '../../collaboration/yjs/provider';
 
 interface Props {
   roomId: string;
+  canCollaborate: boolean;
+  isReadonly: boolean;
 }
 
-const CollaborativeEditor: React.FC<Props> = ({ roomId }) => {
+const CollaborativeEditor: React.FC<Props> = ({ roomId, canCollaborate, isReadonly }) => {
   const collabRef = useRef<ReturnType<typeof createCollabProvider> | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [collaborationError, setCollaborationError] = React.useState<string | null>(null);
 
   const bindEditor = useCallback(() => {
     const collab = collabRef.current;
@@ -31,7 +35,16 @@ const CollaborativeEditor: React.FC<Props> = ({ roomId }) => {
   }, []);
 
   useEffect(() => {
-    const collab = createCollabProvider(roomId);
+    if (!canCollaborate) {
+      setCollaborationError(null);
+      return;
+    }
+
+    const collab = createCollabProvider(roomId, {
+      onAuthenticationFailed: (reason) => {
+        setCollaborationError(reason || 'You are not allowed to use the shared code editor.');
+      },
+    });
     collabRef.current = collab;
 
     bindEditor();
@@ -45,7 +58,39 @@ const CollaborativeEditor: React.FC<Props> = ({ roomId }) => {
         collabRef.current = null;
       }
     };
-  }, [roomId, bindEditor]);
+  }, [roomId, bindEditor, canCollaborate]);
+
+  if (!canCollaborate) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#0d1117] text-gray-400">
+        <div className="flex flex-col items-center gap-3 text-center px-6">
+          <Lock className="w-8 h-8 text-gray-600" />
+          <div>
+            <p className="text-sm font-semibold text-gray-200">
+              {isReadonly ? 'Code editor is read-only' : 'Code collaboration unavailable'}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              You do not currently have permission to use the live code workspace.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (collaborationError) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#0d1117] text-red-400">
+        <div className="flex flex-col items-center gap-3 text-center px-6">
+          <AlertCircle className="w-8 h-8" />
+          <div>
+            <p className="text-sm font-semibold text-gray-100">Code collaboration denied</p>
+            <p className="text-xs text-gray-500 mt-1">{collaborationError}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Editor

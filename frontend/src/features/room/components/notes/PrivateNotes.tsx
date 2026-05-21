@@ -8,19 +8,23 @@ import SaveStatusIndicator from './SaveStatusIndicator';
 
 interface PrivateNotesProps {
   roomId: string;
+  canEdit: boolean;
 }
 
-const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
+const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId, canEdit }) => {
   const { content, isLoading, loadError, saveStatus, updateContent } = usePrivateNotes(roomId);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: 'Start typing your private notes...',
+        placeholder: canEdit
+          ? 'Start typing your private notes...'
+          : 'You can view your notes here.',
       }),
     ],
     content: content,
+    editable: canEdit,
     editorProps: {
       attributes: {
         class:
@@ -28,7 +32,9 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
       },
     },
     onUpdate: ({ editor }) => {
-      updateContent(editor.getJSON() as Record<string, unknown>);
+      if (canEdit) {
+        updateContent(editor.getJSON() as Record<string, unknown>);
+      }
     },
   });
 
@@ -80,6 +86,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleBold().run()}
           isActive={editor?.isActive('bold') ?? false}
           title="Bold"
+          disabled={!canEdit}
         >
           <span className="font-bold text-[11px]">B</span>
         </ToolbarButton>
@@ -87,6 +94,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleItalic().run()}
           isActive={editor?.isActive('italic') ?? false}
           title="Italic"
+          disabled={!canEdit}
         >
           <span className="italic text-[11px]">I</span>
         </ToolbarButton>
@@ -94,6 +102,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleStrike().run()}
           isActive={editor?.isActive('strike') ?? false}
           title="Strikethrough"
+          disabled={!canEdit}
         >
           <span className="line-through text-[11px]">S</span>
         </ToolbarButton>
@@ -104,6 +113,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
           isActive={editor?.isActive('bulletList') ?? false}
           title="Bullet list"
+          disabled={!canEdit}
         >
           <span className="text-[11px] font-mono">•—</span>
         </ToolbarButton>
@@ -111,6 +121,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
           isActive={editor?.isActive('orderedList') ?? false}
           title="Numbered list"
+          disabled={!canEdit}
         >
           <span className="text-[11px] font-mono">1.</span>
         </ToolbarButton>
@@ -121,6 +132,7 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleCode().run()}
           isActive={editor?.isActive('code') ?? false}
           title="Inline code"
+          disabled={!canEdit}
         >
           <span className="font-mono text-[11px]">{`<>`}</span>
         </ToolbarButton>
@@ -128,12 +140,19 @@ const PrivateNotes: React.FC<PrivateNotesProps> = ({ roomId }) => {
           onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
           isActive={editor?.isActive('codeBlock') ?? false}
           title="Code block"
+          disabled={!canEdit}
         >
           <span className="font-mono text-[10px] leading-none">{`{}`}</span>
         </ToolbarButton>
 
         <div className="flex-1" />
-        <SaveStatusIndicator status={saveStatus} />
+        {canEdit ? (
+          <SaveStatusIndicator status={saveStatus} />
+        ) : (
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
+            View Only
+          </span>
+        )}
       </div>
 
       {/* Editor area */}
@@ -156,16 +175,20 @@ interface ToolbarButtonProps {
   isActive: boolean;
   title: string;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
-const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, isActive, title, children }) => (
+const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, isActive, title, children, disabled = false }) => (
   <button
     onClick={onClick}
     title={title}
+    disabled={disabled}
     className={`w-6 h-6 flex items-center justify-center rounded transition-all ${
-      isActive
-        ? 'bg-blue-500/20 text-blue-400'
-        : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/60'
+      disabled
+        ? 'text-gray-700 cursor-not-allowed'
+        : isActive
+          ? 'bg-blue-500/20 text-blue-400'
+          : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/60'
     }`}
   >
     {children}

@@ -2,7 +2,14 @@ import * as Y from 'yjs';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { store } from '../../../store';
 
-export const createCollabProvider = (roomId: string) => {
+interface CollabProviderOptions {
+  onAuthenticationFailed?: (reason: string) => void;
+}
+
+export const createCollabProvider = (
+  roomId: string,
+  options?: CollabProviderOptions,
+) => {
   const doc = new Y.Doc();
 
   const url = import.meta.env.VITE_HOCUSPOCUS_URL || 'ws://localhost:1234';
@@ -15,6 +22,7 @@ export const createCollabProvider = (roomId: string) => {
     document: doc,
     token: () => store.getState().auth.accessToken || '',
     onAuthenticationFailed: ({ reason }) => {
+      options?.onAuthenticationFailed?.(String(reason ?? 'Authorization failed'));
       console.error('[Hocuspocus] authentication failed', { documentName, reason });
     },
   });

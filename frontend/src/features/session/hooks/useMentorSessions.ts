@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { SessionService } from "../../../services/sessionService";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
 import { BaseError } from "../../../shared/errors/BaseError";

@@ -6,15 +6,22 @@ import { createWhiteboardProvider } from '../../../collaboration/yjs/createWhite
 interface WhiteboardContextType {
   provider: HocuspocusProvider | null;
   doc: Y.Doc | null;
+  error: string | null;
 }
 
 const WhiteboardContext = createContext<WhiteboardContextType | undefined>(undefined);
 
 export const WhiteboardProvider: React.FC<{ roomId: string; children: ReactNode }> = ({ roomId, children }) => {
   const [collab, setCollab] = useState<ReturnType<typeof createWhiteboardProvider> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const instance = createWhiteboardProvider(roomId);
+    setError(null);
+    const instance = createWhiteboardProvider(roomId, {
+      onAuthenticationFailed: (reason) => {
+        setError(reason || 'You are not allowed to use the shared whiteboard.');
+      },
+    });
     setCollab(instance);
 
     return () => {
@@ -26,9 +33,10 @@ export const WhiteboardProvider: React.FC<{ roomId: string; children: ReactNode 
   return (
     <WhiteboardContext.Provider value={{ 
       provider: collab?.provider ?? null, 
-      doc: collab?.doc ?? null 
+      doc: collab?.doc ?? null,
+      error,
     }}>
-      {children}
+      {collab || error ? children : null}
     </WhiteboardContext.Provider>
   );
 };

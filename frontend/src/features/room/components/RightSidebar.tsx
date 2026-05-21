@@ -9,6 +9,7 @@ import PollsPanel from './PollsPanel';
 import NotesPanel from './notes/NotesPanel';
 import type { Poll } from '../../../shared/socket/roomTypes';
 import type { CreatePollRequest } from '../../../shared/types/api/room';
+import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 
 
 interface RightSidebarProps {
@@ -43,15 +44,25 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   onClosePoll,
   roomId,
 }) => {
-
+  const authorization = useRoomAuthorization();
   const [activeTab, setActiveTab] = useState<TabType>('chat');
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
-    { id: 'chat', icon: <MessageSquare className="w-4 h-4" />, label: 'Chat' },
-    { id: 'notes', icon: <StickyNote className="w-4 h-4" />, label: 'Notes' },
-    { id: 'polls', icon: <BarChart2 className="w-4 h-4" />, label: 'Polls' },
+    ...(authorization.canReadChat || authorization.canWriteChat
+      ? [{ id: 'chat' as TabType, icon: <MessageSquare className="w-4 h-4" />, label: 'Chat' }]
+      : []),
+    ...(authorization.canViewNotes
+      ? [{ id: 'notes' as TabType, icon: <StickyNote className="w-4 h-4" />, label: 'Notes' }]
+      : []),
+    ...(authorization.canViewPolls
+      ? [{ id: 'polls' as TabType, icon: <BarChart2 className="w-4 h-4" />, label: 'Polls' }]
+      : []),
   ];
+
+  const resolvedActiveTab = tabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : tabs[0]?.id;
 
   const handleTabClick = (id: TabType) => {
     setActiveTab(id);
@@ -61,7 +72,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   const renderContent = () => {
     if (isCollapsed) return null;
 
-    switch (activeTab) {
+    switch (resolvedActiveTab) {
       case 'chat':
         return (
           <ChatPanel
@@ -76,7 +87,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         );
       case 'notes':
-        return <NotesPanel roomId={roomId} currentUserRole={currentUser.role} />;
+        return <NotesPanel roomId={roomId} />;
 
       case 'polls':
         return (
@@ -89,7 +100,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         );
       default:
-        return null;
+        return (
+          <div className="flex h-full items-center justify-center px-6 text-center text-gray-500">
+            <p className="text-sm">No workspace tools are available in this room.</p>
+          </div>
+        );
     }
   };
 
