@@ -50,6 +50,8 @@ import { SessionActivationPublisher } from '../../infrastructure/queue/publisher
 import { SessionActivationConsumer } from '../../infrastructure/queue/consumer/SessionActivationConsumer';
 import { SessionActivationDlqConsumer } from '../../infrastructure/queue/consumer/SessionActivationDlqConsumer';
 import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
+import { EntitlementResolutionService } from '../../application/services/EntitlementsResolutionService';
+import { RoomFeatureSnapshotFactory } from '../../application/services/RoomFeatureSnapshotFactory';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -158,6 +160,7 @@ export class ServiceModule {
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);
     container.registerSingleton(RoomAuthorizationService, RoomAuthorizationService);
-
+    container.registerSingleton(EntitlementResolutionService, EntitlementResolutionService);
+    container.registerSingleton(RoomFeatureSnapshotFactory, RoomFeatureSnapshotFactory);
   }
 }

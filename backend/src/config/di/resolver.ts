@@ -26,6 +26,7 @@ import { PublicNoteController } from '../../presentation/controllers/note/Public
 import { MessageController } from '../../presentation/controllers/message/MessageController';
 import { PollController } from '../../presentation/controllers/poll/PollController';
 import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
+import { PlanController } from '../../presentation/controllers/plan/PlanController';
 
 ContainerSetup.registerAll();
 
@@ -62,6 +63,8 @@ export const publicNoteController = container.resolve(PublicNoteController);
 export const messageController = container.resolve(MessageController);
 
 export const pollController = container.resolve(PollController);
+
+export const planController = container.resolve(PlanController);
 
 export const socketHandlers: ISocketHandler[] = [
   container.resolve(RoomSocketHandler),

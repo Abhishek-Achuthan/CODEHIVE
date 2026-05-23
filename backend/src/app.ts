@@ -25,6 +25,7 @@ import {
 } from "./config/di/resolver";
 import { initializeRabbitMQConnection } from './config/rabbitMQConfig';
 import { RoomRoutes } from './presentation/routes/RoomRoutes';
+import { PlanRoute } from './presentation/routes/PlanRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -78,6 +79,7 @@ export class App {
     const webhookRoutes = new WebhooksRoutes();
     const walletRoutes = new WalletRoutes();
     const roomRoutes = new RoomRoutes();
+    const planRoute = new PlanRoute();
     this._app.use("/api/auth", authRoute.getRoutes());
     this._app.use("/api/admin", adminRoute.getRoutes());
     this._app.use("/api/qna", qnaRoutes.getRoutes());
@@ -87,6 +89,7 @@ export class App {
     this._app.use("/api/webhook", webhookRoutes.getRoutes());
     this._app.use("/api/wallet", walletRoutes.getRoutes());
     this._app.use("/api/rooms", roomRoutes.getRoutes());
+    this._app.use("/api/plans", planRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

@@ -45,6 +45,8 @@ import { IPrivateNoteRepository } from '../../domain/interfaces/IPrivateNoteRepo
 import { PrivateNoteRepository } from '../../infrastructure/database/repository/PrivateNoteRepository';
 import { PublicNoteRepository } from '../../infrastructure/database/repository/PublicNoteRepository';
 import { IPublicNoteRepository } from '../../domain/interfaces/IPublicNoteRepository';
+import { ISubscriptionRepository } from '../../domain/interfaces/ISubscriptionRepository';
+import { SubscriptionRepository } from '../../infrastructure/database/repository/SubscriptionRepository';
 
 export class RepositoryModule {
   static registerModules(): void {
@@ -153,6 +155,10 @@ export class RepositoryModule {
 
     container.register<IPlanRepository>('IPlanRepository', {
       useClass: PlanRepository,
+    });
+
+    container.register<ISubscriptionRepository>('ISubscriptionRepository', {
+      useClass: SubscriptionRepository,
     });
 
 

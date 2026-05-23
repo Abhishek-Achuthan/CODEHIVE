@@ -143,6 +143,7 @@ export const ERROR_MESSAGES = {
     ACCESS_DENIED: 'You are not allowed to access this room',
     PARTICIPANT_NOT_FOUND: 'Participant not found in this room',
     FORBIDDEN: 'You are not allowed to view these notes',
+    ACTIVE_ROOM_LIMIT_REACHED: 'Active room limit reached for your current plan.',
   },
 
   POLL: {
@@ -167,5 +168,12 @@ export const ERROR_MESSAGES = {
     PAYMENT_INTENT_CLIENT_SECRET_FETCH_FAILED:
       'Failed to retrieve payment intent client secret',
     INVALID_STRIPE_WEBHOOK_SIGNATURE: 'Invalid Stripe webhook signature',
+  },
+
+  PLAN: {
+    ALREADY_EXIST: 'Plan with this slug already exists',
+    NOT_FOUND: 'Plan not found',
+    UPDATE_FAILED: 'Failed to update plan',
+    FREE_PLAN_NOT_FOUND: 'Free plan not found',
   },
 };

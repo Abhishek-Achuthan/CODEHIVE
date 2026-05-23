@@ -1,4 +1,5 @@
-import { Document, Schema, Types } from 'mongoose';
+import { Schema, Types, Document } from 'mongoose';
+
 import { FeatureKey } from '../../../domain/types/FeatureKey';
 import { LimitKey } from '../../../domain/types/LimitKey';
 
@@ -6,17 +7,37 @@ export interface PlanDocument extends Document {
   _id: Types.ObjectId;
 
   name: string;
-  description?: string;
 
-  price: number;
-  currency: string;
+  slug: string;
+
+  description?: string;
 
   isActive: boolean;
 
+  isPublic: boolean;
+
+  sortOrder: number;
+
   features: FeatureKey[];
-  limits: Map<LimitKey, number>;
+
+  limits: Partial<Record<LimitKey, number>>;
+
+  pricing: {
+    monthly: number;
+    yearly: number;
+    currency: string;
+  };
+
+  stripe?: {
+    productId?: string;
+
+    monthlyPriceId?: string;
+
+    yearlyPriceId?: string;
+  };
 
   createdAt: Date;
+
   updatedAt: Date;
 }
 
@@ -24,39 +45,144 @@ export type PlanLeanDoc = {
   _id: Types.ObjectId;
 
   name: string;
-  description?: string;
 
-  price: number;
-  currency: string;
+  slug: string;
+
+  description?: string;
 
   isActive: boolean;
 
+  isPublic: boolean;
+
+  sortOrder: number;
+
   features: FeatureKey[];
-  limits: Record<LimitKey, number>;
+
+  limits: Partial<Record<LimitKey, number>>;
+
+  pricing: {
+    monthly: number;
+    yearly: number;
+    currency: string;
+  };
+
+  stripe?: {
+    productId?: string;
+
+    monthlyPriceId?: string;
+
+    yearlyPriceId?: string;
+  };
 
   createdAt: Date;
+
   updatedAt: Date;
 };
 
-export const PlanSchema = new Schema<PlanDocument>(
+const PricingSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true, unique: true },
-    description: { type: String, required: false },
-    price: { type: Number, required: true, min: 0 },
-    currency: { type: String, required: true, default: 'USD' },
-    isActive: { type: Boolean, required: true, default: true },
+    monthly: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    yearly: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    currency: {
+      type: String,
+      required: true,
+      trim: true,
+      uppercase: true,
+    },
+  },
+  { _id: false },
+);
+
+const StripeMetadataSchema = new Schema(
+  {
+    productId: {
+      type: String,
+      required: false,
+    },
+
+    monthlyPriceId: {
+      type: String,
+      required: false,
+    },
+
+    yearlyPriceId: {
+      type: String,
+      required: false,
+    },
+  },
+  { _id: false },
+);
+
+export const PlanSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+
+    description: {
+      type: String,
+      required: false,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+
+    isPublic: {
+      type: Boolean,
+      default: true,
+    },
+
+    sortOrder: {
+      type: Number,
+      default: 0,
+    },
+
     features: {
       type: [String],
-      enum: Object.values(FeatureKey),
       default: [],
     },
+
     limits: {
       type: Map,
       of: Number,
       default: {},
     },
-  },
-  { timestamps: true },
-);
 
-PlanSchema.index({ isActive: 1 });
+    pricing: {
+      type: PricingSchema,
+      required: true,
+    },
+
+    stripe: {
+      type: StripeMetadataSchema,
+      required: false,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);

@@ -8,6 +8,7 @@ import { PaginationResult } from "../../../domain/types/PaginationResult";
 import { RoomVisibility } from "../../../domain/types/RoomVisibility";
 import { RoomDocument, RoomLeanDoc } from "../schemas/room/RoomSchema";
 import { LimitKey } from "../../../domain/types/LimitKey";
+import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
 
 type LimitMap = Map<LimitKey, number>;
 
@@ -157,5 +158,12 @@ export class RoomRepository
       ...(doc.archivedAt && { archivedAt: doc.archivedAt }),
       ...(doc.purgedAt && { purgedAt: doc.purgedAt }),
     };
+  }
+
+  async countActiveRoomsByHostId(hostId: string): Promise<number> {
+    return this._model.countDocuments({
+      hostId: new Types.ObjectId(hostId),
+      lifecycleStatus: RoomLifeCycleStatus.ACTIVE,
+    });
   }
 }

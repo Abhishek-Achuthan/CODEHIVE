@@ -6,4 +6,5 @@ export interface IRoomRepository
   extends IGenericRepository<RoomEntity>
 {
     findAllPublic(page:number,limit:number ): Promise<PaginationResult<RoomEntity>>;
+    countActiveRoomsByHostId(hostId: string): Promise<number>;
 }
