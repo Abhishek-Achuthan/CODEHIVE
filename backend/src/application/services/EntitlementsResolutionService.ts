@@ -1,16 +1,11 @@
-import { inject, injectable } from "tsyringe";
-
-import type { IPlanRepository } from "../../domain/interfaces/IPlanRepository";
-import type { ISubscriptionRepository } from "../../domain/interfaces/ISubscriptionRepository";
-
-import { NotFoundError } from "../../core/errors/NotFoundError";
-
-import { ERROR_MESSAGES } from "../../shared/constants/errorMessages";
-
-import { SubscriptionStatus } from "../../domain/types/SubscriptionStatus";
-
-import { FeatureKey } from "../../domain/types/FeatureKey";
-import { LimitKey } from "../../domain/types/LimitKey";
+import { inject, injectable } from 'tsyringe';
+import type { IPlanRepository } from '../../domain/interfaces/IPlanRepository';
+import type { ISubscriptionRepository } from '../../domain/interfaces/ISubscriptionRepository';
+import { NotFoundError } from '../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
+import { SubscriptionStatus } from '../../domain/types/SubscriptionStatus';
+import { FeatureKey } from '../../domain/types/FeatureKey';
+import { LimitKey } from '../../domain/types/LimitKey';
 
 export interface ResolvedEntitlements {
   plan: {
@@ -40,10 +35,10 @@ const VALID_SUBSCRIPTION_STATUSES = [
 @injectable()
 export class EntitlementResolutionService {
   constructor(
-    @inject("IPlanRepository")
+    @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
 
-    @inject("ISubscriptionRepository")
+    @inject('ISubscriptionRepository')
     private readonly _subscriptionRepository: ISubscriptionRepository,
   ) {}
 
@@ -52,7 +47,7 @@ export class EntitlementResolutionService {
   ): Promise<ResolvedEntitlements> {
     const freePlan =
       await this._planRepository.findBySlug(
-        "free",
+        'free',
       );
 
     if (!freePlan) {

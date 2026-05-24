@@ -1,9 +1,9 @@
-import { injectable, inject } from "tsyringe";
-import { PaginationResult } from "../../../domain/types/PaginationResult";
-import type { PlanResponseDTO } from "../../dto/PlanDTO";
-import type { IPlanRepository } from "../../../domain/interfaces/IPlanRepository";
-import { PlanMapper } from "../../mapper/PlanMapper";
-import { IListAllPlansUseCase } from "../interface/plan/IListAllPlansUseCase";
+import { injectable, inject } from 'tsyringe';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
+import type { PlanResponseDTO } from '../../dto/PlanDTO';
+import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
+import { PlanMapper } from '../../mapper/PlanMapper';
+import { IListAllPlansUseCase } from '../interface/plan/IListAllPlansUseCase';
 
 @injectable()
 export class ListAllPlansUseCase implements IListAllPlansUseCase {

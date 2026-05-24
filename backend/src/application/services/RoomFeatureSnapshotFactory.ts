@@ -1,8 +1,6 @@
-import { injectable } from "tsyringe";
-
-import { RoomFeatureSnapshot } from "../../domain/entities/room/RoomEntity";
-
-import { ResolvedEntitlements } from "./EntitlementsResolutionService";
+import { injectable } from 'tsyringe';
+import { RoomFeatureSnapshot } from '../../domain/entities/room/RoomEntity';
+import { ResolvedEntitlements } from './EntitlementsResolutionService';
 
 @injectable()
 export class RoomFeatureSnapshotFactory {

@@ -63,7 +63,7 @@ export class SessionActivationConsumer {
               channel.nack(msg, false, true); 
             }
           } else {
-            this._logger.error(`[Queue Consumer] Session activation failed after 3 attempts or invalid payload. Nacking to DLQ.`, { sessionId });
+            this._logger.error('[Queue Consumer] Session activation failed after 3 attempts or invalid payload. Nacking to DLQ.', { sessionId });
             channel.nack(msg, false, false);
           }
         }

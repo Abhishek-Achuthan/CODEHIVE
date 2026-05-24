@@ -1,17 +1,17 @@
-import { inject, injectable } from "tsyringe";
-import { IUpdatePlanUseCase } from "../interface/plan/IUpdatePlanUseCase";
-import { PlanResponseDTO, UpdatePlanDTO } from "../../dto/PlanDTO";
-import type { IPlanRepository } from "../../../domain/interfaces/IPlanRepository";
-import { ConflictError } from "../../../core/errors/ConflictError";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { PlanMapper } from "../../mapper/PlanMapper";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { PlanEntity } from "../../../domain/entities/PlanEntity";
+import { inject, injectable } from 'tsyringe';
+import { IUpdatePlanUseCase } from '../interface/plan/IUpdatePlanUseCase';
+import { PlanResponseDTO, UpdatePlanDTO } from '../../dto/PlanDTO';
+import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
+import { ConflictError } from '../../../core/errors/ConflictError';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { PlanMapper } from '../../mapper/PlanMapper';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { PlanEntity } from '../../../domain/entities/PlanEntity';
 
 @injectable()
 export class UpdatePlanUseCase implements IUpdatePlanUseCase {
   constructor(
-    @inject("IPlanRepository")
+    @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
   ) {}
 

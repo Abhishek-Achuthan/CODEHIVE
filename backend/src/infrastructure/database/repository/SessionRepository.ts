@@ -1,19 +1,19 @@
-import { injectable } from "tsyringe";
-import { ISessionRepository } from "../../../domain/interfaces/ISessionReposiotry";
-import { SessionEntity } from "../../../domain/session/SessionEntity";
-import { PaginationResult } from "../../../domain/types/PaginationResult";
-import { GenericRepository } from "./GenericRepository";
-import { SessionModel } from "../models/session/SessionModel";
-import { SessionDoc, SessionLeanDoc } from "../schemas/session/SessionSchema";
-import { ClientSession, FilterQuery, Model, Types } from "mongoose";
-import { PopulatedSessionDoc } from "../types/PopulatedSessionDoc";
-import { UserLeanDoc } from "../schemas/UserSchema";
-import { EssentialUserInfo } from "../../../domain/types/EssentialUserInfo";
-import { SessionWithParticipants } from "../../../domain/types/SessionWithParticipants";
-import { SessionStatus } from "../../../domain/types/SessionStatus";
-import { SessionPaymentStatus } from "../../../domain/types/SessionPaymentStatus";
-import { PaymentSource } from "../../../domain/types/PaymentSource";
-import { SessionSchema } from "../../database/schemas/session/SessionSchema";
+import { injectable } from 'tsyringe';
+import { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
+import { SessionEntity } from '../../../domain/session/SessionEntity';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
+import { GenericRepository } from './GenericRepository';
+import { SessionModel } from '../models/session/SessionModel';
+import { SessionDoc, SessionLeanDoc } from '../schemas/session/SessionSchema';
+import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
+import { PopulatedSessionDoc } from '../types/PopulatedSessionDoc';
+import { UserLeanDoc } from '../schemas/UserSchema';
+import { EssentialUserInfo } from '../../../domain/types/EssentialUserInfo';
+import { SessionWithParticipants } from '../../../domain/types/SessionWithParticipants';
+import { SessionStatus } from '../../../domain/types/SessionStatus';
+import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
+import { PaymentSource } from '../../../domain/types/PaymentSource';
+import { SessionSchema } from '../../database/schemas/session/SessionSchema';
 
 @injectable()
 export class SessionRepository
@@ -25,14 +25,14 @@ export class SessionRepository
   }
 
   async create(
-    data: Omit<SessionEntity, "id" | "createdAt" | "updatedAt">,
+    data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<SessionEntity> {
     const session = await SessionModel.create(data);
     return this.toEntity(session);
   }
 
   async createWithSession(
-    data: Omit<SessionEntity, "id" | "createdAt" | "updatedAt">,
+    data: Omit<SessionEntity, 'id' | 'createdAt' | 'updatedAt'>,
     session: ClientSession,
   ): Promise<SessionEntity> {
     const docs = await SessionModel.create([data], { session });
@@ -54,12 +54,12 @@ export class SessionRepository
   async findByMentor(mentorId: string): Promise<SessionWithParticipants[]> {
     const docs = await SessionModel.find({ mentorId })
       .populate<{ mentorId: UserLeanDoc }>({
-        path: "mentorId",
-        select: "firstName lastName",
+        path: 'mentorId',
+        select: 'firstName lastName',
       })
       .populate<{ userId: UserLeanDoc }>({
-        path: "userId",
-        select: "firstName lastName",
+        path: 'userId',
+        select: 'firstName lastName',
       })
       .lean<PopulatedSessionDoc[]>();
 
@@ -101,12 +101,12 @@ export class SessionRepository
   async findByUser(userId: string): Promise<SessionWithParticipants[]> {
     const docs = await SessionModel.find({ userId })
       .populate<{ mentorId: UserLeanDoc }>({
-        path: "mentorId",
-        select: "firstName lastName",
+        path: 'mentorId',
+        select: 'firstName lastName',
       })
       .populate<{ userId: UserLeanDoc }>({
-        path: "userId",
-        select: "firstName lastName",
+        path: 'userId',
+        select: 'firstName lastName',
       })
       .lean<PopulatedSessionDoc[]>();
 
@@ -148,7 +148,7 @@ export class SessionRepository
   async listByParticipant(
     userId: string,
     options: {
-      role?: "mentor" | "mentee" | "all";
+      role?: 'mentor' | 'mentee' | 'all';
       page?: number;
       limit?: number;
       search?: string;
@@ -163,13 +163,13 @@ export class SessionRepository
     },
   ): Promise<PaginationResult<SessionWithParticipants>> {
     const query: FilterQuery<SessionDoc> = {};
-    const role = options.role ?? "all";
+    const role = options.role ?? 'all';
     const filter = options.filter;
     const andConditions: FilterQuery<SessionDoc>[] = [];
 
-    if (role === "mentor") {
+    if (role === 'mentor') {
       query.mentorId = new Types.ObjectId(userId);
-    } else if (role === "mentee") {
+    } else if (role === 'mentee') {
       query.userId = new Types.ObjectId(userId);
     } else {
       andConditions.push({
@@ -239,12 +239,12 @@ export class SessionRepository
     const docsQuery = SessionModel.find(query)
       .sort(sortCondition as any)
       .populate<{ mentorId: UserLeanDoc }>({
-        path: "mentorId",
-        select: "firstName lastName",
+        path: 'mentorId',
+        select: 'firstName lastName',
       })
       .populate<{ userId: UserLeanDoc }>({
-        path: "userId",
-        select: "firstName lastName",
+        path: 'userId',
+        select: 'firstName lastName',
       });
 
     if (options.page !== undefined && options.limit !== undefined) {
@@ -358,11 +358,11 @@ export class SessionRepository
     const doc: Partial<SessionDoc> = {};
 
     if (data.mentorId !== undefined)
-      doc.mentorId = data.mentorId as unknown as SessionDoc["mentorId"];
+      doc.mentorId = data.mentorId as unknown as SessionDoc['mentorId'];
     if (data.userId !== undefined)
-      doc.userId = data.userId as unknown as SessionDoc["userId"];
+      doc.userId = data.userId as unknown as SessionDoc['userId'];
     if (data.roomId !== undefined)
-      doc.roomId = data.roomId as unknown as SessionDoc["roomId"];
+      doc.roomId = data.roomId as unknown as SessionDoc['roomId'];
     if (data.startTime !== undefined) doc.startTime = data.startTime;
     if (data.endTime !== undefined) doc.endTime = data.endTime;
     if (data.status !== undefined) doc.status = data.status;

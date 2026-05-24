@@ -1,12 +1,12 @@
-import { inject, injectable } from "tsyringe";
-import { IResolveUserEntitlementsUseCase } from "../interface/entitlement/IResolveUserEntitlementsUseCase";
-import { ResolveUserEntitlementsResponseDTO } from "../../dto/PlanDTO";
-import type { IPlanRepository } from "../../../domain/interfaces/IPlanRepository";
-import type { ISubscriptionRepository } from "../../../domain/interfaces/ISubscriptionRepository";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { SubscriptionStatus } from "../../../domain/types/SubscriptionStatus";
-import { PlanMapper } from "../../mapper/PlanMapper";
+import { inject, injectable } from 'tsyringe';
+import { IResolveUserEntitlementsUseCase } from '../interface/entitlement/IResolveUserEntitlementsUseCase';
+import { ResolveUserEntitlementsResponseDTO } from '../../dto/PlanDTO';
+import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
+import type { ISubscriptionRepository } from '../../../domain/interfaces/ISubscriptionRepository';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
+import { PlanMapper } from '../../mapper/PlanMapper';
 
 const VALID_SUBSCRIPTION_STATUSES = [
   SubscriptionStatus.ACTIVE,
@@ -16,15 +16,15 @@ const VALID_SUBSCRIPTION_STATUSES = [
 @injectable()
 export class ResolveUserEntitlementsUseCase implements IResolveUserEntitlementsUseCase {
   constructor(
-    @inject("IPlanRepository")
+    @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
 
-    @inject("ISubscriptionRepository")
+    @inject('ISubscriptionRepository')
     private readonly _subscriptionRepository: ISubscriptionRepository,
   ) {}
 
   async execute(userId: string): Promise<ResolveUserEntitlementsResponseDTO> {
-    const freePlan = await this._planRepository.findBySlug("free");
+    const freePlan = await this._planRepository.findBySlug('free');
 
     if (!freePlan)
       throw new NotFoundError(ERROR_MESSAGES.PLAN.FREE_PLAN_NOT_FOUND);

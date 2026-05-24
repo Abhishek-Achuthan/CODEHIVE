@@ -1,253 +1,253 @@
-import { container } from "tsyringe";
-import { IUserRegisterUseCase } from "../../application/useCase/interface/auth/IUserRegisterUseCase";
-import { ISendOTPUseCase } from "../../application/useCase/interface/auth/ISendOTPUseCase";
-import { UserRegisterUseCase } from "../../application/useCase/auth/UserRegisterUseCase";
-import { SendOTPUseCase } from "../../application/useCase/auth/SendOTPUseCase";
-import { IVerifyOTPUseCase } from "../../application/useCase/interface/auth/IVerifyOTPUseCase";
-import { VerifyOTPUseCase } from "../../application/useCase/auth/VerifyOTPUseCase";
-import { IUserLoginUseCase } from "../../application/useCase/interface/auth/IUserLoginUseCase";
-import { UserLoginUseCase } from "../../application/useCase/auth/UserLoginUseCase";
-import { IForgotPasswordSendOTPUseCase } from "../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase";
-import { ForgotPasswordSendOTPUseCase } from "../../application/useCase/auth/ForgotPasswordSendOTPUseCase";
-import { IForgotPasswordVerifyOTPUseCase } from "../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase";
-import { ForgotPasswordVerifyOTPUseCase } from "../../application/useCase/auth/ForgotPasswordVerifyOTPUseCase";
-import { IResetPasswordUseCase } from "../../application/useCase/interface/auth/IResetPasswordUseCase";
-import { ResetPasswordUseCase } from "../../application/useCase/auth/ResetPasswordUseCase";
-import { IListUsersUseCase } from "../../application/useCase/interface/admin/IListUsersUseCase";
-import { ListUsersUseCase } from "../../application/useCase/admin/ListUsersUseCase";
-import { IUpdateUserStatusUseCase } from "../../application/useCase/interface/admin/IUpdateUserStatusUseCase";
-import { UpdateUserStatusUseCase } from "../../application/useCase/admin/UpdateUserStatusUseCase";
-import { IUserLogoutUseCase } from "../../application/useCase/interface/auth/IUserLogoutUseCase";
-import { UserLogoutUseCase } from "../../application/useCase/auth/UserLogoutUseCase";
-import { IRefreshAccessTokenUseCase } from "../../application/useCase/interface/auth/IRefreshAccessTokenUseCase";
-import { RefreshAccessTokenUseCase } from "../../application/useCase/auth/RefreshAccessTokenUseCase";
-import { IGoogleLoginUseCase } from "../../application/useCase/interface/auth/IGoogleLoginUseCase";
-import { GoogleLoginUseCase } from "../../application/useCase/auth/GoogleLoginUseCase";
-import { IChangePasswordUseCase } from "../../application/useCase/interface/auth/IChangePasswordUseCase";
-import { ChangePasswordUseCase } from "../../application/useCase/auth/ChangePasswordUseCase";
-import { IGithubLoginUseCase } from "../../application/useCase/interface/auth/IGithubLoginUseCase";
-import { GithubLoginUseCase } from "../../application/useCase/auth/GithubLoginUseCase";
-import { IInitiateGithubOAuthUseCase } from "../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase";
-import { InitiateGithubOAuthUseCase } from "../../application/useCase/auth/InitiateGithubOAuthUseCase";
-import { ICreateQuestionUseCase } from "../../application/useCase/interface/qna/ICreateQuestionUseCase";
-import { CreateQuestionUseCase } from "../../application/useCase/qna/createQuestionUseCase";
-import { IListQuestionUseCase } from "../../application/useCase/interface/qna/IListQuestionsUseCase";
-import { ListQuestionUseCase } from "../../application/useCase/qna/ListQuestionUseCase";
-import { IPostAnswerUseCase } from "../../application/useCase/interface/qna/IPostAnswerUseCase";
-import { PostAnswerUseCase } from "../../application/useCase/qna/PostAnswerUseCase";
-import { IListAnswerUseCase } from "../../application/useCase/interface/qna/IListAnswerUseCase";
-import { ListAnswerUseCase } from "../../application/useCase/qna/ListAnswerUseCase";
-import { IGetQuestionUseCase } from "../../application/useCase/interface/qna/IGetQuestionUseCase";
-import { GetQuestionUseCase } from "../../application/useCase/qna/GetQuestionUseCase";
-import { IRelatedQuestionUseCase } from "../../application/useCase/interface/qna/IRelatedQuestionUseCase";
-import { RelatedQuestionUseCase } from "../../application/useCase/qna/RelatedQuestionUseCase";
-import { IToggleSaveQuestionUseCase } from "../../application/useCase/interface/qna/IToggleSaveQuestionUseCase";
-import { ToggleSaveQuestionUseCase } from "../../application/useCase/qna/ToggleSaveQuestionUseCase";
-import { IEditQuestionUseCase } from "../../application/useCase/interface/qna/IEditQuestionUseCase";
-import { EditQuestionUseCase } from "../../application/useCase/qna/EditQuestionUseCase";
-import { IEditAnswerUseCase } from "../../application/useCase/interface/qna/IEditAnswerUseCase";
-import { EditAnswerUseCase } from "../../application/useCase/qna/EditAnswerUseCase";
-import { IGetAnswerUseCase } from "../../application/useCase/interface/qna/IGetAnswerUseCase";
-import { GetAnswerUseCase } from "../../application/useCase/qna/GetAnswerUseCase";
-import { IListUserQuestionsUseCase } from "../../application/useCase/interface/qna/IListUserQuestionsUseCase";
-import { ListUserQuestionsUseCase } from "../../application/useCase/qna/ListUserQuestionsUseCase";
-import { IListAnsweredQuestionUseCase } from "../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase";
-import { listAnsweredQuestionUseCase } from "../../application/useCase/qna/ListAnsweredQuestionUseCase";
-import { IRecordQuestionViewUseCase } from "../../application/useCase/interface/qna/IRecordQuestionViewUseCase";
-import { RecordQuestionViewUseCase } from "../../application/useCase/qna/RecordQuestionViewUseCase";
-import { IVoteQuestionUseCase } from "../../application/useCase/interface/qna/IVoteQuestionUseCase";
-import { VoteQuestionUseCase } from "../../application/useCase/qna/VoteQuestionUseCase";
-import { IVoteAnswerUseCase } from "../../application/useCase/interface/qna/IVoteAnswerUseCase";
-import { VoteAnswerUseCase } from "../../application/useCase/qna/VoteAnswerUseCase";
-import { ICreateSavedListUseCase } from "../../application/useCase/interface/qna/ICreateSavedListUseCase";
-import { CreateSavedListUseCase } from "../../application/useCase/qna/CreateSavedListUseCase";
-import { IListSavedListsUseCase } from "../../application/useCase/interface/qna/IListSavedListsUseCase";
-import { ListSavedListsUseCase } from "../../application/useCase/qna/ListSavedListsUseCase";
-import { IAddQuestionToSavedListUseCase } from "../../application/useCase/interface/qna/IAddQuestionToSavedListUseCase";
-import { AddQuestionToSavedListUseCase } from "../../application/useCase/qna/AddQuestionToSavedListUseCase";
-import { IRemoveQuestionFromSavedListUseCase } from "../../application/useCase/interface/qna/IRemoveQuestionFromSavedListUseCase";
-import { RemoveQuestionFromSavedListUseCase } from "../../application/useCase/qna/RemoveQuestionFromSavedListUseCase";
-import { IListSavedQuestionsUseCase } from "../../application/useCase/interface/qna/IListSavedQuestionsUseCase";
-import { ListSavedQuestionsUseCase } from "../../application/useCase/qna/ListSavedQuestionsUseCase";
-import { IListSavedListQuestionsUseCase } from "../../application/useCase/interface/qna/IListSavedListQuestionsUseCase";
-import { ListSavedListQuestionsUseCase } from "../../application/useCase/qna/ListSavedListQuestionsUseCase";
-import { IGetSavedListIdsForQuestionUseCase } from "../../application/useCase/interface/qna/IGetSavedListIdsForQuestionUseCase";
-import { GetSavedListIdsForQuestionUseCase } from "../../application/useCase/qna/GetSavedListIdsForQuestionUseCase";
-import { IDeleteSavedListUseCase } from "../../application/useCase/interface/qna/IDeleteSavedListUseCase";
-import { DeleteSavedListUseCase } from "../../application/useCase/qna/DeleteSavedListUseCase";
-import { IAcceptAnswerUseCase } from "../../application/useCase/interface/qna/IAcceptAnswerUseCase";
-import { AcceptAnswerUseCase } from "../../application/useCase/qna/AcceptAnswerUseCase";
-import { IAiAssistantUseCase } from "../../application/useCase/interface/qna/IAiAssistantUseCase";
-import { AiAssistantUseCase } from "../../application/useCase/qna/AiAssistantUseCase";
-import { ICreateAiChatSessionUseCase } from "../../application/useCase/interface/qna/ICreateAiChatSessionUseCase";
-import { CreateAiChatSessionUseCase } from "../../application/useCase/qna/CreateAiChatSessionUseCase";
-import { IListAiChatSessionsUseCase } from "../../application/useCase/interface/qna/IListAiChatSessionsUseCase";
-import { ListAiChatSessionsUseCase } from "../../application/useCase/qna/ListAiChatSessionsUseCase";
-import { IGetAiChatMessagesUseCase } from "../../application/useCase/interface/qna/IGetAiChatMessagesUseCase";
-import { GetAiChatMessagesUseCase } from "../../application/useCase/qna/GetAiChatMessagesUseCase";
-import { IUpdateUserProfileUseCase } from "../../application/useCase/interface/user/IUpdateUserProfileUseCase";
-import { UpdateUserProfileUseCase } from "../../application/useCase/user/UpdateUserProfileUseCase";
-import { IDeleteQuestionUseCase } from "../../application/useCase/interface/qna/IDeleteQuestionUseCase";
-import { DeleteQuestionUseCase } from "../../application/useCase/qna/DeleteQuestionUseCase";
-import { IDeleteAnswerUseCase } from "../../application/useCase/interface/qna/IDeleteAnswerUseCase";
-import { DeleteAnswerUseCase } from "../../application/useCase/qna/DeleteAnswerUseCase";
-import { IRemoveAcceptedAnswerUseCase } from "../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase";
-import { RemoveAcceptedAnswerUseCase } from "../../application/useCase/qna/RemoveAcceptedAnswerUseCase";
-import { IUnsaveItemUseCase } from "../../application/useCase/interface/qna/IUnsaveItemUseCase";
-import { UnsaveItemUseCase } from "../../application/useCase/qna/UnsaveItemUseCase";
-import { IListMentorsUseCase } from "../../application/useCase/interface/mentor/IListMentorsUseCase";
-import { ListMentorsUseCase } from "../../application/useCase/mentor/ListMentorsUseCase";
-import { IGetBookedSessionsUseCase } from "../../application/useCase/interface/session/IGetBookedSessionsUseCase";
-import { GetBookedSessionsUseCase } from "../../application/useCase/session/GetBookedSessionsUseCase";
-import { ICreateMentorAvailabilityUseCase } from "../../application/useCase/interface/mentor/ICreateMentorAvailabilityUseCase";
-import { CreateMentorAvailabilityUseCase } from "../../application/useCase/mentor/CreateMentorAvailabilityUseCase";
-import { IGetMentorAvailabilityUseCase } from "../../application/useCase/interface/mentor/IGetMentorAvailabilityUseCase";
-import { GetMentorAvailabilityUseCase } from "../../application/useCase/mentor/GetMentorAvailabilityUseCase";
-import { IGetAvailableSlotsUseCase } from "../../application/useCase/interface/session/IGetAvailableSlotsUseCase";
-import { GetAvailableSlotsUseCase } from "../../application/useCase/session/GetAvailableSlotsUseCase";
-import { IBookSessionWithStripeUseCase } from "../../application/useCase/interface/session/IBookSessionWithStripeUseCase";
-import { BookSessionWithStripeUseCase } from "../../application/useCase/session/BookSessionWithStripeUseCase";
-import { IBookSessionWithWalletUseCase } from "../../application/useCase/interface/session/IBookSessionWithWalletUseCase";
-import { BookSessionWithWalletUseCase } from "../../application/useCase/session/BookSessionWithWalletUseCase";
-import { IHandleStripeWebhookUseCase } from "../../application/useCase/interface/payment/IHandleStripeWebhookUseCase";
-import { HandleStripeWebhookUseCase } from "../../application/useCase/payment/HandleStripeWebhookUseCase";
-import { IGetMyWalletUseCase } from "../../application/useCase/interface/wallet/IGetMyWalletUseCase";
-import { GetMyWalletUseCase } from "../../application/useCase/wallet/GetMyWalletUseCase";
-import { IGetWalletTransactionsUseCase } from "../../application/useCase/interface/wallet/IGetWalletTransactionsUseCase";
-import { GetWalletTransactionsUseCase } from "../../application/useCase/wallet/GetWalletTransactionsUseCase";
-import { ICancelSessionUseCase } from "../../application/useCase/interface/session/ICancelSessionUseCase";
-import { CancelSessionUseCase } from "../../application/useCase/session/CancelSessionUseCase";
-import { ICancelBookingReservationUseCase } from "../../application/useCase/interface/session/ICancelBookingReservationUseCase";
-import { CancelBookingReservationUseCase } from "../../application/useCase/session/CancelBookingReservationUseCase";
-import { IGetBookingReservationStatusUseCase } from "../../application/useCase/interface/session/IGetBookingReservationStatusUseCase";
-import { GetBookingReservationStatusUseCase } from "../../application/useCase/session/GetBookingReservationStatusUseCase";
-import { IDeleteMentorAvailabilityUseCase } from "../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase";
-import { DeleteMentorAvailabilityUseCase } from "../../application/useCase/mentor/DeleteMentorAvailabilityUseCase";
-import { IAddAvailabilityExceptionUseCase } from "../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase";
-import { AddAvailabilityExceptionUseCase } from "../../application/useCase/mentor/AddAvailabilityExceptionUseCase";
-import { IApplyForMentorUseCase } from "../../application/useCase/interface/user/IApplyForMentorUseCase";
-import { ApplyForMentorUseCase } from "../../application/useCase/user/ApplyForMentorUseCase";
-import { IListMentorApplicationUseCase } from "../../application/useCase/interface/admin/IListMentorApplicationUseCase";
-import { ListMentorApplicationUseCase } from "../../application/useCase/admin/ListMentorApplicationUseCase";
-import { IUpdateMentorStatusUseCase } from "../../application/useCase/interface/admin/IUpdateMentorStatusUseCase";
-import { UpdateMentorStatusUseCase } from "../../application/useCase/admin/UpdateMentorStatusUseCase";
-import { IViewMentorProfileUseCase } from "../../application/useCase/interface/mentor/IViewMentorProfileUseCase";
-import { ViewMentorProfileUseCase } from "../../application/useCase/mentor/ViewMentorProfileUseCase";
-import { ICreateRoomUseCase } from "../../application/useCase/interface/room/ICreateRoomUseCase";
-import { CreateRoomUseCase } from "../../application/useCase/room/CreateRoomUseCase";
-import { IJoinRoomUseCase } from "../../application/useCase/interface/room/IJoinRoomUseCase";
-import { JoinRoomUseCase } from "../../application/useCase/room/JoinRoomUseCase";
-import { ISendMessageUseCase } from "../../application/useCase/interface/message/ISendMessageUseCase";
-import { SendMessageUseCase } from "../../application/useCase/message/SendMessageUseCase";
-import { IEditMessageUseCase } from "../../application/useCase/interface/message/IEditMessageUseCase";
-import { EditMessageUseCase } from "../../application/useCase/message/EditMessageUseCase";
-import { IDeleteMessageUseCase } from "../../application/useCase/interface/message/IDeleteMessageUseCase";
-import { DeleteMessageUseCase } from "../../application/useCase/message/DeleteMessageUseCase";
-import { IGetPublicRoomsUseCase } from "../../application/useCase/interface/room/IGetPublicRoomsUseCase";
-import { GetPublicRoomsUseCase } from "../../application/useCase/room/GetPublicRoomsUseCase";
-import { ILeaveRoomUseCase } from "../../application/useCase/interface/room/ILeaveRoomUseCase";
-import { LeaveRoomUseCase } from "../../application/useCase/room/LeaveRoomUseCase";
-import { IAuthenticateRealtimeUserUseCase } from "../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase";
-import { AuthenticateRealtimeUserUseCase } from "../../application/useCase/realtime/AuthenticateRealtimeUserUseCase";
-import { IAuthorizeCollaborationAccessUseCase } from "../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase";
-import { AuthorizeCollaborationAccessUseCase } from "../../application/useCase/realtime/AuthorizeCollaborationAccessUseCase";
-import { ICreatePollUseCase } from "../../application/useCase/interface/poll/ICreatePollUseCase";
-import { CreatePollUseCase } from "../../application/useCase/poll/CreatePollUseCase";
-import { ISubmitPollVoteUseCase } from "../../application/useCase/interface/poll/ISubmitPollVoteUseCase";
-import { SubmitPollVoteUseCase } from "../../application/useCase/poll/SubmitPollVoteUseCase";
-import { IGetActivePollUseCase } from "../../application/useCase/interface/poll/IGetActivePollUseCase";
-import { GetActivePollUseCase } from "../../application/useCase/poll/GetActivePollUseCase";
-import { IClosePollUseCase } from "../../application/useCase/interface/poll/IClosePollUseCase";
-import { ClosePollUseCase } from "../../application/useCase/poll/ClosePollUseCase";
-import { ISavePrivateNoteUseCase } from "../../application/useCase/interface/notes/privateNote/ISavePrivateNoteUseCase";
-import { SavePrivateNoteUseCase } from "../../application/useCase/notes/privateNote/SavePrivateNoteUseCase";
-import { IGetPrivateNoteUseCase } from "../../application/useCase/interface/notes/privateNote/IGetPrivateNoteUseCase";
-import { GetPrivateNoteUseCase } from "../../application/useCase/notes/privateNote/GetPrivateNoteUseCase";
-import { GetPublicNoteUseCase } from "../../application/useCase/notes/publicNote/GetPublicNoteUseCase";
-import { IGetPublicNoteUseCase } from "../../application/useCase/interface/notes/privateNote/IGetPublicNoteUseCase";
-import { ISavePublicNoteUseCase } from "../../application/useCase/interface/notes/ISavePublicNoteUseCase";
-import { SavePublicNoteUseCase } from "../../application/useCase/notes/publicNote/SavePublicNoteUseCase";
-import { IActivateUpcomingSessionUseCase } from "../../application/useCase/interface/room/IActivateUpcomingSessionRoomsUseCase";
-import { ActivateUpcomingSessionUseCase } from "../../application/useCase/session/ActivateUpcomingSessionUseCase";
-import { ICreatePlanUseCase } from "../../application/useCase/interface/plan/ICreatePlanUseCase";
-import { CreatePlanUseCase } from "../../application/useCase/plan/CreatePlanUseCase";
-import { IUpdatePlanUseCase } from "../../application/useCase/interface/plan/IUpdatePlanUseCase";
-import { UpdatePlanUseCase } from "../../application/useCase/plan/UpdatePlanUseCase";
-import { IListActivePlansUseCase } from "../../application/useCase/interface/plan/IListActivePlansUseCase";
-import { ListActivePlansUseCase } from "../../application/useCase/plan/ListActivePlansUseCase";
-import { IGetPlanByIdUseCase } from "../../application/useCase/interface/plan/IGetPlanByIdUseCase";
-import { GetPlanByIdUseCase } from "../../application/useCase/plan/GetPlanByIdUseCase";
-import { ListAllPlansUseCase } from "../../application/useCase/plan/ListAllPlansUseCase";
-import { IGetPlanBySlugUseCase } from "../../application/useCase/interface/plan/IGetPlanBySlugUseCase";
-import { GetPlanBySlugUseCase } from "../../application/useCase/plan/GetPlanBySlugUseCase";
-import { IArchivePlanUseCase } from "../../application/useCase/interface/plan/IArchivePlanUseCase";
-import { ArchivePlanUseCase } from "../../application/useCase/plan/ArchivePlanUseCase";
-import { IResolveUserEntitlementsUseCase } from "../../application/useCase/interface/entitlement/IResolveUserEntitlementsUseCase";
-import { ResolveUserEntitlementsUseCase } from "../../application/useCase/entitlement/ResolveUserEntitlementsUseCase";
+import { container } from 'tsyringe';
+import { IUserRegisterUseCase } from '../../application/useCase/interface/auth/IUserRegisterUseCase';
+import { ISendOTPUseCase } from '../../application/useCase/interface/auth/ISendOTPUseCase';
+import { UserRegisterUseCase } from '../../application/useCase/auth/UserRegisterUseCase';
+import { SendOTPUseCase } from '../../application/useCase/auth/SendOTPUseCase';
+import { IVerifyOTPUseCase } from '../../application/useCase/interface/auth/IVerifyOTPUseCase';
+import { VerifyOTPUseCase } from '../../application/useCase/auth/VerifyOTPUseCase';
+import { IUserLoginUseCase } from '../../application/useCase/interface/auth/IUserLoginUseCase';
+import { UserLoginUseCase } from '../../application/useCase/auth/UserLoginUseCase';
+import { IForgotPasswordSendOTPUseCase } from '../../application/useCase/interface/auth/IForgotPasswordSendOTPUseCase';
+import { ForgotPasswordSendOTPUseCase } from '../../application/useCase/auth/ForgotPasswordSendOTPUseCase';
+import { IForgotPasswordVerifyOTPUseCase } from '../../application/useCase/interface/auth/IForgotPasswordVerifyOTPUseCase';
+import { ForgotPasswordVerifyOTPUseCase } from '../../application/useCase/auth/ForgotPasswordVerifyOTPUseCase';
+import { IResetPasswordUseCase } from '../../application/useCase/interface/auth/IResetPasswordUseCase';
+import { ResetPasswordUseCase } from '../../application/useCase/auth/ResetPasswordUseCase';
+import { IListUsersUseCase } from '../../application/useCase/interface/admin/IListUsersUseCase';
+import { ListUsersUseCase } from '../../application/useCase/admin/ListUsersUseCase';
+import { IUpdateUserStatusUseCase } from '../../application/useCase/interface/admin/IUpdateUserStatusUseCase';
+import { UpdateUserStatusUseCase } from '../../application/useCase/admin/UpdateUserStatusUseCase';
+import { IUserLogoutUseCase } from '../../application/useCase/interface/auth/IUserLogoutUseCase';
+import { UserLogoutUseCase } from '../../application/useCase/auth/UserLogoutUseCase';
+import { IRefreshAccessTokenUseCase } from '../../application/useCase/interface/auth/IRefreshAccessTokenUseCase';
+import { RefreshAccessTokenUseCase } from '../../application/useCase/auth/RefreshAccessTokenUseCase';
+import { IGoogleLoginUseCase } from '../../application/useCase/interface/auth/IGoogleLoginUseCase';
+import { GoogleLoginUseCase } from '../../application/useCase/auth/GoogleLoginUseCase';
+import { IChangePasswordUseCase } from '../../application/useCase/interface/auth/IChangePasswordUseCase';
+import { ChangePasswordUseCase } from '../../application/useCase/auth/ChangePasswordUseCase';
+import { IGithubLoginUseCase } from '../../application/useCase/interface/auth/IGithubLoginUseCase';
+import { GithubLoginUseCase } from '../../application/useCase/auth/GithubLoginUseCase';
+import { IInitiateGithubOAuthUseCase } from '../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
+import { InitiateGithubOAuthUseCase } from '../../application/useCase/auth/InitiateGithubOAuthUseCase';
+import { ICreateQuestionUseCase } from '../../application/useCase/interface/qna/ICreateQuestionUseCase';
+import { CreateQuestionUseCase } from '../../application/useCase/qna/createQuestionUseCase';
+import { IListQuestionUseCase } from '../../application/useCase/interface/qna/IListQuestionsUseCase';
+import { ListQuestionUseCase } from '../../application/useCase/qna/ListQuestionUseCase';
+import { IPostAnswerUseCase } from '../../application/useCase/interface/qna/IPostAnswerUseCase';
+import { PostAnswerUseCase } from '../../application/useCase/qna/PostAnswerUseCase';
+import { IListAnswerUseCase } from '../../application/useCase/interface/qna/IListAnswerUseCase';
+import { ListAnswerUseCase } from '../../application/useCase/qna/ListAnswerUseCase';
+import { IGetQuestionUseCase } from '../../application/useCase/interface/qna/IGetQuestionUseCase';
+import { GetQuestionUseCase } from '../../application/useCase/qna/GetQuestionUseCase';
+import { IRelatedQuestionUseCase } from '../../application/useCase/interface/qna/IRelatedQuestionUseCase';
+import { RelatedQuestionUseCase } from '../../application/useCase/qna/RelatedQuestionUseCase';
+import { IToggleSaveQuestionUseCase } from '../../application/useCase/interface/qna/IToggleSaveQuestionUseCase';
+import { ToggleSaveQuestionUseCase } from '../../application/useCase/qna/ToggleSaveQuestionUseCase';
+import { IEditQuestionUseCase } from '../../application/useCase/interface/qna/IEditQuestionUseCase';
+import { EditQuestionUseCase } from '../../application/useCase/qna/EditQuestionUseCase';
+import { IEditAnswerUseCase } from '../../application/useCase/interface/qna/IEditAnswerUseCase';
+import { EditAnswerUseCase } from '../../application/useCase/qna/EditAnswerUseCase';
+import { IGetAnswerUseCase } from '../../application/useCase/interface/qna/IGetAnswerUseCase';
+import { GetAnswerUseCase } from '../../application/useCase/qna/GetAnswerUseCase';
+import { IListUserQuestionsUseCase } from '../../application/useCase/interface/qna/IListUserQuestionsUseCase';
+import { ListUserQuestionsUseCase } from '../../application/useCase/qna/ListUserQuestionsUseCase';
+import { IListAnsweredQuestionUseCase } from '../../application/useCase/interface/qna/IListAnsweredQuestionsUseCase';
+import { listAnsweredQuestionUseCase } from '../../application/useCase/qna/ListAnsweredQuestionUseCase';
+import { IRecordQuestionViewUseCase } from '../../application/useCase/interface/qna/IRecordQuestionViewUseCase';
+import { RecordQuestionViewUseCase } from '../../application/useCase/qna/RecordQuestionViewUseCase';
+import { IVoteQuestionUseCase } from '../../application/useCase/interface/qna/IVoteQuestionUseCase';
+import { VoteQuestionUseCase } from '../../application/useCase/qna/VoteQuestionUseCase';
+import { IVoteAnswerUseCase } from '../../application/useCase/interface/qna/IVoteAnswerUseCase';
+import { VoteAnswerUseCase } from '../../application/useCase/qna/VoteAnswerUseCase';
+import { ICreateSavedListUseCase } from '../../application/useCase/interface/qna/ICreateSavedListUseCase';
+import { CreateSavedListUseCase } from '../../application/useCase/qna/CreateSavedListUseCase';
+import { IListSavedListsUseCase } from '../../application/useCase/interface/qna/IListSavedListsUseCase';
+import { ListSavedListsUseCase } from '../../application/useCase/qna/ListSavedListsUseCase';
+import { IAddQuestionToSavedListUseCase } from '../../application/useCase/interface/qna/IAddQuestionToSavedListUseCase';
+import { AddQuestionToSavedListUseCase } from '../../application/useCase/qna/AddQuestionToSavedListUseCase';
+import { IRemoveQuestionFromSavedListUseCase } from '../../application/useCase/interface/qna/IRemoveQuestionFromSavedListUseCase';
+import { RemoveQuestionFromSavedListUseCase } from '../../application/useCase/qna/RemoveQuestionFromSavedListUseCase';
+import { IListSavedQuestionsUseCase } from '../../application/useCase/interface/qna/IListSavedQuestionsUseCase';
+import { ListSavedQuestionsUseCase } from '../../application/useCase/qna/ListSavedQuestionsUseCase';
+import { IListSavedListQuestionsUseCase } from '../../application/useCase/interface/qna/IListSavedListQuestionsUseCase';
+import { ListSavedListQuestionsUseCase } from '../../application/useCase/qna/ListSavedListQuestionsUseCase';
+import { IGetSavedListIdsForQuestionUseCase } from '../../application/useCase/interface/qna/IGetSavedListIdsForQuestionUseCase';
+import { GetSavedListIdsForQuestionUseCase } from '../../application/useCase/qna/GetSavedListIdsForQuestionUseCase';
+import { IDeleteSavedListUseCase } from '../../application/useCase/interface/qna/IDeleteSavedListUseCase';
+import { DeleteSavedListUseCase } from '../../application/useCase/qna/DeleteSavedListUseCase';
+import { IAcceptAnswerUseCase } from '../../application/useCase/interface/qna/IAcceptAnswerUseCase';
+import { AcceptAnswerUseCase } from '../../application/useCase/qna/AcceptAnswerUseCase';
+import { IAiAssistantUseCase } from '../../application/useCase/interface/qna/IAiAssistantUseCase';
+import { AiAssistantUseCase } from '../../application/useCase/qna/AiAssistantUseCase';
+import { ICreateAiChatSessionUseCase } from '../../application/useCase/interface/qna/ICreateAiChatSessionUseCase';
+import { CreateAiChatSessionUseCase } from '../../application/useCase/qna/CreateAiChatSessionUseCase';
+import { IListAiChatSessionsUseCase } from '../../application/useCase/interface/qna/IListAiChatSessionsUseCase';
+import { ListAiChatSessionsUseCase } from '../../application/useCase/qna/ListAiChatSessionsUseCase';
+import { IGetAiChatMessagesUseCase } from '../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
+import { GetAiChatMessagesUseCase } from '../../application/useCase/qna/GetAiChatMessagesUseCase';
+import { IUpdateUserProfileUseCase } from '../../application/useCase/interface/user/IUpdateUserProfileUseCase';
+import { UpdateUserProfileUseCase } from '../../application/useCase/user/UpdateUserProfileUseCase';
+import { IDeleteQuestionUseCase } from '../../application/useCase/interface/qna/IDeleteQuestionUseCase';
+import { DeleteQuestionUseCase } from '../../application/useCase/qna/DeleteQuestionUseCase';
+import { IDeleteAnswerUseCase } from '../../application/useCase/interface/qna/IDeleteAnswerUseCase';
+import { DeleteAnswerUseCase } from '../../application/useCase/qna/DeleteAnswerUseCase';
+import { IRemoveAcceptedAnswerUseCase } from '../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
+import { RemoveAcceptedAnswerUseCase } from '../../application/useCase/qna/RemoveAcceptedAnswerUseCase';
+import { IUnsaveItemUseCase } from '../../application/useCase/interface/qna/IUnsaveItemUseCase';
+import { UnsaveItemUseCase } from '../../application/useCase/qna/UnsaveItemUseCase';
+import { IListMentorsUseCase } from '../../application/useCase/interface/mentor/IListMentorsUseCase';
+import { ListMentorsUseCase } from '../../application/useCase/mentor/ListMentorsUseCase';
+import { IGetBookedSessionsUseCase } from '../../application/useCase/interface/session/IGetBookedSessionsUseCase';
+import { GetBookedSessionsUseCase } from '../../application/useCase/session/GetBookedSessionsUseCase';
+import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/ICreateMentorAvailabilityUseCase';
+import { CreateMentorAvailabilityUseCase } from '../../application/useCase/mentor/CreateMentorAvailabilityUseCase';
+import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IGetMentorAvailabilityUseCase';
+import { GetMentorAvailabilityUseCase } from '../../application/useCase/mentor/GetMentorAvailabilityUseCase';
+import { IGetAvailableSlotsUseCase } from '../../application/useCase/interface/session/IGetAvailableSlotsUseCase';
+import { GetAvailableSlotsUseCase } from '../../application/useCase/session/GetAvailableSlotsUseCase';
+import { IBookSessionWithStripeUseCase } from '../../application/useCase/interface/session/IBookSessionWithStripeUseCase';
+import { BookSessionWithStripeUseCase } from '../../application/useCase/session/BookSessionWithStripeUseCase';
+import { IBookSessionWithWalletUseCase } from '../../application/useCase/interface/session/IBookSessionWithWalletUseCase';
+import { BookSessionWithWalletUseCase } from '../../application/useCase/session/BookSessionWithWalletUseCase';
+import { IHandleStripeWebhookUseCase } from '../../application/useCase/interface/payment/IHandleStripeWebhookUseCase';
+import { HandleStripeWebhookUseCase } from '../../application/useCase/payment/HandleStripeWebhookUseCase';
+import { IGetMyWalletUseCase } from '../../application/useCase/interface/wallet/IGetMyWalletUseCase';
+import { GetMyWalletUseCase } from '../../application/useCase/wallet/GetMyWalletUseCase';
+import { IGetWalletTransactionsUseCase } from '../../application/useCase/interface/wallet/IGetWalletTransactionsUseCase';
+import { GetWalletTransactionsUseCase } from '../../application/useCase/wallet/GetWalletTransactionsUseCase';
+import { ICancelSessionUseCase } from '../../application/useCase/interface/session/ICancelSessionUseCase';
+import { CancelSessionUseCase } from '../../application/useCase/session/CancelSessionUseCase';
+import { ICancelBookingReservationUseCase } from '../../application/useCase/interface/session/ICancelBookingReservationUseCase';
+import { CancelBookingReservationUseCase } from '../../application/useCase/session/CancelBookingReservationUseCase';
+import { IGetBookingReservationStatusUseCase } from '../../application/useCase/interface/session/IGetBookingReservationStatusUseCase';
+import { GetBookingReservationStatusUseCase } from '../../application/useCase/session/GetBookingReservationStatusUseCase';
+import { IDeleteMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase';
+import { DeleteMentorAvailabilityUseCase } from '../../application/useCase/mentor/DeleteMentorAvailabilityUseCase';
+import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
+import { AddAvailabilityExceptionUseCase } from '../../application/useCase/mentor/AddAvailabilityExceptionUseCase';
+import { IApplyForMentorUseCase } from '../../application/useCase/interface/user/IApplyForMentorUseCase';
+import { ApplyForMentorUseCase } from '../../application/useCase/user/ApplyForMentorUseCase';
+import { IListMentorApplicationUseCase } from '../../application/useCase/interface/admin/IListMentorApplicationUseCase';
+import { ListMentorApplicationUseCase } from '../../application/useCase/admin/ListMentorApplicationUseCase';
+import { IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
+import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
+import { IViewMentorProfileUseCase } from '../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
+import { ViewMentorProfileUseCase } from '../../application/useCase/mentor/ViewMentorProfileUseCase';
+import { ICreateRoomUseCase } from '../../application/useCase/interface/room/ICreateRoomUseCase';
+import { CreateRoomUseCase } from '../../application/useCase/room/CreateRoomUseCase';
+import { IJoinRoomUseCase } from '../../application/useCase/interface/room/IJoinRoomUseCase';
+import { JoinRoomUseCase } from '../../application/useCase/room/JoinRoomUseCase';
+import { ISendMessageUseCase } from '../../application/useCase/interface/message/ISendMessageUseCase';
+import { SendMessageUseCase } from '../../application/useCase/message/SendMessageUseCase';
+import { IEditMessageUseCase } from '../../application/useCase/interface/message/IEditMessageUseCase';
+import { EditMessageUseCase } from '../../application/useCase/message/EditMessageUseCase';
+import { IDeleteMessageUseCase } from '../../application/useCase/interface/message/IDeleteMessageUseCase';
+import { DeleteMessageUseCase } from '../../application/useCase/message/DeleteMessageUseCase';
+import { IGetPublicRoomsUseCase } from '../../application/useCase/interface/room/IGetPublicRoomsUseCase';
+import { GetPublicRoomsUseCase } from '../../application/useCase/room/GetPublicRoomsUseCase';
+import { ILeaveRoomUseCase } from '../../application/useCase/interface/room/ILeaveRoomUseCase';
+import { LeaveRoomUseCase } from '../../application/useCase/room/LeaveRoomUseCase';
+import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
+import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
+import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
+import { AuthorizeCollaborationAccessUseCase } from '../../application/useCase/realtime/AuthorizeCollaborationAccessUseCase';
+import { ICreatePollUseCase } from '../../application/useCase/interface/poll/ICreatePollUseCase';
+import { CreatePollUseCase } from '../../application/useCase/poll/CreatePollUseCase';
+import { ISubmitPollVoteUseCase } from '../../application/useCase/interface/poll/ISubmitPollVoteUseCase';
+import { SubmitPollVoteUseCase } from '../../application/useCase/poll/SubmitPollVoteUseCase';
+import { IGetActivePollUseCase } from '../../application/useCase/interface/poll/IGetActivePollUseCase';
+import { GetActivePollUseCase } from '../../application/useCase/poll/GetActivePollUseCase';
+import { IClosePollUseCase } from '../../application/useCase/interface/poll/IClosePollUseCase';
+import { ClosePollUseCase } from '../../application/useCase/poll/ClosePollUseCase';
+import { ISavePrivateNoteUseCase } from '../../application/useCase/interface/notes/privateNote/ISavePrivateNoteUseCase';
+import { SavePrivateNoteUseCase } from '../../application/useCase/notes/privateNote/SavePrivateNoteUseCase';
+import { IGetPrivateNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPrivateNoteUseCase';
+import { GetPrivateNoteUseCase } from '../../application/useCase/notes/privateNote/GetPrivateNoteUseCase';
+import { GetPublicNoteUseCase } from '../../application/useCase/notes/publicNote/GetPublicNoteUseCase';
+import { IGetPublicNoteUseCase } from '../../application/useCase/interface/notes/privateNote/IGetPublicNoteUseCase';
+import { ISavePublicNoteUseCase } from '../../application/useCase/interface/notes/ISavePublicNoteUseCase';
+import { SavePublicNoteUseCase } from '../../application/useCase/notes/publicNote/SavePublicNoteUseCase';
+import { IActivateUpcomingSessionUseCase } from '../../application/useCase/interface/room/IActivateUpcomingSessionRoomsUseCase';
+import { ActivateUpcomingSessionUseCase } from '../../application/useCase/session/ActivateUpcomingSessionUseCase';
+import { ICreatePlanUseCase } from '../../application/useCase/interface/plan/ICreatePlanUseCase';
+import { CreatePlanUseCase } from '../../application/useCase/plan/CreatePlanUseCase';
+import { IUpdatePlanUseCase } from '../../application/useCase/interface/plan/IUpdatePlanUseCase';
+import { UpdatePlanUseCase } from '../../application/useCase/plan/UpdatePlanUseCase';
+import { IListActivePlansUseCase } from '../../application/useCase/interface/plan/IListActivePlansUseCase';
+import { ListActivePlansUseCase } from '../../application/useCase/plan/ListActivePlansUseCase';
+import { IGetPlanByIdUseCase } from '../../application/useCase/interface/plan/IGetPlanByIdUseCase';
+import { GetPlanByIdUseCase } from '../../application/useCase/plan/GetPlanByIdUseCase';
+import { ListAllPlansUseCase } from '../../application/useCase/plan/ListAllPlansUseCase';
+import { IGetPlanBySlugUseCase } from '../../application/useCase/interface/plan/IGetPlanBySlugUseCase';
+import { GetPlanBySlugUseCase } from '../../application/useCase/plan/GetPlanBySlugUseCase';
+import { IArchivePlanUseCase } from '../../application/useCase/interface/plan/IArchivePlanUseCase';
+import { ArchivePlanUseCase } from '../../application/useCase/plan/ArchivePlanUseCase';
+import { IResolveUserEntitlementsUseCase } from '../../application/useCase/interface/entitlement/IResolveUserEntitlementsUseCase';
+import { ResolveUserEntitlementsUseCase } from '../../application/useCase/entitlement/ResolveUserEntitlementsUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
     //----------------------------------Auth----------------------------------------//
 
-    container.register<IUserRegisterUseCase>("IUserRegisterUseCase", {
+    container.register<IUserRegisterUseCase>('IUserRegisterUseCase', {
       useClass: UserRegisterUseCase,
     });
 
-    container.register<ISendOTPUseCase>("ISendOTPUseCase", {
+    container.register<ISendOTPUseCase>('ISendOTPUseCase', {
       useClass: SendOTPUseCase,
     });
 
-    container.register<IVerifyOTPUseCase>("IVerifyOTPUseCase", {
+    container.register<IVerifyOTPUseCase>('IVerifyOTPUseCase', {
       useClass: VerifyOTPUseCase,
     });
 
-    container.register<IUserLoginUseCase>("IUserLoginUseCase", {
+    container.register<IUserLoginUseCase>('IUserLoginUseCase', {
       useClass: UserLoginUseCase,
     });
 
     container.register<IForgotPasswordSendOTPUseCase>(
-      "IForgotPasswordSendOTPUseCase",
+      'IForgotPasswordSendOTPUseCase',
       {
         useClass: ForgotPasswordSendOTPUseCase,
       },
     );
 
     container.register<IForgotPasswordVerifyOTPUseCase>(
-      "IForgotPasswordVerifyOTPUseCase",
+      'IForgotPasswordVerifyOTPUseCase',
       {
         useClass: ForgotPasswordVerifyOTPUseCase,
       },
     );
 
-    container.register<IResetPasswordUseCase>("IResetPasswordUseCase", {
+    container.register<IResetPasswordUseCase>('IResetPasswordUseCase', {
       useClass: ResetPasswordUseCase,
     });
 
-    container.register<IChangePasswordUseCase>("IChangePasswordUseCase", {
+    container.register<IChangePasswordUseCase>('IChangePasswordUseCase', {
       useClass: ChangePasswordUseCase,
     });
 
-    container.register<IUserLogoutUseCase>("IUserLogoutUseCase", {
+    container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {
       useClass: UserLogoutUseCase,
     });
 
     container.register<IRefreshAccessTokenUseCase>(
-      "IRefreshAccessTokenUseCase",
+      'IRefreshAccessTokenUseCase',
       {
         useClass: RefreshAccessTokenUseCase,
       },
     );
 
-    container.register<IGoogleLoginUseCase>("IGoogleLoginUseCase", {
+    container.register<IGoogleLoginUseCase>('IGoogleLoginUseCase', {
       useClass: GoogleLoginUseCase,
     });
 
-    container.register<IGithubLoginUseCase>("IGithubLoginUseCase", {
+    container.register<IGithubLoginUseCase>('IGithubLoginUseCase', {
       useClass: GithubLoginUseCase,
     });
 
     container.register<IInitiateGithubOAuthUseCase>(
-      "IInitiateGithubOAuthUseCase",
+      'IInitiateGithubOAuthUseCase',
       {
         useClass: InitiateGithubOAuthUseCase,
       },
@@ -255,23 +255,23 @@ export class UseCaseModule {
 
     //----------------------------------Admin----------------------------------------//
 
-    container.register<IListUsersUseCase>("IListUsersUseCase", {
+    container.register<IListUsersUseCase>('IListUsersUseCase', {
       useClass: ListUsersUseCase,
     });
 
-    container.register<IUpdateUserStatusUseCase>("IUpdateUserStatusUseCase", {
+    container.register<IUpdateUserStatusUseCase>('IUpdateUserStatusUseCase', {
       useClass: UpdateUserStatusUseCase,
     });
 
     container.register<IListMentorApplicationUseCase>(
-      "IListMentorApplicationUseCase",
+      'IListMentorApplicationUseCase',
       {
         useClass: ListMentorApplicationUseCase,
       },
     );
 
     container.register<IUpdateMentorStatusUseCase>(
-      "IUpdateMentorStatusUseCase",
+      'IUpdateMentorStatusUseCase',
       {
         useClass: UpdateMentorStatusUseCase,
       },
@@ -279,162 +279,162 @@ export class UseCaseModule {
 
     //----------------------------------QnA----------------------------------------//
 
-    container.register<ICreateQuestionUseCase>("ICreateQuestionUseCase", {
+    container.register<ICreateQuestionUseCase>('ICreateQuestionUseCase', {
       useClass: CreateQuestionUseCase,
     });
 
-    container.register<IListQuestionUseCase>("IListQuestionUseCase", {
+    container.register<IListQuestionUseCase>('IListQuestionUseCase', {
       useClass: ListQuestionUseCase,
     });
 
-    container.register<IPostAnswerUseCase>("IPostAnswerUseCase", {
+    container.register<IPostAnswerUseCase>('IPostAnswerUseCase', {
       useClass: PostAnswerUseCase,
     });
 
-    container.register<IListAnswerUseCase>("IListAnswerUseCase", {
+    container.register<IListAnswerUseCase>('IListAnswerUseCase', {
       useClass: ListAnswerUseCase,
     });
 
-    container.register<IGetQuestionUseCase>("IGetQuestionUseCase", {
+    container.register<IGetQuestionUseCase>('IGetQuestionUseCase', {
       useClass: GetQuestionUseCase,
     });
 
-    container.register<IRelatedQuestionUseCase>("IRelatedQuestionUseCase", {
+    container.register<IRelatedQuestionUseCase>('IRelatedQuestionUseCase', {
       useClass: RelatedQuestionUseCase,
     });
 
     container.register<IToggleSaveQuestionUseCase>(
-      "IToggleSaveQuestionUseCase",
+      'IToggleSaveQuestionUseCase',
       {
         useClass: ToggleSaveQuestionUseCase,
       },
     );
 
-    container.register<IUnsaveItemUseCase>("IUnsaveItemUseCase", {
+    container.register<IUnsaveItemUseCase>('IUnsaveItemUseCase', {
       useClass: UnsaveItemUseCase,
     });
 
-    container.register<IEditQuestionUseCase>("IEditQuestionUseCase", {
+    container.register<IEditQuestionUseCase>('IEditQuestionUseCase', {
       useClass: EditQuestionUseCase,
     });
 
-    container.register<IEditAnswerUseCase>("IEditAnswerUseCase", {
+    container.register<IEditAnswerUseCase>('IEditAnswerUseCase', {
       useClass: EditAnswerUseCase,
     });
 
-    container.register<IGetAnswerUseCase>("IGetAnswerUseCase", {
+    container.register<IGetAnswerUseCase>('IGetAnswerUseCase', {
       useClass: GetAnswerUseCase,
     });
 
-    container.register<IListUserQuestionsUseCase>("IListUserQuestionsUseCase", {
+    container.register<IListUserQuestionsUseCase>('IListUserQuestionsUseCase', {
       useClass: ListUserQuestionsUseCase,
     });
 
     container.register<IListAnsweredQuestionUseCase>(
-      "IListAnsweredQuestionUseCase",
+      'IListAnsweredQuestionUseCase',
       {
         useClass: listAnsweredQuestionUseCase,
       },
     );
 
     container.register<IRecordQuestionViewUseCase>(
-      "IRecordQuestionViewUseCase",
+      'IRecordQuestionViewUseCase',
       {
         useClass: RecordQuestionViewUseCase,
       },
     );
 
-    container.register<IVoteQuestionUseCase>("IVoteQuestionUseCase", {
+    container.register<IVoteQuestionUseCase>('IVoteQuestionUseCase', {
       useClass: VoteQuestionUseCase,
     });
 
-    container.register<IVoteAnswerUseCase>("IVoteAnswerUseCase", {
+    container.register<IVoteAnswerUseCase>('IVoteAnswerUseCase', {
       useClass: VoteAnswerUseCase,
     });
 
-    container.register<ICreateSavedListUseCase>("ICreateSavedListUseCase", {
+    container.register<ICreateSavedListUseCase>('ICreateSavedListUseCase', {
       useClass: CreateSavedListUseCase,
     });
 
-    container.register<IListSavedListsUseCase>("IListSavedListsUseCase", {
+    container.register<IListSavedListsUseCase>('IListSavedListsUseCase', {
       useClass: ListSavedListsUseCase,
     });
 
     container.register<IAddQuestionToSavedListUseCase>(
-      "IAddQuestionToSavedListUseCase",
+      'IAddQuestionToSavedListUseCase',
       {
         useClass: AddQuestionToSavedListUseCase,
       },
     );
 
     container.register<IRemoveQuestionFromSavedListUseCase>(
-      "IRemoveQuestionFromSavedListUseCase",
+      'IRemoveQuestionFromSavedListUseCase',
       {
         useClass: RemoveQuestionFromSavedListUseCase,
       },
     );
 
     container.register<IListSavedQuestionsUseCase>(
-      "IListSavedQuestionsUseCase",
+      'IListSavedQuestionsUseCase',
       {
         useClass: ListSavedQuestionsUseCase,
       },
     );
 
     container.register<IListSavedListQuestionsUseCase>(
-      "IListSavedListQuestionsUseCase",
+      'IListSavedListQuestionsUseCase',
       {
         useClass: ListSavedListQuestionsUseCase,
       },
     );
 
     container.register<IGetSavedListIdsForQuestionUseCase>(
-      "IGetSavedListIdsForQuestionUseCase",
+      'IGetSavedListIdsForQuestionUseCase',
       {
         useClass: GetSavedListIdsForQuestionUseCase,
       },
     );
 
-    container.register<IDeleteSavedListUseCase>("IDeleteSavedListUseCase", {
+    container.register<IDeleteSavedListUseCase>('IDeleteSavedListUseCase', {
       useClass: DeleteSavedListUseCase,
     });
 
-    container.register<IAcceptAnswerUseCase>("IAcceptAnswerUseCase", {
+    container.register<IAcceptAnswerUseCase>('IAcceptAnswerUseCase', {
       useClass: AcceptAnswerUseCase,
     });
 
-    container.register<IAiAssistantUseCase>("IAiAssistantUseCase", {
+    container.register<IAiAssistantUseCase>('IAiAssistantUseCase', {
       useClass: AiAssistantUseCase,
     });
 
     container.register<ICreateAiChatSessionUseCase>(
-      "ICreateAiChatSessionUseCase",
+      'ICreateAiChatSessionUseCase',
       {
         useClass: CreateAiChatSessionUseCase,
       },
     );
 
     container.register<IListAiChatSessionsUseCase>(
-      "IListAiChatSessionsUseCase",
+      'IListAiChatSessionsUseCase',
       {
         useClass: ListAiChatSessionsUseCase,
       },
     );
 
-    container.register<IGetAiChatMessagesUseCase>("IGetAiChatMessagesUseCase", {
+    container.register<IGetAiChatMessagesUseCase>('IGetAiChatMessagesUseCase', {
       useClass: GetAiChatMessagesUseCase,
     });
 
-    container.register<IDeleteQuestionUseCase>("IDeleteQuestionUseCase", {
+    container.register<IDeleteQuestionUseCase>('IDeleteQuestionUseCase', {
       useClass: DeleteQuestionUseCase,
     });
 
-    container.register<IDeleteAnswerUseCase>("IDeleteAnswerUseCase", {
+    container.register<IDeleteAnswerUseCase>('IDeleteAnswerUseCase', {
       useClass: DeleteAnswerUseCase,
     });
 
     container.register<IRemoveAcceptedAnswerUseCase>(
-      "IRemoveAcceptedAnswerUseCase",
+      'IRemoveAcceptedAnswerUseCase',
       {
         useClass: RemoveAcceptedAnswerUseCase,
       },
@@ -442,53 +442,53 @@ export class UseCaseModule {
 
     //---------------------------------Room--------------------------------------//
 
-    container.register<ICreateRoomUseCase>("ICreateRoomUseCase", {
+    container.register<ICreateRoomUseCase>('ICreateRoomUseCase', {
       useClass: CreateRoomUseCase,
     });
 
-    container.register<IJoinRoomUseCase>("IJoinRoomUseCase", {
+    container.register<IJoinRoomUseCase>('IJoinRoomUseCase', {
       useClass: JoinRoomUseCase,
     });
 
-    container.register<IGetPublicRoomsUseCase>("IGetPublicRoomsUseCase", {
+    container.register<IGetPublicRoomsUseCase>('IGetPublicRoomsUseCase', {
       useClass: GetPublicRoomsUseCase,
     });
 
-    container.register<ISendMessageUseCase>("ISendMessageUseCase", {
+    container.register<ISendMessageUseCase>('ISendMessageUseCase', {
       useClass: SendMessageUseCase,
     });
 
-    container.register<IEditMessageUseCase>("IEditMessageUseCase", {
+    container.register<IEditMessageUseCase>('IEditMessageUseCase', {
       useClass: EditMessageUseCase,
     });
 
-    container.register<IDeleteMessageUseCase>("IDeleteMessageUseCase", {
+    container.register<IDeleteMessageUseCase>('IDeleteMessageUseCase', {
       useClass: DeleteMessageUseCase,
     });
 
-    container.register<ILeaveRoomUseCase>("ILeaveRoomUseCase", {
+    container.register<ILeaveRoomUseCase>('ILeaveRoomUseCase', {
       useClass: LeaveRoomUseCase,
     });
 
-    container.register<ICreatePollUseCase>("ICreatePollUseCase", {
+    container.register<ICreatePollUseCase>('ICreatePollUseCase', {
       useClass: CreatePollUseCase,
     });
 
-    container.register<ISubmitPollVoteUseCase>("ISubmitPollVoteUseCase", {
+    container.register<ISubmitPollVoteUseCase>('ISubmitPollVoteUseCase', {
       useClass: SubmitPollVoteUseCase,
     });
 
     //---------------------------------Realtime--------------------------------------//
 
     container.register<IAuthenticateRealtimeUserUseCase>(
-      "IAuthenticateRealtimeUserUseCase",
+      'IAuthenticateRealtimeUserUseCase',
       {
         useClass: AuthenticateRealtimeUserUseCase,
       },
     );
 
     container.register<IAuthorizeCollaborationAccessUseCase>(
-      "IAuthorizeCollaborationAccessUseCase",
+      'IAuthorizeCollaborationAccessUseCase',
       {
         useClass: AuthorizeCollaborationAccessUseCase,
       },
@@ -496,84 +496,84 @@ export class UseCaseModule {
 
     //---------------------------------Session---------------------------------------//
 
-    container.register<IListMentorsUseCase>("IListMentorsUseCase", {
+    container.register<IListMentorsUseCase>('IListMentorsUseCase', {
       useClass: ListMentorsUseCase,
     });
 
-    container.register<IGetBookedSessionsUseCase>("IGetBookedSessionsUseCase", {
+    container.register<IGetBookedSessionsUseCase>('IGetBookedSessionsUseCase', {
       useClass: GetBookedSessionsUseCase,
     });
 
     container.register<ICreateMentorAvailabilityUseCase>(
-      "ICreateMentorAvailabilityUseCase",
+      'ICreateMentorAvailabilityUseCase',
       {
         useClass: CreateMentorAvailabilityUseCase,
       },
     );
 
-    container.register<IGetAvailableSlotsUseCase>("IGetAvailableSlotsUseCase", {
+    container.register<IGetAvailableSlotsUseCase>('IGetAvailableSlotsUseCase', {
       useClass: GetAvailableSlotsUseCase,
     });
 
     container.register<IGetMentorAvailabilityUseCase>(
-      "IGetMentorAvailabilityUseCase",
+      'IGetMentorAvailabilityUseCase',
       {
         useClass: GetMentorAvailabilityUseCase,
       },
     );
 
     container.register<IBookSessionWithStripeUseCase>(
-      "IBookSessionWithStripeUseCase",
+      'IBookSessionWithStripeUseCase',
       {
         useClass: BookSessionWithStripeUseCase,
       },
     );
 
     container.register<IBookSessionWithWalletUseCase>(
-      "IBookSessionWithWalletUseCase",
+      'IBookSessionWithWalletUseCase',
       {
         useClass: BookSessionWithWalletUseCase,
       },
     );
 
     container.register<IGetBookingReservationStatusUseCase>(
-      "IGetBookingReservationStatusUseCase",
+      'IGetBookingReservationStatusUseCase',
       {
         useClass: GetBookingReservationStatusUseCase,
       },
     );
 
-    container.register<ICancelSessionUseCase>("ICancelSessionUseCase", {
+    container.register<ICancelSessionUseCase>('ICancelSessionUseCase', {
       useClass: CancelSessionUseCase,
     });
 
     container.register<ICancelBookingReservationUseCase>(
-      "ICancelBookingReservationUseCase",
+      'ICancelBookingReservationUseCase',
       {
         useClass: CancelBookingReservationUseCase,
       },
     );
 
     container.register<IDeleteMentorAvailabilityUseCase>(
-      "IDeleteMentorAvailabilityUseCase",
+      'IDeleteMentorAvailabilityUseCase',
       {
         useClass: DeleteMentorAvailabilityUseCase,
       },
     );
 
     container.register<IAddAvailabilityExceptionUseCase>(
-      "IAddAvailabilityExceptionUseCase",
+      'IAddAvailabilityExceptionUseCase',
       {
         useClass: AddAvailabilityExceptionUseCase,
       },
     );
 
-    container.register<IViewMentorProfileUseCase>("IViewMentorProfileUseCase", {
+    container.register<IViewMentorProfileUseCase>('IViewMentorProfileUseCase', {
       useClass: ViewMentorProfileUseCase,
     });
 
     container.register<IActivateUpcomingSessionUseCase>(
-      "IActivateUpcomingSessionUseCase",
+      'IActivateUpcomingSessionUseCase',
       {
         useClass: ActivateUpcomingSessionUseCase,
       },
@@ -582,7 +582,7 @@ export class UseCaseModule {
     //---------------------------------Payment---------------------------------------//
 
     container.register<IHandleStripeWebhookUseCase>(
-      "IHandleStripeWebhookUseCase",
+      'IHandleStripeWebhookUseCase',
       {
         useClass: HandleStripeWebhookUseCase,
       },
@@ -590,12 +590,12 @@ export class UseCaseModule {
 
     //---------------------------------Wallet---------------------------------------//
 
-    container.register<IGetMyWalletUseCase>("IGetMyWalletUseCase", {
+    container.register<IGetMyWalletUseCase>('IGetMyWalletUseCase', {
       useClass: GetMyWalletUseCase,
     });
 
     container.register<IGetWalletTransactionsUseCase>(
-      "IGetWalletTransactionsUseCase",
+      'IGetWalletTransactionsUseCase',
       {
         useClass: GetWalletTransactionsUseCase,
       },
@@ -603,74 +603,74 @@ export class UseCaseModule {
 
     //---------------------------------User---------------------------------------//
 
-    container.register<IUpdateUserProfileUseCase>("IUpdateUserProfileUseCase", {
+    container.register<IUpdateUserProfileUseCase>('IUpdateUserProfileUseCase', {
       useClass: UpdateUserProfileUseCase,
     });
 
-    container.register<IApplyForMentorUseCase>("IApplyForMentorUseCase", {
+    container.register<IApplyForMentorUseCase>('IApplyForMentorUseCase', {
       useClass: ApplyForMentorUseCase,
     });
 
     //---------------------------------Poll---------------------------------------//
 
-    container.register<IGetActivePollUseCase>("IGetActivePollUseCase", {
+    container.register<IGetActivePollUseCase>('IGetActivePollUseCase', {
       useClass: GetActivePollUseCase,
     });
 
-    container.register<IClosePollUseCase>("IClosePollUseCase", {
+    container.register<IClosePollUseCase>('IClosePollUseCase', {
       useClass: ClosePollUseCase,
     });
 
     //---------------------------------Notes--------------------------------------//
 
-    container.register<ISavePrivateNoteUseCase>("ISavePrivateNoteUseCase", {
+    container.register<ISavePrivateNoteUseCase>('ISavePrivateNoteUseCase', {
       useClass: SavePrivateNoteUseCase,
     });
 
-    container.register<IGetPrivateNoteUseCase>("IGetPrivateNoteUseCase", {
+    container.register<IGetPrivateNoteUseCase>('IGetPrivateNoteUseCase', {
       useClass: GetPrivateNoteUseCase,
     });
 
-    container.register<IGetPublicNoteUseCase>("IGetPublicNoteUseCase", {
+    container.register<IGetPublicNoteUseCase>('IGetPublicNoteUseCase', {
       useClass: GetPublicNoteUseCase,
     });
 
-    container.register<ISavePublicNoteUseCase>("ISavePublicNoteUseCase", {
+    container.register<ISavePublicNoteUseCase>('ISavePublicNoteUseCase', {
       useClass: SavePublicNoteUseCase,
     });
 
     //---------------------------------Plan--------------------------------------//
 
-    container.register<ICreatePlanUseCase>("ICreatePlanUseCase", {
+    container.register<ICreatePlanUseCase>('ICreatePlanUseCase', {
       useClass: CreatePlanUseCase,
     });
 
-    container.register<IUpdatePlanUseCase>("IUpdatePlanUseCase", {
+    container.register<IUpdatePlanUseCase>('IUpdatePlanUseCase', {
       useClass: UpdatePlanUseCase,
     });
 
-    container.register<IListActivePlansUseCase>("IListActivePlanUseCase", {
+    container.register<IListActivePlansUseCase>('IListActivePlanUseCase', {
       useClass: ListActivePlansUseCase,
     });
 
-    container.register<IGetPlanByIdUseCase>("IGetPlanByIdUseCase", {
+    container.register<IGetPlanByIdUseCase>('IGetPlanByIdUseCase', {
       useClass: GetPlanByIdUseCase,
     });
 
-    container.register<IListActivePlansUseCase>("IListActivePlansUseCase", {
+    container.register<IListActivePlansUseCase>('IListActivePlansUseCase', {
       useClass: ListAllPlansUseCase,
     });
 
-    container.register<IGetPlanBySlugUseCase>("IGetPlanBySlugUseCase", {
+    container.register<IGetPlanBySlugUseCase>('IGetPlanBySlugUseCase', {
       useClass: GetPlanBySlugUseCase,
     });
 
-    container.register<IArchivePlanUseCase>("IArchivePlanUseCase", {
+    container.register<IArchivePlanUseCase>('IArchivePlanUseCase', {
       useClass: ArchivePlanUseCase,
     });
 
     container.register<IResolveUserEntitlementsUseCase>(
-      "IResolveUserEntitlementsUseCase",
+      'IResolveUserEntitlementsUseCase',
       {
         useClass: ResolveUserEntitlementsUseCase,
       },

@@ -1,15 +1,15 @@
-import { inject, injectable } from "tsyringe";
-import { ICreatePlanUseCase } from "../interface/plan/ICreatePlanUseCase";
-import { CreatePlanDTO, PlanResponseDTO } from "../../dto/PlanDTO";
-import type { IPlanRepository } from "../../../domain/interfaces/IPlanRepository";
-import { ConflictError } from "../../../core/errors/ConflictError";
-import { PlanMapper } from "../../mapper/PlanMapper";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { inject, injectable } from 'tsyringe';
+import { ICreatePlanUseCase } from '../interface/plan/ICreatePlanUseCase';
+import { CreatePlanDTO, PlanResponseDTO } from '../../dto/PlanDTO';
+import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
+import { ConflictError } from '../../../core/errors/ConflictError';
+import { PlanMapper } from '../../mapper/PlanMapper';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class CreatePlanUseCase implements ICreatePlanUseCase {
   constructor(
-    @inject("IPlanRepository")
+    @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
   ) {}
 

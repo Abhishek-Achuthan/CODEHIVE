@@ -1,4 +1,4 @@
 export enum RoomType {
-  CUSTOM = "CUSTOM",
-  SESSION = "SESSION"
+  CUSTOM = 'CUSTOM',
+  SESSION = 'SESSION'
 }

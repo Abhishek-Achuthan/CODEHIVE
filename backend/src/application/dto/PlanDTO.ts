@@ -1,6 +1,6 @@
-import { FeatureKey } from "../../domain/types/FeatureKey";
-import { LimitKey } from "../../domain/types/LimitKey";
-import { SubscriptionStatus } from "../../domain/types/SubscriptionStatus";
+import { FeatureKey } from '../../domain/types/FeatureKey';
+import { LimitKey } from '../../domain/types/LimitKey';
+import { SubscriptionStatus } from '../../domain/types/SubscriptionStatus';
 
 export interface CreatePlanDTO {
   name: string;
