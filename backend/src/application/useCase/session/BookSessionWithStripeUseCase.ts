@@ -7,11 +7,13 @@ import type { ISlotConflictService } from '../../ports/slot/ISlotConflictService
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import type { ILoggerService } from '../../ports/logging/ILoggerService';
 import type { IPaymentService } from '../../ports/payment/IPaymentService';
+import { EntitlementResolutionService } from '../../services/EntitlementsResolutionService';
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { UserRole } from '../../../domain/types/UserRole';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
+import { FeatureKey } from '../../../domain/types/FeatureKey';
 import { BookingReservationStatus } from '../../../domain/types/BookingReservationStatus';
 import { RefundStatus } from '../../../domain/types/RefundStatus';
 import { SessionMapper } from '../../mapper/SessionMapper';
@@ -40,12 +42,19 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     @inject('IPaymentService')
     private readonly _paymentService: IPaymentService,
     @inject('ILoggerService')
-    private readonly _logger: ILoggerService
+    private readonly _logger: ILoggerService,
+    @inject(EntitlementResolutionService)
+    private readonly _entitlementResolutionService: EntitlementResolutionService,
   ) {}
 
   async execute(input: BookSessionDTO): Promise<StripeCheckoutResponseDTO> {
-    const { mentorId, userId, date, startTime, endTime, topic, clientRequestId } =
-      input;
+    const { mentorId, userId, date, startTime, endTime, topic, clientRequestId } = input;
+
+
+    const studentEntitlements = await this._entitlementResolutionService.resolve(userId);
+    if (!studentEntitlements.features.includes(FeatureKey.SESSION_BOOKING)) {
+      throw new ForbiddenError(ERROR_MESSAGES.SESSION.SESSION_BOOKING_NOT_ALLOWED);
+    }
 
     const mentor = await this._userRepository.find(mentorId);
 
@@ -81,7 +90,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
         mentorId,
         date,
         start,
-        clientRequestId
+        clientRequestId,
       );
 
     if (
@@ -90,48 +99,37 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       existingReservation.status !== BookingReservationStatus.EXPIRED
     ) {
       return {
-        reservation:
-          SessionMapper.toBookingReservationResponse(existingReservation),
+        reservation: SessionMapper.toBookingReservationResponse(existingReservation),
         clientSecret: await this._paymentService.getPaymentIntentClientSecret(
-          existingReservation.stripePaymentIntentId
+          existingReservation.stripePaymentIntentId,
         ),
         paymentIntentId: existingReservation.stripePaymentIntentId,
         expiresAt: existingReservation.expiresAt.toISOString(),
       };
     }
 
-    const derivedSlots = this._rruleSlotService.generateSlots(
-      availabilities,
-      from,
-      to
-    );
+    const derivedSlots = this._rruleSlotService.generateSlots(availabilities, from, to);
 
-    const existingSessions = await this._sessionRepo.findByMentorAndDate(
-      mentorId,
-      date
-    );
+    const existingSessions = await this._sessionRepo.findByMentorAndDate(mentorId, date);
     const activeReservations =
       await this._bookingReservationRepository.findActivePendingByMentorAndDate(
         mentorId,
         date,
-        now
+        now,
       );
 
-    const freeSlots = this._slotConflictService.filterBookedSlots(
-      derivedSlots,
-      [
-        ...existingSessions,
-        ...activeReservations.map((reservation) =>
-          SessionMapper.toSessionLikeLock(reservation)
-        ),
-      ]
-    );
+    const freeSlots = this._slotConflictService.filterBookedSlots(derivedSlots, [
+      ...existingSessions,
+      ...activeReservations.map((reservation) =>
+        SessionMapper.toSessionLikeLock(reservation),
+      ),
+    ]);
 
     const matchedSlot = freeSlots.find(
       (slot) =>
         slot.date === date &&
         slot.startTime === startTime &&
-        slot.endTime === endTime
+        slot.endTime === endTime,
     );
 
     if (!matchedSlot) {
@@ -143,7 +141,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       date,
       start,
       end,
-      now
+      now,
     );
 
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
@@ -168,17 +166,17 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
         refundStatus: RefundStatus.NONE,
       });
     } catch (error: unknown) {
-      if (this.isDuplicateKeyError(error)) {
+      if (this._isDuplicateKeyError(error)) {
         const conflictingReservation =
           await this._bookingReservationRepository.findActivePendingByMentorAndDate(
             mentorId,
             date,
-            now
+            now,
           );
         const sameSlotConflict = conflictingReservation.find(
           (entry) =>
             entry.startTime.getTime() === start.getTime() &&
-            entry.endTime.getTime() === end.getTime()
+            entry.endTime.getTime() === end.getTime(),
         );
 
         if (sameSlotConflict) {
@@ -193,11 +191,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       reservationId: reservation.id,
       userId,
       mentorId,
-      slot: {
-        date,
-        startTime,
-        endTime,
-      },
+      slot: { date, startTime, endTime },
       bookingStartKey,
     });
 
@@ -205,14 +199,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
       amount: matchedSlot.price,
       currency: 'inr',
       idempotencyKey: `pi:create:${reservation.id}`,
-      metadata: {
-        reservationId: reservation.id,
-        mentorId,
-        userId,
-        date,
-        startTime,
-        endTime,
-      },
+      metadata: { reservationId: reservation.id, mentorId, userId, date, startTime, endTime },
     });
 
     this._logger.info('payment_intent.created', {
@@ -222,15 +209,11 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
 
     const updatedReservation = await this._bookingReservationRepository.update(
       reservation.id,
-      {
-        stripePaymentIntentId: payment.paymentIntentId,
-      }
+      { stripePaymentIntentId: payment.paymentIntentId },
     );
 
     if (!updatedReservation) {
-      throw new ConflictError(
-        ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_UPDATE_FAILED
-      );
+      throw new ConflictError(ERROR_MESSAGES.SESSION.BOOKING_RESERVATION_UPDATE_FAILED);
     }
 
     return {
@@ -241,7 +224,12 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
     };
   }
 
-  private isDuplicateKeyError(error: unknown): error is { code: number } {
-    return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
+  private _isDuplicateKeyError(error: unknown): error is { code: number } {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    );
   }
 }

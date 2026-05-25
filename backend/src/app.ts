@@ -22,6 +22,7 @@ import {
   socketHandlers,
   socketService,
   stripeRefundRetryService,
+  loggerService
 } from './config/di/resolver';
 import { initializeRabbitMQConnection } from './config/rabbitMQConfig';
 import { RoomRoutes } from './presentation/routes/RoomRoutes';
@@ -31,8 +32,10 @@ export class App {
   private readonly _app: Express;
   private readonly _httpServer: HttpServer;
   private readonly _io: SocketIOServer;
-
-  constructor() {
+  private readonly _logger;
+  constructor(
+    
+  ) {
     this._app = express();
     this._httpServer = createServer(this._app);
     this._io = new SocketIOServer(this._httpServer, {
@@ -45,7 +48,8 @@ export class App {
     this.configRoutes();
     this.configSocket();
     this.configErrorHanldingMiddleWares();
-  }
+    this._logger = loggerService;
+    }
 
   private async configDb() {
     await MongodbConfig.connectDB();
@@ -109,13 +113,22 @@ export class App {
   }
 
   public async listen() {
-    await this.configDb();
-    this.startBackgroundJobs();
-    await initializeRabbitMQConnection();
-    hocuspocusService.listen();
-    this._httpServer.listen(env.port, () => {
-      console.log(`server started at port ${env.port}`);
-    });
+    try {
+      await this.configDb();
+      this.startBackgroundJobs();
+      await initializeRabbitMQConnection();
+      hocuspocusService.listen();
+      this._httpServer.listen(env.port, () => {
+        this._logger.info(`server started at port ${env.port}`)
+      }); 
+    } catch (error) {``
+      if(error instanceof Error) {
+        this._logger.error(error.message);
+      }else {
+        this._logger.error('Unknown startup error');
+      }
+      process.exit(1)
+    }
   }
 }
 

@@ -16,32 +16,58 @@ export class StripeWebhookEventRepository
     type: string,
     session: ClientSession
   ): Promise<StripeWebhookBeginResult> {
-    const existing = await StripeWebhookEventModel.findOne({ eventId }).session(
-      session
-    );
-
-    if (existing) {
-      if (existing.status === StripeWebhookProcessingStatus.PROCESSED) {
-        return 'processed';
-      }
-
-      return 'processing';
-    }
-
-    await StripeWebhookEventModel.create(
-      [
-        {
+    const existing = await StripeWebhookEventModel.findOneAndUpdate(
+      { eventId },
+      {
+        $setOnInsert: {
           eventId,
           type,
           status: StripeWebhookProcessingStatus.PROCESSING,
           lastError: null,
           processedAt: null,
         },
-      ],
-      { session }
+      },
+      {
+        upsert: true,
+        new: false,
+        session,
+      }
     );
 
-    return 'new';
+    if (!existing) {
+      return 'new';
+    }
+
+    if (existing.status === StripeWebhookProcessingStatus.PROCESSED) {
+      return 'processed';
+    }
+
+    if (existing.status === StripeWebhookProcessingStatus.FAILED) {
+      const retried = await StripeWebhookEventModel.findOneAndUpdate(
+        {
+          eventId,
+          status: StripeWebhookProcessingStatus.FAILED,
+        },
+        {
+          $set: {
+            status: StripeWebhookProcessingStatus.PROCESSING,
+            lastError: null,
+          },
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+
+      if (retried) {
+        return 'new';
+      }
+
+      return 'processing';
+    }
+
+    return 'processing';
   }
 
   async markProcessed(eventId: string, session: ClientSession): Promise<void> {

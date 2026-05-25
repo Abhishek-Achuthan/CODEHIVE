@@ -14,6 +14,7 @@ const AuthCallbackPage = lazy(() => import("../features/auth/pages/AuthCallbackP
 
 // Home
 const LandingPage = lazy(() => import("../features/home/components/LandingPage"));
+const PricingPage = lazy(() => import("../features/home/components/PricingPage"));
 
 // Profile & Wallet
 const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
@@ -23,6 +24,7 @@ const WalletPage = lazy(() => import("../features/wallet/pages/WalletPage"));
 const UserManagementPage = lazy(() => import("../features/admin/pages/UserManagementPage").then(module => ({ default: module.UserManagementPage })));
 const MentorManagementPage = lazy(() => import("../features/admin/pages/MentorManagementPage").then(module => ({ default: module.MentorManagementPage })));
 const MentorApplicationsManagementPage = lazy(() => import("../features/admin/pages/MentorApplicationsManagementPage").then(module => ({ default: module.MentorApplicationsManagementPage })));
+const PlanManagementPage = lazy(() => import("../features/admin/pages/PlanManagementPage").then(module => ({ default: module.PlanManagementPage })));
 
 // QnA pages
 const QnaLandigPage = lazy(() => import("../features/qna/page/QnaLandingPage"));
@@ -72,6 +74,7 @@ export default function AppRoutes() {
             }
           >
             <Route path="/home" element={<LandingPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/wallet" element={<WalletPage />} />
 
@@ -126,6 +129,7 @@ export default function AppRoutes() {
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/mentors" element={<MentorManagementPage />} />
             <Route path="/admin/applications" element={<MentorApplicationsManagementPage />} />
+            <Route path="/admin/plans" element={<PlanManagementPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

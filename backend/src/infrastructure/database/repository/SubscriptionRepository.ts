@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { ClientSession, Model, Types } from 'mongoose';
 import { GenericRepository } from './GenericRepository';
 import SubscriptionModel from '../models/SubscriptionModel';
 import { ISubscriptionRepository } from '../../../domain/interfaces/ISubscriptionRepository';
@@ -29,6 +29,60 @@ export class SubscriptionRepository
     return this.leanToEntity(doc);
   }
 
+  async findByStripeSubscriptionId(
+    stripeSubscriptionId: string,
+  ): Promise<SubscriptionEntity | null> {
+    const doc = await this._model
+      .findOne({ stripeSubscriptionId })
+      .lean<SubscriptionLeanDoc | null>();
+
+    if (!doc) return null;
+
+    return this.leanToEntity(doc);
+  }
+
+  async findByBillingSubscriptionId(
+    billingSubscriptionId: string,
+  ): Promise<SubscriptionEntity | null> {
+    return this.findByStripeSubscriptionId(billingSubscriptionId);
+  }
+
+  async findByStripeSubscriptionIdWithSession(
+    stripeSubscriptionId: string,
+    session: ClientSession,
+  ): Promise<SubscriptionEntity | null> {
+    const doc = await this._model
+      .findOne({ stripeSubscriptionId })
+      .session(session)
+      .lean<SubscriptionLeanDoc | null>();
+
+    if (!doc) return null;
+
+    return this.leanToEntity(doc);
+  }
+
+  async createWithSession(
+    data: Partial<SubscriptionEntity>,
+    session: ClientSession,
+  ): Promise<SubscriptionEntity> {
+    const docData = this.toDocument(data);
+    const [doc] = await this._model.create([docData], { session });
+    return this.toEntity(doc as SubscriptionDocument);
+  }
+
+  async updateWithSession(
+    id: string,
+    data: Partial<SubscriptionEntity>,
+    session: ClientSession,
+  ): Promise<SubscriptionEntity | null> {
+    const docData = this.toDocument(data);
+    const updated = await this._model.findByIdAndUpdate(id, docData, {
+      new: true,
+      session,
+    });
+    return updated ? this.toEntity(updated as SubscriptionDocument) : null;
+  }
+
   protected toEntity(doc: SubscriptionDocument): SubscriptionEntity {
     return {
       id: doc._id.toString(),
@@ -38,8 +92,11 @@ export class SubscriptionRepository
       currentPeriodStart: doc.currentPeriodStart,
       currentPeriodEnd: doc.currentPeriodEnd,
       cancelAtPeriodEnd: doc.cancelAtPeriodEnd,
-      ...(doc.stripeCustomerId !== undefined && { stripeCustomerId: doc.stripeCustomerId }),
-      ...(doc.stripeSubscriptionId !== undefined && { stripeSubscriptionId: doc.stripeSubscriptionId }),
+      ...(doc.stripeCustomerId ? { stripeCustomerId: doc.stripeCustomerId } : {}),
+      ...(doc.stripeSubscriptionId ? { stripeSubscriptionId: doc.stripeSubscriptionId } : {}),
+      ...(doc.canceledAt ? { canceledAt: doc.canceledAt } : {}),
+      ...(doc.expiredAt ? { expiredAt: doc.expiredAt } : {}),
+      ...(doc.stripePriceId ? { stripePriceId: doc.stripePriceId } : {}),
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -72,6 +129,15 @@ export class SubscriptionRepository
     if (data.stripeSubscriptionId !== undefined) {
       doc.stripeSubscriptionId = data.stripeSubscriptionId;
     }
+    if (data.canceledAt !== undefined) {
+      doc.canceledAt = data.canceledAt;
+    }
+    if (data.expiredAt !== undefined) {
+      doc.expiredAt = data.expiredAt;
+    }
+    if (data.stripePriceId !== undefined) {
+      doc.stripePriceId = data.stripePriceId;
+    }
 
     return doc;
   }
@@ -85,8 +151,11 @@ export class SubscriptionRepository
       currentPeriodStart: doc.currentPeriodStart,
       currentPeriodEnd: doc.currentPeriodEnd,
       cancelAtPeriodEnd: doc.cancelAtPeriodEnd,
-      ...(doc.stripeCustomerId !== undefined && { stripeCustomerId: doc.stripeCustomerId }),
-      ...(doc.stripeSubscriptionId !== undefined && { stripeSubscriptionId: doc.stripeSubscriptionId }),
+      ...(doc.stripeCustomerId ? { stripeCustomerId: doc.stripeCustomerId } : {}),
+      ...(doc.stripeSubscriptionId ? { stripeSubscriptionId: doc.stripeSubscriptionId } : {}),
+      ...(doc.canceledAt ? { canceledAt: doc.canceledAt } : {}),
+      ...(doc.expiredAt ? { expiredAt: doc.expiredAt } : {}),
+      ...(doc.stripePriceId ? { stripePriceId: doc.stripePriceId } : {}),
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };

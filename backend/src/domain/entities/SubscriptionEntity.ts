@@ -1,4 +1,4 @@
-import { SubscriptionStatus } from "../types/SubscriptionStatus";
+import { SubscriptionStatus } from '../types/SubscriptionStatus';
 
 export interface SubscriptionEntity {
   id: string;
@@ -20,6 +20,12 @@ export interface SubscriptionEntity {
   stripeSubscriptionId?: string;
 
   createdAt: Date;
+
+  canceledAt?: Date;
+
+  expiredAt?: Date;
+
+  stripePriceId?: string;
 
   updatedAt: Date;
 }

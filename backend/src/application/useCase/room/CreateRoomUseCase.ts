@@ -8,7 +8,9 @@ import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 import { RoomAdmissionPolicy } from '../../../domain/types/RoomAdmissionPolicy';
 import { RoomType } from '../../../domain/types/RoomType';
 import { RoomRole } from '../../../domain/types/RoomRole';
+import { RoomVisibility } from '../../../domain/types/RoomVisibility';
 import { LimitKey } from '../../../domain/types/LimitKey';
+import { FeatureKey } from '../../../domain/types/FeatureKey';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { EntitlementResolutionService } from '../../services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../services/RoomFeatureSnapshotFactory';
@@ -24,11 +26,19 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
     private readonly _entitlementResolutionService: EntitlementResolutionService,
     @inject(RoomFeatureSnapshotFactory)
     private readonly _roomFeatureSnapshotFactory: RoomFeatureSnapshotFactory,
-  ) { }
+  ) {}
 
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
     const entitlements = await this._entitlementResolutionService.resolve(data.userId);
     const featureSnapshot = this._roomFeatureSnapshotFactory.create(entitlements);
+
+
+    if (
+      data.visibility === RoomVisibility.PRIVATE &&
+      !entitlements.features.includes(FeatureKey.PRIVATE_ROOMS)
+    ) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.PRIVATE_ROOM_NOT_ALLOWED);
+    }
 
     const activeRoomsCount = await this._roomRepository.countActiveRoomsByHostId(data.userId);
     const maxActiveRooms = entitlements.limits[LimitKey.MAX_ACTIVE_ROOMS] ?? 3;
@@ -66,6 +76,7 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
 
       return room;
     } catch (error) {
+      //TODO: need to replace this with the transaction
       await this._roomRepository.delete(room.id);
       throw error;
     }

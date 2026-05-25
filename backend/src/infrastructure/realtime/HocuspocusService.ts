@@ -6,6 +6,7 @@ import {
   CollaborationContext,
   HocuspocusHookHandler,
 } from '../../presentation/collaboration/HocuspocusHookHandler';
+import { loggerService } from '../../config/di/resolver'; 
 
 @injectable()
 export class HocuspocusService {
@@ -28,6 +29,6 @@ export class HocuspocusService {
 
   listen(): void {
     this._server.listen();
-    console.log(`Hocuspocus running on ws://localhost:${env.hocuspocusPort}`);
+    loggerService.info(`Hocuspocus running on ws://localhost:${env.hocuspocusPort}`);
   }
 }

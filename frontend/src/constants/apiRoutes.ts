@@ -55,6 +55,21 @@ export const API_ROUTES = {
     UPDATE_MENTOR_STATUS: `/admin/update-mentor-status`,
   },
 
+  PLANS: {
+    LIST: (params?: { page?: number; limit?: number; search?: string }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params?.search) qp.append("search", params.search);
+      const query = qp.toString();
+      return query ? `/plans?${query}` : `/plans`;
+    },
+    CREATE: `/plans`,
+    UPDATE: (id: string) => `/plans/${id}`,
+    ARCHIVE: (id: string) => `/plans/${id}/archive`,
+    GET_BY_ID: (id: string) => `/plans/${id}`,
+  },
+
   QnA: {
     //---------------------------Question URL----------------------------------------//
 

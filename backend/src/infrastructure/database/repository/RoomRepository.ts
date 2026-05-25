@@ -1,14 +1,14 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
-import { GenericRepository } from "./GenericRepository";
-import RoomModel from "../models/room/RoomModel";
-import { RoomEntity, RoomFeatureSnapshot } from "../../../domain/entities/room/RoomEntity";
-import { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import { PaginationResult } from "../../../domain/types/PaginationResult";
-import { RoomVisibility } from "../../../domain/types/RoomVisibility";
-import { RoomDocument, RoomLeanDoc } from "../schemas/room/RoomSchema";
-import { LimitKey } from "../../../domain/types/LimitKey";
-import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
+import { GenericRepository } from './GenericRepository';
+import RoomModel from '../models/room/RoomModel';
+import { RoomEntity, RoomFeatureSnapshot } from '../../../domain/entities/room/RoomEntity';
+import { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { PaginationResult } from '../../../domain/types/PaginationResult';
+import { RoomVisibility } from '../../../domain/types/RoomVisibility';
+import { RoomDocument, RoomLeanDoc } from '../schemas/room/RoomSchema';
+import { LimitKey } from '../../../domain/types/LimitKey';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 
 type LimitMap = Map<LimitKey, number>;
 
@@ -59,7 +59,7 @@ export class RoomRepository
     page: number,
     limit: number,
   ): Promise<PaginationResult<RoomEntity>> {
-    const query = { visibility: "PUBLIC_REQUEST" as RoomVisibility };
+    const query = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
 
     const [docs, totalItems] = await Promise.all([
       this._model
@@ -165,5 +165,46 @@ export class RoomRepository
       hostId: new Types.ObjectId(hostId),
       lifecycleStatus: RoomLifeCycleStatus.ACTIVE,
     });
+  }
+
+  /**
+   * Atomically increments participantCount by 1 only when the room exists and
+   * its current count is strictly below maxParticipants.
+   *
+   * The capacity guard lives entirely inside the MongoDB filter — no separate
+   * read is needed, so concurrent joins cannot race past the limit.
+   */
+  async incrementParticipantCount(
+    roomId: string,
+    maxParticipants: number,
+  ): Promise<RoomEntity | null> {
+    const updated = await this._model.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(roomId),
+        participantCount: { $lt: maxParticipants },
+      },
+      { $inc: { participantCount: 1 } },
+      { new: true },
+    );
+
+    return updated ? this.toEntity(updated as RoomDocument) : null;
+  }
+
+  /**
+   * Atomically decrements participantCount by 1, floored at 0.
+   * The floor guard prevents the counter from going negative if a leave
+   * arrives after the count was already corrected by another operation.
+   */
+  async decrementParticipantCount(roomId: string): Promise<RoomEntity | null> {
+    const updated = await this._model.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(roomId),
+        participantCount: { $gt: 0 },
+      },
+      { $inc: { participantCount: -1 } },
+      { new: true },
+    );
+
+    return updated ? this.toEntity(updated as RoomDocument) : null;
   }
 }

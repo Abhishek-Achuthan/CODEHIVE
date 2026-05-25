@@ -61,12 +61,12 @@ export default function Header() {
             >
               Session
             </Link>
-            <a
-              href="#pricing"
+            <Link
+              to="/pricing"
               className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
             >
               Pricing
-            </a>
+            </Link>
           </nav>
 
           {/* User Dropdown */}

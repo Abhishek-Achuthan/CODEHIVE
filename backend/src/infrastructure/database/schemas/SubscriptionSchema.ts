@@ -1,5 +1,5 @@
-import { Schema, Types, Document } from "mongoose";
-import { SubscriptionStatus } from "../../../domain/types/SubscriptionStatus";
+import { Schema, Types, Document } from 'mongoose';
+import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
 
 export interface SubscriptionDocument extends Document {
   _id: Types.ObjectId;
@@ -21,6 +21,12 @@ export interface SubscriptionDocument extends Document {
   stripeSubscriptionId?: string;
 
   createdAt: Date;
+
+  canceledAt?: Date;
+
+  expiredAt?: Date;
+
+  stripePriceId?: string;
 
   updatedAt: Date;
 }
@@ -46,6 +52,12 @@ export type SubscriptionLeanDoc = {
 
   createdAt: Date;
 
+  canceledAt?: Date;
+
+  expiredAt?: Date;
+
+  stripePriceId?: string;
+
   updatedAt: Date;
 };
 
@@ -53,14 +65,14 @@ export const SubscriptionSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       index: true,
     },
 
     planId: {
       type: Schema.Types.ObjectId,
-      ref: "Plan",
+      ref: 'Plan',
       required: true,
     },
 
@@ -100,6 +112,21 @@ export const SubscriptionSchema = new Schema(
       sparse: true,
       index: true,
     },
+
+    canceledAt: {
+      type: Date,
+      required: false,
+    },
+
+    expiredAt: {
+      type: Date,
+      required: false,
+    },
+
+    stripePriceId: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,
@@ -115,7 +142,7 @@ SubscriptionSchema.index(
   {
     partialFilterExpression: {
       status: {
-        $in: ["ACTIVE", "TRIALING"],
+        $in: ['ACTIVE', 'TRIALING'],
       },
     },
     unique: true,

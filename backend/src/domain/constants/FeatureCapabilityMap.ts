@@ -40,7 +40,20 @@ export const FeatureCapabilityMap: Record<FeatureKey, CapabilityKey[]> = {
   [FeatureKey.SCREEN_SHARE]: [
     CapabilityKey.ROOM_SCREENSHARE_START,
   ],
-  [FeatureKey.VIDEO_AUDIO]: [],
+
+  // Moderation and room-management capabilities are gated behind VIDEO_AUDIO
+  // because meaningful moderation only exists in a live audio/video session.
+  // Plans that include VIDEO_AUDIO unlock the full moderation surface.
+  [FeatureKey.VIDEO_AUDIO]: [
+    CapabilityKey.ROOM_PARTICIPANT_MUTE,
+    CapabilityKey.ROOM_PARTICIPANT_KICK,
+    CapabilityKey.ROOM_PARTICIPANT_PROMOTE,
+    CapabilityKey.ROOM_MANAGE_PERMISSIONS,
+    CapabilityKey.ROOM_MANAGE_SETTINGS,
+  ],
+
+  // PRIVATE_ROOMS and SESSION_BOOKING are plan-level access gates checked at
+  // creation/booking time (not capability-level), so they map to no capabilities.
   [FeatureKey.PRIVATE_ROOMS]: [],
   [FeatureKey.SESSION_BOOKING]: [],
 };

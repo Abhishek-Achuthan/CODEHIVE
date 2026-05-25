@@ -129,6 +129,7 @@ export const ERROR_MESSAGES = {
       'Booking reservation state transition failed',
     WEBHOOK_PROCESSING_FAILED: 'Stripe webhook processing failed',
     REFUND_TRIGGER_FAILED: 'Refund trigger failed',
+    SESSION_BOOKING_NOT_ALLOWED: 'Session booking is not available on your current plan.',
   },
 
   ROOM: {
@@ -144,6 +145,7 @@ export const ERROR_MESSAGES = {
     PARTICIPANT_NOT_FOUND: 'Participant not found in this room',
     FORBIDDEN: 'You are not allowed to view these notes',
     ACTIVE_ROOM_LIMIT_REACHED: 'Active room limit reached for your current plan.',
+    PRIVATE_ROOM_NOT_ALLOWED: 'Private rooms are not available on your current plan.',
   },
 
   POLL: {
@@ -175,5 +177,12 @@ export const ERROR_MESSAGES = {
     NOT_FOUND: 'Plan not found',
     UPDATE_FAILED: 'Failed to update plan',
     FREE_PLAN_NOT_FOUND: 'Free plan not found',
+    INACTIVE: 'Plan is inactive',
+    FREE_PLAN_CANNOT_BE_PURCHASED: 'Free plan cannot be purchased',
+    STRIPE_PRICE_NOT_CONFIGURED: 'Stripe price not configured for this plan',
+  },
+
+  SUBSCRIPTION: {
+    ALREADY_ACTIVE: 'You already have an active subscription',
   },
 };

@@ -27,6 +27,12 @@ import { IWalletService } from '../../application/ports/wallet/IWalletService';
 import { WalletService } from '../../infrastructure/adapters/wallet/WalletService';
 import { IPaymentService } from '../../application/ports/payment/IPaymentService';
 import { PaymentService } from '../../infrastructure/adapters/payment/PaymentService';
+import { IStripeSubscriptionWebhookHandler } from '../../application/ports/payment/IStripeSubscriptionWebhookHandler';
+import { StripeSubscriptionWebhookHandler } from '../../infrastructure/webhook/stripe/StripeSubscriptionWebhookHandler';
+import { IStripeSessionWebhookHandler } from '../../application/ports/payment/IStripeSessionWebhookHandler';
+import { StripeSessionWebhookHandler } from '../../infrastructure/webhook/stripe/StripeSessionWebhookHandler';
+import { IStripeWebhookDispatcher } from '../../application/ports/payment/IStripeWebhookDispatcher';
+import { StripeWebhookDispatcher } from '../../infrastructure/webhook/StripeWebhookDispatcher';
 import { ISocketService } from '../../application/ports/socket/ISocketService';
 import { SocketService } from '../../infrastructure/adapters/socket/SocketService';
 import { StripeRefundRetryService } from '../../application/services/StripeRefundRetryService';
@@ -111,12 +117,20 @@ export class ServiceModule {
       useClass: PaymentService,
     });
 
-    container.register<ILoggerService>('ILoggerService', {
-      useClass: LoggingService
-    })
+    container.register<IStripeSubscriptionWebhookHandler>('IStripeSubscriptionWebhookHandler', {
+      useClass: StripeSubscriptionWebhookHandler,
+    });
+
+    container.register<IStripeSessionWebhookHandler>('IStripeSessionWebhookHandler', {
+      useClass: StripeSessionWebhookHandler,
+    });
+
+    container.register<IStripeWebhookDispatcher>('IStripeWebhookDispatcher', {
+      useClass: StripeWebhookDispatcher,
+    });
 
     container.registerSingleton<ISocketService>('ISocketService', SocketService);
-
+    
     container.registerSingleton<IRoomEventEmitter>(
       'IRoomEventEmitter',
       RoomEventEmitter,
@@ -147,11 +161,12 @@ export class ServiceModule {
     container.register('PermissionService', {
       useClass: PermissionService
     })
+    container.registerSingleton<ILoggerService>('ILoggerService',LoggingService);
 
     container.registerSingleton(HocuspocusService, HocuspocusService);
-
+    
     container.registerSingleton(StripeRefundRetryService, StripeRefundRetryService);
-
+    
     container.registerSingleton<IMessageQueueService>('IMessageQueueService', RabbitMQService);
     container.registerSingleton<ISessionActivationPublisher>('ISessionActivationPublisher', SessionActivationPublisher);
     container.registerSingleton(SessionActivationConsumer);

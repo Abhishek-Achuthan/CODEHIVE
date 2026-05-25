@@ -5,48 +5,51 @@ import type { IParticipantRepository } from '../../../domain/interfaces/IPartici
 import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
+import type { IPollRepository } from '../../../domain/interfaces/IPollRepository';
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
-import type{ IPollRepository } from '../../../domain/interfaces/IPollRepository';
 import { RoomRole } from '../../../domain/types/RoomRole';
 import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
+import { ConflictError } from '../../../core/errors/ConflictError';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
   constructor(
-    @inject('IRoomRepository') 
+    @inject('IRoomRepository')
     private readonly roomRepository: IRoomRepository,
     @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
     @inject('IMessageRepository')
     private readonly messageRepository: IMessageRepository,
-    @inject('IUserRepository') 
+    @inject('IUserRepository')
     private readonly userRepository: IUserRepository,
-    @inject('IPollRepository') 
+    @inject('IPollRepository')
     private readonly pollRepository: IPollRepository,
     @inject(RoomAuthorizationService)
     private readonly roomAuthorizationService: RoomAuthorizationService,
   ) {}
+
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const joinAuthorization = await this.roomAuthorizationService.assertCanJoinRoom(
       data.roomId,
       data.userId,
     );
-    const room = joinAuthorization.room;
 
-    const existing = joinAuthorization.existingParticipant;
+    const room = joinAuthorization.room;
     let isNewParticipant = false;
 
-    try {
-      if (joinAuthorization.shouldCreateParticipant) {
-        const currentCount = await this.participantRepository.countByRoomId(
-          data.roomId,
-        );
+    if (joinAuthorization.shouldCreateParticipant) {
 
-        if (currentCount >= room.maxParticipants) {
-          throw new Error(ERROR_MESSAGES.ROOM.ROOM_FULL);
-        }
+      const updatedRoom = await this.roomRepository.incrementParticipantCount(
+        room.id,
+        room.maxParticipants,
+      );
 
+      if (!updatedRoom) {
+        throw new ConflictError(ERROR_MESSAGES.ROOM.ROOM_FULL);
+      }
+
+      try {
         const participant: ParticipantEntity = {
           id: '',
           roomId: data.roomId,
@@ -58,32 +61,22 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
 
         await this.participantRepository.create(participant);
         isNewParticipant = true;
-
-        await this.roomRepository.update(room.id, {
-          participantCount: currentCount + 1,
-        });
-      }
-    } catch (error: unknown) {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        (error as { code?: number }).code === 11000
-      ) {
-        isNewParticipant = false;
-      } else {
-        throw error;
+      } catch (error: unknown) {
+        if (this._isDuplicateKeyError(error)) {
+          await this.roomRepository.decrementParticipantCount(room.id);
+          isNewParticipant = false;
+        } else {
+          await this.roomRepository.decrementParticipantCount(room.id);
+          throw error;
+        }
       }
     }
 
-    const participants = await this.participantRepository.findByRoomIdWithUsers(
-      data.roomId,
-    );
-    const recentMessages = await this.messageRepository.findRecentByRoomId(
-      data.roomId,
-      50,
-    );
-    const activePoll = await this.pollRepository.findActivePollByRoomId(data.roomId);
+    const [participants, recentMessages, activePoll] = await Promise.all([
+      this.participantRepository.findByRoomIdWithUsers(data.roomId),
+      this.messageRepository.findRecentByRoomId(data.roomId, 50),
+      this.pollRepository.findActivePollByRoomId(data.roomId),
+    ]);
 
     const messagesWithSenders = await Promise.all(
       recentMessages.map(async (msg) => {
@@ -97,7 +90,10 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
             : 'Unknown User',
           content: msg.content,
           createdAt: msg.createdAt,
-          isEdited: msg.updatedAt && msg.createdAt && msg.updatedAt.getTime() > msg.createdAt.getTime(),
+          isEdited:
+            msg.updatedAt &&
+            msg.createdAt &&
+            msg.updatedAt.getTime() > msg.createdAt.getTime(),
           ...(msg.parentMessageId && { parentMessageId: msg.parentMessageId }),
           ...(sender?.avatarUrl && { avatarUrl: sender.avatarUrl }),
         };
@@ -125,5 +121,14 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       lifecycleStatus: room.lifecycleStatus,
       featureSnapshot: room.featureSnapshot,
     };
+  }
+
+  private _isDuplicateKeyError(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code?: number }).code === 11000
+    );
   }
 }

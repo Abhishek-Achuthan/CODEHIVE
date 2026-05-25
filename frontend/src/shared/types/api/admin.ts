@@ -1,4 +1,5 @@
 import type { PaginatedResponse } from "../core/api";
+import type { FeatureKey, LimitKey } from "../view/PlanView";
 
 export interface AdminUserListItemApi {
   id: string;
@@ -24,3 +25,24 @@ export interface MentorApplicationApi {
 }
 
 export type ListMentorApplicationsApiResponse = PaginatedResponse<MentorApplicationApi>;
+
+export interface PlanApiResponse {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  isActive: boolean;
+  isPublic: boolean;
+  sortOrder: number;
+  features: FeatureKey[];
+  limits: Partial<Record<LimitKey, number>>;
+  pricing: {
+    monthly: number;
+    yearly: number;
+    currency: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ListPlansApiResponse = PaginatedResponse<PlanApiResponse>;

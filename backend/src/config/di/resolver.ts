@@ -27,6 +27,7 @@ import { MessageController } from '../../presentation/controllers/message/Messag
 import { PollController } from '../../presentation/controllers/poll/PollController';
 import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
 import { PlanController } from '../../presentation/controllers/plan/PlanController';
+import { ILoggerService } from '../../application/ports/logging/ILoggerService';
 
 ContainerSetup.registerAll();
 
@@ -73,6 +74,8 @@ export const socketHandlers: ISocketHandler[] = [
   container.resolve(PollSocketHandler),
 ];
   export const socketService = container.resolve<ISocketService>('ISocketService');
+
+export const loggerService = container.resolve<ILoggerService>('ILoggerService');
 
 export const messageQueueService = container.resolve<IMessageQueueService>('IMessageQueueService');
 

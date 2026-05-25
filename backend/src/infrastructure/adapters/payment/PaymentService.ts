@@ -7,6 +7,8 @@ import { CreateRefundInput } from '../../../domain/types/CreateRefundInput';
 import { WebhookEvent } from '../../../domain/types/WebhookEvent';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { CreateSubscriptionCheckoutSessionInput } from '../../../domain/types/CreateSubscriptionCheckoutSessionInput';
+import { CreateSubscriptionCheckoutSessionResult } from '../../../domain/types/CreateSubscriptionCheckoutSessionResult';
 
 
 export class PaymentService implements IPaymentService {
@@ -77,5 +79,36 @@ export class PaymentService implements IPaymentService {
 
             throw error;
         }
+    }
+
+    async createSubscriptionCheckoutSession(
+        input: CreateSubscriptionCheckoutSessionInput
+    ): Promise<CreateSubscriptionCheckoutSessionResult> {
+        const session = await this._stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            mode: 'subscription',
+            line_items: [
+                {
+                    price: input.stripePriceId,
+                    quantity: 1,
+                },
+            ],
+            success_url: input.successUrl,
+            cancel_url: input.cancelUrl,
+            client_reference_id: input.userId,
+            subscription_data: {
+                metadata: input.metadata,
+            },
+            metadata: input.metadata,
+        });
+
+        if (!session.url) {
+            throw new Error('Failed to create subscription checkout session URL');
+        }
+
+        return {
+            id: session.id,
+            url: session.url,
+        };
     }
 }
