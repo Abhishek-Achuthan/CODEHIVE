@@ -2,13 +2,12 @@ import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Plus, Minus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "../../../shared/ui/dialog/Dialog";
 import type { PlanView, CreatePlanPayload, UpdatePlanPayload, FeatureKey, LimitKey } from "../../../shared/types/view/PlanView";
 
@@ -193,34 +192,26 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="!max-w-2xl w-full bg-zinc-900 border border-white/10 text-white rounded-2xl shadow-2xl p-0 overflow-hidden">
+      <DialogContent
+        closeButtonClassName="top-5 right-5 rounded-xl p-2 text-zinc-500 opacity-100 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors"
+        className="!max-w-2xl w-[calc(100vw-2rem)] bg-zinc-900 border border-white/10 text-white rounded-2xl shadow-2xl p-0 overflow-hidden"
+      >
         {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-white/10 flex-row items-center justify-between">
-          <div>
-            <DialogTitle className="text-xl font-bold text-white">
-              {isEdit ? "Edit Plan" : "Create New Plan"}
-            </DialogTitle>
-            <p className="text-sm text-zinc-500 mt-1">
-              {isEdit
-                ? "Update the plan details below"
-                : "Configure a new subscription plan for your platform"}
-            </p>
-          </div>
-          <DialogClose asChild>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </DialogClose>
+        <DialogHeader className="px-6 pt-6 pb-4 pr-14 border-b border-white/10 text-left">
+          <DialogTitle className="text-xl font-bold text-white">
+            {isEdit ? "Edit Plan" : "Create New Plan"}
+          </DialogTitle>
+          <p className="text-sm text-zinc-500 mt-1">
+            {isEdit
+              ? "Update the plan details below"
+              : "Configure a new subscription plan for your platform"}
+          </p>
         </DialogHeader>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
-          className="overflow-y-auto max-h-[70vh] px-6 py-5 space-y-6"
+          className="modal-scrollbar overflow-y-auto overflow-x-hidden max-h-[70vh] px-6 py-5 space-y-6 min-w-0"
         >
           {/* Basic Info */}
           <section>
@@ -332,8 +323,8 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400/80 mb-4">
               Pricing
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="flex min-w-0 flex-col gap-1.5">
                 <label className="text-xs font-semibold text-zinc-400">
                   Monthly Price <span className="text-rose-400">*</span>
                 </label>
@@ -350,7 +341,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
                 )}
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex min-w-0 flex-col gap-1.5">
                 <label className="text-xs font-semibold text-zinc-400">
                   Yearly Price <span className="text-rose-400">*</span>
                 </label>
@@ -367,7 +358,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
                 )}
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
                 <label className="text-xs font-semibold text-zinc-400">
                   Currency <span className="text-rose-400">*</span>
                 </label>
@@ -389,7 +380,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400/80 mb-4">
               Features <span className="text-rose-400">*</span>
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {ALL_FEATURES.map(({ key, label }) => {
                 const isSelected = selectedFeatures?.includes(key);
                 return (
@@ -437,20 +428,24 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
           </section>
 
           {/* Limits */}
-          <section>
+          <section className="min-w-0">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400/80 mb-1">
               Limits
             </h3>
             <p className="text-xs text-zinc-600 mb-4">
               Leave at 0 to apply no limit for that field.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-3">
               {ALL_LIMITS.map(({ key, label, placeholder }) => (
-                <div key={key} className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-zinc-400">
-                    {label}
-                  </label>
-                  <div className="flex items-center gap-2">
+                <div
+                  key={key}
+                  className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-zinc-200">{label}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{placeholder}</p>
+                  </div>
+                  <div className="flex w-full items-center gap-2 sm:w-auto sm:min-w-[9.5rem]">
                     <button
                       type="button"
                       onClick={() => {
@@ -459,16 +454,17 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
                         const val = typeof current === "number" ? current : 0;
                         if (val > 0) setValue(fieldKey as keyof PlanFormValues, val - 1 as never);
                       }}
-                      className="w-8 h-8 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all flex-shrink-0"
+                      className="h-9 w-9 shrink-0 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+                      aria-label={`Decrease ${label}`}
                     >
-                      <Minus className="w-3 h-3" />
+                      <Minus className="w-3.5 h-3.5" />
                     </button>
                     <input
                       {...register(`limits.${key}`)}
                       type="number"
                       min={0}
-                      placeholder={placeholder}
-                      className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white text-center placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                      placeholder="0"
+                      className="h-9 w-full min-w-0 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-sm text-white text-center placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all sm:w-20"
                     />
                     <button
                       type="button"
@@ -478,9 +474,10 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
                         const val = typeof current === "number" ? current : 0;
                         setValue(fieldKey as keyof PlanFormValues, val + 1 as never);
                       }}
-                      className="w-8 h-8 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all flex-shrink-0"
+                      className="h-9 w-9 shrink-0 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+                      aria-label={`Increase ${label}`}
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

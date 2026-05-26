@@ -30,14 +30,12 @@ export class PlanRoute {
     this._router.get(
       '/',
       authMiddleware.check,
-      roleMiddleware.authorize([UserRole.ADMIN]),
       this._planController.handleListActivePlans.bind(this._planController)
     );
 
     this._router.get(
       '/:id',
       authMiddleware.check,
-      roleMiddleware.authorize([UserRole.ADMIN]),
       this._planController.handleGetPlanById.bind(this._planController)
     );
 
@@ -55,6 +53,12 @@ export class PlanRoute {
       this._planController.handleArchivePlan.bind(this._planController)
     );
 
+    this._router.post(
+      '/:id/sync-stripe',
+      authMiddleware.check,
+      roleMiddleware.authorize([UserRole.ADMIN]),
+      this._planController.handleSyncPlanStripe.bind(this._planController)
+    );
   }
 
   public getRoutes(): Router {

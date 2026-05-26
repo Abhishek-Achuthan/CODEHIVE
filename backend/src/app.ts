@@ -17,6 +17,7 @@ import { SessionRoutes } from './presentation/routes/SessionRoutes';
 import { MentorRoutes } from './presentation/routes/MentorRoutes';
 import { WebhooksRoutes } from './presentation/routes/WebhooksRoutes';
 import { WalletRoutes } from './presentation/routes/WalletRoutes';
+import { SubscriptionRoutes } from './presentation/routes/SubscriptionRoutes';
 import {
   hocuspocusService,
   socketHandlers,
@@ -84,6 +85,7 @@ export class App {
     const walletRoutes = new WalletRoutes();
     const roomRoutes = new RoomRoutes();
     const planRoute = new PlanRoute();
+    const subscriptionRoute = new SubscriptionRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -94,6 +96,7 @@ export class App {
     this._app.use('/api/wallet', walletRoutes.getRoutes());
     this._app.use('/api/rooms', roomRoutes.getRoutes());
     this._app.use('/api/plans', planRoute.getRoutes());
+    this._app.use('/api/subscriptions', subscriptionRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

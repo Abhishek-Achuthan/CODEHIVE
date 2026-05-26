@@ -22,7 +22,11 @@ export function errorHandler(
       .map((d) => `${d.path}: ${d.message}`)
       .join(', ');
 
-    loggerService.error('Validation Error:', {errors: errorMessages});
+    loggerService.error('Validation Error', {
+      path: req.path,
+      method: req.method,
+      errors: errorMessages,
+    });
 
     return res.status(HttpStatus.BadRequest).json({
       success: false,
@@ -33,7 +37,12 @@ export function errorHandler(
 
   if (err instanceof BaseError) {
 
-    loggerService.error('Base Error:', {error: err.stack});
+    loggerService.error(`${err.name}: ${err.message}`, {
+      statusCode: err._statusCode,
+      path: req.path,
+      method: req.method,
+      stack: err.stack,
+    });
 
     return res.status(err._statusCode).json({
       success: false,
@@ -41,7 +50,15 @@ export function errorHandler(
     });
   }
 
-  loggerService.error('Internal Server Error:', {error : err});
+  const internalMessage =
+    err instanceof Error ? err.message : String(err);
+  const internalStack = err instanceof Error ? err.stack : undefined;
+
+  loggerService.error(`Internal Server Error: ${internalMessage}`, {
+    path: req.path,
+    method: req.method,
+    stack: internalStack,
+  });
 
   return res.status(HttpStatus.InternalServerError).json({
     success: false,

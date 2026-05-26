@@ -13,6 +13,7 @@ import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
 import { SubscriptionMapper } from '../../mapper/SubscriptionMapper';
+import { resolvePlanStripePriceId } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscriptionCheckoutSessionUseCase {
@@ -47,9 +48,13 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
       );
     }
 
-    if (!plan.stripe?.monthlyPriceId) {
+    const stripePriceId = resolvePlanStripePriceId(plan, data.billingInterval);
+
+    if (!stripePriceId) {
       throw new BadRequestError(
-        ERROR_MESSAGES.PLAN.STRIPE_PRICE_NOT_CONFIGURED,
+        data.billingInterval === 'yearly'
+          ? ERROR_MESSAGES.PLAN.STRIPE_YEARLY_PRICE_NOT_CONFIGURED
+          : ERROR_MESSAGES.PLAN.STRIPE_PRICE_NOT_CONFIGURED,
       );
     }
 
@@ -71,7 +76,7 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
       await this._paymentService.createSubscriptionCheckoutSession({
         userId: data.userId,
 
-        stripePriceId: plan.stripe.monthlyPriceId,
+        stripePriceId,
 
         successUrl: data.successUrl,
 
@@ -83,6 +88,8 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
           planId: plan.id,
 
           planSlug: plan.slug,
+
+          billingInterval: data.billingInterval,
         },
       });
 

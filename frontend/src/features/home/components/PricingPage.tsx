@@ -2,10 +2,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Zap, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../store";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import { useFetchPublicPlans } from "../hooks/useFetchPublicPlans";
+import { useSubscriptionCheckout } from "../hooks/useSubscriptionCheckout";
 import type { PlanView, FeatureKey } from "../../../shared/types/view/PlanView";
+import type { PlanBillingInterval } from "../../../shared/types/api/subscription";
 
 // ─── Feature label map ────────────────────────────────────────────────────────
 
@@ -44,12 +48,21 @@ const SkeletonCard = () => (
 
 interface PlanCardProps {
   plan: PlanView;
-  billing: "monthly" | "yearly";
+  billing: PlanBillingInterval;
   isPopular: boolean;
   index: number;
+  checkoutLoading: boolean;
+  onCheckout: (plan: PlanView, billingInterval: PlanBillingInterval) => void;
 }
 
-const PlanCard = ({ plan, billing, isPopular, index }: PlanCardProps) => {
+const PlanCard = ({
+  plan,
+  billing,
+  isPopular,
+  index,
+  checkoutLoading,
+  onCheckout,
+}: PlanCardProps) => {
   const navigate = useNavigate();
   const price = billing === "monthly" ? plan.pricing.monthly : plan.pricing.yearly;
   const isFree = price === 0;
@@ -57,9 +70,10 @@ const PlanCard = ({ plan, billing, isPopular, index }: PlanCardProps) => {
   const handleCTA = () => {
     if (isFree) {
       navigate("/register");
-    } else {
-      navigate("/sessions/discover");
+      return;
     }
+
+    onCheckout(plan, billing);
   };
 
   return (
@@ -124,7 +138,8 @@ const PlanCard = ({ plan, billing, isPopular, index }: PlanCardProps) => {
       {/* CTA */}
       <button
         onClick={handleCTA}
-        className={`w-full mt-6 mb-8 py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
+        disabled={!isFree && checkoutLoading}
+        className={`w-full mt-6 mb-8 py-3 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
           isPopular
             ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-95"
             : isFree
@@ -132,7 +147,16 @@ const PlanCard = ({ plan, billing, isPopular, index }: PlanCardProps) => {
             : "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 hover:border-zinc-600"
         }`}
       >
-        {isFree ? "Get Started for Free" : `Get ${plan.name}`}
+        {!isFree && checkoutLoading ? (
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Redirecting…
+          </span>
+        ) : isFree ? (
+          "Get Started for Free"
+        ) : (
+          `Get ${plan.name}`
+        )}
       </button>
 
       {/* Divider */}
@@ -200,8 +224,20 @@ const PlanCard = ({ plan, billing, isPopular, index }: PlanCardProps) => {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const PricingPage = () => {
-  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [billing, setBilling] = useState<PlanBillingInterval>("monthly");
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { plans, loading, error } = useFetchPublicPlans();
+  const { startCheckout, loading: checkoutLoading } = useSubscriptionCheckout();
+
+  const handleCheckout = (plan: PlanView, billingInterval: PlanBillingInterval) => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: "/pricing" } });
+      return;
+    }
+
+    void startCheckout({ planSlug: plan.slug, billingInterval });
+  };
 
   // The middle plan (by sortOrder) is "most popular"
   const popularIndex = Math.floor(plans.length / 2);
@@ -328,6 +364,8 @@ const PricingPage = () => {
                   billing={billing}
                   isPopular={i === popularIndex && plans.length > 1}
                   index={i}
+                  checkoutLoading={checkoutLoading}
+                  onCheckout={handleCheckout}
                 />
               ))}
             </div>

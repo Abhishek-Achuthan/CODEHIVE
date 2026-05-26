@@ -1,4 +1,13 @@
 import { IPaymentService } from '../../../application/ports/payment/IPaymentService';
+import { IBillingCatalogService } from '../../../application/ports/payment/IBillingCatalogService';
+import {
+  BillingCatalogSnapshot,
+  CreateBillingPriceInput,
+  CreateBillingPriceResult,
+  CreateBillingProductInput,
+  CreateBillingProductResult,
+  UpdateBillingProductInput,
+} from '../../../domain/types/BillingCatalogTypes';
 import Stripe from 'stripe';
 import { env } from '../../../config/envConfig';
 import { CreatePaymentIntentInput } from '../../../domain/types/CreatePaymentIntentInput';
@@ -11,7 +20,7 @@ import { CreateSubscriptionCheckoutSessionInput } from '../../../domain/types/Cr
 import { CreateSubscriptionCheckoutSessionResult } from '../../../domain/types/CreateSubscriptionCheckoutSessionResult';
 
 
-export class PaymentService implements IPaymentService {
+export class PaymentService implements IPaymentService, IBillingCatalogService {
 
     private _stripe: Stripe
     private _stripeSky: string;
@@ -110,5 +119,93 @@ export class PaymentService implements IPaymentService {
             id: session.id,
             url: session.url,
         };
+    }
+
+    async createBillingProduct(
+        input: CreateBillingProductInput,
+    ): Promise<CreateBillingProductResult> {
+        try {
+            const product = await this._stripe.products.create({
+                name: input.name,
+                ...(input.description !== undefined
+                    ? { description: input.description }
+                    : {}),
+                metadata: input.metadata,
+            });
+
+            return { productId: product.id };
+        } catch (error) {
+            throw this._toBillingCatalogError(
+                ERROR_MESSAGES.PLAN.STRIPE_PRODUCT_CREATE_FAILED,
+                error,
+            );
+        }
+    }
+
+    async updateBillingProduct(
+        productId: string,
+        input: UpdateBillingProductInput,
+    ): Promise<void> {
+        await this._stripe.products.update(productId, {
+            ...(input.name !== undefined ? { name: input.name } : {}),
+            ...(input.description !== undefined
+                ? { description: input.description }
+                : {}),
+            ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
+        });
+    }
+
+    async createBillingPrice(
+        input: CreateBillingPriceInput,
+    ): Promise<CreateBillingPriceResult> {
+        try {
+            const requestOptions = input.idempotencyKey
+                ? { idempotencyKey: input.idempotencyKey }
+                : undefined;
+
+            const price = await this._stripe.prices.create(
+                {
+                    product: input.productId,
+                    currency: input.currency,
+                    unit_amount: input.unitAmountCents,
+                    recurring: { interval: input.interval },
+                    ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
+                },
+                requestOptions,
+            );
+
+            return { priceId: price.id };
+        } catch (error) {
+            throw this._toBillingCatalogError(
+                ERROR_MESSAGES.PLAN.STRIPE_PRICE_CREATE_FAILED,
+                error,
+            );
+        }
+    }
+
+    private _toBillingCatalogError(fallbackMessage: string, error: unknown): Error {
+        if (error instanceof Stripe.errors.StripeError) {
+            return new Error(`${fallbackMessage}: ${error.message}`);
+        }
+
+        if (error instanceof Error && error.message) {
+            return error;
+        }
+
+        return new Error(fallbackMessage);
+    }
+
+    async archiveBillingPrice(priceId: string): Promise<void> {
+        await this._stripe.prices.update(priceId, { active: false });
+    }
+
+    async archiveBillingCatalog(catalog: BillingCatalogSnapshot): Promise<void> {
+        const priceIds = [catalog.monthlyPriceId, catalog.yearlyPriceId].filter(
+            (priceId): priceId is string => !!priceId,
+        );
+
+        await Promise.all(
+            priceIds.map((priceId) => this.archiveBillingPrice(priceId)),
+        );
     }
 }

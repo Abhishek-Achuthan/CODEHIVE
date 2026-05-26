@@ -182,8 +182,14 @@ import { IGetPlanBySlugUseCase } from '../../application/useCase/interface/plan/
 import { GetPlanBySlugUseCase } from '../../application/useCase/plan/GetPlanBySlugUseCase';
 import { IArchivePlanUseCase } from '../../application/useCase/interface/plan/IArchivePlanUseCase';
 import { ArchivePlanUseCase } from '../../application/useCase/plan/ArchivePlanUseCase';
+import { ISyncPlanStripeCatalogUseCase } from '../../application/useCase/interface/plan/ISyncPlanStripeCatalogUseCase';
+import { SyncPlanStripeCatalogUseCase } from '../../application/useCase/plan/SyncPlanStripeCatalogUseCase';
 import { IResolveUserEntitlementsUseCase } from '../../application/useCase/interface/entitlement/IResolveUserEntitlementsUseCase';
 import { ResolveUserEntitlementsUseCase } from '../../application/useCase/entitlement/ResolveUserEntitlementsUseCase';
+import { ICreateSubscriptionCheckoutSessionUseCase } from '../../application/useCase/interface/subscription/ICreateSubscriptionCheckoutSessionUseCase';
+import { CreateSubscriptionCheckoutSessionUseCase } from '../../application/useCase/subscription/CreateSubscriptionCheckoutSessionUseCase';
+import { GetActiveSubscriptionUseCase } from '../../application/useCase/subscription/GetActiveSubscriptionUseCase';
+import { IGetActiveSubscriptionUseCase } from '../../application/useCase/interface/subscription/IGetActiveSubscriptionUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -669,11 +675,29 @@ export class UseCaseModule {
       useClass: ArchivePlanUseCase,
     });
 
+    container.register<ISyncPlanStripeCatalogUseCase>(
+      'ISyncPlanStripeCatalogUseCase',
+      {
+        useClass: SyncPlanStripeCatalogUseCase,
+      },
+    );
+
     container.register<IResolveUserEntitlementsUseCase>(
       'IResolveUserEntitlementsUseCase',
       {
         useClass: ResolveUserEntitlementsUseCase,
       },
     );
+
+    container.register<ICreateSubscriptionCheckoutSessionUseCase>(
+      'ICreateSubscriptionCheckoutSessionUseCase',
+      {
+        useClass: CreateSubscriptionCheckoutSessionUseCase,
+      }
+    );
+
+    container.register<IGetActiveSubscriptionUseCase>('IGetActiveSubscriptionUseCase', {
+      useClass: GetActiveSubscriptionUseCase,
+    });
   }
 }

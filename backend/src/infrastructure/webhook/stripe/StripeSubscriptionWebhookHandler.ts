@@ -10,42 +10,7 @@ import type { ILoggerService } from '../../../application/ports/logging/ILoggerS
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
-/**
- * Idempotent handler for Stripe subscription lifecycle events.
- *
- * Consistency strategy
- * ────────────────────
- * Every event is processed inside a single Mongoose transaction that spans:
- *   1. Idempotency check  – beginProcessing() atomically inserts a
- *      StripeWebhookEvent record (unique on eventId).  Duplicate or
- *      in-flight events are dropped before any business logic runs.
- *   2. Stale-event guard  – for update events the incoming
- *      currentPeriodEnd is compared against the stored value.  An event
- *      whose billing period is strictly older than what we already have
- *      is silently skipped and still marked processed so it is never
- *      retried.
- *   3. Business mutation  – subscription create / update / delete runs
- *      inside the same session so it either commits with the idempotency
- *      record or rolls back entirely.
- *   4. markProcessed()    – written inside the transaction; if the
- *      transaction rolls back the event stays PROCESSING and Stripe will
- *      retry, which is the safe default.
- *   5. markFailed()       – written outside the transaction (in catch)
- *      so the failure is always persisted even after a rollback.
- *
- * Event-ordering risks
- * ────────────────────
- * Stripe does not guarantee delivery order.  The most dangerous race is
- * customer.subscription.updated arriving before
- * customer.subscription.created (the subscription row does not exist yet).
- * The handler returns early in that case; Stripe will retry the update
- * event and by then the created event will have been processed.
- *
- * A second risk is two updated events for the same subscription arriving
- * concurrently with different billing periods.  The stale-event guard
- * (currentPeriodEnd comparison) ensures the older period never overwrites
- * a newer one.
- */
+
 @injectable()
 export class StripeSubscriptionWebhookHandler
   implements IStripeSubscriptionWebhookHandler
@@ -53,18 +18,14 @@ export class StripeSubscriptionWebhookHandler
   constructor(
     @inject('IStripeWebhookEventRepository')
     private readonly _stripeWebhookEventRepository: IStripeWebhookEventRepository,
-
     @inject('ISubscriptionRepository')
     private readonly _subscriptionRepository: ISubscriptionRepository,
-
     @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
-
     @inject('ILoggerService')
     private readonly _logger: ILoggerService,
   ) {}
 
-  // ─── Public entry point ────────────────────────────────────────────────────
 
   async handle(rawEvent: WebhookEvent): Promise<void> {
     const event = this._toStripeEvent(rawEvent);
@@ -78,7 +39,6 @@ export class StripeSubscriptionWebhookHandler
 
     try {
       await dbSession.withTransaction(async () => {
-        // ── 1. Idempotency gate ──────────────────────────────────────────────
         const beginResult =
           await this._stripeWebhookEventRepository.beginProcessing(
             event.id,
@@ -94,11 +54,9 @@ export class StripeSubscriptionWebhookHandler
         }
 
         if (beginResult === 'processing') {
-          // Another worker is handling this event right now; let it finish.
           return;
         }
 
-        // ── 2. Dispatch to the appropriate handler ───────────────────────────
         switch (event.type) {
           case 'customer.subscription.created':
             await this._handleSubscriptionCreated(event, dbSession);
@@ -120,15 +78,12 @@ export class StripeSubscriptionWebhookHandler
             break;
         }
 
-        // ── 3. Commit idempotency record ─────────────────────────────────────
         await this._stripeWebhookEventRepository.markProcessed(
           event.id,
           dbSession,
         );
       });
     } catch (error) {
-      // markFailed is intentionally outside the transaction so it persists
-      // even when the transaction rolled back.
       const message =
         error instanceof Error
           ? error.message
@@ -147,8 +102,6 @@ export class StripeSubscriptionWebhookHandler
       await dbSession.endSession();
     }
   }
-
-  // ─── Event handlers ────────────────────────────────────────────────────────
 
   private async _handleSubscriptionCreated(
     event: Stripe.Event,
@@ -174,9 +127,6 @@ export class StripeSubscriptionWebhookHandler
       return;
     }
 
-    // Guard: do not double-create if the subscription already exists.
-    // This covers the case where a previous attempt partially succeeded
-    // and the unique index on stripeSubscriptionId would have thrown anyway.
     const existing =
       await this._subscriptionRepository.findByStripeSubscriptionIdWithSession(
         subscription.id,
@@ -240,8 +190,6 @@ export class StripeSubscriptionWebhookHandler
       );
 
     if (!existing) {
-      // The created event may not have been processed yet.  Stripe will
-      // retry this event; by then the subscription row will exist.
       this._logger.warn('subscription_webhook.updated_not_found', {
         eventId: event.id,
         stripeSubscriptionId: subscription.id,
@@ -254,10 +202,6 @@ export class StripeSubscriptionWebhookHandler
 
     const incomingPeriodEnd = new Date(firstItem.current_period_end * 1000);
 
-    // ── Stale-event guard ────────────────────────────────────────────────────
-    // Reject events whose billing period ends before the period we already
-    // have stored.  This prevents out-of-order delivery from regressing the
-    // billing window.
     if (incomingPeriodEnd < existing.currentPeriodEnd) {
       this._logger.warn('subscription_webhook.stale_update_skipped', {
         eventId: event.id,
@@ -312,7 +256,6 @@ export class StripeSubscriptionWebhookHandler
       return;
     }
 
-    // Idempotent: if already canceled, nothing to do.
     if (existing.status === SubscriptionStatus.CANCELED) {
       this._logger.info('subscription_webhook.already_canceled', {
         eventId: event.id,
@@ -370,7 +313,6 @@ export class StripeSubscriptionWebhookHandler
       return;
     }
 
-    // Idempotent: only move to PAST_DUE from an active-like state.
     if (
       existing.status === SubscriptionStatus.CANCELED ||
       existing.status === SubscriptionStatus.EXPIRED

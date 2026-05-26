@@ -20,6 +20,19 @@ export class PlanMapper {
         yearly: plan.pricing.yearly,
         currency: plan.pricing.currency,
       },
+      ...(plan.stripe !== undefined
+        ? {
+            stripe: {
+              ...(plan.stripe.productId ? { productId: plan.stripe.productId } : {}),
+              ...(plan.stripe.monthlyPriceId
+                ? { monthlyPriceId: plan.stripe.monthlyPriceId }
+                : {}),
+              ...(plan.stripe.yearlyPriceId
+                ? { yearlyPriceId: plan.stripe.yearlyPriceId }
+                : {}),
+            },
+          }
+        : {}),
       createdAt: plan.createdAt,
       updatedAt: plan.updatedAt,
     };

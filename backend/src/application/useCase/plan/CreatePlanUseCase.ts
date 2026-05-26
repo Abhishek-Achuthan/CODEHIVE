@@ -5,16 +5,20 @@ import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { PlanMapper } from '../../mapper/PlanMapper';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import type { ISyncPlanStripeCatalogUseCase } from '../interface/plan/ISyncPlanStripeCatalogUseCase';
+import { isPaidPlan } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class CreatePlanUseCase implements ICreatePlanUseCase {
   constructor(
     @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
+
+    @inject('ISyncPlanStripeCatalogUseCase')
+    private readonly _syncPlanStripeCatalog: ISyncPlanStripeCatalogUseCase,
   ) {}
 
   async execute(data: CreatePlanDTO): Promise<PlanResponseDTO> {
-
     const normalizedSlug = data.slug.trim().toLowerCase();
 
     const existingPlan = await this._planRepository.findBySlug(normalizedSlug);
@@ -41,6 +45,17 @@ export class CreatePlanUseCase implements ICreatePlanUseCase {
       },
     });
 
-    return PlanMapper.toCreateResponse(createdPlan);
+    let plan = createdPlan;
+
+    if (isPaidPlan(createdPlan)) {
+      try {
+        plan = await this._syncPlanStripeCatalog.execute(createdPlan.id);
+      } catch (error) {
+        await this._planRepository.delete(createdPlan.id);
+        throw error;
+      }
+    }
+
+    return PlanMapper.toCreateResponse(plan);
   }
 }

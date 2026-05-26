@@ -28,6 +28,7 @@ import { PollController } from '../../presentation/controllers/poll/PollControll
 import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
 import { PlanController } from '../../presentation/controllers/plan/PlanController';
 import { ILoggerService } from '../../application/ports/logging/ILoggerService';
+import { SubscriptionController } from '../../presentation/controllers/Subscription/SubscriptionController';
 
 ContainerSetup.registerAll();
 
@@ -67,13 +68,15 @@ export const pollController = container.resolve(PollController);
 
 export const planController = container.resolve(PlanController);
 
+export const subscriptionController = container.resolve(SubscriptionController);
+
 export const socketHandlers: ISocketHandler[] = [
   container.resolve(RoomSocketHandler),
   container.resolve(ChatSocketHandler),
   container.resolve(PresenceSocketHandler),
   container.resolve(PollSocketHandler),
 ];
-  export const socketService = container.resolve<ISocketService>('ISocketService');
+export const socketService = container.resolve<ISocketService>('ISocketService');
 
 export const loggerService = container.resolve<ILoggerService>('ILoggerService');
 

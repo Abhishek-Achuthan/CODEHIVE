@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminService } from "../../../services/adminService";
 import toast from "react-hot-toast";
 import type { PlanView } from "../../../shared/types/view/PlanView";
+import { PlanService } from "../../../services/planService";
 
 function mapApiPlanToView(plan: {
   id: string;
@@ -41,7 +42,7 @@ export function useFetchPlans(search: string, page: number) {
   const fetchPlans = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await AdminService.listPlans(page, 10, search);
+      const data = await PlanService.listPlans(page, 10, search);
       const items = Array.isArray(data?.items)
         ? data.items.map(mapApiPlanToView)
         : [];

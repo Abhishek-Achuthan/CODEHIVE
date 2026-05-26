@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { AdminService } from "../../../services/adminService";
 import toast from "react-hot-toast";
 import type { UpdatePlanPayload } from "../../../shared/types/view/PlanView";
+import { PlanService } from "../../../services/planService";
 
 export function useUpdatePlan() {
   const [loading, setLoading] = useState(false);
@@ -9,7 +9,7 @@ export function useUpdatePlan() {
   const updatePlan = useCallback(async (id: string, payload: UpdatePlanPayload) => {
     setLoading(true);
     try {
-      const data = await AdminService.updatePlan(id, payload);
+      const data = await PlanService.updatePlan(id, payload);
       toast.success("Plan updated successfully");
       return { success: true, data };
     } catch (error) {

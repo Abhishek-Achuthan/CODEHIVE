@@ -7,12 +7,17 @@ import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { PlanMapper } from '../../mapper/PlanMapper';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { PlanEntity } from '../../../domain/entities/PlanEntity';
+import type { ISyncPlanStripeCatalogUseCase } from '../interface/plan/ISyncPlanStripeCatalogUseCase';
+import { isPaidPlan } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class UpdatePlanUseCase implements IUpdatePlanUseCase {
   constructor(
     @inject('IPlanRepository')
     private readonly _planRepository: IPlanRepository,
+
+    @inject('ISyncPlanStripeCatalogUseCase')
+    private readonly _syncPlanStripeCatalog: ISyncPlanStripeCatalogUseCase,
   ) {}
 
   async execute(data: UpdatePlanDTO): Promise<PlanResponseDTO> {
@@ -20,9 +25,13 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
 
     if (!existingPlan) throw new NotFoundError(ERROR_MESSAGES.PLAN.NOT_FOUND);
 
-    const normalizedSlug = data.slug !== undefined ? data.slug.trim().toLowerCase() : undefined;
-    
-    const normalizedCurrency = data.pricing?.currency !== undefined ? data.pricing.currency.trim().toUpperCase() : undefined;
+    const normalizedSlug =
+      data.slug !== undefined ? data.slug.trim().toLowerCase() : undefined;
+
+    const normalizedCurrency =
+      data.pricing?.currency !== undefined
+        ? data.pricing.currency.trim().toUpperCase()
+        : undefined;
 
     if (normalizedSlug !== undefined && normalizedSlug !== existingPlan.slug) {
       const existingSlugPlan = await this._planRepository.findBySlug(normalizedSlug);
@@ -31,7 +40,8 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
       }
     }
 
-    const uniqueFeatures = data.features !== undefined ? [...new Set(data.features)] : undefined;
+    const uniqueFeatures =
+      data.features !== undefined ? [...new Set(data.features)] : undefined;
 
     const mergedData: Partial<PlanEntity> = {
       ...(data.name !== undefined ? { name: data.name } : {}),
@@ -41,14 +51,25 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
       ...(data.isPublic !== undefined ? { isPublic: data.isPublic } : {}),
       ...(data.sortOrder !== undefined ? { sortOrder: data.sortOrder } : {}),
       ...(uniqueFeatures !== undefined ? { features: uniqueFeatures } : {}),
-      ...(data.limits !== undefined ? { limits: { ...existingPlan.limits, ...data.limits } } : {}),
+      ...(data.limits !== undefined
+        ? { limits: { ...existingPlan.limits, ...data.limits } }
+        : {}),
     };
 
     if (data.pricing) {
       mergedData.pricing = {
-        monthly: data.pricing.monthly !== undefined ? data.pricing.monthly : existingPlan.pricing.monthly,
-        yearly: data.pricing.yearly !== undefined ? data.pricing.yearly : existingPlan.pricing.yearly,
-        currency: normalizedCurrency !== undefined ? normalizedCurrency : existingPlan.pricing.currency,
+        monthly:
+          data.pricing.monthly !== undefined
+            ? data.pricing.monthly
+            : existingPlan.pricing.monthly,
+        yearly:
+          data.pricing.yearly !== undefined
+            ? data.pricing.yearly
+            : existingPlan.pricing.yearly,
+        currency:
+          normalizedCurrency !== undefined
+            ? normalizedCurrency
+            : existingPlan.pricing.currency,
       };
     }
 
@@ -57,6 +78,14 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
       throw new NotFoundError(ERROR_MESSAGES.PLAN.NOT_FOUND);
     }
 
-    return PlanMapper.toCreateResponse(updatedPlan);
+    let plan = updatedPlan;
+
+    if (isPaidPlan(updatedPlan)) {
+      plan = await this._syncPlanStripeCatalog.execute(data.planId, {
+        recreatePrices: data.pricing !== undefined,
+      });
+    }
+
+    return PlanMapper.toCreateResponse(plan);
   }
 }

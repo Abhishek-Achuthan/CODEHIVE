@@ -1,6 +1,7 @@
 import z from 'zod';
 import { FeatureKey } from '../../domain/types/FeatureKey';
 import { LimitKey } from '../../domain/types/LimitKey';
+import { isStripeBillingCurrency } from '../../shared/constants/stripeBillingCurrencies';
 
 export const createPlanSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -16,7 +17,12 @@ export const createPlanSchema = z.object({
   pricing: z.object({
     monthly: z.number().nonnegative('Monthly price must be non-negative'),
     yearly: z.number().nonnegative('Yearly price must be non-negative'),
-    currency: z.string().length(3)
+    currency: z
+      .string()
+      .length(3)
+      .refine((value) => isStripeBillingCurrency(value), {
+        message: 'Unsupported currency. Use a Stripe-supported code like USD or INR',
+      }),
   }),
 });
 
@@ -50,6 +56,12 @@ export const updatePlanSchema = z.object({
   pricing: z.object({
     monthly: z.number().nonnegative('Monthly price must be non-negative').optional(),
     yearly: z.number().nonnegative('Yearly price must be non-negative').optional(),
-    currency: z.string().length(3).optional()
+    currency: z
+      .string()
+      .length(3)
+      .refine((value) => isStripeBillingCurrency(value), {
+        message: 'Unsupported currency. Use a Stripe-supported code like USD or INR',
+      })
+      .optional(),
   }).optional(),
 });

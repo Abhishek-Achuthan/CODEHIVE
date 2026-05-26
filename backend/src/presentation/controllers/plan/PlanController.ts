@@ -6,8 +6,10 @@ import type { IListActivePlansUseCase } from '../../../application/useCase/inter
 import type { IArchivePlanUseCase } from '../../../application/useCase/interface/plan/IArchivePlanUseCase';
 import type { IGetPlanByIdUseCase } from '../../../application/useCase/interface/plan/IGetPlanByIdUseCase';
 import type { IGetPlanBySlugUseCase } from '../../../application/useCase/interface/plan/IGetPlanBySlugUseCase';
+import type { ISyncPlanStripeCatalogUseCase } from '../../../application/useCase/interface/plan/ISyncPlanStripeCatalogUseCase';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import { createPlanSchema, planIdParamSchema, updatePlanSchema, planSlugParamSchema, listPlansQuerySchema } from '../../validation/planValidation';
+import { PlanMapper } from '../../../application/mapper/PlanMapper';
 
 @injectable()
 export class PlanController {
@@ -24,6 +26,8 @@ export class PlanController {
     private readonly _getPlanByIdUseCase: IGetPlanByIdUseCase,
     @inject('IGetPlanBySlugUseCase')
     private readonly _getPlanBySlugUseCase: IGetPlanBySlugUseCase,
+    @inject('ISyncPlanStripeCatalogUseCase')
+    private readonly _syncPlanStripeCatalogUseCase: ISyncPlanStripeCatalogUseCase,
   ) {}
 
   async handleCreatePlan(req: Request, res: Response, next: NextFunction) {
@@ -32,7 +36,7 @@ export class PlanController {
 
       const data = await this._createPlanUseCase.execute(validatedData);
 
-      return res.status(HttpStatus.Created).json(data);
+       res.status(HttpStatus.Created).json(data);
       
     } catch (error) {
       next(error);
@@ -49,7 +53,7 @@ export class PlanController {
         ...validatedBody,
       });
 
-      return res.status(HttpStatus.OK).json(data);
+       res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }
@@ -63,7 +67,7 @@ export class PlanController {
         limit,
         search
       );
-      return res.status(HttpStatus.OK).json(data);
+       res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }
@@ -94,6 +98,18 @@ export class PlanController {
       const { slug } = planSlugParamSchema.parse(req.params);
       const data = await this._getPlanBySlugUseCase.execute(slug);
       return res.status(HttpStatus.OK).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleSyncPlanStripe(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = planIdParamSchema.parse(req.params);
+      const plan = await this._syncPlanStripeCatalogUseCase.execute(id, {
+        recreatePrices: true,
+      });
+      return res.status(HttpStatus.OK).json(PlanMapper.toCreateResponse(plan));
     } catch (error) {
       next(error);
     }

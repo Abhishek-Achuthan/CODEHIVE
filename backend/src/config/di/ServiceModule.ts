@@ -26,6 +26,7 @@ import { SlotConflictService } from '../../infrastructure/adapters/session/SlotC
 import { IWalletService } from '../../application/ports/wallet/IWalletService';
 import { WalletService } from '../../infrastructure/adapters/wallet/WalletService';
 import { IPaymentService } from '../../application/ports/payment/IPaymentService';
+import { IBillingCatalogService } from '../../application/ports/payment/IBillingCatalogService';
 import { PaymentService } from '../../infrastructure/adapters/payment/PaymentService';
 import { IStripeSubscriptionWebhookHandler } from '../../application/ports/payment/IStripeSubscriptionWebhookHandler';
 import { StripeSubscriptionWebhookHandler } from '../../infrastructure/webhook/stripe/StripeSubscriptionWebhookHandler';
@@ -115,6 +116,11 @@ export class ServiceModule {
 
     container.register<IPaymentService>('IPaymentService', {
       useClass: PaymentService,
+    });
+
+    container.register<IBillingCatalogService>('IBillingCatalogService', {
+      useFactory: (dependencyContainer) =>
+        dependencyContainer.resolve(PaymentService),
     });
 
     container.register<IStripeSubscriptionWebhookHandler>('IStripeSubscriptionWebhookHandler', {

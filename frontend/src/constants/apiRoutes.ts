@@ -55,6 +55,11 @@ export const API_ROUTES = {
     UPDATE_MENTOR_STATUS: `/admin/update-mentor-status`,
   },
 
+  SUBSCRIPTIONS: {
+    CHECKOUT: "/subscriptions/checkout",
+    ME: "/subscriptions/me",
+  },
+
   PLANS: {
     LIST: (params?: { page?: number; limit?: number; search?: string }) => {
       const qp = new URLSearchParams();

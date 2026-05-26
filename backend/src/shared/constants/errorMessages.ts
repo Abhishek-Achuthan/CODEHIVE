@@ -179,7 +179,11 @@ export const ERROR_MESSAGES = {
     FREE_PLAN_NOT_FOUND: 'Free plan not found',
     INACTIVE: 'Plan is inactive',
     FREE_PLAN_CANNOT_BE_PURCHASED: 'Free plan cannot be purchased',
-    STRIPE_PRICE_NOT_CONFIGURED: 'Stripe price not configured for this plan',
+    STRIPE_PRICE_NOT_CONFIGURED: 'Stripe monthly price not configured for this plan',
+    STRIPE_YEARLY_PRICE_NOT_CONFIGURED: 'Stripe yearly price not configured for this plan',
+    STRIPE_CATALOG_SYNC_FAILED: 'Failed to sync plan with Stripe billing catalog',
+    STRIPE_PRODUCT_CREATE_FAILED: 'Failed to create Stripe product for plan',
+    STRIPE_PRICE_CREATE_FAILED: 'Failed to create Stripe price for plan',
   },
 
   SUBSCRIPTION: {
