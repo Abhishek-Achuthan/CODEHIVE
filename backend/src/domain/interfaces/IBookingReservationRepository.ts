@@ -19,6 +19,7 @@ export interface CreateBookingReservationInput {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
+  guestCount: number;
 }
 
 export interface IBookingReservationRepository {

@@ -52,6 +52,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
     const { mentorId, userId, date, startTime, endTime, topic } = input;
+    const guestCount = Math.max(0, Math.min(input.guestCount ?? 0, 20));
 
 
     const studentEntitlements = await this._entitlementResolutionService.resolve(userId);
@@ -126,6 +127,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
         paymentReferenceId: null,
         topic,
         amount,
+        guestCount,
       });
 
       try {

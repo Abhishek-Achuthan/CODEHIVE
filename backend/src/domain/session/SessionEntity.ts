@@ -18,4 +18,6 @@ export interface SessionEntity {
   createdAt: Date;
   updatedAt: Date;
   roomId?: string | undefined;
+  guestCount: number;
+  joinUrl?: string | undefined;
 }

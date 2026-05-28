@@ -19,6 +19,7 @@ export interface BookingReservationDoc extends Document {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
+  guestCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,6 +41,7 @@ export interface BookingReservationLeanDoc {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
+  guestCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +75,7 @@ export const BookingReservationSchema = new Schema<BookingReservationDoc>(
       default: RefundStatus.NONE,
       required: true,
     },
+    guestCount: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true }
 );

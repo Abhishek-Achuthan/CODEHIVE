@@ -90,6 +90,8 @@ export class SessionRepository
         amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
+        guestCount: doc.guestCount ?? 0,
+        ...(doc.joinUrl ? { joinUrl: doc.joinUrl } : {}),
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
       };
@@ -137,6 +139,8 @@ export class SessionRepository
         amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
+        guestCount: doc.guestCount ?? 0,
+        ...(doc.joinUrl ? { joinUrl: doc.joinUrl } : {}),
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
       };
@@ -280,6 +284,8 @@ export class SessionRepository
         amount: doc.amount,
         status: doc.status,
         topic: doc.topic,
+        guestCount: doc.guestCount ?? 0,
+        ...(doc.joinUrl ? { joinUrl: doc.joinUrl } : {}),
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
       };
@@ -329,6 +335,8 @@ export class SessionRepository
       paymentReferenceId: doc.paymentReferenceId,
       amount: doc.amount,
       topic: doc.topic,
+      guestCount: doc.guestCount ?? 0,
+      ...(doc.joinUrl ? { joinUrl: doc.joinUrl } : {}),
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -349,6 +357,8 @@ export class SessionRepository
       paymentReferenceId: doc.paymentReferenceId,
       amount: doc.amount,
       topic: doc.topic,
+      guestCount: doc.guestCount ?? 0,
+      ...(doc.joinUrl ? { joinUrl: doc.joinUrl } : {}),
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -375,6 +385,8 @@ export class SessionRepository
     if (data.amount !== undefined) doc.amount = data.amount;
     if (data.topic !== undefined) doc.topic = data.topic;
     if (data.date !== undefined) doc.date = data.date;
+    if (data.guestCount !== undefined) doc.guestCount = data.guestCount;
+    if (data.joinUrl !== undefined) doc.joinUrl = data.joinUrl;
 
     return doc;
   }

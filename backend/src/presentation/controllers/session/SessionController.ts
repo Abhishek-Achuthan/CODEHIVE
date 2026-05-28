@@ -40,7 +40,13 @@ export class SessionController {
       const parsed = bookSessionWithStripeSchema.parse(req.body);
       const result = await this._bookSessionWithStripe.execute({
         userId: id,
-        ...parsed,
+        mentorId: parsed.mentorId,
+        date: parsed.date,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        topic: parsed.topic,
+        clientRequestId: parsed.clientRequestId,
+        guestCount: parsed.guestCount ?? 0,
       });
       res.status(HttpStatus.Created).json(result);
     } catch (error) {

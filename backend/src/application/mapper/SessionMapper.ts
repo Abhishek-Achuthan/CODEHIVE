@@ -27,6 +27,7 @@ export class SessionMapper {
       amount: session.amount,
       paymentSource:session.paymentSource,
       paymentStatus:session.paymentStatus,
+      guestCount: session.guestCount,
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };
@@ -59,7 +60,9 @@ export class SessionMapper {
       amount: session.amount,
       paymentSource:session.paymentSource,
       paymentStatus:session.paymentStatus,
-      ...(session.roomId && {roomId : session.roomId}),
+      ...(session.roomId && { roomId: session.roomId }),
+      ...(session.joinUrl !== undefined && { joinUrl: session.joinUrl }),
+      guestCount: session.guestCount,
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };
@@ -120,6 +123,7 @@ export class SessionMapper {
       paymentSource: PaymentSource.STRIPE,
       paymentReferenceId: reservation.stripePaymentIntentId ?? null,
       amount: reservation.amount,
+      guestCount: 0,
       createdAt: reservation.createdAt,
       updatedAt: reservation.updatedAt,
     };

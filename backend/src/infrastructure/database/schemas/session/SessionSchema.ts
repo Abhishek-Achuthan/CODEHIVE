@@ -18,6 +18,8 @@ export interface SessionDoc extends Document {
     paymentReferenceId: string | null;
     amount: number;
     topic: string;
+    guestCount: number;
+    joinUrl?: string | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -36,6 +38,8 @@ export interface SessionLeanDoc {
     paymentReferenceId: string | null;
     amount: number;
     topic: string;
+    guestCount: number;
+    joinUrl?: string | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -54,6 +58,8 @@ export const SessionSchema = new Schema({
     paymentReferenceId: { type: String, default: null },
     status: { type: String, enum: Object.values(SessionStatus), default: SessionStatus.UPCOMING },
     topic: { type: String, required: true },
+    guestCount: { type: Number, default: 0, min: 0 },
+    joinUrl: { type: String, default: null },
 }, {
     timestamps: true
 });

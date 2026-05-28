@@ -22,6 +22,7 @@ export interface BookSessionDTO {
   endTime: string;
   topic: string;
   clientRequestId: string;
+  guestCount?: number;
 }
 
 export interface MentorListInputDTO {
@@ -66,6 +67,7 @@ export interface ISessionResponseDTO {
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
   topic: string;
+  guestCount: number;
   createdAt: string;
   updatedAt: string;
   amount: number;
@@ -92,6 +94,8 @@ export interface IBookedSessionResponseDTO {
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
   amount: number,
+  guestCount: number;
+  joinUrl?: string;
   createdAt: string;
   updatedAt: string;
 }

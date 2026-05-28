@@ -49,6 +49,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
 
   async execute(input: BookSessionDTO): Promise<StripeCheckoutResponseDTO> {
     const { mentorId, userId, date, startTime, endTime, topic, clientRequestId } = input;
+    const guestCount = Math.max(0, Math.min(input.guestCount ?? 0, 20));
 
 
     const studentEntitlements = await this._entitlementResolutionService.resolve(userId);
@@ -164,6 +165,7 @@ export class BookSessionWithStripeUseCase implements IBookSessionWithStripeUseCa
         expiresAt,
         lastStripeEventId: null,
         refundStatus: RefundStatus.NONE,
+        guestCount,
       });
     } catch (error: unknown) {
       if (this._isDuplicateKeyError(error)) {

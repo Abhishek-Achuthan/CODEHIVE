@@ -157,6 +157,7 @@ export class BookingReservationRepository
       expiresAt: doc.expiresAt,
       lastStripeEventId: doc.lastStripeEventId,
       refundStatus: doc.refundStatus,
+      guestCount: doc.guestCount ?? 0,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };

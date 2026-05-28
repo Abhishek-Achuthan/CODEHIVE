@@ -13,8 +13,10 @@ import { RoomRole } from '../../../domain/types/RoomRole';
 import { LimitKey } from '../../../domain/types/LimitKey';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { RoomInviteService } from '../../services/RoomInviteService';
 
-const SESSION_ROOM_PARTICIPANT_COUNT = 2;
+const SESSION_ROOM_BASE_PARTICIPANTS = 2;
+const SESSION_END_BUFFER_MS = 30 * 60 * 1000;
 
 @injectable()
 export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionUseCase {
@@ -33,6 +35,9 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
 
     @inject(RoomFeatureSnapshotFactory)
     private readonly _roomFeatureSnapshotFactory: RoomFeatureSnapshotFactory,
+
+    @inject(RoomInviteService)
+    private readonly _roomInviteService: RoomInviteService,
   ) {}
 
   async execute(sessionId: string): Promise<void> {
@@ -48,12 +53,11 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     );
     const featureSnapshot = this._roomFeatureSnapshotFactory.create(entitlements);
 
+    const guestCount = session.guestCount ?? 0;
+    const desiredCapacity = SESSION_ROOM_BASE_PARTICIPANTS + guestCount;
     const planMaxParticipants =
-      entitlements.limits[LimitKey.MAX_PARTICIPANTS] ?? SESSION_ROOM_PARTICIPANT_COUNT;
-    const maxParticipants = Math.min(
-      SESSION_ROOM_PARTICIPANT_COUNT,
-      planMaxParticipants,
-    );
+      entitlements.limits[LimitKey.MAX_PARTICIPANTS] ?? SESSION_ROOM_BASE_PARTICIPANTS;
+    const maxParticipants = Math.min(desiredCapacity, planMaxParticipants);
 
     const room = await this._roomRepo.create({
       title: 'Mentor Session',
@@ -65,7 +69,7 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
       admissionPolicy: RoomAdmissionPolicy.BOOKING_ONLY,
       featureSnapshot,
       maxParticipants,
-      participantCount: SESSION_ROOM_PARTICIPANT_COUNT,
+      participantCount: SESSION_ROOM_BASE_PARTICIPANTS,
     });
 
     const hostPromise = this._participantRepo.create({
@@ -83,5 +87,17 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     const roomIdPromise = this._sessionRepo.update(session.id, { roomId: room.id });
 
     await Promise.all([hostPromise, participantPromise, roomIdPromise]);
+
+    const expiresAt = new Date(session.endTime.getTime() + SESSION_END_BUFFER_MS);
+
+    const { joinUrl } = await this._roomInviteService.createSessionInvite({
+      roomId: room.id,
+      sessionId: session.id,
+      createdBy: session.mentorId,
+      expiresAt,
+      maxUses: maxParticipants,
+    });
+
+    await this._sessionRepo.update(session.id, { joinUrl });
   }
 }

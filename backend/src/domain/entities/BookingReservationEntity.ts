@@ -18,6 +18,7 @@ export interface BookingReservationEntity {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
+  guestCount: number;
   createdAt: Date;
   updatedAt: Date;
 }

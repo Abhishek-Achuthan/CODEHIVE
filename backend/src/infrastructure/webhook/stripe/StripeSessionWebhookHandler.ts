@@ -153,6 +153,7 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
                 paymentReferenceId: reservation.stripePaymentIntentId ?? null,
                 topic: reservation.topic,
                 amount: reservation.amount,
+                guestCount: reservation.guestCount ?? 0,
               },
               dbSession,
             );
