@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DataTable } from "../../../shared/ui/DataTable";
-import { useDebounce } from "../hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { useBlockUser } from "../hooks/useBlockUser";
 import { userColumns } from "../columns/userColumns";
 import { Pagination } from "../../../shared/ui/Pagination";

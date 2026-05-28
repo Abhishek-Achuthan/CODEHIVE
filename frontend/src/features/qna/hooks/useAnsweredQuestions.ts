@@ -8,7 +8,7 @@ import type {
     QuestionListFilter,
     QuestionSortApi,
 } from "../../../shared/types/api/qna";
-import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
 import { APP_MESSAGES } from "../../../shared/constants/messages";

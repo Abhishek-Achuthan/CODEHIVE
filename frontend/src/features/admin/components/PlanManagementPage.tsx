@@ -5,7 +5,7 @@ import { Pagination } from "../../../shared/ui/Pagination";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 import { PlanFormModal } from "./PlanFormModal";
 import { planColumns } from "../columns/planColumns";
-import { useDebounce } from "../hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { useFetchPlans } from "../hooks/useFetchPlans";
 import { useCreatePlan } from "../hooks/useCreatePlan";
 import { useUpdatePlan } from "../hooks/useUpdatePlan";

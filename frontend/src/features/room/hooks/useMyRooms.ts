@@ -4,7 +4,7 @@ import type {
   GetPublicRoomsPaginatedResponse,
   RoomVisibility,
 } from "../../../shared/types/api/room";
-import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import type { MyRoomsVisibilityFilter } from "../components/MyRoomsVisibilityTabs";
 
 const DEFAULT_LIMIT = 5;

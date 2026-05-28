@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 import { QnAService } from "../../../services/qnaService";
 import type { QuestionListFilter, QuestionListParams, QuestionSortApi } from "../../../shared/types/api/qna";
-import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";

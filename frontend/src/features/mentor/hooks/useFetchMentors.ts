@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MentorshipService } from "../../../services/mentorService";
 import { BaseError } from "../../../shared/errors/BaseError";
-import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { mapMentorListItemToView } from "../../../shared/mappers/mentor.mapper";
 import type {
   MentorCardData,
