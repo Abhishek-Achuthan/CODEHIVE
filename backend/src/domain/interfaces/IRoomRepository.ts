@@ -4,6 +4,11 @@ import { IGenericRepository } from './IGenericRepository';
 
 export interface IRoomRepository extends IGenericRepository<RoomEntity> {
   findAllPublic(page: number, limit: number): Promise<PaginationResult<RoomEntity>>;
+  findAllByHostId(
+    hostId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<RoomEntity>>;
   countActiveRoomsByHostId(hostId: string): Promise<number>;
   incrementParticipantCount(
     roomId: string,
