@@ -10,6 +10,7 @@ import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEnti
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { RoomRole } from '../../../domain/types/RoomRole';
 import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
+import { RoomInviteService } from '../../services/RoomInviteService';
 import { ConflictError } from '../../../core/errors/ConflictError';
 
 @injectable()
@@ -27,12 +28,15 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     private readonly pollRepository: IPollRepository,
     @inject(RoomAuthorizationService)
     private readonly roomAuthorizationService: RoomAuthorizationService,
+    @inject(RoomInviteService)
+    private readonly roomInviteService: RoomInviteService,
   ) {}
 
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
     const joinAuthorization = await this.roomAuthorizationService.assertCanJoinRoom(
       data.roomId,
       data.userId,
+      data.inviteCode !== undefined ? { inviteCode: data.inviteCode } : undefined,
     );
 
     const room = joinAuthorization.room;
@@ -61,6 +65,10 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
 
         await this.participantRepository.create(participant);
         isNewParticipant = true;
+
+        if (joinAuthorization.validatedInvite) {
+          await this.roomInviteService.recordInviteUse(joinAuthorization.validatedInvite.id);
+        }
       } catch (error: unknown) {
         if (this._isDuplicateKeyError(error)) {
           await this.roomRepository.decrementParticipantCount(room.id);

@@ -15,6 +15,7 @@ import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { EntitlementResolutionService } from '../../services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../services/RoomFeatureSnapshotFactory';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { RoomInviteService } from '../../services/RoomInviteService';
 
 @injectable()
 export class CreateRoomUseCase implements ICreateRoomUseCase {
@@ -26,6 +27,8 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
     private readonly _entitlementResolutionService: EntitlementResolutionService,
     @inject(RoomFeatureSnapshotFactory)
     private readonly _roomFeatureSnapshotFactory: RoomFeatureSnapshotFactory,
+    @inject(RoomInviteService)
+    private readonly _roomInviteService: RoomInviteService,
   ) {}
 
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
@@ -49,6 +52,11 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
 
     const maxParticipants = entitlements.limits[LimitKey.MAX_PARTICIPANTS] ?? 10;
 
+    const isPrivate = data.visibility === RoomVisibility.PRIVATE;
+    const admissionPolicy = isPrivate
+      ? RoomAdmissionPolicy.INVITE_ONLY
+      : RoomAdmissionPolicy.REQUEST_TO_JOIN;
+
     const room = await this._roomRepository.create({
       title: data.title,
       hostId: data.userId,
@@ -58,7 +66,7 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       maxParticipants,
       featureSnapshot,
       lifecycleStatus: RoomLifeCycleStatus.ACTIVE,
-      admissionPolicy: RoomAdmissionPolicy.REQUEST_TO_JOIN,
+      admissionPolicy,
       ...(data.description && { description: data.description }),
     });
 
@@ -73,6 +81,14 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       };
 
       await this._participantRepository.create(participant);
+
+      if (isPrivate) {
+        const { joinUrl } = await this._roomInviteService.createHostInvite(
+          room.id,
+          data.userId,
+        );
+        return { ...room, joinUrl };
+      }
 
       return room;
     } catch (error) {
