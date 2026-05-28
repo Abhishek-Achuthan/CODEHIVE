@@ -29,6 +29,18 @@ export class RoomRoutes {
       this._roomController.handleGetPublicRooms.bind(this._roomController),
     );
 
+    this._router.get(
+      '/mine',
+      this._authMiddleware.check,
+      this._roomController.handleGetMyRooms.bind(this._roomController),
+    );
+
+    this._router.get(
+      '/:roomId/settings',
+      this._authMiddleware.check,
+      this._roomController.handleGetRoomSettings.bind(this._roomController),
+    );
+
     this._router.post(
       '/:roomId/join',
       this._authMiddleware.check,
@@ -39,6 +51,36 @@ export class RoomRoutes {
       '/:roomId/leave',
       this._authMiddleware.check,
       this._roomController.handleLeaveRoom.bind(this._roomController),
+    );
+
+    this._router.post(
+      '/:roomId/invites',
+      this._authMiddleware.check,
+      this._roomController.handleCreateRoomInvite.bind(this._roomController),
+    );
+
+    this._router.post(
+      '/:roomId/invites/regenerate',
+      this._authMiddleware.check,
+      this._roomController.handleRegenerateRoomInvite.bind(this._roomController),
+    );
+
+    this._router.get(
+      '/:roomId/invites',
+      this._authMiddleware.check,
+      this._roomController.handleListRoomInvites.bind(this._roomController),
+    );
+
+    this._router.delete(
+      '/:roomId/invites/:inviteId',
+      this._authMiddleware.check,
+      this._roomController.handleRevokeRoomInvite.bind(this._roomController),
+    );
+
+    this._router.post(
+      '/:roomId/participants/:userId/kick',
+      this._authMiddleware.check,
+      this._roomController.handleKickParticipant.bind(this._roomController),
     );
 
     this._router.use('/:roomId/messages', new MessageRoutes().getRoutes());

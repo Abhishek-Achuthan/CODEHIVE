@@ -146,6 +146,15 @@ export const ERROR_MESSAGES = {
     FORBIDDEN: 'You are not allowed to view these notes',
     ACTIVE_ROOM_LIMIT_REACHED: 'Active room limit reached for your current plan.',
     PRIVATE_ROOM_NOT_ALLOWED: 'Private rooms are not available on your current plan.',
+    INVITE_REQUIRED: 'An invite link is required to join this room',
+    INVITE_INVALID: 'This invite link is invalid or has been revoked',
+    INVITE_EXPIRED: 'This invite link has expired',
+    INVITE_MAX_USES_REACHED: 'This invite link has reached its maximum number of uses',
+    REMOVED_FROM_ROOM: 'You were removed from this room and cannot rejoin with this link',
+    ONLY_HOST_CAN_MANAGE_INVITES: 'Only the room host can manage invite links',
+    ONLY_HOST_CAN_KICK: 'Only the room host can remove participants',
+    CANNOT_KICK_HOST: 'The host cannot be removed from the room',
+    CANNOT_KICK_SELF: 'Use leave room instead of removing yourself',
   },
 
   POLL: {
