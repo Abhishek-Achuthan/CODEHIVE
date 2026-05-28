@@ -49,6 +49,7 @@ const BookingPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlotResponse | null>(null);
   const [topic, setTopic] = useState("");
+  const [guestCount, setGuestCount] = useState(0);
 
   const {
     slots,
@@ -78,6 +79,7 @@ const BookingPage: React.FC = () => {
         date: dateStr,
         topic,
         clientRequestId: createClientRequestId(),
+        guestCount,
       })
     );
 
@@ -265,6 +267,31 @@ const BookingPage: React.FC = () => {
                     Please briefly describe the topic or questions you have for{" "}
                     {mentor?.firstName}.
                   </p>
+
+                  <div>
+                    <label
+                      htmlFor="guest-count"
+                      className="mb-1 block text-sm font-medium text-zinc-300"
+                    >
+                      Friends joining (optional)
+                    </label>
+                    <p className="mb-2 text-xs text-zinc-500">
+                      How many friends will join via your session invite link (not including you).
+                    </p>
+                    <input
+                      id="guest-count"
+                      type="number"
+                      min={0}
+                      max={20}
+                      value={guestCount}
+                      onChange={(e) =>
+                        setGuestCount(
+                          Math.max(0, Math.min(20, Number(e.target.value) || 0)),
+                        )
+                      }
+                      className="w-24 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white"
+                    />
+                  </div>
 
                   <div className="flex items-center gap-4 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
                     <div>

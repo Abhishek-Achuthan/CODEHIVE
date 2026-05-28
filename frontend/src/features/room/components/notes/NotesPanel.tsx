@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ShieldAlert, Users } from 'lucide-react';
+import { Lock, Users } from 'lucide-react';
 import PrivateNotes from './PrivateNotes';
 import PublicNotes from './PublicNotes';
 import { useRoomAuthorization } from '../../authorization/RoomAuthorizationContext';
@@ -12,23 +12,7 @@ type NoteTab = 'private' | 'public';
 
 const NotesPanel: React.FC<NotesPanelProps> = ({ roomId }) => {
   const [activeTab, setActiveTab] = useState<NoteTab>('private');
-  const { canViewNotes, canEditNotes, hasFeature } = useRoomAuthorization();
-
-  if (!hasFeature('notes') || !canViewNotes) {
-    return (
-      <div className="flex h-full items-center justify-center bg-[#0d1117] text-gray-400">
-        <div className="flex flex-col items-center gap-3 text-center px-6">
-          <ShieldAlert className="w-8 h-8 text-gray-600" />
-          <div>
-            <p className="text-sm font-semibold text-gray-100">Notes unavailable</p>
-            <p className="text-xs text-gray-500 mt-1">
-              Notes are disabled for this room or not available to your account.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { canEditNotes } = useRoomAuthorization();
 
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">

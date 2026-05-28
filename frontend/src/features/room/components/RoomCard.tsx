@@ -5,9 +5,10 @@ import type { GetPublicRoomsResponse } from '../../../shared/types/api/room';
 
 interface RoomCardProps {
     room: GetPublicRoomsResponse;
+    actionLabel?: string;
 }
 
-export const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
+export const RoomCard: React.FC<RoomCardProps> = ({ room, actionLabel = "Join Room" }) => {
     const navigate = useNavigate();
     const createdAtDate = parseDate(room.createdAt);
 
@@ -29,8 +30,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
                     <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-1">
                         {room.title}
                     </h3>
-                    <span className="shrink-0 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full">
-                        Public
+                    <span
+                      className={`shrink-0 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${
+                        room.visibility === "PRIVATE"
+                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          : "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
+                      }`}
+                    >
+                        {room.visibility === "PRIVATE" ? "Private" : "Public"}
                     </span>
                 </div>
 
@@ -52,7 +59,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
                 onClick={handleJoin}
                 className="relative w-full mt-6 px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-lg active:scale-[0.98]"
             >
-                Join Room
+                {actionLabel}
             </button>
         </div>
     );

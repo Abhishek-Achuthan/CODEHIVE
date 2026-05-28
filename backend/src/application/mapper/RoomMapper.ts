@@ -1,4 +1,5 @@
-import { RoomFeatureSnapshot } from '../../domain/entities/room/RoomEntity';
+import { RoomEntity, RoomFeatureSnapshot } from '../../domain/entities/room/RoomEntity';
+import { GetPublicRoomsResponseDTO } from '../dto/RoomDTO';
 import { ResolvedEntitlements } from '../services/EntitlementsResolutionService';
 
 export class RoomMapper {
@@ -10,6 +11,20 @@ export class RoomMapper {
       limits: {
         ...entitlements.limits,
       },
+    };
+  }
+
+  public static toPublicRoomResponse(room: RoomEntity): GetPublicRoomsResponseDTO {
+    return {
+      id: room.id,
+      title: room.title,
+      ...(room.description !== undefined ? { description: room.description } : {}),
+      visibility: room.visibility,
+      hostId: room.hostId,
+      maxParticipants: room.maxParticipants,
+      participantCount: room.participantCount,
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
     };
   }
 }

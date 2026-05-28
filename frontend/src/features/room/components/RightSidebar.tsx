@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import {
   MessageSquare, StickyNote, BarChart2,
-  Search, Settings, ChevronRight, ChevronLeft
+  Search, Settings, ChevronRight, ChevronLeft, Lock,
 } from 'lucide-react';
 import type { TabType, RoomMessage as Message, Participant } from '../types';
 import ChatPanel from './ChatPanel';
 import PollsPanel from './PollsPanel';
 import NotesPanel from './notes/NotesPanel';
+import { FeatureLockedPanel } from './FeatureLockedPanel';
 import type { Poll } from '../../../shared/socket/roomTypes';
 import type { CreatePollRequest } from '../../../shared/types/api/room';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
+import {
+  getFeatureLockReason,
+  isChatAccessible,
+  isNotesAccessible,
+  isPollsAccessible,
+} from '../authorization/featureAccess';
 
 
 interface RightSidebarProps {
@@ -26,8 +33,16 @@ interface RightSidebarProps {
   onVotePoll: (pollId: string, optionIds: string[]) => void;
   onClosePoll: (pollId: string) => void;
   roomId: string;
+  onOpenSettings?: () => void;
 }
 
+type SidebarTab = {
+  id: TabType;
+  icon: React.ReactNode;
+  label: string;
+  isAccessible: boolean;
+  feature: 'chat' | 'notes' | 'polls';
+};
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
   messages,
@@ -43,36 +58,61 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   onVotePoll,
   onClosePoll,
   roomId,
+  onOpenSettings,
 }) => {
   const authorization = useRoomAuthorization();
   const [activeTab, setActiveTab] = useState<TabType>('chat');
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
-    ...(authorization.canReadChat || authorization.canWriteChat
-      ? [{ id: 'chat' as TabType, icon: <MessageSquare className="w-4 h-4" />, label: 'Chat' }]
-      : []),
-    ...(authorization.canViewNotes
-      ? [{ id: 'notes' as TabType, icon: <StickyNote className="w-4 h-4" />, label: 'Notes' }]
-      : []),
-    ...(authorization.canViewPolls
-      ? [{ id: 'polls' as TabType, icon: <BarChart2 className="w-4 h-4" />, label: 'Polls' }]
-      : []),
+  const tabs: SidebarTab[] = [
+    {
+      id: 'chat',
+      icon: <MessageSquare className="w-4 h-4" />,
+      label: 'Chat',
+      isAccessible: isChatAccessible(authorization),
+      feature: 'chat',
+    },
+    {
+      id: 'notes',
+      icon: <StickyNote className="w-4 h-4" />,
+      label: 'Notes',
+      isAccessible: isNotesAccessible(authorization),
+      feature: 'notes',
+    },
+    {
+      id: 'polls',
+      icon: <BarChart2 className="w-4 h-4" />,
+      label: 'Polls',
+      isAccessible: isPollsAccessible(authorization),
+      feature: 'polls',
+    },
   ];
-
-  const resolvedActiveTab = tabs.some((tab) => tab.id === activeTab)
-    ? activeTab
-    : tabs[0]?.id;
 
   const handleTabClick = (id: TabType) => {
     setActiveTab(id);
     if (isCollapsed) setIsCollapsed(false);
   };
 
+  const activeTabMeta = tabs.find((tab) => tab.id === activeTab) ?? tabs[0]!;
+
   const renderContent = () => {
     if (isCollapsed) return null;
 
-    switch (resolvedActiveTab) {
+    if (!activeTabMeta.isAccessible) {
+      return (
+        <FeatureLockedPanel
+          feature={activeTabMeta.feature}
+          reason={getFeatureLockReason(
+            authorization,
+            activeTabMeta.feature,
+            false,
+          )}
+          planName={authorization.featureSnapshot?.planName}
+        />
+      );
+    }
+
+    switch (activeTab) {
       case 'chat':
         return (
           <ChatPanel
@@ -88,7 +128,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         );
       case 'notes':
         return <NotesPanel roomId={roomId} />;
-
       case 'polls':
         return (
           <PollsPanel
@@ -100,11 +139,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         );
       default:
-        return (
-          <div className="flex h-full items-center justify-center px-6 text-center text-gray-500">
-            <p className="text-sm">No workspace tools are available in this room.</p>
-          </div>
-        );
+        return null;
     }
   };
 
@@ -120,6 +155,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
            <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2' : 'gap-2'}`}>
              <button
+                type="button"
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-all"
              >
@@ -128,38 +164,67 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
              {!isCollapsed && (
                <>
                  <Search className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer" />
-                 <Settings className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer" />
+                 <button
+                   type="button"
+                   onClick={onOpenSettings}
+                   className="rounded p-0.5 text-gray-500 transition-colors hover:text-white"
+                   title="Room settings"
+                 >
+                   <Settings className="h-3.5 w-3.5" />
+                 </button>
                </>
              )}
            </div>
         </div>
 
         <div className={`flex ${isCollapsed ? 'flex-col gap-4 mt-4 items-center' : 'items-center gap-1'}`}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
-              className={`transition-all relative group ${
-                isCollapsed
-                  ? 'p-2 rounded-xl'
-                  : 'flex-1 flex flex-col items-center gap-1.5 py-2 px-1 text-[10px] font-bold uppercase rounded-t-lg border-b-2'
-              } ${
-                activeTab === tab.id
-                  ? 'text-blue-400 bg-[#161b22] ' + (!isCollapsed ? 'border-blue-500' : '')
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 border-transparent'
-              }`}
-              title={tab.label}
-            >
-              <div className={`${activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110'}`}>
-                {tab.icon}
-              </div>
-              {!isCollapsed && <span className="tracking-tighter">{tab.label}</span>}
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const isLocked = !tab.isAccessible;
 
-              {isCollapsed && activeTab === tab.id && (
-                <div className="absolute left-0 w-1 h-4 bg-blue-500 rounded-r-full" />
-              )}
-            </button>
-          ))}
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabClick(tab.id)}
+                className={`transition-all relative group ${
+                  isCollapsed
+                    ? 'p-2 rounded-xl'
+                    : 'flex-1 flex flex-col items-center gap-1.5 py-2 px-1 text-[10px] font-bold uppercase rounded-t-lg border-b-2'
+                } ${
+                  isLocked
+                    ? isCollapsed
+                      ? 'text-gray-600 opacity-45 hover:opacity-70'
+                      : 'text-gray-600 opacity-50 border-transparent hover:text-gray-400 hover:opacity-70'
+                    : isActive
+                      ? 'text-blue-400 bg-[#161b22] ' + (!isCollapsed ? 'border-blue-500' : '')
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 border-transparent'
+                }`}
+                title={isLocked ? `${tab.label} — upgrade to unlock` : tab.label}
+                aria-disabled={isLocked}
+              >
+                <div
+                  className={`relative ${
+                    isActive && !isLocked ? 'scale-110' : 'group-hover:scale-105'
+                  } ${isLocked ? 'grayscale' : ''}`}
+                >
+                  {tab.icon}
+                  {isLocked && (
+                    <Lock className="absolute -bottom-1 -right-1 h-2.5 w-2.5 text-gray-500" />
+                  )}
+                </div>
+                {!isCollapsed && <span className="tracking-tighter">{tab.label}</span>}
+
+                {isCollapsed && isActive && (
+                  <div
+                    className={`absolute left-0 w-1 h-4 rounded-r-full ${
+                      isLocked ? 'bg-gray-600' : 'bg-blue-500'
+                    }`}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 

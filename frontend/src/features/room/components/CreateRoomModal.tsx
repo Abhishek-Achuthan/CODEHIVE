@@ -13,6 +13,7 @@ import type { RoomVisibility } from '../../../shared/types/api/room';
 interface CreateRoomModalProps {
   open: boolean;
   onClose: () => void;
+  onCreated?: () => void;
 }
 
 interface FormErrors {
@@ -20,7 +21,7 @@ interface FormErrors {
   description?: string;
 }
 
-const CreateRoomModal = ({ open, onClose }: CreateRoomModalProps) => {
+const CreateRoomModal = ({ open, onClose, onCreated }: CreateRoomModalProps) => {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
@@ -70,6 +71,10 @@ const CreateRoomModal = ({ open, onClose }: CreateRoomModalProps) => {
         description: description.trim() || undefined,
         visibility,
       });
+      if (room.joinUrl) {
+        await navigator.clipboard.writeText(room.joinUrl);
+      }
+      onCreated?.();
       handleClose();
       navigate(`/room/${room.id}`);
     } catch (err) {
@@ -147,7 +152,7 @@ const CreateRoomModal = ({ open, onClose }: CreateRoomModalProps) => {
               className="bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <option value="PUBLIC_REQUEST">Public (anyone can request to join)</option>
-              <option value="PRIVATE">Private (invite only)</option>
+              <option value="PRIVATE">Private — join via invite link only</option>
             </select>
           </div>
 

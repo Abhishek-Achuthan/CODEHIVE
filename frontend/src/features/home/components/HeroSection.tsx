@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Code2, Users, MonitorPlay } from 'lucide-react';
+import { Code2, Users, MonitorPlay } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { CreateRoomButton } from '../../room/components/CreateRoomButton';
 
 interface HeroSectionProps {
   onOpenModal: () => void;
@@ -55,13 +56,7 @@ const HeroSection = ({ onOpenModal }: HeroSectionProps) => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
         >
-          <button
-            onClick={onOpenModal}
-            className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-semibold rounded-lg overflow-hidden transition-all hover:scale-[1.02] active:scale-95"
-          >
-            Create Room
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </button>
+          <CreateRoomButton onClick={onOpenModal} />
           <button
             onClick={() => navigate('/sessions/discover')}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-zinc-900 text-white border border-zinc-800 font-semibold rounded-lg hover:bg-zinc-800 transition-colors"

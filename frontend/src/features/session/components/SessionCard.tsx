@@ -1,4 +1,5 @@
-import { User, Loader2 } from "lucide-react";
+import { User, Loader2, Copy } from "lucide-react";
+import toast from "react-hot-toast";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
 
 interface SessionCardProps {
@@ -105,6 +106,19 @@ export function SessionCard({
                                     className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-green-500 to-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:opacity-90"
                                 >
                                     Join Room
+                                </button>
+                            )}
+                            {session.joinUrl && session.roomId && (
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        await navigator.clipboard.writeText(session.joinUrl!);
+                                        toast.success("Session invite link copied");
+                                    }}
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-xs font-semibold text-gray-200 transition-all hover:bg-gray-800"
+                                >
+                                    <Copy className="h-3 w-3" />
+                                    Copy invite link
                                 </button>
                             )}
                             {showCancelAction && (

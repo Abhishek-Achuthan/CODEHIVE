@@ -1,13 +1,23 @@
 import React from 'react';
 import { Mic, Video, LogOut, Settings, Monitor, Share2 } from 'lucide-react';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
+import { RoomInviteShare } from './RoomInviteShare';
 
 interface TopBarProps {
   roomName: string;
+  roomId: string;
+  showInviteControls?: boolean;
+  onOpenSettings?: () => void;
   onLeave: () => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ roomName, onLeave }) => {
+const TopBar: React.FC<TopBarProps> = ({
+  roomName,
+  roomId,
+  showInviteControls = false,
+  onOpenSettings,
+  onLeave,
+}) => {
   const authorization = useRoomAuthorization();
   const canUseVideoAudio = authorization.hasFeature('video_audio') && authorization.isActive;
   return (
@@ -28,6 +38,7 @@ const TopBar: React.FC<TopBarProps> = ({ roomName, onLeave }) => {
       </div>
 
       <div className="flex items-center gap-2">
+        {showInviteControls && <RoomInviteShare roomId={roomId} />}
         <div className="flex items-center bg-[#161b22] rounded-lg p-1 mr-2 border border-gray-800">
           <button
             disabled={!canUseVideoAudio}
@@ -64,13 +75,10 @@ const TopBar: React.FC<TopBarProps> = ({ roomName, onLeave }) => {
           </button>
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
           <button
-            disabled={!authorization.canManageRoomSettings}
-            className={`p-2 rounded-md transition-colors ${
-              authorization.canManageRoomSettings
-                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                : 'text-gray-700 cursor-not-allowed'
-            }`}
-            title={authorization.canManageRoomSettings ? 'Settings' : 'Room settings unavailable'}
+            type="button"
+            onClick={onOpenSettings}
+            className="p-2 rounded-md text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+            title="Room settings"
           >
             <Settings className="w-4 h-4" />
           </button>

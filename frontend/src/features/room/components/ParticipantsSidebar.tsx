@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import type { Participant } from '../types';
-import { Users, MoreVertical, Circle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Circle, ChevronLeft, ChevronRight, UserMinus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
+import { RoomService } from '../../../services/roomService';
 
 interface ParticipantsSidebarProps {
   participants: Participant[];
+  roomId: string;
 }
 
-const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants }) => {
+const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants, roomId }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const onlineCount = participants.filter(p => p.status === 'online').length;
   const authorization = useRoomAuthorization();
@@ -81,9 +84,24 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants 
                 )}
               </div>
               
-              {!isCollapsed && authorization.canModerateParticipants && (
-                <button className="p-1 text-gray-600 hover:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <MoreVertical className="w-4 h-4" />
+              {!isCollapsed &&
+                authorization.canModerateParticipants &&
+                !participant.isCurrentUser &&
+                participant.role !== 'HOST' && (
+                <button
+                  type="button"
+                  title="Remove from room"
+                  onClick={async () => {
+                    try {
+                      await RoomService.kickParticipant(roomId, participant.id);
+                      toast.success(`${participant.name} was removed`);
+                    } catch {
+                      toast.error('Failed to remove participant');
+                    }
+                  }}
+                  className="p-1 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <UserMinus className="w-4 h-4" />
                 </button>
               )}
             </div>

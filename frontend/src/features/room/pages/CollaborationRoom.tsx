@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRoomSocket } from '../../../shared/socket/useRoomSocket';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
@@ -14,6 +14,7 @@ import TopBar from '../components/TopBar';
 import ParticipantsSidebar from '../components/ParticipantsSidebar';
 import EditorArea from '../components/EditorArea';
 import RightSidebar from '../components/RightSidebar';
+import { RoomSettingsModal } from '../components/RoomSettingsModal';
 
 import { Loader2, AlertCircle } from 'lucide-react';
 
@@ -43,6 +44,8 @@ const CollaborationRoom: React.FC = () => {
     isRealtimeReady,
     error,
   } = useRoomSocket(roomId || null);
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const roomName = 'Project Collaboration Room';
 
@@ -175,7 +178,18 @@ const CollaborationRoom: React.FC = () => {
         {/* Top Bar */}
         <TopBar
           roomName={roomName}
+          roomId={roomId!}
+          showInviteControls={
+            finalCurrentUser.role === 'HOST' || finalCurrentUser.role === 'MODERATOR'
+          }
+          onOpenSettings={() => setSettingsOpen(true)}
           onLeave={handleLeaveRoom}
+        />
+
+        <RoomSettingsModal
+          roomId={roomId!}
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
         />
 
         {(authorization.isReadonly || authorization.isArchived || authorization.isScheduled || authorization.isPurged) && (
@@ -195,6 +209,7 @@ const CollaborationRoom: React.FC = () => {
           {/* Participants */}
           <ParticipantsSidebar
             participants={formattedParticipants}
+            roomId={roomId!}
           />
 
           {/* Editor */}
@@ -215,6 +230,7 @@ const CollaborationRoom: React.FC = () => {
             onVotePoll={votePoll}
             onClosePoll={closePoll}
             roomId={roomId || ''}
+            onOpenSettings={() => setSettingsOpen(true)}
           />
         </div>
       </div>
