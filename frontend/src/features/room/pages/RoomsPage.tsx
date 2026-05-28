@@ -8,7 +8,6 @@ import { QnaBackgroundGlow } from "../../../shared/ui/QnaBackgroundGlow";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import CreateRoomModal from "../components/CreateRoomModal";
-import { CreateRoomButton } from "../components/CreateRoomButton";
 import { RoomViewTabs, type RoomListTab } from "../components/RoomViewTabs";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { RoomsSidebar } from "../components/RoomsSidebar";
@@ -91,12 +90,7 @@ const RoomsPage: React.FC = () => {
                 label="Rooms"
                 title={headerCopy.title}
                 description={headerCopy.description}
-              >
-                <CreateRoomButton
-                  size="compact"
-                  onClick={() => setIsModalOpen(true)}
-                />
-              </PageHeader>
+              />
 
               <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:hidden">
                 <RoomViewTabs
@@ -105,14 +99,15 @@ const RoomsPage: React.FC = () => {
                 />
               </div>
 
-              {activeTab === "mine" && user ? (
-                <MyRoomsToolbar
-                  visibility={myRooms.visibility}
-                  onVisibilityChange={myRooms.setVisibility}
-                  searchTerm={myRooms.searchTerm}
-                  onSearchChange={myRooms.setSearchTerm}
-                />
-              ) : null}
+              <MyRoomsToolbar
+                showVisibility={activeTab === "mine" && Boolean(user)}
+                visibility={myRooms.visibility}
+                onVisibilityChange={myRooms.setVisibility}
+                showSearch={activeTab === "mine" && Boolean(user)}
+                searchTerm={myRooms.searchTerm}
+                onSearchChange={myRooms.setSearchTerm}
+                onCreateRoom={() => setIsModalOpen(true)}
+              />
 
               {activeTab === "mine" && !user ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-zinc-900/40 py-20 text-center backdrop-blur-xl">
