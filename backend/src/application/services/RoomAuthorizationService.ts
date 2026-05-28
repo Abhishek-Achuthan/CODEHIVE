@@ -2,6 +2,9 @@ import { inject, injectable } from 'tsyringe';
 
 import type { IParticipantRepository } from '../../domain/interfaces/IParticipantRepository';
 import type { IRoomRepository } from '../../domain/interfaces/IRoomRepository';
+import type { IRoomBanRepository } from '../../domain/interfaces/IRoomBanRepository';
+import { RoomInviteEntity } from '../../domain/entities/room/RoomInviteEntity';
+import { RoomInviteService } from './RoomInviteService';
 import { PermissionService } from '../../domain/services/PermissionService';
 import type { ParticipantEntity } from '../../domain/entities/room/ParticipantEntity';
 import type { RoomEntity } from '../../domain/entities/room/RoomEntity';
@@ -35,6 +38,10 @@ export class RoomAuthorizationService {
     private readonly _roomRepository: IRoomRepository,
     @inject('IParticipantRepository')
     private readonly _participantRepository: IParticipantRepository,
+    @inject('IRoomBanRepository')
+    private readonly _roomBanRepository: IRoomBanRepository,
+    @inject(RoomInviteService)
+    private readonly _roomInviteService: RoomInviteService,
     @inject(PermissionService)
     private readonly _permissionService: PermissionService,
   ) {}
@@ -108,29 +115,50 @@ export class RoomAuthorizationService {
   async assertCanJoinRoom(
     roomId: string,
     userId: string,
+    options?: { inviteCode?: string },
   ): Promise<{
     room: RoomEntity;
     existingParticipant: ParticipantEntity | null;
     shouldCreateParticipant: boolean;
+    validatedInvite?: RoomInviteEntity;
   }> {
     const room = await this._getRoom(roomId);
     this.assertLifecycleAccess(room, 'join');
+
+    if (await this._roomBanRepository.exists(roomId, userId)) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.REMOVED_FROM_ROOM);
+    }
 
     const existingParticipant = await this._getParticipant(room, userId);
     if (existingParticipant) {
       return { room, existingParticipant, shouldCreateParticipant: false };
     }
 
-    if (room.visibility === RoomVisibility.PRIVATE) {
+    const requiresInvite =
+      room.visibility === RoomVisibility.PRIVATE ||
+      room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY ||
+      room.admissionPolicy === RoomAdmissionPolicy.BOOKING_ONLY;
+
+    if (room.admissionPolicy === RoomAdmissionPolicy.CLOSED) {
       throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
     }
 
-    if (
-      room.admissionPolicy === RoomAdmissionPolicy.BOOKING_ONLY ||
-      room.admissionPolicy === RoomAdmissionPolicy.CLOSED ||
-      room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY
-    ) {
-      throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
+    if (requiresInvite) {
+      if (!options?.inviteCode) {
+        throw new ForbiddenError(ERROR_MESSAGES.ROOM.INVITE_REQUIRED);
+      }
+
+      const validatedInvite = await this._roomInviteService.validateInviteCode(
+        options.inviteCode,
+        roomId,
+      );
+
+      return {
+        room,
+        existingParticipant: null,
+        shouldCreateParticipant: true,
+        validatedInvite,
+      };
     }
 
     return {
@@ -138,6 +166,16 @@ export class RoomAuthorizationService {
       existingParticipant: null,
       shouldCreateParticipant: true,
     };
+  }
+
+  async assertHost(roomId: string, userId: string): Promise<RoomEntity> {
+    const room = await this._getRoom(roomId);
+
+    if (room.hostId !== userId) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.ONLY_HOST_CAN_MANAGE_INVITES);
+    }
+
+    return room;
   }
 
   async assertCollaborationAccess(
