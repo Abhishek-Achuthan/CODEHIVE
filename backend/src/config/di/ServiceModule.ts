@@ -1,4 +1,5 @@
 import { container } from 'tsyringe';
+import { env } from '../envConfig';
 import { ICacheService } from '../../application/ports/cache/ICacheService';
 import { CacheService } from '../../infrastructure/adapters/cache/CacheService';
 import { IEmailService } from '../../application/ports/mail/IEmailService';
@@ -57,6 +58,7 @@ import { SessionActivationPublisher } from '../../infrastructure/queue/publisher
 import { SessionActivationConsumer } from '../../infrastructure/queue/consumer/SessionActivationConsumer';
 import { SessionActivationDlqConsumer } from '../../infrastructure/queue/consumer/SessionActivationDlqConsumer';
 import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
+import { RoomInviteService } from '../../application/services/RoomInviteService';
 import { EntitlementResolutionService } from '../../application/services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../application/services/RoomFeatureSnapshotFactory';
 
@@ -181,6 +183,9 @@ export class ServiceModule {
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);
     container.registerSingleton(RoomAuthorizationService, RoomAuthorizationService);
+    container.register('frontendUrl', { useValue: env.frontendUrl ?? 'http://localhost:5173' });
+    container.register('invitePepper', { useValue: env.secretKey ?? 'codehive-invite' });
+    container.registerSingleton(RoomInviteService, RoomInviteService);
     container.registerSingleton(EntitlementResolutionService, EntitlementResolutionService);
     container.registerSingleton(RoomFeatureSnapshotFactory, RoomFeatureSnapshotFactory);
   }

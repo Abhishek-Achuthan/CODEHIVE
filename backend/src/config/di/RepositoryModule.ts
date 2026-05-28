@@ -35,6 +35,10 @@ import { IRoomRepository } from '../../domain/interfaces/IRoomRepository';
 import { RoomRepository } from '../../infrastructure/database/repository/RoomRepository';
 import { IParticipantRepository } from '../../domain/interfaces/IParticipantRepository';
 import { ParticipantRepository } from '../../infrastructure/database/repository/ParticipantRepository';
+import { IRoomInviteRepository } from '../../domain/interfaces/IRoomInviteRepository';
+import { RoomInviteRepository } from '../../infrastructure/database/repository/RoomInviteRepository';
+import { IRoomBanRepository } from '../../domain/interfaces/IRoomBanRepository';
+import { RoomBanRepository } from '../../infrastructure/database/repository/RoomBanRepository';
 import { IMessageRepository } from '../../domain/interfaces/IMessageRepository';
 import { MessageRepository } from '../../infrastructure/database/repository/MessageRepository';
 import { IPollRepository } from '../../domain/interfaces/IPollRepository';
@@ -109,6 +113,14 @@ export class RepositoryModule {
 
     container.register<IParticipantRepository>('IParticipantRepository', {
       useClass: ParticipantRepository
+    });
+
+    container.register<IRoomInviteRepository>('IRoomInviteRepository', {
+      useClass: RoomInviteRepository,
+    });
+
+    container.register<IRoomBanRepository>('IRoomBanRepository', {
+      useClass: RoomBanRepository,
     });
 
     container.register<IMessageRepository>('IMessageRepository', {

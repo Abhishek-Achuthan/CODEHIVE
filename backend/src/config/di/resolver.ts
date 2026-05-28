@@ -22,6 +22,7 @@ import { PollSocketHandler } from '../../presentation/socket/PollSocketHandler';
 import { HocuspocusService } from '../../infrastructure/realtime/HocuspocusService';
 import { ISocketService } from '../../application/ports/socket/ISocketService';
 import { RoomController } from '../../presentation/controllers/room/RoomController';
+import { InviteController } from '../../presentation/controllers/room/InviteController';
 import { PublicNoteController } from '../../presentation/controllers/note/PublicNoteController';
 import { MessageController } from '../../presentation/controllers/message/MessageController';
 import { PollController } from '../../presentation/controllers/poll/PollController';
@@ -59,6 +60,8 @@ export const walletController = container.resolve(WalletController);
 export const hocuspocusService = container.resolve(HocuspocusService);
 
 export const roomController = container.resolve(RoomController);
+
+export const inviteController = container.resolve(InviteController);
 
 export const publicNoteController = container.resolve(PublicNoteController);
 

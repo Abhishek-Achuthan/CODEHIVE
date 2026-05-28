@@ -27,6 +27,7 @@ import {
 } from './config/di/resolver';
 import { initializeRabbitMQConnection } from './config/rabbitMQConfig';
 import { RoomRoutes } from './presentation/routes/RoomRoutes';
+import { InviteRoutes } from './presentation/routes/InviteRoutes';
 import { PlanRoute } from './presentation/routes/PlanRoutes';
 
 export class App {
@@ -84,6 +85,7 @@ export class App {
     const webhookRoutes = new WebhooksRoutes();
     const walletRoutes = new WalletRoutes();
     const roomRoutes = new RoomRoutes();
+    const inviteRoutes = new InviteRoutes();
     const planRoute = new PlanRoute();
     const subscriptionRoute = new SubscriptionRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
@@ -95,6 +97,7 @@ export class App {
     this._app.use('/api/webhook', webhookRoutes.getRoutes());
     this._app.use('/api/wallet', walletRoutes.getRoutes());
     this._app.use('/api/rooms', roomRoutes.getRoutes());
+    this._app.use('/api/invites', inviteRoutes.getRoutes());
     this._app.use('/api/plans', planRoute.getRoutes());
     this._app.use('/api/subscriptions', subscriptionRoute.getRoutes());
   }

@@ -145,8 +145,26 @@ import { IDeleteMessageUseCase } from '../../application/useCase/interface/messa
 import { DeleteMessageUseCase } from '../../application/useCase/message/DeleteMessageUseCase';
 import { IGetPublicRoomsUseCase } from '../../application/useCase/interface/room/IGetPublicRoomsUseCase';
 import { GetPublicRoomsUseCase } from '../../application/useCase/room/GetPublicRoomsUseCase';
+import { IGetMyRoomsUseCase } from '../../application/useCase/interface/room/IGetMyRoomsUseCase';
+import { GetMyRoomsUseCase } from '../../application/useCase/room/GetMyRoomsUseCase';
 import { ILeaveRoomUseCase } from '../../application/useCase/interface/room/ILeaveRoomUseCase';
 import { LeaveRoomUseCase } from '../../application/useCase/room/LeaveRoomUseCase';
+import { ICreateRoomInviteUseCase } from '../../application/useCase/interface/room/ICreateRoomInviteUseCase';
+import { CreateRoomInviteUseCase } from '../../application/useCase/room/CreateRoomInviteUseCase';
+import { IRegenerateRoomInviteUseCase } from '../../application/useCase/interface/room/IRegenerateRoomInviteUseCase';
+import { RegenerateRoomInviteUseCase } from '../../application/useCase/room/RegenerateRoomInviteUseCase';
+import { IRevokeRoomInviteUseCase } from '../../application/useCase/interface/room/IRevokeRoomInviteUseCase';
+import { RevokeRoomInviteUseCase } from '../../application/useCase/room/RevokeRoomInviteUseCase';
+import { IListRoomInvitesUseCase } from '../../application/useCase/interface/room/IListRoomInvitesUseCase';
+import { ListRoomInvitesUseCase } from '../../application/useCase/room/ListRoomInvitesUseCase';
+import { IPreviewInviteUseCase } from '../../application/useCase/interface/room/IPreviewInviteUseCase';
+import { PreviewInviteUseCase } from '../../application/useCase/room/PreviewInviteUseCase';
+import { IJoinRoomViaInviteUseCase } from '../../application/useCase/interface/room/IJoinRoomViaInviteUseCase';
+import { JoinRoomViaInviteUseCase } from '../../application/useCase/room/JoinRoomViaInviteUseCase';
+import { IKickParticipantUseCase } from '../../application/useCase/interface/room/IKickParticipantUseCase';
+import { IGetRoomSettingsUseCase } from '../../application/useCase/interface/room/IGetRoomSettingsUseCase';
+import { GetRoomSettingsUseCase } from '../../application/useCase/room/GetRoomSettingsUseCase';
+import { KickParticipantUseCase } from '../../application/useCase/room/KickParticipantUseCase';
 import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
 import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
 import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
@@ -460,6 +478,10 @@ export class UseCaseModule {
       useClass: GetPublicRoomsUseCase,
     });
 
+    container.register<IGetMyRoomsUseCase>('IGetMyRoomsUseCase', {
+      useClass: GetMyRoomsUseCase,
+    });
+
     container.register<ISendMessageUseCase>('ISendMessageUseCase', {
       useClass: SendMessageUseCase,
     });
@@ -474,6 +496,38 @@ export class UseCaseModule {
 
     container.register<ILeaveRoomUseCase>('ILeaveRoomUseCase', {
       useClass: LeaveRoomUseCase,
+    });
+
+    container.register<ICreateRoomInviteUseCase>('ICreateRoomInviteUseCase', {
+      useClass: CreateRoomInviteUseCase,
+    });
+
+    container.register<IRegenerateRoomInviteUseCase>('IRegenerateRoomInviteUseCase', {
+      useClass: RegenerateRoomInviteUseCase,
+    });
+
+    container.register<IRevokeRoomInviteUseCase>('IRevokeRoomInviteUseCase', {
+      useClass: RevokeRoomInviteUseCase,
+    });
+
+    container.register<IListRoomInvitesUseCase>('IListRoomInvitesUseCase', {
+      useClass: ListRoomInvitesUseCase,
+    });
+
+    container.register<IPreviewInviteUseCase>('IPreviewInviteUseCase', {
+      useClass: PreviewInviteUseCase,
+    });
+
+    container.register<IJoinRoomViaInviteUseCase>('IJoinRoomViaInviteUseCase', {
+      useClass: JoinRoomViaInviteUseCase,
+    });
+
+    container.register<IKickParticipantUseCase>('IKickParticipantUseCase', {
+      useClass: KickParticipantUseCase,
+    });
+
+    container.register<IGetRoomSettingsUseCase>('IGetRoomSettingsUseCase', {
+      useClass: GetRoomSettingsUseCase,
     });
 
     container.register<ICreatePollUseCase>('ICreatePollUseCase', {
