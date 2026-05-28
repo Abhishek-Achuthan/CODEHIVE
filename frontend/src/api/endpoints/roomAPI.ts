@@ -5,6 +5,7 @@ import type {
     CreateRoomMessageRequest,
     CreateRoomRequest,
     EditRoomMessageRequest,
+    MyRoomsListParams,
     PublicRoomsListParams,
 } from "../../shared/types/api/room";
 
@@ -14,7 +15,7 @@ export const createRoom = (data: CreateRoomRequest) =>
 export const getPublicRooms = (params?: PublicRoomsListParams) =>
     apiClient.get(API_ROUTES.ROOM.GET_PUBLIC_ROOMS(params));
 
-export const getMyRooms = (params?: PublicRoomsListParams) =>
+export const getMyRooms = (params?: MyRoomsListParams) =>
     apiClient.get(API_ROUTES.ROOM.GET_MY_ROOMS(params));
 
 export const getRoomSettings = (roomId: string) =>

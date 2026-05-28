@@ -307,10 +307,11 @@ export const API_ROUTES = {
 
   ROOM: {
     CREATE_ROOM: "/rooms",
-    GET_MY_ROOMS: (params?: { page?: number; limit?: number }) => {
+    GET_MY_ROOMS: (params?: { page?: number; limit?: number; search?: string }) => {
       const qp = new URLSearchParams();
       if (params?.page !== undefined) qp.append("page", String(params.page));
       if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params?.search) qp.append("search", params.search);
       const query = qp.toString();
       return query ? `/rooms/mine?${query}` : "/rooms/mine";
     },

@@ -89,6 +89,10 @@ export interface PublicRoomsListParams {
   limit?: number;
 }
 
+export interface MyRoomsListParams extends PublicRoomsListParams {
+  search?: string;
+}
+
 export interface RoomMessageResponse {
   id: string;
   roomId: string;

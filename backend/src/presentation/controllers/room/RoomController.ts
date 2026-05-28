@@ -83,6 +83,9 @@ export class RoomController {
     try {
       const pageParam = Number(req.query.page);
       const limitParam = Number(req.query.limit);
+      const searchParam = req.query.search;
+      const search =
+        typeof searchParam === 'string' ? searchParam.trim() : undefined;
 
       const page = pageParam || 1;
       const limit = limitParam || 12;
@@ -90,6 +93,7 @@ export class RoomController {
       const rooms = await this._getMyRoomsUseCase.execute(req.user.id, {
         page,
         limit,
+        ...(search ? { search } : {}),
       });
 
       res.status(HttpStatus.OK).json(rooms);

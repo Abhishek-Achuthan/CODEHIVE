@@ -8,6 +8,7 @@ export interface IRoomRepository extends IGenericRepository<RoomEntity> {
     hostId: string,
     page: number,
     limit: number,
+    search?:string,
   ): Promise<PaginationResult<RoomEntity>>;
   countActiveRoomsByHostId(hostId: string): Promise<number>;
   incrementParticipantCount(

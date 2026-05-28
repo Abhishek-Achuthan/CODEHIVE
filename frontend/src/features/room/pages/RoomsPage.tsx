@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { PageHeader } from "../../../shared/ui/PageHeader";
 import { RoomList } from "../components/RoomList";
 import { useRooms } from "../hooks/useRooms";
-import { MY_ROOMS_PAGE_SIZE, useMyRooms } from "../hooks/useMyRooms";
+import { useMyRooms } from "../hooks/useMyRooms";
 import { QnaBackgroundGlow } from "../../../shared/ui/QnaBackgroundGlow";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
@@ -12,23 +12,19 @@ import { CreateRoomButton } from "../components/CreateRoomButton";
 import { RoomViewTabs, type RoomListTab } from "../components/RoomViewTabs";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { RoomsSidebar } from "../components/RoomsSidebar";
-import type { RoomVisibility } from "../../../shared/types/api/room";
+import { MyRoomsToolbar } from "../components/MyRoomsToolbar";
+import type { MyRoomsVisibilityFilter } from "../components/MyRoomsVisibilityTabs";
 
 const LIST_PARAMS = { page: 1, limit: 5 };
-
-type MyRoomsVisibilityFilter = "all" | "public" | "private";
 
 const RoomsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<RoomListTab>("public");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [myRoomsPage, setMyRoomsPage] = useState(1);
-  const [myRoomsVisibility, setMyRoomsVisibility] =
-    useState<MyRoomsVisibilityFilter>("all");
   const user = useAppSelector((state) => state.auth.user);
 
   const publicRooms = useRooms(LIST_PARAMS);
   const myRoomsEnabled = activeTab === "mine" && Boolean(user);
-  const myRooms = useMyRooms(myRoomsPage, myRoomsEnabled, MY_ROOMS_PAGE_SIZE);
+  const myRooms = useMyRooms(myRoomsEnabled);
 
   const isPublicTab = activeTab === "public";
   const { isLoading, error } = isPublicTab ? publicRooms : myRooms;
@@ -36,31 +32,27 @@ const RoomsPage: React.FC = () => {
   const handleTabChange = (tab: RoomListTab) => {
     setActiveTab(tab);
     if (tab === "mine") {
-      setMyRoomsPage(1);
+      myRooms.setCurrentPage(1);
+    } else {
+      myRooms.resetSearch();
     }
   };
 
-  const handleVisibilityChange = (next: MyRoomsVisibilityFilter) => {
-    setMyRoomsVisibility(next);
-    setMyRoomsPage(1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const handleMyRoomsPageChange = (page: number) => {
-    setMyRoomsPage(page);
+    myRooms.setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
     if (
       myRoomsEnabled &&
-      myRooms.data &&
-      myRoomsPage > myRooms.totalPages &&
+      myRooms.rooms &&
+      myRooms.currentPage > myRooms.totalPages &&
       myRooms.totalPages >= 1
     ) {
-      setMyRoomsPage(myRooms.totalPages);
+      myRooms.setCurrentPage(myRooms.totalPages);
     }
-  }, [myRoomsEnabled, myRooms.data, myRoomsPage, myRooms.totalPages]);
+  }, [myRoomsEnabled, myRooms.rooms, myRooms.currentPage, myRooms.totalPages]);
 
   const headerCopy =
     activeTab === "public"
@@ -75,46 +67,10 @@ const RoomsPage: React.FC = () => {
             "Rooms you created — public and private. Open any room to continue collaborating or share your invite link.",
         };
 
-  const visibilityFilterToRoomVisibility = (
-    filter: MyRoomsVisibilityFilter,
-  ): RoomVisibility | null => {
-    if (filter === "private") return "PRIVATE";
-    if (filter === "public") return "PUBLIC_REQUEST";
-    return null;
-  };
-
-  const filteredRooms = (() => {
-    if (isPublicTab) return publicRooms.data;
-    const rooms = myRooms.data;
-    if (!rooms) return rooms;
-
-    const visibility = visibilityFilterToRoomVisibility(myRoomsVisibility);
-    if (!visibility) return rooms;
-
-    return {
-      ...rooms,
-      items: rooms.items.filter((room) => room.visibility === visibility),
-    };
-  })();
-
-  const myRoomsEmptyCopy =
-    myRoomsVisibility === "private"
-      ? {
-          title: "No private rooms yet",
-          description:
-            "Create a private room to collaborate via invite links only.",
-        }
-      : myRoomsVisibility === "public"
-        ? {
-            title: "No public rooms yet",
-            description:
-              "Create a public room to let others request to join.",
-          }
-        : {
-            title: "You have not created any rooms yet",
-            description:
-              "Create a public or private room to start collaborating with your team.",
-          };
+  const myRoomsEmptyCopy = getMyRoomsEmptyCopy(
+    myRooms.debouncedSearch,
+    myRooms.visibility,
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-black">
@@ -150,30 +106,12 @@ const RoomsPage: React.FC = () => {
               </div>
 
               {activeTab === "mine" && user ? (
-                <div className="mb-8 flex items-center justify-between">
-                  <div className="inline-flex rounded-lg border border-zinc-800 bg-zinc-950 p-1">
-                    {(
-                      [
-                        { value: "all", label: "All" },
-                        { value: "public", label: "Public" },
-                        { value: "private", label: "Private" },
-                      ] as const
-                    ).map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => handleVisibilityChange(option.value)}
-                        className={`rounded-md px-4 py-1.5 text-xs font-semibold transition-all ${
-                          myRoomsVisibility === option.value
-                            ? "bg-white text-black shadow-sm"
-                            : "text-zinc-400 hover:text-white"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <MyRoomsToolbar
+                  visibility={myRooms.visibility}
+                  onVisibilityChange={myRooms.setVisibility}
+                  searchTerm={myRooms.searchTerm}
+                  onSearchChange={myRooms.setSearchTerm}
+                />
               ) : null}
 
               {activeTab === "mine" && !user ? (
@@ -193,7 +131,7 @@ const RoomsPage: React.FC = () => {
                 </div>
               ) : (
                 <RoomList
-                  rooms={filteredRooms}
+                  rooms={isPublicTab ? publicRooms.data : myRooms.rooms}
                   isLoading={isLoading}
                   error={error}
                   actionLabel={isPublicTab ? "Join Room" : "Open Room"}
@@ -230,12 +168,45 @@ const RoomsPage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onCreated={() => {
           void publicRooms.refetch();
-          setMyRoomsPage(1);
+          myRooms.setCurrentPage(1);
           void myRooms.refetch();
         }}
       />
     </div>
   );
 };
+
+function getMyRoomsEmptyCopy(
+  debouncedSearch: string,
+  visibility: MyRoomsVisibilityFilter,
+) {
+  if (debouncedSearch) {
+    return {
+      title: "No rooms match your search",
+      description: "Try a different title or clear the search field.",
+    };
+  }
+
+  if (visibility === "private") {
+    return {
+      title: "No private rooms yet",
+      description:
+        "Create a private room to collaborate via invite links only.",
+    };
+  }
+
+  if (visibility === "public") {
+    return {
+      title: "No public rooms yet",
+      description: "Create a public room to let others request to join.",
+    };
+  }
+
+  return {
+    title: "You have not created any rooms yet",
+    description:
+      "Create a public or private room to start collaborating with your team.",
+  };
+}
 
 export default RoomsPage;

@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 
 import { GenericRepository } from './GenericRepository';
 import RoomModel from '../models/room/RoomModel';
@@ -83,12 +83,20 @@ export class RoomRepository
     hostId: string,
     page: number,
     limit: number,
+    search?:string
   ): Promise<PaginationResult<RoomEntity>> {
-    const query = {
-      hostId: new Types.ObjectId(hostId),
-      lifecycleStatus: { $ne: RoomLifeCycleStatus.PURGED },
-      type: { $ne: RoomType.SESSION },
-    };
+
+    let query: FilterQuery<RoomDocument> = {};
+
+    query.hostId = new Types.ObjectId(hostId);
+    query.lifecycleStatus = {$ne : RoomLifeCycleStatus.PURGED};
+    query.type = {$ne : RoomType.SESSION};
+    
+    if(search) {
+      query.$or = [
+        {title: {$regex:search,$options:'i'}}
+      ]
+    }
 
     const [docs, totalItems] = await Promise.all([
       this._model

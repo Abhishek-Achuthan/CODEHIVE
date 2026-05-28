@@ -1,5 +1,5 @@
 import { RoomEntity, RoomFeatureSnapshot } from '../../domain/entities/room/RoomEntity';
-import { GetPublicRoomsResponseDTO } from '../dto/RoomDTO';
+import { RoomListItemDTO } from '../dto/RoomDTO';
 import { ResolvedEntitlements } from '../services/EntitlementsResolutionService';
 
 export class RoomMapper {
@@ -14,7 +14,7 @@ export class RoomMapper {
     };
   }
 
-  public static toPublicRoomResponse(room: RoomEntity): GetPublicRoomsResponseDTO {
+  public static toRoomListItem(room: RoomEntity): RoomListItemDTO {
     return {
       id: room.id,
       title: room.title,

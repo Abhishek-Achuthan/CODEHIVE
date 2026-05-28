@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IGetMyRoomsUseCase } from '../interface/room/IGetMyRoomsUseCase';
-import { GetPublicRoomsDTO, GetPublicRoomsResponseDTO } from '../../dto/RoomDTO';
+import { GetMyRoomsDTO, RoomListItemDTO } from '../../dto/RoomDTO';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
 import { RoomMapper } from '../../mapper/RoomMapper';
@@ -14,17 +14,18 @@ export class GetMyRoomsUseCase implements IGetMyRoomsUseCase {
 
   async execute(
     hostId: string,
-    data: GetPublicRoomsDTO,
-  ): Promise<PaginationResult<GetPublicRoomsResponseDTO>> {
+    data: GetMyRoomsDTO,
+  ): Promise<PaginationResult<RoomListItemDTO>> {
     const result = await this._roomRepository.findAllByHostId(
       hostId,
       data.page,
       data.limit,
+      data.search,
     );
 
     return {
       ...result,
-      items: result.items.map(RoomMapper.toPublicRoomResponse),
+      items: result.items.map(RoomMapper.toRoomListItem),
     };
   }
 }

@@ -1,6 +1,6 @@
 import { PaginationResult } from '../../../../domain/types/PaginationResult';
-import { GetPublicRoomsDTO, GetPublicRoomsResponseDTO } from '../../../dto/RoomDTO';
+import { GetPublicRoomsDTO, RoomListItemDTO } from '../../../dto/RoomDTO';
 
 export interface IGetPublicRoomsUseCase {
-    execute(data:GetPublicRoomsDTO):Promise<PaginationResult<GetPublicRoomsResponseDTO>>   
+  execute(data: GetPublicRoomsDTO): Promise<PaginationResult<RoomListItemDTO>>;
 }

@@ -97,7 +97,13 @@ export interface GetPublicRoomsDTO {
   limit: number;
 }
 
-export interface GetPublicRoomsResponseDTO {
+export interface GetMyRoomsDTO {
+  page: number;
+  limit: number;
+  search?: string;
+}
+
+export interface RoomListItemDTO {
   id: string;
   title: string;
   description?: string;
@@ -108,3 +114,4 @@ export interface GetPublicRoomsResponseDTO {
   createdAt: Date;
   updatedAt: Date;
 }
+

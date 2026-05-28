@@ -6,6 +6,7 @@ import type {
   CreateRoomResponse,
   GetPrivateNoteResponse,
   GetPublicRoomsPaginatedResponse,
+  MyRoomsListParams,
   PublicRoomsListParams,
   SavePrivateNoteResponse,
 } from "../shared/types/api/room";
@@ -37,7 +38,7 @@ export class RoomService {
   }
 
   static async getMyRooms(
-    params?: PublicRoomsListParams,
+    params?: MyRoomsListParams,
   ): Promise<GetPublicRoomsPaginatedResponse> {
     try {
       const response = await RoomAPI.getMyRooms(params);
