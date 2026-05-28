@@ -307,6 +307,13 @@ export const API_ROUTES = {
 
   ROOM: {
     CREATE_ROOM: "/rooms",
+    GET_MY_ROOMS: (params?: { page?: number; limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      const query = qp.toString();
+      return query ? `/rooms/mine?${query}` : "/rooms/mine";
+    },
     GET_PUBLIC_ROOMS: (params?: { page?: number; limit?: number }) => {
       const qp = new URLSearchParams();
       if (params?.page !== undefined) qp.append("page", String(params.page));
@@ -314,6 +321,7 @@ export const API_ROUTES = {
       const query = qp.toString();
       return query ? `/rooms?${query}` : `/rooms`;
     },
+    GET_SETTINGS: (roomId: string) => `/rooms/${roomId}/settings`,
     JOIN_ROOM: (roomId: string) => `/rooms/${roomId}/join`,
     LEAVE_ROOM: (roomId: string) => `/rooms/${roomId}/leave`,
     CREATE_MESSAGE: (roomId: string) => `/rooms/${roomId}/messages`,
@@ -329,6 +337,18 @@ export const API_ROUTES = {
     GET_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
     SAVE_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
     GET_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`,
-    SAVE_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`
-  }
+    SAVE_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`,
+    CREATE_INVITE: (roomId: string) => `/rooms/${roomId}/invites`,
+    REGENERATE_INVITE: (roomId: string) => `/rooms/${roomId}/invites/regenerate`,
+    LIST_INVITES: (roomId: string) => `/rooms/${roomId}/invites`,
+    REVOKE_INVITE: (roomId: string, inviteId: string) =>
+      `/rooms/${roomId}/invites/${inviteId}`,
+    KICK_PARTICIPANT: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/kick`,
+  },
+
+  INVITE: {
+    PREVIEW: (code: string) => `/invites/${code}`,
+    JOIN: (code: string) => `/invites/${code}/join`,
+  },
 };

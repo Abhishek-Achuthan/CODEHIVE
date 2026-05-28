@@ -9,6 +9,8 @@ import type {
   PublicRoomsListParams,
   SavePrivateNoteResponse,
 } from "../shared/types/api/room";
+import type { RoomSettingsResponse } from "../shared/types/api/roomSettings";
+import type { RoomInviteResponse } from "../shared/types/api/roomInvite";
 import { APP_MESSAGES } from "../shared/constants/messages";
 
 export class RoomService {
@@ -29,6 +31,52 @@ export class RoomService {
     try {
       const response = await RoomAPI.getPublicRooms(params);
       return response.data as GetPublicRoomsPaginatedResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async getMyRooms(
+    params?: PublicRoomsListParams,
+  ): Promise<GetPublicRoomsPaginatedResponse> {
+    try {
+      const response = await RoomAPI.getMyRooms(params);
+      return response.data as GetPublicRoomsPaginatedResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async getRoomSettings(roomId: string): Promise<RoomSettingsResponse> {
+    try {
+      const response = await RoomAPI.getRoomSettings(roomId);
+      return response.data as RoomSettingsResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async createRoomInvite(roomId: string): Promise<RoomInviteResponse> {
+    try {
+      const response = await RoomAPI.createRoomInvite(roomId);
+      return response.data as RoomInviteResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async regenerateRoomInvite(roomId: string): Promise<RoomInviteResponse> {
+    try {
+      const response = await RoomAPI.regenerateRoomInvite(roomId);
+      return response.data as RoomInviteResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async kickParticipant(roomId: string, userId: string): Promise<void> {
+    try {
+      await RoomAPI.kickParticipant(roomId, userId);
     } catch (error) {
       throw this.handleError(error);
     }

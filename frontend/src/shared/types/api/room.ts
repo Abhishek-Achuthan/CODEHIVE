@@ -64,6 +64,7 @@ export interface CreateRoomResponse {
   hostId: string;
   maxParticipants: number;
   participantCount: number;
+  joinUrl?: string;
   createdAt: string;
   updatedAt: string;
 }

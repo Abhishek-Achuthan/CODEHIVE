@@ -14,11 +14,26 @@ export const createRoom = (data: CreateRoomRequest) =>
 export const getPublicRooms = (params?: PublicRoomsListParams) =>
     apiClient.get(API_ROUTES.ROOM.GET_PUBLIC_ROOMS(params));
 
+export const getMyRooms = (params?: PublicRoomsListParams) =>
+    apiClient.get(API_ROUTES.ROOM.GET_MY_ROOMS(params));
+
+export const getRoomSettings = (roomId: string) =>
+    apiClient.get(API_ROUTES.ROOM.GET_SETTINGS(roomId));
+
 export const joinRoom = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.JOIN_ROOM(roomId));
 
 export const leaveRoom = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.LEAVE_ROOM(roomId));
+
+export const createRoomInvite = (roomId: string) =>
+    apiClient.post(API_ROUTES.ROOM.CREATE_INVITE(roomId));
+
+export const regenerateRoomInvite = (roomId: string) =>
+    apiClient.post(API_ROUTES.ROOM.REGENERATE_INVITE(roomId));
+
+export const kickParticipant = (roomId: string, userId: string) =>
+    apiClient.post(API_ROUTES.ROOM.KICK_PARTICIPANT(roomId, userId));
 
 export const createMessage = (roomId: string, data: CreateRoomMessageRequest) =>
     apiClient.post(API_ROUTES.ROOM.CREATE_MESSAGE(roomId), data);
