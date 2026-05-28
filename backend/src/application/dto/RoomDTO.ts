@@ -21,6 +21,7 @@ export interface CreateRoomResponseDTO {
   participantCount: number;
   admissionPolicy: RoomAdmissionPolicy;
   lifecycleStatus: RoomLifeCycleStatus;
+  joinUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +29,38 @@ export interface CreateRoomResponseDTO {
 export interface JoinRoomDTO {
   roomId: string;
   userId: string;
+  inviteCode?: string;
+}
+
+export interface RoomInviteResponseDTO {
+  id: string;
+  roomId: string;
+  joinUrl: string;
+  type: string;
+  expiresAt?: string;
+  maxUses?: number;
+  useCount: number;
+  revokedAt?: string;
+  createdAt: string;
+}
+
+export interface InvitePreviewResponseDTO {
+  roomId: string;
+  title: string;
+  hostName: string;
+  isFull: boolean;
+  canJoin: boolean;
+}
+
+export interface JoinViaInviteDTO {
+  inviteCode: string;
+  userId: string;
+}
+
+export interface KickParticipantDTO {
+  roomId: string;
+  hostUserId: string;
+  targetUserId: string;
 }
 
 export interface JoinRoomResponseDTO {
