@@ -78,6 +78,32 @@ export class RoomRepository
     return { items, totalItems, totalPages };
   }
 
+  async findAllByHostId(
+    hostId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<RoomEntity>> {
+    const query = {
+      hostId: new Types.ObjectId(hostId),
+      lifecycleStatus: { $ne: RoomLifeCycleStatus.PURGED },
+    };
+
+    const [docs, totalItems] = await Promise.all([
+      this._model
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean<RoomLeanDoc[]>(),
+      this._model.countDocuments(query),
+    ]);
+
+    const items = docs.map((doc) => this.leanToEntity(doc));
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return { items, totalItems, totalPages };
+  }
+
   protected toEntity(doc: RoomDocument): RoomEntity {
     return {
       id: doc._id.toString(),
