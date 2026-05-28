@@ -9,6 +9,7 @@ import { RoomVisibility } from '../../../domain/types/RoomVisibility';
 import { RoomDocument, RoomLeanDoc } from '../schemas/room/RoomSchema';
 import { LimitKey } from '../../../domain/types/LimitKey';
 import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
+import { RoomType } from '../../../domain/types/RoomType';
 
 type LimitMap = Map<LimitKey, number>;
 
@@ -86,6 +87,7 @@ export class RoomRepository
     const query = {
       hostId: new Types.ObjectId(hostId),
       lifecycleStatus: { $ne: RoomLifeCycleStatus.PURGED },
+      type: { $ne: RoomType.SESSION },
     };
 
     const [docs, totalItems] = await Promise.all([
