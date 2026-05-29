@@ -7,13 +7,15 @@ import {
 import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
 import type { ISubscriptionRepository } from '../../../domain/interfaces/ISubscriptionRepository';
 import type { IPaymentService } from '../../ports/payment/IPaymentService';
+import type { IBillingCatalogService } from '../../ports/payment/IBillingCatalogService';
+import type { ISyncPlanStripeCatalogUseCase } from '../interface/plan/ISyncPlanStripeCatalogUseCase';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
 import { SubscriptionMapper } from '../../mapper/SubscriptionMapper';
-import { resolvePlanStripePriceId } from '../../helpers/planBillingHelpers';
+import { isPaidPlan, resolvePlanStripePriceId } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscriptionCheckoutSessionUseCase {
@@ -26,6 +28,12 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
 
     @inject('IPaymentService')
     private readonly _paymentService: IPaymentService,
+
+    @inject('IBillingCatalogService')
+    private readonly _billingCatalog: IBillingCatalogService,
+
+    @inject('ISyncPlanStripeCatalogUseCase')
+    private readonly _syncPlanStripeCatalog: ISyncPlanStripeCatalogUseCase,
   ) {}
 
   async execute(
@@ -48,7 +56,19 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
       );
     }
 
-    const stripePriceId = resolvePlanStripePriceId(plan, data.billingInterval);
+    let checkoutPlan = plan;
+    let stripePriceId = resolvePlanStripePriceId(checkoutPlan, data.billingInterval);
+
+    if (stripePriceId && isPaidPlan(checkoutPlan)) {
+      const priceIsActive = await this._billingCatalog.isBillingPriceActive(stripePriceId);
+
+      if (!priceIsActive) {
+        checkoutPlan = await this._syncPlanStripeCatalog.execute(checkoutPlan.id, {
+          recreatePrices: true,
+        });
+        stripePriceId = resolvePlanStripePriceId(checkoutPlan, data.billingInterval);
+      }
+    }
 
     if (!stripePriceId) {
       throw new BadRequestError(
@@ -68,8 +88,8 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
       ) &&
       existingSubscription.currentPeriodEnd > new Date();
 
-    if (hasValidSubscription) {
-      throw new ConflictError(ERROR_MESSAGES.SUBSCRIPTION.ALREADY_ACTIVE);
+    if (hasValidSubscription && existingSubscription!.planId === checkoutPlan.id) {
+      throw new ConflictError(ERROR_MESSAGES.SUBSCRIPTION.SAME_PLAN_ACTIVE);
     }
 
     const checkoutSession =
@@ -85,9 +105,9 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
         metadata: {
           userId: data.userId,
 
-          planId: plan.id,
+          planId: checkoutPlan.id,
 
-          planSlug: plan.slug,
+          planSlug: checkoutPlan.slug,
 
           billingInterval: data.billingInterval,
         },

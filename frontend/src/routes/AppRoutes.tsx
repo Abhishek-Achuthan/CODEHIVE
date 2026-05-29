@@ -15,6 +15,9 @@ const AuthCallbackPage = lazy(() => import("../features/auth/pages/AuthCallbackP
 // Home
 const LandingPage = lazy(() => import("../features/home/components/LandingPage"));
 const PricingPage = lazy(() => import("../features/home/components/PricingPage"));
+const SubscriptionSuccessPage = lazy(
+  () => import("../features/home/pages/SubscriptionSuccessPage"),
+);
 
 // Profile & Wallet
 const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
@@ -76,6 +79,7 @@ export default function AppRoutes() {
           >
             <Route path="/home" element={<LandingPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/pricing/success" element={<SubscriptionSuccessPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/wallet" element={<WalletPage />} />
 

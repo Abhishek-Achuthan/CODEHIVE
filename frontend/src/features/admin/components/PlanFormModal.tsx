@@ -170,7 +170,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
     if (values.limits.max_session_hours !== undefined && values.limits.max_session_hours > 0)
       limits.max_session_hours = values.limits.max_session_hours;
 
-    const payload: CreatePlanPayload = {
+    const payload: CreatePlanPayload | UpdatePlanPayload = {
       name: values.name,
       slug: values.slug,
       description: values.description || undefined,
@@ -178,12 +178,22 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
       sortOrder: values.sortOrder,
       features: values.features as FeatureKey[],
       limits,
-      pricing: {
+    };
+
+    const pricingUnchanged =
+      isEdit &&
+      plan &&
+      values.pricing.monthly === plan.pricing.monthly &&
+      values.pricing.yearly === plan.pricing.yearly &&
+      values.pricing.currency.toUpperCase().trim() === plan.pricing.currency.toUpperCase().trim();
+
+    if (!isEdit || !pricingUnchanged) {
+      payload.pricing = {
         monthly: values.pricing.monthly,
         yearly: values.pricing.yearly,
         currency: values.pricing.currency.toUpperCase(),
-      },
-    };
+      };
+    }
 
     await onSubmit(payload);
   };

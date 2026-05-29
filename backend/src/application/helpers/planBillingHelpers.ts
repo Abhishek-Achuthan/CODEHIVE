@@ -17,6 +17,37 @@ export function toStripeUnitAmount(amount: number): number {
   return Math.round(amount * 100);
 }
 
+export interface PlanPricingSnapshot {
+  monthly: number;
+  yearly: number;
+  currency: string;
+}
+
+export type PlanPricingUpdate = {
+  monthly?: number | undefined;
+  yearly?: number | undefined;
+  currency?: string | undefined;
+};
+
+export function hasPlanPricingChanged(
+  existing: PlanPricingSnapshot,
+  update?: PlanPricingUpdate,
+): boolean {
+  if (!update) {
+    return false;
+  }
+
+  const monthly = update.monthly !== undefined ? update.monthly : existing.monthly;
+  const yearly = update.yearly !== undefined ? update.yearly : existing.yearly;
+  const currency = (update.currency ?? existing.currency).trim().toUpperCase();
+
+  return (
+    monthly !== existing.monthly ||
+    yearly !== existing.yearly ||
+    currency !== existing.currency.trim().toUpperCase()
+  );
+}
+
 export function resolvePlanStripePriceId(
   plan: PlanEntity,
   billingInterval: PlanBillingInterval,

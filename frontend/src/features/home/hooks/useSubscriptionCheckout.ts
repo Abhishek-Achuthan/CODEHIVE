@@ -17,7 +17,7 @@ export function useSubscriptionCheckout() {
       const { url } = await SubscriptionService.createCheckoutSession({
         planSlug,
         billingInterval,
-        successUrl: `${origin}/pricing?checkout=success`,
+        successUrl: `${origin}/pricing/success`,
         cancelUrl: `${origin}/pricing?checkout=cancelled`,
       });
 

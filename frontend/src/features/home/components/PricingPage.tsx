@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Zap, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../store";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import { useFetchPublicPlans } from "../hooks/useFetchPublicPlans";
 import { useSubscriptionCheckout } from "../hooks/useSubscriptionCheckout";
+import {
+  formatSubscriptionDate,
+  isPlanCurrentForUser,
+  useMySubscription,
+} from "../hooks/useMySubscription";
 import type { PlanView, FeatureKey, LimitKey } from "../../../shared/types/view/PlanView";
 import type { PlanBillingInterval } from "../../../shared/types/api/subscription";
 
@@ -115,27 +121,56 @@ function getCurrencySymbol(currency: string): string {
   }
 }
 
-function formatPrice(plan: PlanView, billing: PlanBillingInterval): {
-  amount: string;
-  period: string;
-} {
-  const price = billing === "monthly" ? plan.pricing.monthly : plan.pricing.yearly;
-  const symbol = getCurrencySymbol(plan.pricing.currency);
-
-  if (price === 0) {
-    return { amount: `${symbol}0`, period: billing === "monthly" ? "/month" : "/year" };
-  }
-
-  const formatted = price.toLocaleString("en-US", {
+function formatPriceValue(price: number, currency: string): string {
+  const locale = currency.toUpperCase() === "INR" ? "en-IN" : "en-US";
+  return price.toLocaleString(locale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
+}
+
+function formatPrice(plan: PlanView, billing: PlanBillingInterval): {
+  symbol: string;
+  value: string;
+  period: string;
+} {
+  const price = billing === "monthly" ? plan.pricing.monthly : plan.pricing.yearly;
+  const currency = plan.pricing.currency;
 
   return {
-    amount: `${symbol}${formatted}`,
+    symbol: getCurrencySymbol(currency),
+    value: formatPriceValue(price, currency),
     period: billing === "monthly" ? "/month" : "/year",
   };
 }
+
+const PRICE_DISPLAY_CLASS =
+  "text-[2.125rem] font-bold leading-none tracking-tight text-white sm:text-5xl";
+
+interface PlanPriceDisplayProps {
+  symbol: string;
+  value: string;
+  period: string;
+}
+
+const PlanPriceDisplay = ({ symbol, value, period }: PlanPriceDisplayProps) => (
+  <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
+    <span
+      className={`inline-flex items-baseline gap-x-px font-sans ${PRICE_DISPLAY_CLASS}`}
+      aria-label={`${symbol}${value}${period}`}
+    >
+      <span
+        className={`shrink-0 tabular-nums [font-feature-settings:'tnum'] ${
+          symbol === "₹" ? "relative top-px" : ""
+        }`}
+      >
+        {symbol}
+      </span>
+      <span className="tabular-nums [font-feature-settings:'tnum']">{value}</span>
+    </span>
+    <span className="pb-0.5 text-sm font-normal leading-none text-zinc-500">{period}</span>
+  </p>
+);
 
 function getPricingGridClass(planCount: number): string {
   const base = "grid w-full items-stretch gap-6";
@@ -179,6 +214,7 @@ interface PlanCardProps {
   previousPlan: PlanView | null;
   billing: PlanBillingInterval;
   isPopular: boolean;
+  isCurrentPlan: boolean;
   index: number;
   checkoutLoading: boolean;
   onCheckout: (plan: PlanView, billingInterval: PlanBillingInterval) => void;
@@ -189,6 +225,7 @@ const PlanCard = ({
   previousPlan,
   billing,
   isPopular,
+  isCurrentPlan,
   index,
   checkoutLoading,
   onCheckout,
@@ -196,7 +233,7 @@ const PlanCard = ({
   const navigate = useNavigate();
   const price = billing === "monthly" ? plan.pricing.monthly : plan.pricing.yearly;
   const isFree = price === 0;
-  const { amount, period } = formatPrice(plan, billing);
+  const { symbol, value, period } = formatPrice(plan, billing);
   const tagline = plan.description?.trim() ?? "";
   const { title: featureTitle, items: featureItems } = getPlanFeatureSection(plan, previousPlan);
 
@@ -217,18 +254,35 @@ const PlanCard = ({
     <motion.article
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={{
+        y: -4,
+        transition: { type: "spring", stiffness: 420, damping: 28 },
+      }}
       transition={{ duration: 0.3, delay: index * 0.04 }}
-      className={`relative flex h-full flex-col rounded-2xl border p-5 ${
-        isPopular
-          ? "z-10 border-indigo-500/70 bg-zinc-950 shadow-[0_0_24px_rgba(99,102,241,0.08)] md:scale-[1.03]"
-          : "border-zinc-800/90 bg-zinc-950"
+      className={`relative flex h-full cursor-default flex-col rounded-2xl border p-5 transition-[border-color,background-color,box-shadow] duration-200 ${
+        isCurrentPlan
+          ? "border-emerald-500/50 bg-zinc-950 ring-1 ring-emerald-500/20"
+          : isPopular
+          ? "z-10 border-indigo-500/70 bg-zinc-950 shadow-[0_0_24px_rgba(99,102,241,0.08)] hover:border-indigo-400/90 hover:shadow-[0_0_28px_rgba(99,102,241,0.12)] md:scale-[1.03]"
+          : "border-zinc-800/90 bg-zinc-950 hover:border-zinc-600 hover:bg-zinc-900/40"
       }`}
     >
-      <div className="mb-2 h-5 shrink-0">
-        {isPopular && (
+      <div className="mb-2 flex h-5 shrink-0 items-center gap-2">
+        {isCurrentPlan && (
+          <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
+            Current Plan
+          </span>
+        )}
+        {isPopular && !isCurrentPlan && (
           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400">
             <Zap className="h-3 w-3" />
             Most Popular
+          </span>
+        )}
+        {isPopular && isCurrentPlan && (
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-400">
+            <Zap className="h-3 w-3" />
+            Popular
           </span>
         )}
       </div>
@@ -248,12 +302,7 @@ const PlanCard = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
           >
-            <p className="flex items-baseline gap-1.5">
-              <span className="text-[2.125rem] font-bold leading-none tracking-tight tabular-nums text-white sm:text-5xl">
-                {amount}
-              </span>
-              <span className="pb-0.5 text-sm text-zinc-500">{period}</span>
-            </p>
+            <PlanPriceDisplay symbol={symbol} value={value} period={period} />
             <p className="mt-1 h-4 text-xs text-emerald-400/90">
               {yearlySavings !== null ? `Save ${yearlySavings}% billed yearly` : ""}
             </p>
@@ -261,27 +310,39 @@ const PlanCard = ({
         </AnimatePresence>
       </div>
 
-      <button
-        type="button"
-        onClick={handleCTA}
-        disabled={!isFree && checkoutLoading}
-        className={`mt-4 w-full shrink-0 rounded-lg text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-          isPopular
-            ? "bg-indigo-600 py-2.5 text-white hover:bg-indigo-500"
-            : "border border-zinc-700 bg-transparent py-2.5 text-white hover:border-zinc-500 hover:bg-zinc-900"
-        }`}
-      >
-        {!isFree && checkoutLoading ? (
-          <span className="inline-flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Redirecting…
-          </span>
-        ) : isFree ? (
-          "Get Started"
-        ) : (
-          `Get ${plan.name}`
-        )}
-      </button>
+      {isCurrentPlan ? (
+        <p className="mt-4 shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-center text-sm text-emerald-300/90">
+          {isFree
+            ? "You are on this plan."
+            : (
+              <>
+                Your current Plan
+              </>
+            )}
+        </p>
+      ) : (
+        <button
+          type="button"
+          onClick={handleCTA}
+          disabled={isCurrentPlan || (!isFree && checkoutLoading)}
+          className={`mt-4 w-full shrink-0 rounded-lg text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            isPopular
+              ? "bg-indigo-600 py-2.5 text-white hover:bg-indigo-500"
+              : "border border-zinc-700 bg-transparent py-2.5 text-white hover:border-zinc-500 hover:bg-zinc-900"
+          }`}
+        >
+          {!isFree && checkoutLoading ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Redirecting…
+            </span>
+          ) : isFree ? (
+            "Get Started"
+          ) : (
+            `Get ${plan.name}`
+          )}
+        </button>
+      )}
 
       <hr className="mt-4 mb-4 shrink-0 border-zinc-800" />
 
@@ -309,17 +370,30 @@ const PlanCard = ({
 
 const PricingPage = () => {
   const [billing, setBilling] = useState<PlanBillingInterval>("monthly");
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { plans, loading, error } = useFetchPublicPlans();
+  const { subscription, loading: subscriptionLoading } = useMySubscription();
   const { startCheckout, loading: checkoutLoading } = useSubscriptionCheckout();
 
-  const handleCheckout = (plan: PlanView, billingInterval: PlanBillingInterval) => {
+  const checkoutCancelled = searchParams.get("checkout") === "cancelled";
+
+  const handleCheckout = async (plan: PlanView, billingInterval: PlanBillingInterval) => {
     if (!isAuthenticated) {
       navigate("/login", { state: { from: "/pricing" } });
       return;
     }
-    void startCheckout({ planSlug: plan.slug, billingInterval });
+
+    if (subscription && subscription.plan.id === plan.id) {
+      toast.error("You are already subscribed to this plan.");
+      return;
+    }
+
+    const result = await startCheckout({ planSlug: plan.slug, billingInterval });
+    if (result && !result.success) {
+      toast.error("Could not start checkout. Please try again.");
+    }
   };
 
   const popularIndex = Math.floor(plans.length / 2);
@@ -337,7 +411,40 @@ const PricingPage = () => {
             <p className="mt-1 text-sm text-zinc-500">
               Simple plans that scale with your team.
             </p>
+            {isAuthenticated && subscription && !subscriptionLoading && (
+              <p className="mt-2 text-sm text-zinc-400">
+                You are on{" "}
+                <span className="font-medium text-white">{subscription.plan.name}</span>
+                {subscription.cancelAtPeriodEnd ? (
+                  <>
+                    {" "}
+                    until {formatSubscriptionDate(subscription.currentPeriodEnd)}
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    · renews {formatSubscriptionDate(subscription.currentPeriodEnd)}
+                  </>
+                )}
+              </p>
+            )}
           </header>
+
+          {checkoutCancelled && (
+            <div className="mb-4 flex justify-center">
+              <div className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-400">
+                <span>Checkout was cancelled. You can try again anytime.</span>
+                <button
+                  type="button"
+                  onClick={() => setSearchParams({})}
+                  className="shrink-0 text-zinc-500 hover:text-white"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="mb-5 flex justify-center">
             <div
@@ -393,6 +500,7 @@ const PricingPage = () => {
                   previousPlan={i > 0 ? plans[i - 1]! : null}
                   billing={billing}
                   isPopular={i === popularIndex && plans.length > 1}
+                  isCurrentPlan={isPlanCurrentForUser(plan, subscription)}
                   index={i}
                   checkoutLoading={checkoutLoading}
                   onCheckout={handleCheckout}

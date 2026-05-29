@@ -199,6 +199,11 @@ export class PaymentService implements IPaymentService, IBillingCatalogService {
         await this._stripe.prices.update(priceId, { active: false });
     }
 
+    async isBillingPriceActive(priceId: string): Promise<boolean> {
+        const price = await this._stripe.prices.retrieve(priceId);
+        return price.active;
+    }
+
     async archiveBillingCatalog(catalog: BillingCatalogSnapshot): Promise<void> {
         const priceIds = [catalog.monthlyPriceId, catalog.yearlyPriceId].filter(
             (priceId): priceId is string => !!priceId,

@@ -197,5 +197,6 @@ export const ERROR_MESSAGES = {
 
   SUBSCRIPTION: {
     ALREADY_ACTIVE: 'You already have an active subscription',
+    SAME_PLAN_ACTIVE: 'You are already subscribed to this plan',
   },
 };

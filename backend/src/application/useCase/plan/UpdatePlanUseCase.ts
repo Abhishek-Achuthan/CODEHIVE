@@ -8,7 +8,7 @@ import { PlanMapper } from '../../mapper/PlanMapper';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { PlanEntity } from '../../../domain/entities/PlanEntity';
 import type { ISyncPlanStripeCatalogUseCase } from '../interface/plan/ISyncPlanStripeCatalogUseCase';
-import { isPaidPlan } from '../../helpers/planBillingHelpers';
+import { hasPlanPricingChanged, isPaidPlan } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class UpdatePlanUseCase implements IUpdatePlanUseCase {
@@ -81,8 +81,13 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
     let plan = updatedPlan;
 
     if (isPaidPlan(updatedPlan)) {
+      const pricingChanged = hasPlanPricingChanged(
+        existingPlan.pricing,
+        data.pricing,
+      );
+
       plan = await this._syncPlanStripeCatalog.execute(data.planId, {
-        recreatePrices: data.pricing !== undefined,
+        recreatePrices: pricingChanged,
       });
     }
 

@@ -24,4 +24,6 @@ export interface IBillingCatalogService {
   archiveBillingPrice(priceId: string): Promise<void>;
 
   archiveBillingCatalog(catalog: BillingCatalogSnapshot): Promise<void>;
+
+  isBillingPriceActive(priceId: string): Promise<boolean>;
 }

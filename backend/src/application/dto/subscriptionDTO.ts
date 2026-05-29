@@ -13,6 +13,12 @@ export interface SubscriptionCheckoutSessionResponseDTO {
   url: string;
 }
 
+export interface SubscriptionPlanSummaryDTO {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface SubscriptionResponseDTO {
   id: string;
   userId: string;
@@ -26,4 +32,8 @@ export interface SubscriptionResponseDTO {
   stripePriceId?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface CurrentSubscriptionResponseDTO extends SubscriptionResponseDTO {
+  plan: SubscriptionPlanSummaryDTO;
 }

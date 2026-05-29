@@ -1,17 +1,22 @@
 import { inject, injectable } from 'tsyringe';
 import { IGetActiveSubscriptionUseCase } from '../interface/subscription/IGetActiveSubscriptionUseCase';
 import type { ISubscriptionRepository } from '../../../domain/interfaces/ISubscriptionRepository';
-import { SubscriptionResponseDTO } from '../../dto/subscriptionDTO';
-import { SubscriptionMapper } from '../../mapper/SubscriptionMapper';
+import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
+import { CurrentSubscriptionResponseDTO } from '../../dto/subscriptionDTO';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class GetActiveSubscriptionUseCase implements IGetActiveSubscriptionUseCase {
   constructor(
     @inject('ISubscriptionRepository')
     private readonly _subscriptionRepository: ISubscriptionRepository,
+
+    @inject('IPlanRepository')
+    private readonly _planRepository: IPlanRepository,
   ) {}
 
-  async execute(userId: string): Promise<SubscriptionResponseDTO | null> {
+  async execute(userId: string): Promise<CurrentSubscriptionResponseDTO | null> {
     const subscription =
       await this._subscriptionRepository.findActiveByUserId(userId);
 
@@ -19,6 +24,30 @@ export class GetActiveSubscriptionUseCase implements IGetActiveSubscriptionUseCa
       return null;
     }
 
-    return SubscriptionMapper.toResponse(subscription);
+    const plan = await this._planRepository.find(subscription.planId);
+
+    if (!plan) {
+      throw new NotFoundError(ERROR_MESSAGES.PLAN.NOT_FOUND);
+    }
+
+    return {
+      id: subscription.id,
+      userId: subscription.userId,
+      planId: subscription.planId,
+      status: subscription.status,
+      currentPeriodStart: subscription.currentPeriodStart,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      createdAt: subscription.createdAt,
+      updatedAt: subscription.updatedAt,
+      ...(subscription.canceledAt ? { canceledAt: subscription.canceledAt } : {}),
+      ...(subscription.expiredAt ? { expiredAt: subscription.expiredAt } : {}),
+      ...(subscription.stripePriceId ? { stripePriceId: subscription.stripePriceId } : {}),
+      plan: {
+        id: plan.id,
+        name: plan.name,
+        slug: plan.slug,
+      },
+    };
   }
 }

@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { inject, injectable } from 'tsyringe';
 import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
 import type { IBillingCatalogService } from '../../ports/payment/IBillingCatalogService';
@@ -137,6 +138,8 @@ export class SyncPlanStripeCatalogUseCase implements ISyncPlanStripeCatalogUseCa
       );
     }
     const catalog: BillingCatalogSnapshot = { productId };
+    const hadExistingPrices = !!(plan.stripe?.monthlyPriceId || plan.stripe?.yearlyPriceId);
+    const priceNonce = hadExistingPrices ? randomUUID() : 'initial';
 
     if (plan.pricing.monthly > 0) {
       const monthlyPrice = await this._billingCatalog.createBillingPrice({
@@ -145,7 +148,7 @@ export class SyncPlanStripeCatalogUseCase implements ISyncPlanStripeCatalogUseCa
         currency,
         interval: 'month',
         metadata,
-        idempotencyKey: `plan-${plan.id}-monthly-${plan.pricing.monthly}-${currency}`,
+        idempotencyKey: `plan-${plan.id}-monthly-${plan.pricing.monthly}-${currency}-${priceNonce}`,
       });
       catalog.monthlyPriceId = monthlyPrice.priceId;
     }
@@ -157,7 +160,7 @@ export class SyncPlanStripeCatalogUseCase implements ISyncPlanStripeCatalogUseCa
         currency,
         interval: 'year',
         metadata,
-        idempotencyKey: `plan-${plan.id}-yearly-${plan.pricing.yearly}-${currency}`,
+        idempotencyKey: `plan-${plan.id}-yearly-${plan.pricing.yearly}-${currency}-${priceNonce}`,
       });
       catalog.yearlyPriceId = yearlyPrice.priceId;
     }

@@ -13,6 +13,10 @@ import AccountSecurityCard from "../components/AccountSecurityCard";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 
 import { useMemo, useRef, useState } from "react";
+import {
+  formatSubscriptionDate,
+  useMySubscription,
+} from "../../home/hooks/useMySubscription";
 import toast from "react-hot-toast";
 
 import Header from "../../../shared/ui/Header";
@@ -31,6 +35,27 @@ export default function ProfilePage() {
   const { updateProfile, applyForMentor, uploadAvatar } = useProfileUpdater();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
+  const { subscription, loading: subscriptionLoading } = useMySubscription();
+
+  const billingInfo = useMemo(() => {
+    if (subscription) {
+      return {
+        planLabel: subscription.plan.name,
+        renewalLabel: formatSubscriptionDate(subscription.currentPeriodEnd),
+        statusLabel: subscription.status.toLowerCase().replace(/_/g, " "),
+        badgeLabel: subscription.plan.name.toUpperCase(),
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      };
+    }
+
+    return {
+      planLabel: "Free",
+      renewalLabel: "—",
+      statusLabel: undefined,
+      badgeLabel: "FREE",
+      cancelAtPeriodEnd: false,
+    };
+  }, [subscription]);
 
   // Refs for scrolling to sections
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -171,9 +196,12 @@ export default function ProfilePage() {
                 />
 
                 <PlanBillingCard
-                  currentPlanLabel="PRO"
-                  renewalDateLabel="11/10/2025"
-                  badgeLabel="PRO"
+                  currentPlanLabel={billingInfo.planLabel}
+                  renewalDateLabel={billingInfo.renewalLabel}
+                  statusLabel={billingInfo.statusLabel}
+                  badgeLabel={billingInfo.badgeLabel}
+                  cancelAtPeriodEnd={billingInfo.cancelAtPeriodEnd}
+                  loading={subscriptionLoading}
                 />
 
                 <AccountSecurityCard

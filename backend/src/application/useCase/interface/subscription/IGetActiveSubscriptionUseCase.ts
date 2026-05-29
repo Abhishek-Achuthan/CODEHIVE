@@ -1,5 +1,5 @@
-import { SubscriptionResponseDTO } from "../../../dto/subscriptionDTO";
+import { CurrentSubscriptionResponseDTO } from '../../../dto/subscriptionDTO';
 
 export interface IGetActiveSubscriptionUseCase {
-    execute(userId:string):Promise<SubscriptionResponseDTO | null>
+  execute(userId: string): Promise<CurrentSubscriptionResponseDTO | null>;
 }
