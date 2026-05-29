@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { getLifecycleTransitionToast } from "../../features/room/authorization/lifecycleMessages";
 import { useAppSelector } from "../hooks/storeHooks";
 import * as RoomAPI from "../../api/endpoints/roomAPI";
 import { useSocket } from "./useSocket";
@@ -6,6 +8,7 @@ import { useRoomSocketEvent } from "./roomSocketEvents";
 import { toErrorMessage } from "./roomErrors";
 import type {
   RoomConnectionState,
+  RoomLifecycleChangedPayload,
   RoomSnapshot,
   RoomSocket,
   RoomSubscribedPayload,
@@ -35,10 +38,12 @@ export const useRoomConnection = (
     useState<RoomConnectionState>("idle");
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const previousLifecycleRef = useRef<string | null>(null);
 
   useEffect(() => {
     setSnapshot(null);
     setError(null);
+    previousLifecycleRef.current = null;
     setConnectionState(roomId && currentUserId ? "joining" : "idle");
   }, [roomId, currentUserId]);
 
@@ -128,6 +133,32 @@ export const useRoomConnection = (
   );
 
   useRoomSocketEvent(roomSocket, "room:subscribed", handleSubscribed);
+
+  const handleLifecycleChanged = useCallback(
+    (payload: RoomLifecycleChangedPayload) => {
+      if (!roomId || payload.roomId !== roomId) return;
+
+      setSnapshot((current) =>
+        current
+          ? {
+              ...current,
+              lifecycleStatus: payload.lifecycleStatus,
+            }
+          : current,
+      );
+
+      if (previousLifecycleRef.current !== payload.lifecycleStatus) {
+        const message = getLifecycleTransitionToast(payload.lifecycleStatus);
+        if (message) {
+          toast(message, { icon: "ℹ️" });
+        }
+        previousLifecycleRef.current = payload.lifecycleStatus;
+      }
+    },
+    [roomId],
+  );
+
+  useRoomSocketEvent(roomSocket, "room:lifecycle-changed", handleLifecycleChanged);
 
   const handleSocketError = useCallback((payload: { message: string }) => {
     setError(payload.message);

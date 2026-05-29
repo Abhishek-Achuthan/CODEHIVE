@@ -31,6 +31,12 @@ export function getFeatureLockReason(
     if (!auth.hasFeature(feature)) {
       return 'upgrade';
     }
+    if (auth.isArchived) {
+      return 'archived';
+    }
+    if (auth.isScheduled) {
+      return 'scheduled';
+    }
     if (auth.isReadonly || auth.isWriteRestricted) {
       return 'readonly';
     }

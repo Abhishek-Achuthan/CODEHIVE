@@ -17,6 +17,7 @@ import RightSidebar from '../components/RightSidebar';
 import { RoomSettingsModal } from '../components/RoomSettingsModal';
 
 import { Loader2, AlertCircle } from 'lucide-react';
+import { getLifecycleBannerMessage } from '../authorization/lifecycleMessages';
 
 const CollaborationRoom: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -137,6 +138,8 @@ const CollaborationRoom: React.FC = () => {
     );
   }, [formattedParticipants, user, currentUser]);
 
+  const lifecycleBanner = getLifecycleBannerMessage(authorization);
+
   // Error state
   if (error) {
     return (
@@ -192,15 +195,9 @@ const CollaborationRoom: React.FC = () => {
           onOpenChange={setSettingsOpen}
         />
 
-        {(authorization.isReadonly || authorization.isArchived || authorization.isScheduled || authorization.isPurged) && (
+        {lifecycleBanner && (
           <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-200">
-            {authorization.isReadonly
-              ? 'This room is currently read-only. Editing and live collaboration actions are disabled.'
-              : authorization.isArchived
-                ? 'This room is archived. Interactive tools are no longer available.'
-                : authorization.isScheduled
-                  ? 'This room is scheduled and not yet active.'
-                  : 'This room is no longer available.'}
+            {lifecycleBanner}
           </div>
         )}
 

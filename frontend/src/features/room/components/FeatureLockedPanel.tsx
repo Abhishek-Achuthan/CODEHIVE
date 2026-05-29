@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { Crown, Lock, Sparkles } from 'lucide-react';
 import type { FeatureKey } from '../../../shared/types/api/room';
 
-export type FeatureLockReason = 'upgrade' | 'readonly' | 'permission';
+export type FeatureLockReason =
+  | 'upgrade'
+  | 'readonly'
+  | 'archived'
+  | 'scheduled'
+  | 'permission';
 
 const FEATURE_LABELS: Record<FeatureKey, string> = {
   chat: 'Chat',
@@ -35,14 +40,22 @@ export const FeatureLockedPanel: React.FC<FeatureLockedPanelProps> = ({
       ? `Unlock ${label}`
       : reason === 'readonly'
         ? `${label} is read-only`
-        : `${label} unavailable`;
+        : reason === 'archived'
+          ? `${label} archived`
+          : reason === 'scheduled'
+            ? `${label} not available yet`
+            : `${label} unavailable`;
 
   const description =
     reason === 'upgrade'
       ? `Your current plan${planName ? ` (${planName})` : ''} does not include ${label.toLowerCase()} in collaboration rooms. Upgrade to use it with your team.`
       : reason === 'readonly'
         ? 'This room is in read-only mode. You can browse but not edit or create content.'
-        : `You do not have permission to use ${label.toLowerCase()} in this room.`;
+        : reason === 'archived'
+          ? 'This room has been archived. Interactive features are disabled; saved content may still be viewable.'
+          : reason === 'scheduled'
+            ? 'This session has not started yet. This feature unlocks when the room becomes active.'
+            : `You do not have permission to use ${label.toLowerCase()} in this room.`;
 
   return (
     <div className="flex h-full items-center justify-center bg-[#0d1117] p-6">

@@ -56,6 +56,11 @@ export interface RoomSubscribedPayload {
   featureSnapshot?: RoomFeatureSnapshotResponse | null;
 }
 
+export interface RoomLifecycleChangedPayload {
+  roomId: string;
+  lifecycleStatus: RoomLifecycleStatus;
+}
+
 export interface RoomUserJoinedPayload {
   roomId?: string;
   userId: string;
@@ -86,6 +91,7 @@ export interface SocketErrorPayload {
 
 export interface ServerToClientRoomEvents {
   'room:subscribed': (payload: RoomSubscribedPayload) => void;
+  'room:lifecycle-changed': (payload: RoomLifecycleChangedPayload) => void;
   'message:created': (payload: Message) => void;
   'message:edited': (payload: MessageEditedResponse) => void;
   'message:deleted': (payload: MessageDeletedResponse) => void;

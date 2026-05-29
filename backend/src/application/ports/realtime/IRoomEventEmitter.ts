@@ -3,6 +3,7 @@ import type {
   IClosePollOutputDTO,
   ICreatePollOutputDTO,
 } from '../../dto/PollDTO';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 
 export interface MessageEditedPayload {
   messageId: string;
@@ -54,4 +55,5 @@ export interface IRoomEventEmitter {
     excludedSocketId: string,
     payload: TypingStoppedPayload,
   ): void;
+  emitLifecycleChanged(roomId: string, lifecycleStatus: RoomLifeCycleStatus): void;
 }

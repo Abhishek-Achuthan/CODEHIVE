@@ -1,9 +1,12 @@
+import type { RoomLifecycleStatus } from './room';
+
 export interface InvitePreviewResponse {
   roomId: string;
   title: string;
   hostName: string;
   isFull: boolean;
   canJoin: boolean;
+  lifecycleStatus?: RoomLifecycleStatus;
 }
 
 export interface RoomInviteResponse {
@@ -29,7 +32,7 @@ export interface JoinViaInviteSnapshot {
   }>;
   messages: unknown[];
   capabilities: Record<string, boolean>;
-  lifecycleStatus: string;
+  lifecycleStatus: RoomLifecycleStatus;
   featureSnapshot: unknown;
   onlineUserIds?: string[];
 }

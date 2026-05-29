@@ -1,3 +1,5 @@
+import { formatRoomAccessError } from '../../features/room/authorization/lifecycleMessages';
+
 export const toErrorMessage = (error: unknown): string => {
   if (
     typeof error === 'object' &&
@@ -11,8 +13,9 @@ export const toErrorMessage = (error: unknown): string => {
     'message' in error.response.data &&
     typeof error.response.data.message === 'string'
   ) {
-    return error.response.data.message;
+    return formatRoomAccessError(error.response.data.message);
   }
 
-  return error instanceof Error ? error.message : 'Something went wrong';
+  const fallback = error instanceof Error ? error.message : 'Something went wrong';
+  return formatRoomAccessError(fallback);
 };

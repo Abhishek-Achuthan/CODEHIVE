@@ -16,6 +16,7 @@ import Header from '../../../shared/ui/Header';
 import Footer from '../../../shared/ui/Footer';
 import SuccessIcon from '../components/SuccessIcon';
 import BookingTimeline from '../components/BookingTimeline';
+import { getSessionJoinLabel, getSessionRoomPhase } from '../../room/authorization/lifecycleMessages';
 
 interface BookingSuccessState {
   sessionId: string;
@@ -77,6 +78,10 @@ const BookingSuccessPage: React.FC = () => {
     day: 'numeric',
     year: 'numeric'
   });
+
+  const roomPhase = getSessionRoomPhase(startTime, endTime);
+  const sessionJoinLabel = getSessionJoinLabel(roomPhase);
+  const roomOpensAt = new Date(new Date(startTime).getTime() - 15 * 60 * 1000);
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
@@ -220,15 +225,27 @@ const BookingSuccessPage: React.FC = () => {
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <button 
-                      disabled 
-                      className="w-full h-12 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-zinc-500 font-bold flex items-center justify-center gap-2 cursor-not-allowed opacity-50"
+                    <button
+                      type="button"
+                      onClick={() => navigate('/sessions/my-sessions')}
+                      className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center gap-2 transition-colors"
                     >
-                      Join Room
+                      {sessionJoinLabel ?? 'Go to My Sessions'}
                       <ChevronRight size={18} />
                     </button>
                     <p className="text-[10px] text-zinc-500 text-center font-medium italic">
-                      Join access will automatically unlock when the room becomes active.
+                      {roomPhase === 'upcoming'
+                        ? `Your workspace opens ${roomOpensAt.toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })} (15 minutes before the session).`
+                        : roomPhase === 'waiting'
+                          ? 'Your waiting room may be open — join from My Sessions when ready.'
+                          : roomPhase === 'live'
+                            ? 'Your session room should be live — open it from My Sessions.'
+                            : 'Open My Sessions to view this room and session history.'}
                     </p>
                   </div>
                 </div>

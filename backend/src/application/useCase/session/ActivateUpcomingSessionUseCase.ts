@@ -14,6 +14,9 @@ import { LimitKey } from '../../../domain/types/LimitKey';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { RoomInviteService } from '../../services/RoomInviteService';
+import type { IRoomLifecyclePublisher } from '../../ports/queue/IRoomLifecyclePublisher';
+import { RoomLifecycleTransition } from '../../../domain/types/RoomLifecycleTransition';
+import { env } from '../../../config/envConfig';
 
 const SESSION_ROOM_BASE_PARTICIPANTS = 2;
 const SESSION_END_BUFFER_MS = 30 * 60 * 1000;
@@ -38,6 +41,9 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
 
     @inject(RoomInviteService)
     private readonly _roomInviteService: RoomInviteService,
+
+    @inject('IRoomLifecyclePublisher')
+    private readonly _roomLifecyclePublisher: IRoomLifecyclePublisher,
   ) {}
 
   async execute(sessionId: string): Promise<void> {
@@ -65,7 +71,7 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
       sessionId: session.id,
       type: RoomType.SESSION,
       visibility: RoomVisibility.PRIVATE,
-      lifecycleStatus: RoomLifeCycleStatus.ACTIVE,
+      lifecycleStatus: RoomLifeCycleStatus.SCHEDULED,
       admissionPolicy: RoomAdmissionPolicy.BOOKING_ONLY,
       featureSnapshot,
       maxParticipants,
@@ -99,5 +105,19 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     });
 
     await this._sessionRepo.update(session.id, { joinUrl });
+
+    const now = Date.now();
+    const startDelay = Math.max(0, session.startTime.getTime() - now);
+    const endDelay = Math.max(0, session.endTime.getTime() - now);
+    const archiveDelay = Math.max(
+      0,
+      session.endTime.getTime() + env.roomArchiveGracePeriodMs - now,
+    );
+
+    await Promise.all([
+      this._roomLifecyclePublisher.publish(room.id, RoomLifecycleTransition.START, startDelay),
+      this._roomLifecyclePublisher.publish(room.id, RoomLifecycleTransition.END, endDelay),
+      this._roomLifecyclePublisher.publish(room.id, RoomLifecycleTransition.ARCHIVE, archiveDelay),
+    ]);
   }
 }

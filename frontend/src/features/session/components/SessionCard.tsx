@@ -1,6 +1,11 @@
 import { User, Loader2, Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
+import {
+    canOpenSessionRoom,
+    getSessionJoinLabel,
+    getSessionRoomPhase,
+} from "../../room/authorization/lifecycleMessages";
 
 interface SessionCardProps {
     session: BookedSessionResponse;
@@ -49,9 +54,9 @@ export function SessionCard({
             ? `${session.mentor.firstName} ${session.mentor.lastName}`
             : "N/A";
 
-    const timeToStartMs = new Date(session.startTime).getTime() - Date.now();
-    const isWithin15Mins = timeToStartMs <= 15 * 60 * 1000;
-    const isJoinable = !!session.roomId && isWithin15Mins;
+    const roomPhase = getSessionRoomPhase(session.startTime, session.endTime);
+    const canOpenRoom = canOpenSessionRoom(session.roomId, roomPhase);
+    const joinLabel = getSessionJoinLabel(roomPhase);
 
     return (
         <div className="rounded-2xl border border-gray-800 bg-black p-5 transition-colors hover:bg-gray-950/40">
@@ -98,14 +103,14 @@ export function SessionCard({
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-2">
-                    {session.status === "upcoming" && (
+                    {(session.status === "upcoming" || session.status === "completed") && (
                         <>
-                            {isJoinable && (
+                            {canOpenRoom && joinLabel && (
                                 <button
                                     onClick={onJoinRoom}
                                     className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-linear-to-r from-green-500 to-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:opacity-90"
                                 >
-                                    Join Room
+                                    {joinLabel}
                                 </button>
                             )}
                             {session.joinUrl && session.roomId && (

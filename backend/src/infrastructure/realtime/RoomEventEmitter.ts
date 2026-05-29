@@ -8,6 +8,7 @@ import type {
   TypingStartedPayload,
   TypingStoppedPayload,
 } from '../../application/ports/realtime/IRoomEventEmitter';
+import { RoomLifeCycleStatus } from '../../domain/types/RoomLifeCycleStatus';
 import type { ISocketService } from '../../application/ports/socket/ISocketService';
 import type { SendMessageResponseDTO } from '../../application/dto/MessageDTO';
 import type {
@@ -98,5 +99,12 @@ export class RoomEventEmitter implements IRoomEventEmitter {
       'typing:stop',
       payload,
     );
+  }
+
+  emitLifecycleChanged(roomId: string, lifecycleStatus: RoomLifeCycleStatus): void {
+    this._socketService.emitToRoom(roomId, 'room:lifecycle-changed', {
+      roomId,
+      lifecycleStatus,
+    });
   }
 }

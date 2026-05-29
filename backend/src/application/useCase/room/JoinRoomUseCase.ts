@@ -126,7 +126,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       messages: messagesWithSenders,
       activePoll,
       capabilities: authorizationContext.capabilities,
-      lifecycleStatus: room.lifecycleStatus,
+      lifecycleStatus: authorizationContext.room.lifecycleStatus,
       featureSnapshot: room.featureSnapshot,
     };
   }

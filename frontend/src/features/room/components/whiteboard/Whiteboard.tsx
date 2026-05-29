@@ -9,7 +9,8 @@ interface WhiteboardProps {
   user: { userId: string; userName: string };
   canEdit: boolean;
   canCollaborate: boolean;
-  isReadonly: boolean;
+  lockTitle: string;
+  lockDescription: string;
 }
 
 const Whiteboard: React.FC<WhiteboardProps> = (props) => {
@@ -19,12 +20,8 @@ const Whiteboard: React.FC<WhiteboardProps> = (props) => {
         <div className="flex flex-col items-center gap-3 text-center px-6">
           <Lock className="w-8 h-8 text-gray-600" />
           <div>
-            <p className="text-sm font-semibold text-gray-100">
-              {props.isReadonly ? 'Whiteboard is read-only' : 'Whiteboard unavailable'}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              You do not currently have permission to use the live whiteboard.
-            </p>
+            <p className="text-sm font-semibold text-gray-100">{props.lockTitle}</p>
+            <p className="text-xs text-gray-500 mt-1">{props.lockDescription}</p>
           </div>
         </div>
       </div>

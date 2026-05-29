@@ -4,6 +4,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import * as InviteAPI from "../../../api/endpoints/inviteAPI";
 import type { InvitePreviewResponse } from "../../../shared/types/api/roomInvite";
+import { formatRoomAccessError } from "../authorization/lifecycleMessages";
 
 const JoinViaInvitePage = () => {
   const { inviteCode } = useParams<{ inviteCode: string }>();
@@ -47,7 +48,9 @@ const JoinViaInvitePage = () => {
         (err as { response?: { data?: { message?: string } } }).response?.data
           ?.message;
       toast.error(
-        typeof message === "string" ? message : "Unable to join this room",
+        typeof message === "string"
+          ? formatRoomAccessError(message)
+          : "Unable to join this room",
       );
     } finally {
       setJoining(false);
@@ -91,7 +94,11 @@ const JoinViaInvitePage = () => {
 
         {!preview.canJoin && !preview.isFull && (
           <p className="mt-4 text-sm text-red-400">
-            You cannot join this room with this link.
+            {preview.lifecycleStatus === 'ARCHIVED'
+              ? 'This room has been archived and no longer accepts new participants.'
+              : preview.lifecycleStatus === 'SCHEDULED'
+                ? 'This room is not active yet. Try again when the session starts.'
+                : 'You cannot join this room with this link.'}
           </p>
         )}
 

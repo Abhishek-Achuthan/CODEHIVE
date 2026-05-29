@@ -123,7 +123,6 @@ export class RoomAuthorizationService {
     validatedInvite?: RoomInviteEntity;
   }> {
     const room = await this._getRoom(roomId);
-    this.assertLifecycleAccess(room, 'join');
 
     if (await this._roomBanRepository.exists(roomId, userId)) {
       throw new ForbiddenError(ERROR_MESSAGES.ROOM.REMOVED_FROM_ROOM);
@@ -133,6 +132,8 @@ export class RoomAuthorizationService {
     if (existingParticipant) {
       return { room, existingParticipant, shouldCreateParticipant: false };
     }
+
+    this.assertLifecycleAccess(room, 'join');
 
     const requiresInvite =
       room.visibility === RoomVisibility.PRIVATE ||
@@ -195,13 +196,13 @@ export class RoomAuthorizationService {
     switch (room.lifecycleStatus) {
       case RoomLifeCycleStatus.ACTIVE:
         return;
+      case RoomLifeCycleStatus.SCHEDULED:
       case RoomLifeCycleStatus.READONLY:
+      case RoomLifeCycleStatus.ARCHIVED:
         if (accessMode === 'read') {
           return;
         }
         throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
-      case RoomLifeCycleStatus.SCHEDULED:
-      case RoomLifeCycleStatus.ARCHIVED:
       case RoomLifeCycleStatus.PURGED:
       default:
         throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);

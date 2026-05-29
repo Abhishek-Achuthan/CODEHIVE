@@ -8,10 +8,16 @@ import { createCollabProvider } from '../../collaboration/yjs/provider';
 interface Props {
   roomId: string;
   canCollaborate: boolean;
-  isReadonly: boolean;
+  lockTitle: string;
+  lockDescription: string;
 }
 
-const CollaborativeEditor: React.FC<Props> = ({ roomId, canCollaborate, isReadonly }) => {
+const CollaborativeEditor: React.FC<Props> = ({
+  roomId,
+  canCollaborate,
+  lockTitle,
+  lockDescription,
+}) => {
   const collabRef = useRef<ReturnType<typeof createCollabProvider> | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -66,12 +72,8 @@ const CollaborativeEditor: React.FC<Props> = ({ roomId, canCollaborate, isReadon
         <div className="flex flex-col items-center gap-3 text-center px-6">
           <Lock className="w-8 h-8 text-gray-600" />
           <div>
-            <p className="text-sm font-semibold text-gray-200">
-              {isReadonly ? 'Code editor is read-only' : 'Code collaboration unavailable'}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              You do not currently have permission to use the live code workspace.
-            </p>
+            <p className="text-sm font-semibold text-gray-200">{lockTitle}</p>
+            <p className="text-xs text-gray-500 mt-1">{lockDescription}</p>
           </div>
         </div>
       </div>

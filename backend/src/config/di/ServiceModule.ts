@@ -57,6 +57,9 @@ import { ISessionActivationPublisher } from '../../application/ports/queue/ISess
 import { SessionActivationPublisher } from '../../infrastructure/queue/publisher/SessionActivationPublisher';
 import { SessionActivationConsumer } from '../../infrastructure/queue/consumer/SessionActivationConsumer';
 import { SessionActivationDlqConsumer } from '../../infrastructure/queue/consumer/SessionActivationDlqConsumer';
+import { IRoomLifecyclePublisher } from '../../application/ports/queue/IRoomLifecyclePublisher';
+import { RoomLifecyclePublisher } from '../../infrastructure/queue/publisher/RoomLifecyclePublisher';
+import { RoomLifecycleConsumer } from '../../infrastructure/queue/consumer/RoomLifecycleConsumer';
 import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
 import { RoomInviteService } from '../../application/services/RoomInviteService';
 import { EntitlementResolutionService } from '../../application/services/EntitlementsResolutionService';
@@ -177,8 +180,10 @@ export class ServiceModule {
     
     container.registerSingleton<IMessageQueueService>('IMessageQueueService', RabbitMQService);
     container.registerSingleton<ISessionActivationPublisher>('ISessionActivationPublisher', SessionActivationPublisher);
+    container.registerSingleton<IRoomLifecyclePublisher>('IRoomLifecyclePublisher', RoomLifecyclePublisher);
     container.registerSingleton(SessionActivationConsumer);
     container.registerSingleton(SessionActivationDlqConsumer);
+    container.registerSingleton(RoomLifecycleConsumer);
 
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);

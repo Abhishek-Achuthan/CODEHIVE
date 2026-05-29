@@ -187,6 +187,8 @@ import { ISavePublicNoteUseCase } from '../../application/useCase/interface/note
 import { SavePublicNoteUseCase } from '../../application/useCase/notes/publicNote/SavePublicNoteUseCase';
 import { IActivateUpcomingSessionUseCase } from '../../application/useCase/interface/room/IActivateUpcomingSessionRoomsUseCase';
 import { ActivateUpcomingSessionUseCase } from '../../application/useCase/session/ActivateUpcomingSessionUseCase';
+import { ITransitionRoomLifecycleUseCase } from '../../application/useCase/interface/room/ITransitionRoomLifecycleUseCase';
+import { TransitionRoomLifecycleUseCase } from '../../application/useCase/room/TransitionRoomLifecycleUseCase';
 import { ICreatePlanUseCase } from '../../application/useCase/interface/plan/ICreatePlanUseCase';
 import { CreatePlanUseCase } from '../../application/useCase/plan/CreatePlanUseCase';
 import { IUpdatePlanUseCase } from '../../application/useCase/interface/plan/IUpdatePlanUseCase';
@@ -636,6 +638,13 @@ export class UseCaseModule {
       'IActivateUpcomingSessionUseCase',
       {
         useClass: ActivateUpcomingSessionUseCase,
+      },
+    );
+
+    container.register<ITransitionRoomLifecycleUseCase>(
+      'ITransitionRoomLifecycleUseCase',
+      {
+        useClass: TransitionRoomLifecycleUseCase,
       },
     );
 

@@ -18,6 +18,10 @@ import {
   isCodeEditorAccessible,
   isWhiteboardAccessible,
 } from '../authorization/featureAccess';
+import {
+  getCollaborationLockDescription,
+  getCollaborationLockTitle,
+} from '../authorization/lifecycleMessages';
 
 type ViewMode = 'editor' | 'whiteboard';
 
@@ -36,6 +40,8 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
 
   const editorAccessible = isCodeEditorAccessible(authorization);
   const whiteboardAccessible = isWhiteboardAccessible(authorization);
+  const collabLockTitle = getCollaborationLockTitle(authorization);
+  const collabLockDescription = getCollaborationLockDescription(authorization);
 
   const views: {
     id: ViewMode;
@@ -82,7 +88,8 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
         <CollaborativeEditor
           roomId={roomId}
           canCollaborate={authorization.canUseCodeCollaboration}
-          isReadonly={authorization.isReadonly}
+          lockTitle={collabLockTitle}
+          lockDescription={collabLockDescription}
         />
       );
     }
@@ -93,7 +100,8 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
         user={{ userId: user.id, userName: `${user.firstName} ${user.lastName}` }}
         canEdit={authorization.canEditWhiteboard}
         canCollaborate={authorization.canUseWhiteboardCollaboration}
-        isReadonly={authorization.isReadonly}
+        lockTitle={collabLockTitle}
+        lockDescription={collabLockDescription}
       />
     );
   };

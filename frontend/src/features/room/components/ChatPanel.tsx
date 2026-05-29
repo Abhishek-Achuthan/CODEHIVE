@@ -595,7 +595,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 !isRealtimeReady
                   ? 'Reconnecting...'
                   : !authorization.canWriteChat
-                  ? 'You do not have permission to chat in this room.'
+                  ? authorization.isArchived
+                    ? 'This room is archived — chat history is read-only.'
+                    : authorization.isScheduled
+                      ? 'Chat unlocks when the session starts.'
+                      : authorization.isReadonly
+                        ? 'This room is read-only — you cannot send new messages.'
+                        : 'You do not have permission to chat in this room.'
                   : editingMessageId
                   ? 'Edit your message...'
                   : 'Message team...'

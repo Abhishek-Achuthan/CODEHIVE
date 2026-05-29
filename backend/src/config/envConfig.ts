@@ -34,4 +34,7 @@ export const env = {
   stripeSKY: requireEnv('STRIPE_SECRET_KEY'),
   stripeWebhookSKY: requireEnv('STRIPE_WEBHOOK_SECRET_KEY'),
   cloudAMQPUrl: process.env.CLOUDAMQP_URL || 'amqp://localhost',
+  roomArchiveGracePeriodMs: Number(
+    process.env.ROOM_ARCHIVE_GRACE_PERIOD_MS || 7 * 24 * 60 * 60 * 1000,
+  ),
 };
