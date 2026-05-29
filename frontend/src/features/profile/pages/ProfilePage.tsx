@@ -14,6 +14,7 @@ import ChangePasswordDialog from "../components/ChangePasswordDialog";
 
 import { useMemo, useRef, useState } from "react";
 import {
+  formatBillingIntervalLabel,
   formatSubscriptionDate,
   useMySubscription,
 } from "../../home/hooks/useMySubscription";
@@ -40,7 +41,7 @@ export default function ProfilePage() {
   const billingInfo = useMemo(() => {
     if (subscription) {
       return {
-        planLabel: subscription.plan.name,
+        planLabel: `${subscription.plan.name} · ${formatBillingIntervalLabel(subscription.billingInterval)}`,
         renewalLabel: formatSubscriptionDate(subscription.currentPeriodEnd),
         statusLabel: subscription.status.toLowerCase().replace(/_/g, " "),
         badgeLabel: subscription.plan.name.toUpperCase(),

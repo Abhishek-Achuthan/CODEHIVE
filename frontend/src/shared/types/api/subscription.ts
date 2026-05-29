@@ -29,6 +29,7 @@ export interface CurrentSubscription {
   id: string;
   userId: string;
   planId: string;
+  billingInterval: PlanBillingInterval;
   plan: SubscriptionPlanSummary;
   status: SubscriptionStatus;
   currentPeriodStart: string;

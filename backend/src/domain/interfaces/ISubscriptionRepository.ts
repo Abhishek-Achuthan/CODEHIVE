@@ -4,6 +4,10 @@ import { IGenericRepository } from './IGenericRepository';
 
 export interface ISubscriptionRepository extends IGenericRepository<SubscriptionEntity> {
   findActiveByUserId(userId: string): Promise<SubscriptionEntity | null>;
+  findActiveByUserIdWithSession(
+    userId: string,
+    session: ClientSession,
+  ): Promise<SubscriptionEntity | null>;
   findByStripeSubscriptionId(
     stripeSubscriptionId: string,
   ): Promise<SubscriptionEntity | null>;

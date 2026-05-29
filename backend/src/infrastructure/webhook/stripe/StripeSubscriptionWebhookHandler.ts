@@ -8,6 +8,11 @@ import type { ISubscriptionRepository } from '../../../domain/interfaces/ISubscr
 import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository';
 import type { ILoggerService } from '../../../application/ports/logging/ILoggerService';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
+import { PlanBillingInterval } from '../../../domain/types/PlanBillingInterval';
+import { PlanEntity } from '../../../domain/entities/PlanEntity';
+import {
+  resolveSubscriptionBillingInterval,
+} from '../../../application/helpers/planBillingHelpers';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 
@@ -149,26 +154,52 @@ export class StripeSubscriptionWebhookHandler
         ? subscription.customer
         : subscription.customer.id;
 
-    await this._subscriptionRepository.createWithSession(
-      {
-        userId,
-        planId,
-        stripeCustomerId,
-        stripeSubscriptionId: subscription.id,
-        status: this._mapStripeStatus(subscription.status),
-        currentPeriodStart: new Date(firstItem.current_period_start * 1000),
-        currentPeriodEnd: new Date(firstItem.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        stripePriceId: firstItem.price.id,
-        ...(subscription.canceled_at
-          ? { canceledAt: new Date(subscription.canceled_at * 1000) }
-          : {}),
-        ...(subscription.ended_at
-          ? { expiredAt: new Date(subscription.ended_at * 1000) }
-          : {}),
-      },
-      session,
+    const billingInterval = this._resolveBillingInterval(
+      existingPlan,
+      subscription.metadata.billingInterval,
+      firstItem.price.id,
+      firstItem.price.recurring?.interval,
     );
+
+    const subscriptionPayload = {
+      userId,
+      planId,
+      billingInterval,
+      stripeCustomerId,
+      stripeSubscriptionId: subscription.id,
+      status: this._mapStripeStatus(subscription.status),
+      currentPeriodStart: new Date(firstItem.current_period_start * 1000),
+      currentPeriodEnd: new Date(firstItem.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      stripePriceId: firstItem.price.id,
+      ...(subscription.canceled_at
+        ? { canceledAt: new Date(subscription.canceled_at * 1000) }
+        : {}),
+      ...(subscription.ended_at
+        ? { expiredAt: new Date(subscription.ended_at * 1000) }
+        : {}),
+    };
+
+    const existingActiveByUser =
+      await this._subscriptionRepository.findActiveByUserIdWithSession(userId, session);
+
+    if (existingActiveByUser) {
+      await this._subscriptionRepository.updateWithSession(
+        existingActiveByUser.id,
+        subscriptionPayload,
+        session,
+      );
+
+      this._logger.info('subscription_webhook.created_replaced_active', {
+        eventId: event.id,
+        stripeSubscriptionId: subscription.id,
+        userId,
+        previousStripeSubscriptionId: existingActiveByUser.stripeSubscriptionId,
+      });
+      return;
+    }
+
+    await this._subscriptionRepository.createWithSession(subscriptionPayload, session);
 
     this._logger.info('subscription_webhook.created', {
       eventId: event.id,
@@ -212,10 +243,21 @@ export class StripeSubscriptionWebhookHandler
       return;
     }
 
+    const plan = await this._planRepository.find(existing.planId);
+    const billingInterval = plan
+      ? this._resolveBillingInterval(
+          plan,
+          subscription.metadata.billingInterval,
+          firstItem.price.id,
+          firstItem.price.recurring?.interval,
+        )
+      : existing.billingInterval;
+
     await this._subscriptionRepository.updateWithSession(
       existing.id,
       {
         status: this._mapStripeStatus(subscription.status),
+        billingInterval,
         currentPeriodStart: new Date(firstItem.current_period_start * 1000),
         currentPeriodEnd: incomingPeriodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -332,6 +374,24 @@ export class StripeSubscriptionWebhookHandler
     });
   }
 
+
+  private _resolveBillingInterval(
+    plan: PlanEntity,
+    metadataInterval: string | undefined,
+    stripePriceId: string,
+    stripeRecurringInterval?: string,
+  ): PlanBillingInterval {
+    if (metadataInterval === 'monthly' || metadataInterval === 'yearly') {
+      return metadataInterval;
+    }
+
+    return resolveSubscriptionBillingInterval(
+      plan,
+      undefined,
+      stripePriceId,
+      stripeRecurringInterval,
+    );
+  }
 
   private _mapStripeStatus(
     status: Stripe.Subscription.Status,

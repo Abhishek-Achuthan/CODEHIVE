@@ -5,6 +5,7 @@ import type { IPlanRepository } from '../../../domain/interfaces/IPlanRepository
 import { CurrentSubscriptionResponseDTO } from '../../dto/subscriptionDTO';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { resolveSubscriptionBillingInterval } from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class GetActiveSubscriptionUseCase implements IGetActiveSubscriptionUseCase {
@@ -30,24 +31,35 @@ export class GetActiveSubscriptionUseCase implements IGetActiveSubscriptionUseCa
       throw new NotFoundError(ERROR_MESSAGES.PLAN.NOT_FOUND);
     }
 
+    const billingInterval = resolveSubscriptionBillingInterval(
+      plan,
+      subscription.billingInterval,
+      subscription.stripePriceId,
+    );
+
+    if (subscription.billingInterval !== billingInterval) {
+      await this._subscriptionRepository.update(subscription.id, { billingInterval });
+    }
+
     return {
       id: subscription.id,
       userId: subscription.userId,
       planId: subscription.planId,
+      billingInterval,
       status: subscription.status,
       currentPeriodStart: subscription.currentPeriodStart,
       currentPeriodEnd: subscription.currentPeriodEnd,
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
       createdAt: subscription.createdAt,
       updatedAt: subscription.updatedAt,
-      ...(subscription.canceledAt ? { canceledAt: subscription.canceledAt } : {}),
-      ...(subscription.expiredAt ? { expiredAt: subscription.expiredAt } : {}),
-      ...(subscription.stripePriceId ? { stripePriceId: subscription.stripePriceId } : {}),
       plan: {
         id: plan.id,
         name: plan.name,
         slug: plan.slug,
       },
+      ...(subscription.canceledAt ? { canceledAt: subscription.canceledAt } : {}),
+      ...(subscription.expiredAt ? { expiredAt: subscription.expiredAt } : {}),
+      ...(subscription.stripePriceId ? { stripePriceId: subscription.stripePriceId } : {}),
     };
   }
 }

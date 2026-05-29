@@ -15,7 +15,11 @@ import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
 import { SubscriptionMapper } from '../../mapper/SubscriptionMapper';
-import { isPaidPlan, resolvePlanStripePriceId } from '../../helpers/planBillingHelpers';
+import {
+  isPaidPlan,
+  resolvePlanStripePriceId,
+  resolveSubscriptionBillingInterval,
+} from '../../helpers/planBillingHelpers';
 
 @injectable()
 export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscriptionCheckoutSessionUseCase {
@@ -89,7 +93,15 @@ export class CreateSubscriptionCheckoutSessionUseCase implements ICreateSubscrip
       existingSubscription.currentPeriodEnd > new Date();
 
     if (hasValidSubscription && existingSubscription!.planId === checkoutPlan.id) {
-      throw new ConflictError(ERROR_MESSAGES.SUBSCRIPTION.SAME_PLAN_ACTIVE);
+      const activeBillingInterval = resolveSubscriptionBillingInterval(
+        checkoutPlan,
+        existingSubscription!.billingInterval,
+        existingSubscription!.stripePriceId,
+      );
+
+      if (activeBillingInterval === data.billingInterval) {
+        throw new ConflictError(ERROR_MESSAGES.SUBSCRIPTION.SAME_PLAN_ACTIVE);
+      }
     }
 
     const checkoutSession =

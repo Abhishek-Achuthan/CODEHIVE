@@ -1,5 +1,6 @@
 import { Schema, Types, Document } from 'mongoose';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
+import { PLAN_BILLING_INTERVALS } from '../../../domain/types/PlanBillingInterval';
 
 export interface SubscriptionDocument extends Document {
   _id: Types.ObjectId;
@@ -7,6 +8,8 @@ export interface SubscriptionDocument extends Document {
   userId: Types.ObjectId;
 
   planId: Types.ObjectId;
+
+  billingInterval?: string;
 
   status: SubscriptionStatus;
 
@@ -37,6 +40,8 @@ export type SubscriptionLeanDoc = {
   userId: Types.ObjectId;
 
   planId: Types.ObjectId;
+
+  billingInterval?: string;
 
   status: SubscriptionStatus;
 
@@ -74,6 +79,12 @@ export const SubscriptionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Plan',
       required: true,
+    },
+
+    billingInterval: {
+      type: String,
+      enum: PLAN_BILLING_INTERVALS,
+      required: false,
     },
 
     status: {

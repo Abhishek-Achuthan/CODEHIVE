@@ -48,6 +48,62 @@ export function hasPlanPricingChanged(
   );
 }
 
+export function resolvePlanBillingIntervalFromPriceId(
+  plan: PlanEntity,
+  stripePriceId: string | undefined,
+): PlanBillingInterval | null {
+  if (!stripePriceId || !plan.stripe) {
+    return null;
+  }
+
+  if (plan.stripe.yearlyPriceId === stripePriceId) {
+    return 'yearly';
+  }
+
+  if (plan.stripe.monthlyPriceId === stripePriceId) {
+    return 'monthly';
+  }
+
+  return null;
+}
+
+export function resolveBillingIntervalFromStripeRecurring(
+  interval: string | undefined,
+): PlanBillingInterval | null {
+  if (interval === 'year') {
+    return 'yearly';
+  }
+
+  if (interval === 'month') {
+    return 'monthly';
+  }
+
+  return null;
+}
+
+export function resolveSubscriptionBillingInterval(
+  plan: PlanEntity,
+  storedInterval: PlanBillingInterval | undefined,
+  stripePriceId: string | undefined,
+  stripeRecurringInterval?: string,
+): PlanBillingInterval {
+  const fromPrice = resolvePlanBillingIntervalFromPriceId(plan, stripePriceId);
+  if (fromPrice) {
+    return fromPrice;
+  }
+
+  const fromRecurring = resolveBillingIntervalFromStripeRecurring(stripeRecurringInterval);
+  if (fromRecurring) {
+    return fromRecurring;
+  }
+
+  if (storedInterval === 'monthly' || storedInterval === 'yearly') {
+    return storedInterval;
+  }
+
+  return 'monthly';
+}
+
 export function resolvePlanStripePriceId(
   plan: PlanEntity,
   billingInterval: PlanBillingInterval,

@@ -1,9 +1,11 @@
 import { SubscriptionStatus } from '../types/SubscriptionStatus';
+import { PlanBillingInterval } from '../types/PlanBillingInterval';
 
 export interface SubscriptionEntity {
   id: string;
   userId: string;
   planId: string;
+  billingInterval: PlanBillingInterval;
   status: SubscriptionStatus;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;

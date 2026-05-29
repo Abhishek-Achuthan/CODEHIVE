@@ -5,6 +5,7 @@ import { ISubscriptionRepository } from '../../../domain/interfaces/ISubscriptio
 import { SubscriptionEntity } from '../../../domain/entities/SubscriptionEntity';
 import { SubscriptionDocument, SubscriptionLeanDoc } from '../schemas/SubscriptionSchema';
 import { SubscriptionStatus } from '../../../domain/types/SubscriptionStatus';
+import { PlanBillingInterval } from '../../../domain/types/PlanBillingInterval';
 
 export class SubscriptionRepository
   extends GenericRepository<SubscriptionDocument, SubscriptionEntity>
@@ -22,6 +23,25 @@ export class SubscriptionRepository
           $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
         },
       })
+      .lean<SubscriptionLeanDoc | null>();
+
+    if (!doc) return null;
+
+    return this.leanToEntity(doc);
+  }
+
+  async findActiveByUserIdWithSession(
+    userId: string,
+    session: ClientSession,
+  ): Promise<SubscriptionEntity | null> {
+    const doc = await this._model
+      .findOne({
+        userId: new Types.ObjectId(userId),
+        status: {
+          $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
+        },
+      })
+      .session(session)
       .lean<SubscriptionLeanDoc | null>();
 
     if (!doc) return null;
@@ -88,6 +108,7 @@ export class SubscriptionRepository
       id: doc._id.toString(),
       userId: doc.userId.toString(),
       planId: doc.planId.toString(),
+      billingInterval: this._mapBillingInterval(doc.billingInterval),
       status: doc.status,
       currentPeriodStart: doc.currentPeriodStart,
       currentPeriodEnd: doc.currentPeriodEnd,
@@ -138,8 +159,15 @@ export class SubscriptionRepository
     if (data.stripePriceId !== undefined) {
       doc.stripePriceId = data.stripePriceId;
     }
+    if (data.billingInterval !== undefined) {
+      doc.billingInterval = data.billingInterval;
+    }
 
     return doc;
+  }
+
+  private _mapBillingInterval(value: string | undefined): PlanBillingInterval {
+    return value === 'yearly' ? 'yearly' : 'monthly';
   }
 
   protected leanToEntity(doc: SubscriptionLeanDoc): SubscriptionEntity {
@@ -147,6 +175,7 @@ export class SubscriptionRepository
       id: doc._id.toString(),
       userId: doc.userId.toString(),
       planId: doc.planId.toString(),
+      billingInterval: this._mapBillingInterval(doc.billingInterval),
       status: doc.status,
       currentPeriodStart: doc.currentPeriodStart,
       currentPeriodEnd: doc.currentPeriodEnd,

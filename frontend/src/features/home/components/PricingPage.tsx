@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Zap, Loader2 } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../store";
@@ -10,8 +10,11 @@ import Footer from "../../../shared/ui/Footer";
 import { useFetchPublicPlans } from "../hooks/useFetchPublicPlans";
 import { useSubscriptionCheckout } from "../hooks/useSubscriptionCheckout";
 import {
+  formatBillingIntervalLabel,
   formatSubscriptionDate,
+  getBillingSwitchLabel,
   isPlanCurrentForUser,
+  isSamePlanBillingSwitch,
   useMySubscription,
 } from "../hooks/useMySubscription";
 import type { PlanView, FeatureKey, LimitKey } from "../../../shared/types/view/PlanView";
@@ -215,6 +218,7 @@ interface PlanCardProps {
   billing: PlanBillingInterval;
   isPopular: boolean;
   isCurrentPlan: boolean;
+  isBillingSwitch: boolean;
   index: number;
   checkoutLoading: boolean;
   onCheckout: (plan: PlanView, billingInterval: PlanBillingInterval) => void;
@@ -226,6 +230,7 @@ const PlanCard = ({
   billing,
   isPopular,
   isCurrentPlan,
+  isBillingSwitch,
   index,
   checkoutLoading,
   onCheckout,
@@ -312,21 +317,17 @@ const PlanCard = ({
 
       {isCurrentPlan ? (
         <p className="mt-4 shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-center text-sm text-emerald-300/90">
-          {isFree
-            ? "You are on this plan."
-            : (
-              <>
-                Your current Plan
-              </>
-            )}
+          {isFree ? "You are on this plan." : "Your current plan"}
         </p>
       ) : (
         <button
           type="button"
           onClick={handleCTA}
-          disabled={isCurrentPlan || (!isFree && checkoutLoading)}
+          disabled={!isFree && checkoutLoading}
           className={`mt-4 w-full shrink-0 rounded-lg text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-            isPopular
+            isBillingSwitch
+              ? "border border-indigo-500/50 bg-indigo-500/10 py-2.5 text-indigo-300 hover:bg-indigo-500/20"
+              : isPopular
               ? "bg-indigo-600 py-2.5 text-white hover:bg-indigo-500"
               : "border border-zinc-700 bg-transparent py-2.5 text-white hover:border-zinc-500 hover:bg-zinc-900"
           }`}
@@ -338,6 +339,8 @@ const PlanCard = ({
             </span>
           ) : isFree ? (
             "Get Started"
+          ) : isBillingSwitch ? (
+            getBillingSwitchLabel(billing)
           ) : (
             `Get ${plan.name}`
           )}
@@ -385,8 +388,14 @@ const PricingPage = () => {
       return;
     }
 
-    if (subscription && subscription.plan.id === plan.id) {
-      toast.error("You are already subscribed to this plan.");
+    if (
+      subscription &&
+      subscription.plan.id === plan.id &&
+      subscription.billingInterval === billingInterval
+    ) {
+      toast.error(
+        `You are already on ${plan.name} (${formatBillingIntervalLabel(billingInterval)}).`,
+      );
       return;
     }
 
@@ -414,7 +423,9 @@ const PricingPage = () => {
             {isAuthenticated && subscription && !subscriptionLoading && (
               <p className="mt-2 text-sm text-zinc-400">
                 You are on{" "}
-                <span className="font-medium text-white">{subscription.plan.name}</span>
+                <span className="font-medium text-white">
+                  {subscription.plan.name} ({formatBillingIntervalLabel(subscription.billingInterval)})
+                </span>
                 {subscription.cancelAtPeriodEnd ? (
                   <>
                     {" "}
@@ -500,7 +511,8 @@ const PricingPage = () => {
                   previousPlan={i > 0 ? plans[i - 1]! : null}
                   billing={billing}
                   isPopular={i === popularIndex && plans.length > 1}
-                  isCurrentPlan={isPlanCurrentForUser(plan, subscription)}
+                  isCurrentPlan={isPlanCurrentForUser(plan, subscription, billing)}
+                  isBillingSwitch={isSamePlanBillingSwitch(plan, subscription, billing)}
                   index={i}
                   checkoutLoading={checkoutLoading}
                   onCheckout={handleCheckout}

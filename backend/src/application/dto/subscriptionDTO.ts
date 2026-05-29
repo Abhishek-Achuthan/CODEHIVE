@@ -23,6 +23,7 @@ export interface SubscriptionResponseDTO {
   id: string;
   userId: string;
   planId: string;
+  billingInterval: PlanBillingInterval;
   status: SubscriptionStatus;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;

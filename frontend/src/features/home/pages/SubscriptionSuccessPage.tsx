@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import Header from "../../../shared/ui/Header";
 import Footer from "../../../shared/ui/Footer";
 import {
+  formatBillingIntervalLabel,
   formatSubscriptionDate,
   useMySubscription,
 } from "../hooks/useMySubscription";
@@ -70,7 +71,7 @@ export default function SubscriptionSuccessPage() {
             {isActivating
               ? "Your payment was received. We are confirming your subscription — this usually takes a few seconds."
               : subscription
-              ? `You are now on the ${subscription.plan.name} plan.`
+              ? `You are now on ${subscription.plan.name} (${formatBillingIntervalLabel(subscription.billingInterval)}).`
               : "Your payment was received. Your subscription will appear in your profile shortly."}
           </p>
 
@@ -78,7 +79,9 @@ export default function SubscriptionSuccessPage() {
             <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-left text-sm">
               <div className="flex justify-between gap-4 py-1.5">
                 <span className="text-zinc-500">Plan</span>
-                <span className="font-medium text-white">{subscription.plan.name}</span>
+                <span className="font-medium text-white">
+                  {subscription.plan.name} ({formatBillingIntervalLabel(subscription.billingInterval)})
+                </span>
               </div>
               <div className="flex justify-between gap-4 py-1.5">
                 <span className="text-zinc-500">Status</span>

@@ -10,6 +10,7 @@ export class SubscriptionMapper {
       id: subscription.id,
       userId: subscription.userId,
       planId: subscription.planId,
+      billingInterval: subscription.billingInterval,
       status: subscription.status,
       currentPeriodStart: subscription.currentPeriodStart,
       currentPeriodEnd: subscription.currentPeriodEnd,
