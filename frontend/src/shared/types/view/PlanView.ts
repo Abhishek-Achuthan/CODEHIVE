@@ -1,3 +1,5 @@
+export const PLAN_DESCRIPTION_MAX_LENGTH = 100;
+
 export type FeatureKey =
   | 'chat'
   | 'notes'

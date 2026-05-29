@@ -9,7 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../shared/ui/dialog/Dialog";
-import type { PlanView, CreatePlanPayload, UpdatePlanPayload, FeatureKey, LimitKey } from "../../../shared/types/view/PlanView";
+import {
+  PLAN_DESCRIPTION_MAX_LENGTH,
+  type PlanView,
+  type CreatePlanPayload,
+  type UpdatePlanPayload,
+  type FeatureKey,
+  type LimitKey,
+} from "../../../shared/types/view/PlanView";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -39,7 +46,12 @@ const planFormSchema = z.object({
     .string()
     .min(1, "Slug is required")
     .regex(/^[a-z0-9-_]+$/, "Only lowercase letters, numbers, hyphens, underscores"),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .max(
+      PLAN_DESCRIPTION_MAX_LENGTH,
+      `Description must be ${PLAN_DESCRIPTION_MAX_LENGTH} characters or less`
+    ),
   isPublic: z.boolean(),
   sortOrder: z.coerce.number().int().nonnegative("Must be 0 or greater"),
   features: z.array(z.string()).min(1, "Select at least one feature"),
@@ -85,9 +97,10 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
     reset,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<PlanFormValues>({
     resolver: zodResolver(planFormSchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       slug: "",
@@ -176,6 +189,9 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
   };
 
   const selectedFeatures = watch("features");
+  const descriptionValue = watch("description") ?? "";
+  const descriptionLength = descriptionValue.length;
+  const isDescriptionOverLimit = descriptionLength > PLAN_DESCRIPTION_MAX_LENGTH;
 
   const toggleFeature = (key: FeatureKey) => {
     const current = selectedFeatures ?? [];
@@ -251,15 +267,46 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
 
               {/* Description */}
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label className="text-xs font-semibold text-zinc-400">
-                  Description
-                </label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs font-semibold text-zinc-400">
+                    Description
+                  </label>
+                  <span
+                    className={`text-xs tabular-nums ${
+                      isDescriptionOverLimit
+                        ? "text-rose-400 font-semibold"
+                        : descriptionLength > PLAN_DESCRIPTION_MAX_LENGTH * 0.85
+                        ? "text-amber-400"
+                        : "text-zinc-500"
+                    }`}
+                    aria-live="polite"
+                  >
+                    {descriptionLength}/{PLAN_DESCRIPTION_MAX_LENGTH}
+                  </span>
+                </div>
                 <textarea
                   {...register("description")}
                   rows={2}
-                  placeholder="Brief description of this plan..."
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all resize-none"
+                  maxLength={PLAN_DESCRIPTION_MAX_LENGTH}
+                  placeholder="Short tagline shown on the pricing page (max 100 characters)"
+                  className={`rounded-xl border bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 transition-all resize-none ${
+                    errors.description || isDescriptionOverLimit
+                      ? "border-rose-500/50 focus:ring-rose-500/30"
+                      : "border-white/10 focus:ring-indigo-500/30"
+                  }`}
                 />
+                {errors.description && (
+                  <p className="text-xs text-rose-400">{errors.description.message}</p>
+                )}
+                {!errors.description && isDescriptionOverLimit && (
+                  <p className="text-xs text-rose-400">
+                    Description exceeds the {PLAN_DESCRIPTION_MAX_LENGTH}-character limit.
+                  </p>
+                )}
+                <p className="text-xs text-zinc-600">
+                  Keep it brief — this appears as supporting text under the plan name on the
+                  pricing page.
+                </p>
               </div>
 
               {/* Sort Order */}
@@ -496,7 +543,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !isValid || isDescriptionOverLimit}
               className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20"
             >
               {submitting

@@ -3,6 +3,13 @@ import { FeatureKey } from '../../domain/types/FeatureKey';
 import { LimitKey } from '../../domain/types/LimitKey';
 import { isStripeBillingCurrency } from '../../shared/constants/stripeBillingCurrencies';
 
+export const PLAN_DESCRIPTION_MAX_LENGTH = 100;
+
+const planDescriptionSchema = z
+  .string()
+  .max(PLAN_DESCRIPTION_MAX_LENGTH, `Description must be ${PLAN_DESCRIPTION_MAX_LENGTH} characters or less`)
+  .optional();
+
 export const createPlanSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   slug: z
@@ -47,7 +54,7 @@ export const updatePlanSchema = z.object({
     .min(1, 'Slug cannot be empty')
     .regex(/^[a-z0-9-_]+$/, 'Slug must only contain lowercase letters, numbers, hyphens, and underscores')
     .optional(),
-  description: z.string().optional(),
+  description: planDescriptionSchema,
   isActive: z.boolean().optional(),
   isPublic: z.boolean().optional(),
   sortOrder: z.number().int().nonnegative().optional(),

@@ -143,6 +143,7 @@ export const PlanSchema = new Schema(
     description: {
       type: String,
       required: false,
+      maxlength: 100,
     },
 
     isActive: {

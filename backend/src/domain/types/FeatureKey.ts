@@ -1,8 +1,3 @@
-/**
- * FeatureKey — Represents a high-level feature that can be enabled or disabled
- * on a subscription plan. A feature being enabled in the plan means the room
- * *supports* it; actual participant access is governed by CapabilityKey.
- */
 export enum FeatureKey {
   CHAT = 'chat',
   NOTES = 'notes',
