@@ -346,6 +346,8 @@ export const API_ROUTES = {
       `/rooms/${roomId}/invites/${inviteId}`,
     KICK_PARTICIPANT: (roomId: string, userId: string) =>
       `/rooms/${roomId}/participants/${userId}/kick`,
+    UPDATE_PARTICIPANT_OVERRIDES: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/overrides`,
   },
 
   INVITE: {

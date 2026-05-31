@@ -63,6 +63,18 @@ export interface KickParticipantDTO {
   targetUserId: string;
 }
 
+export interface UpdateParticipantOverridesDTO {
+  roomId: string;
+  executorUserId: string;
+  targetUserId: string;
+  overrides: Partial<Record<CapabilityKey, boolean>>;
+}
+
+export interface UpdateParticipantOverridesResponseDTO {
+  userId: string;
+  overrides: Partial<Record<CapabilityKey, boolean>>;
+}
+
 export interface JoinRoomResponseDTO {
   id: string;
   roomId: string;

@@ -22,7 +22,7 @@ export class SavePublicNoteUseCase implements ISavePublicNoteUseCase {
     await this._roomAuthorizationService.assertCapability(
       roomId,
       userId,
-      CapabilityKey.ROOM_NOTES_EDIT,
+      CapabilityKey.ROOM_PUBLIC_NOTES_EDIT,
     );
 
     return this._publicNoteRepo.upsert(roomId, content, userId);

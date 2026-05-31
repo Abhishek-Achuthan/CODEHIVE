@@ -6,7 +6,7 @@ export type RoomLifecycleStatus =
   | "READONLY"
   | "ARCHIVED"
   | "PURGED";
-export type RoomRole = "HOST" | "MODERATOR" | "PARTICIPANT" | "VIEWER";
+export type RoomRole = "HOST" | "PARTICIPANT" | "VIEWER";
 export type FeatureKey =
   | "chat"
   | "notes"
@@ -25,8 +25,10 @@ export type CapabilityKey =
   | "room.chat.read"
   | "room.chat.write"
   | "room.chat.delete_own"
-  | "room.notes.view"
-  | "room.notes.edit"
+  | "room.public_notes.view"
+  | "room.public_notes.edit"
+  | "room.private_notes.view"
+  | "room.private_notes.edit"
   | "room.polls.create"
   | "room.polls.vote"
   | "room.polls.close"

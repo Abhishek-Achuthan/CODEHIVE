@@ -12,7 +12,9 @@ type NoteTab = 'private' | 'public';
 
 const NotesPanel: React.FC<NotesPanelProps> = ({ roomId }) => {
   const [activeTab, setActiveTab] = useState<NoteTab>('private');
-  const { canEditNotes } = useRoomAuthorization();
+  const { canEditPublicNotes, canEditPrivateNotes, canViewNotes } = useRoomAuthorization();
+
+  const canViewPublicNotes = canViewNotes;
 
   return (
     <div className="flex flex-col h-full bg-[#0d1117]">
@@ -39,9 +41,9 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ roomId }) => {
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'private' ? (
-          <PrivateNotes roomId={roomId} canEdit={canEditNotes} />
+          <PrivateNotes roomId={roomId} canEdit={canEditPrivateNotes} />
         ) : (
-          <PublicNotes roomId={roomId} canEdit={canEditNotes} />
+          <PublicNotes roomId={roomId} canView={canViewPublicNotes} canEdit={canEditPublicNotes} />
         )}
       </div>
     </div>

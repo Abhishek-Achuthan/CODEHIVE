@@ -44,12 +44,11 @@ export const ParticipantSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['HOST', 'MODERATOR', 'PARTICIPANT', 'VIEWER'],
+    enum: ['HOST', 'PARTICIPANT', 'VIEWER'],
     default: 'PARTICIPANT',
   },
   overrides: {
-    type: Map,
-    of: Boolean,
+    type: Schema.Types.Mixed,
     default: {},
   },
 }, { timestamps: true });

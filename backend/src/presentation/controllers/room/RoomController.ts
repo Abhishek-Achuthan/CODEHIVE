@@ -13,8 +13,13 @@ import type { IRevokeRoomInviteUseCase } from '../../../application/useCase/inte
 import type { IListRoomInvitesUseCase } from '../../../application/useCase/interface/room/IListRoomInvitesUseCase';
 import type { IKickParticipantUseCase } from '../../../application/useCase/interface/room/IKickParticipantUseCase';
 import type { IGetRoomSettingsUseCase } from '../../../application/useCase/interface/room/IGetRoomSettingsUseCase';
+import type { IUpdateParticipantOverridesUseCase } from '../../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import type { IPresenceService } from '../../../application/ports/presence/IPresenceService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
+import {
+  participantOverridesParamsSchema,
+  updateParticipantOverridesBodySchema,
+} from '../../validation/participantValidation';
 
 @injectable()
 export class RoomController {
@@ -43,6 +48,8 @@ export class RoomController {
     private readonly _kickParticipantUseCase: IKickParticipantUseCase,
     @inject('IGetRoomSettingsUseCase')
     private readonly _getRoomSettingsUseCase: IGetRoomSettingsUseCase,
+    @inject('IUpdateParticipantOverridesUseCase')
+    private readonly _updateParticipantOverridesUseCase: IUpdateParticipantOverridesUseCase,
   ) {}
 
   async handleCreateRoom(req: Request, res: Response, next: NextFunction) {
@@ -182,6 +189,29 @@ export class RoomController {
         targetUserId,
       });
       res.status(HttpStatus.NoContent).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleUpdateParticipantOverrides(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { roomId, userId: targetUserId } =
+        participantOverridesParamsSchema.parse(req.params);
+      const { overrides } = updateParticipantOverridesBodySchema.parse(req.body);
+
+      const result = await this._updateParticipantOverridesUseCase.execute({
+        roomId,
+        executorUserId: req.user.id,
+        targetUserId,
+        overrides,
+      });
+
+      res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);
     }

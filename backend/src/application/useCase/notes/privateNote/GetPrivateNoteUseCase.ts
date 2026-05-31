@@ -22,7 +22,7 @@ export class GetPrivateNoteUseCase implements IGetPrivateNoteUseCase {
     await this._roomAuthorizationService.assertCapability(
       roomId,
       userId,
-      CapabilityKey.ROOM_NOTES_VIEW,
+      CapabilityKey.ROOM_PRIVATE_NOTES_VIEW,
       'read',
     );
 

@@ -89,6 +89,12 @@ export interface SocketErrorPayload {
   message: string;
 }
 
+export interface ParticipantPermissionsUpdatedPayload {
+  roomId: string;
+  userId: string;
+  overrides: Record<string, boolean>;
+}
+
 export interface ServerToClientRoomEvents {
   'room:subscribed': (payload: RoomSubscribedPayload) => void;
   'room:lifecycle-changed': (payload: RoomLifecycleChangedPayload) => void;
@@ -102,6 +108,7 @@ export interface ServerToClientRoomEvents {
   'poll:created': (payload: Poll) => void;
   'poll:voted': (payload: Poll) => void;
   'poll:ended': (payload: Poll) => void;
+  'participant:permissions-updated': (payload: ParticipantPermissionsUpdatedPayload) => void;
   error: (payload: SocketErrorPayload) => void;
 }
 

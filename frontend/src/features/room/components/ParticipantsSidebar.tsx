@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import type { Participant } from '../types';
-import { Users, Circle, ChevronLeft, ChevronRight, UserMinus } from 'lucide-react';
+import { Users, Circle, ChevronLeft, ChevronRight, UserMinus, SlidersHorizontal } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 import { RoomService } from '../../../services/roomService';
+import ParticipantPermissionsPanel from './ParticipantPermissionsPanel';
 
 interface ParticipantsSidebarProps {
   participants: Participant[];
@@ -12,11 +13,32 @@ interface ParticipantsSidebarProps {
 
 const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants, roomId }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openPermissionsFor, setOpenPermissionsFor] = useState<string | null>(null);
+  const [participantOverrides, setParticipantOverrides] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
+
   const onlineCount = participants.filter(p => p.status === 'online').length;
   const authorization = useRoomAuthorization();
 
   const handleToggle = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handlePermissionsClick = (participantId: string) => {
+    setOpenPermissionsFor((current) =>
+      current === participantId ? null : participantId,
+    );
+  };
+
+  const handleOverridesUpdated = (
+    participantId: string,
+    overrides: Record<string, boolean>,
+  ) => {
+    setParticipantOverrides((current) => ({
+      ...current,
+      [participantId]: overrides,
+    }));
   };
 
   return (
@@ -50,65 +72,112 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-        <div className="space-y-2">
-          {participants.map((participant) => (
-            <div
-              key={participant.id}
-              className={`flex items-center rounded-lg transition-colors group cursor-pointer ${
-                isCollapsed ? 'justify-center p-1' : 'justify-between p-2'
-              } ${participant.isCurrentUser ? 'bg-blue-600/10' : 'hover:bg-[#161b22]'}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="relative shrink-0">
-                  <img
-                    src={participant.avatar}
-                    alt={participant.name}
-                    className="w-8 h-8 rounded-full bg-gray-700 object-cover"
-                  />
-                  <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#0d1117] ${
-                    participant.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
-                  }`} />
+        <div className="space-y-1">
+          {participants.map((participant) => {
+            const isPermissionsPanelOpen = openPermissionsFor === participant.id;
+            const canManageThisParticipant =
+              !isCollapsed &&
+              authorization.canManageRoomPermissions &&
+              !participant.isCurrentUser &&
+              participant.role !== 'HOST';
+
+            return (
+              <div key={participant.id}>
+                {/* Participant row */}
+                <div
+                  className={`flex items-center rounded-lg transition-colors group cursor-pointer ${
+                    isCollapsed ? 'justify-center p-1' : 'justify-between p-2'
+                  } ${
+                    participant.isCurrentUser
+                      ? 'bg-blue-600/10'
+                      : isPermissionsPanelOpen
+                        ? 'bg-[#1c2128]'
+                        : 'hover:bg-[#161b22]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <img
+                        src={participant.avatar}
+                        alt={participant.name}
+                        className="w-8 h-8 rounded-full bg-gray-700 object-cover"
+                      />
+                      <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#0d1117] ${
+                        participant.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
+                      }`} />
+                    </div>
+
+                    {!isCollapsed && (
+                      <div className="flex flex-col overflow-hidden">
+                        <span className={`text-sm font-medium truncate ${
+                          participant.isCurrentUser ? 'text-blue-400' : 'text-gray-300'
+                        }`}>
+                          {participant.name}
+                        </span>
+                        <span className="text-[10px] text-gray-500 leading-none capitalize">
+                          {participant.role === 'HOST' ? 'host' : participant.status}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action buttons — only shown when not collapsed and not the HOST */}
+                  {canManageThisParticipant && (
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Permission management toggle */}
+                      <button
+                        type="button"
+                        title="Manage permissions"
+                        onClick={() => handlePermissionsClick(participant.id)}
+                        className={`p-1 rounded transition-colors ${
+                          isPermissionsPanelOpen
+                            ? 'text-blue-400 bg-blue-500/10'
+                            : 'text-gray-600 hover:text-blue-400 hover:bg-blue-500/10'
+                        }`}
+                      >
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Kick button */}
+                      {authorization.canModerateParticipants && (
+                        <button
+                          type="button"
+                          title="Remove from room"
+                          onClick={async () => {
+                            try {
+                              await RoomService.kickParticipant(roomId, participant.id);
+                              toast.success(`${participant.name} was removed`);
+                            } catch {
+                              toast.error('Failed to remove participant');
+                            }
+                          }}
+                          className="p-1 text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          <UserMinus className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {!isCollapsed && (
-                  <div className="flex flex-col overflow-hidden">
-                    <span className={`text-sm font-medium truncate ${
-                      participant.isCurrentUser ? 'text-blue-400' : 'text-gray-300'
-                    }`}>
-                      {participant.name}
-                    </span>
-                    <span className="text-[10px] text-gray-500 leading-none capitalize">
-                      {participant.status}
-                    </span>
-                  </div>
+                {/* Inline permissions panel — slides open below the participant row */}
+                {isPermissionsPanelOpen && canManageThisParticipant && (
+                  <ParticipantPermissionsPanel
+                    roomId={roomId}
+                    participantId={participant.id}
+                    participantName={participant.name}
+                    initialOverrides={participantOverrides[participant.id] ?? {}}
+                    onOverridesUpdated={(overrides) =>
+                      handleOverridesUpdated(participant.id, overrides)
+                    }
+                  />
                 )}
               </div>
-              
-              {!isCollapsed &&
-                authorization.canModerateParticipants &&
-                !participant.isCurrentUser &&
-                participant.role !== 'HOST' && (
-                <button
-                  type="button"
-                  title="Remove from room"
-                  onClick={async () => {
-                    try {
-                      await RoomService.kickParticipant(roomId, participant.id);
-                      toast.success(`${participant.name} was removed`);
-                    } catch {
-                      toast.error('Failed to remove participant');
-                    }
-                  }}
-                  className="p-1 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <UserMinus className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
-      
+
       <div className={`p-4 border-t border-gray-800 bg-[#161b22]/30 flex items-center transition-all ${
         isCollapsed ? 'justify-center' : 'justify-between'
       }`}>

@@ -1,6 +1,5 @@
 export enum RoomRole {
   HOST = 'HOST',
-  MODERATOR = 'MODERATOR',
   PARTICIPANT = 'PARTICIPANT',
   VIEWER = 'VIEWER'
 }

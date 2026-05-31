@@ -24,7 +24,7 @@ export class SavePrivateNoteUseCase implements ISavePrivateNoteUseCase {
     await this._roomAuthorizationService.assertCapability(
       roomId,
       userId,
-      CapabilityKey.ROOM_NOTES_EDIT,
+      CapabilityKey.ROOM_PRIVATE_NOTES_EDIT,
     );
 
     const existingNote = await this._noteRepo.findByRoomAndUser(roomId, userId);

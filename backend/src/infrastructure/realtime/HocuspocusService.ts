@@ -6,7 +6,8 @@ import {
   CollaborationContext,
   HocuspocusHookHandler,
 } from '../../presentation/collaboration/HocuspocusHookHandler';
-import { loggerService } from '../../config/di/resolver'; 
+import { loggerService } from '../../config/di/resolver';
+import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
 
 @injectable()
 export class HocuspocusService {
@@ -15,6 +16,8 @@ export class HocuspocusService {
   constructor(
     @inject(HocuspocusHookHandler)
     private readonly _hookHandler: HocuspocusHookHandler,
+    @inject(RoomAuthorizationService)
+    private readonly _roomAuthorizationService: RoomAuthorizationService,
   ) {
     this._server = new Server<CollaborationContext>({
       port: env.hocuspocusPort,
@@ -30,5 +33,34 @@ export class HocuspocusService {
   listen(): void {
     this._server.listen();
     loggerService.info(`Hocuspocus running on ws://localhost:${env.hocuspocusPort}`);
+  }
+
+  /**
+   * Updates readOnly on active Hocuspocus connections after participant overrides change.
+   */
+  async syncCollaborationWriteAccess(roomId: string, userId: string): Promise<void> {
+    const documentNames = [
+      `room-${roomId}-whiteboard`,
+      `room-${roomId}-public-note`,
+    ];
+
+    for (const documentName of documentNames) {
+      const document = this._server.hocuspocus.documents.get(documentName);
+      if (!document) continue;
+
+      const canWrite = await this._roomAuthorizationService.isCollaborationWriteAllowed(
+        userId,
+        documentName,
+      );
+      const readOnly = !canWrite;
+
+      for (const connection of document.getConnections()) {
+        const contextUserId = (connection.context as CollaborationContext | undefined)?.user
+          ?.userId;
+        if (contextUserId === userId) {
+          connection.readOnly = readOnly;
+        }
+      }
+    }
   }
 }

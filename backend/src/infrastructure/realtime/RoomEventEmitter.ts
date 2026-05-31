@@ -4,6 +4,7 @@ import type {
   IRoomEventEmitter,
   MessageDeletedPayload,
   MessageEditedPayload,
+  ParticipantPermissionsUpdatedPayload,
   RoomUserPresencePayload,
   TypingStartedPayload,
   TypingStoppedPayload,
@@ -106,5 +107,12 @@ export class RoomEventEmitter implements IRoomEventEmitter {
       roomId,
       lifecycleStatus,
     });
+  }
+
+  emitPermissionsUpdated(
+    roomId: string,
+    payload: ParticipantPermissionsUpdatedPayload,
+  ): void {
+    this._socketService.emitToRoom(roomId, 'participant:permissions-updated', payload);
   }
 }

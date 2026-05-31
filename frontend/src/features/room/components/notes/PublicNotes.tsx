@@ -5,15 +5,180 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Collaboration from '@tiptap/extension-collaboration';
+import type * as Y from 'yjs';
 import { usePublicNotes } from '../../hooks/usePublicNotes';
+import type { SaveStatus } from '../../hooks/usePublicNotes';
 import SaveStatusIndicator from './SaveStatusIndicator';
 
 interface PublicNotesProps {
   roomId: string;
+  canView: boolean;
   canEdit: boolean;
 }
 
-const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canEdit }) => {
+interface PublicNotesEditorProps {
+  ydoc: Y.Doc;
+  canEdit: boolean;
+  persistedHTML: string;
+  isLoading: boolean;
+  saveStatus: SaveStatus;
+  triggerSave: (html: string) => void;
+}
+
+
+const PublicNotesEditor: React.FC<PublicNotesEditorProps> = ({
+  ydoc,
+  canEdit,
+  persistedHTML,
+  isLoading,
+  saveStatus,
+  triggerSave,
+}) => {
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        undoRedo: false,
+      }),
+      Placeholder.configure({
+        placeholder: canEdit
+          ? 'Start typing shared room notes...'
+          : 'Shared room notes (view only)',
+      }),
+      Collaboration.configure({
+        document: ydoc,
+      }),
+    ],
+    editable: canEdit,
+    editorProps: {
+      attributes: {
+        class:
+          'prose prose-invert prose-sm max-w-none focus:outline-none min-h-full text-gray-200 leading-relaxed',
+      },
+    },
+    onCreate: ({ editor: createdEditor }) => {
+      const fragment = ydoc.getXmlFragment('default');
+      const isYjsDocEmpty = fragment.length === 0;
+
+      if (canEdit && isYjsDocEmpty && persistedHTML) {
+        createdEditor.commands.setContent(persistedHTML, {
+          emitUpdate: false,
+        });
+      }
+    },
+    onUpdate: ({ editor: updatedEditor }) => {
+      if (canEdit) {
+        triggerSave(updatedEditor.getHTML());
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    editor.setEditable(canEdit);
+  }, [editor, canEdit]);
+
+  // Seed persisted content when Yjs doc is still empty after load completes.
+  useEffect(() => {
+    if (isLoading || !editor || editor.isDestroyed) return;
+
+    const fragment = ydoc.getXmlFragment('default');
+    const isYjsDocEmpty = fragment.length === 0;
+
+    if (canEdit && isYjsDocEmpty && persistedHTML) {
+      editor.commands.setContent(persistedHTML, { emitUpdate: false });
+    }
+  }, [canEdit, isLoading, editor, ydoc, persistedHTML]);
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-0.5 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
+        {canEdit ? (
+          <>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleBold().run()}
+              isActive={editor?.isActive('bold') ?? false}
+              title="Bold"
+            >
+              <span className="font-bold text-[11px]">B</span>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleItalic().run()}
+              isActive={editor?.isActive('italic') ?? false}
+              title="Italic"
+            >
+              <span className="italic text-[11px]">I</span>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleStrike().run()}
+              isActive={editor?.isActive('strike') ?? false}
+              title="Strikethrough"
+            >
+              <span className="line-through text-[11px]">S</span>
+            </ToolbarButton>
+
+            <div className="w-px h-3.5 bg-gray-800 mx-1" />
+
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              isActive={editor?.isActive('bulletList') ?? false}
+              title="Bullet list"
+            >
+              <span className="text-[11px] font-mono">•—</span>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              isActive={editor?.isActive('orderedList') ?? false}
+              title="Numbered list"
+            >
+              <span className="text-[11px] font-mono">1.</span>
+            </ToolbarButton>
+
+            <div className="w-px h-3.5 bg-gray-800 mx-1" />
+
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleCode().run()}
+              isActive={editor?.isActive('code') ?? false}
+              title="Inline code"
+            >
+              <span className="font-mono text-[11px]">{`<>`}</span>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+              isActive={editor?.isActive('codeBlock') ?? false}
+              title="Code block"
+            >
+              <span className="font-mono text-[10px] leading-none">{`{}`}</span>
+            </ToolbarButton>
+
+            <div className="flex-1" />
+            <SaveStatusIndicator status={saveStatus} />
+          </>
+        ) : (
+          <>
+            <Lock className="w-3 h-3 text-gray-600" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
+              View Only
+            </span>
+          </>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3">
+        {editor ? (
+          <EditorContent editor={editor} className="h-full" />
+        ) : (
+          <div className="flex items-center justify-center h-full gap-2 text-gray-600">
+            <FileText className="w-5 h-5" />
+            <span className="text-xs">Initializing editor...</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canView, canEdit }) => {
   const {
     ydoc,
     persistedHTML,
@@ -22,92 +187,8 @@ const PublicNotes: React.FC<PublicNotesProps> = ({ roomId, canEdit }) => {
     collaborationError,
     saveStatus,
     triggerSave,
-  } = usePublicNotes(roomId, canEdit);
+  } = usePublicNotes(roomId, canView, canEdit);
 
-
-const editor = useEditor({
-  immediatelyRender: false,
-
-  extensions: [
-    StarterKit.configure({
-      undoRedo: false,
-    }),
-
-    Placeholder.configure({
-      placeholder: canEdit
-        ? 'Start typing shared room notes...'
-        : 'No notes yet for this room.',
-    }),
-
-    ...(ydoc
-      ? [
-          Collaboration.configure({
-            document: ydoc,
-          }),
-        ]
-      : []),
-  ],
-
-  editable: canEdit && !!ydoc,
-
-  editorProps: {
-    attributes: {
-      class:
-        'prose prose-invert prose-sm max-w-none focus:outline-none min-h-full text-gray-200 leading-relaxed',
-    },
-  },
-
-  onCreate: ({ editor }) => {
-    console.log('EDITOR CREATED');
-
-    if (!ydoc) return;
-
-    const fragment = ydoc.getXmlFragment('default');
-
-    const isYjsDocEmpty = fragment.length === 0;
-
-    console.log('IS YJS EMPTY:', isYjsDocEmpty);
-
-    if (isYjsDocEmpty && persistedHTML) {
-      editor.commands.setContent(persistedHTML, {
-        emitUpdate: false,
-      });
-    }
-  },
-
-  onUpdate: ({ editor }) => {
-    console.log('EDITOR UPDATED');
-
-    if (canEdit) {
-      triggerSave(editor.getHTML());
-    }
-  },
-});
-
-  // ── Seed editor with persisted content when Yjs doc is still empty ─────────
-  // This prevents overwriting collaborative state on reconnects while still
-  // loading the last-saved snapshot for brand-new Yjs sessions.
-  useEffect(() => {
-    if (isLoading || !editor || editor.isDestroyed || !ydoc) return;
-
-    const fragment = ydoc.getXmlFragment('default');
-    const isYjsDocEmpty = fragment.length === 0;
-
-    if (isYjsDocEmpty && persistedHTML) {
-      // emitUpdate: false prevents triggering the autosave on initial load
-      editor.commands.setContent(persistedHTML, { emitUpdate: false });
-    }
-  }, [isLoading, editor, ydoc, persistedHTML]);
-
-  // ── Cleanup Yjs / Hocuspocus on unmount ───────────────────────────────────
-  useEffect(() => {
-    return () => {
-      editor?.destroy();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── Loading state ─────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-500">
@@ -117,7 +198,6 @@ const editor = useEditor({
     );
   }
 
-  // ── Error state ───────────────────────────────────────────────────────────
   if (loadError) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 p-6 text-center">
@@ -135,41 +215,6 @@ const editor = useEditor({
           <RefreshCw className="w-3 h-3" />
           Retry
         </button>
-      </div>
-    );
-  }
-
-  if (canEdit && !ydoc && !collaborationError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-500">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-500/60" />
-        <span className="text-xs font-medium">Starting shared notes...</span>
-      </div>
-    );
-  }
-
-  if (!canEdit) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
-          <Lock className="w-3 h-3 text-gray-600" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
-            View Only
-          </span>
-        </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3">
-          {persistedHTML ? (
-            <article
-              className="prose prose-invert prose-sm max-w-none text-gray-200"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(persistedHTML) }}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full gap-2 text-gray-600">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs">No shared notes available.</span>
-            </div>
-          )}
-        </div>
       </div>
     );
   }
@@ -198,97 +243,30 @@ const editor = useEditor({
     );
   }
 
-  // ── Main editor UI ────────────────────────────────────────────────────────
-  return (
-    <div className="flex flex-col h-full">
-      {/* Toolbar — hidden for read-only users */}
-      {canEdit ? (
-        <div className="flex items-center gap-0.5 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            isActive={editor?.isActive('bold') ?? false}
-            title="Bold"
-          >
-            <span className="font-bold text-[11px]">B</span>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            isActive={editor?.isActive('italic') ?? false}
-            title="Italic"
-          >
-            <span className="italic text-[11px]">I</span>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleStrike().run()}
-            isActive={editor?.isActive('strike') ?? false}
-            title="Strikethrough"
-          >
-            <span className="line-through text-[11px]">S</span>
-          </ToolbarButton>
-
-          <div className="w-px h-3.5 bg-gray-800 mx-1" />
-
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            isActive={editor?.isActive('bulletList') ?? false}
-            title="Bullet list"
-          >
-            <span className="text-[11px] font-mono">•—</span>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            isActive={editor?.isActive('orderedList') ?? false}
-            title="Numbered list"
-          >
-            <span className="text-[11px] font-mono">1.</span>
-          </ToolbarButton>
-
-          <div className="w-px h-3.5 bg-gray-800 mx-1" />
-
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleCode().run()}
-            isActive={editor?.isActive('code') ?? false}
-            title="Inline code"
-          >
-            <span className="font-mono text-[11px]">{`<>`}</span>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-            isActive={editor?.isActive('codeBlock') ?? false}
-            title="Code block"
-          >
-            <span className="font-mono text-[10px] leading-none">{`{}`}</span>
-          </ToolbarButton>
-
-          <div className="flex-1" />
-          <SaveStatusIndicator status={saveStatus} />
-        </div>
-      ) : (
-        /* Read-only banner */
-        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/80 bg-[#0d1117]">
-          <Lock className="w-3 h-3 text-gray-600" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
-            View Only
-          </span>
-        </div>
-      )}
-
-      {/* Editor area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3">
-        {editor ? (
-          <EditorContent editor={editor} className="h-full" />
-        ) : (
-          <div className="flex items-center justify-center h-full gap-2 text-gray-600">
-            <FileText className="w-5 h-5" />
-            <span className="text-xs">Initializing editor...</span>
-          </div>
-        )}
+  if (canView && !ydoc) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-500">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500/60" />
+        <span className="text-xs font-medium">Connecting to shared notes...</span>
       </div>
-    </div>
+    );
+  }
+
+  if (!ydoc) {
+    return null;
+  }
+
+  return (
+    <PublicNotesEditor
+      ydoc={ydoc}
+      canEdit={canEdit}
+      persistedHTML={persistedHTML}
+      isLoading={isLoading}
+      saveStatus={saveStatus}
+      triggerSave={triggerSave}
+    />
   );
 };
-
-// ── Shared toolbar button (mirrors PrivateNotes implementation) ──────────────
 
 interface ToolbarButtonProps {
   onClick: () => void;

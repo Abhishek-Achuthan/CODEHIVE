@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { AlertCircle } from "lucide-react";
 import {
   Tldraw,
@@ -53,6 +53,21 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
 }) => {
   const { doc, provider, error: whiteboardError } = useWhiteboardContext();
 
+  const editorRef = useRef<Editor | null>(null);
+
+  const loadingState = useYjsStore({
+    roomId,
+    doc: doc ?? ({} as any), // eslint-disable-line @typescript-eslint/no-explicit-any
+    provider,
+  });
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateInstanceState({ isReadonly: !canEdit });
+    }
+  }, [canEdit]);
+
+
   if (whiteboardError) {
     return (
       <div className="flex items-center justify-center h-full bg-[#0d1117] text-red-400">
@@ -66,12 +81,6 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
       </div>
     );
   }
-
-  const loadingState = useYjsStore({
-    roomId,
-    doc: doc!,
-    provider,
-  });
 
   if (loadingState.status === "loading") {
     return (
@@ -98,6 +107,7 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
         store={loadingState.store}
         autoFocus
         onMount={(editor: Editor) => {
+          editorRef.current = editor;
           editor.updateInstanceState({ isReadonly: !canEdit });
 
           editor.user.updateUserPreferences({
@@ -108,11 +118,11 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
               ],
           });
 
-          // ── Reactive signal for the current user 
+          // ── Reactive signal for the current user
           const userSignal = computed<TLUser>("userSignal", () => {
             const prefs = editor.user.getUserPreferences();
             return {
-              id: prefs.id as TLUser["id"],   
+              id: prefs.id as TLUser["id"],
               name: prefs.name ?? user.userName,
               color: prefs.color ?? PRESENCE_COLORS[0],
               meta: {},
@@ -176,12 +186,13 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
           const awareness = provider?.awareness;
           if (awareness) {
             awareness.on("change", handleAwarenessChange);
-            handleAwarenessChange(); 
+            handleAwarenessChange();
           }
 
           return () => {
             disposePresence();
             awareness?.off("change", handleAwarenessChange);
+            editorRef.current = null;
           };
         }}
       />

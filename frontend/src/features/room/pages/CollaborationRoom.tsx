@@ -182,9 +182,7 @@ const CollaborationRoom: React.FC = () => {
         <TopBar
           roomName={roomName}
           roomId={roomId!}
-          showInviteControls={
-            finalCurrentUser.role === 'HOST' || finalCurrentUser.role === 'MODERATOR'
-          }
+          showInviteControls={authorization.canManageRoomPermissions}
           onOpenSettings={() => setSettingsOpen(true)}
           onLeave={handleLeaveRoom}
         />

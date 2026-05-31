@@ -83,6 +83,19 @@ export class RoomService {
     }
   }
 
+  static async updateParticipantOverrides(
+    roomId: string,
+    userId: string,
+    overrides: Record<string, boolean>,
+  ): Promise<{ userId: string; overrides: Record<string, boolean> }> {
+    try {
+      const response = await RoomAPI.updateParticipantOverrides(roomId, userId, overrides);
+      return response.data as { userId: string; overrides: Record<string, boolean> };
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   static async getPrivateNote(roomId: string): Promise<GetPrivateNoteResponse> {
     try {
       const response = await RoomAPI.getPrivateNote(roomId);

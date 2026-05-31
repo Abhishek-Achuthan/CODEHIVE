@@ -1,6 +1,7 @@
 import { ParticipantEntity } from '../entities/room/ParticipantEntity';
 import { IGenericRepository } from './IGenericRepository';
 import { ParticipantWithUser } from '../types/ParticipantWithUser';
+import { CapabilityKey } from '../types/CapabilityKey';
 
 export interface IParticipantRepository extends IGenericRepository<ParticipantEntity> {
   findByRoomAndUser(
@@ -17,4 +18,10 @@ export interface IParticipantRepository extends IGenericRepository<ParticipantEn
   removeByRoomAndUser(roomId: string, userId: string): Promise<void>;
 
   removeAllByUser(userId: string): Promise<string[]>;
+
+  updateOverrides(
+    roomId: string,
+    userId: string,
+    overrides: Partial<Record<CapabilityKey, boolean>>,
+  ): Promise<ParticipantEntity>;
 }

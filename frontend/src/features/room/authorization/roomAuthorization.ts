@@ -25,6 +25,8 @@ export interface RoomAuthorizationState {
   canDeleteOwnChat: boolean;
   canViewNotes: boolean;
   canEditNotes: boolean;
+  canEditPublicNotes: boolean;
+  canEditPrivateNotes: boolean;
   canViewPolls: boolean;
   canCreatePolls: boolean;
   canVotePolls: boolean;
@@ -67,8 +69,10 @@ export const buildRoomAuthorization = (
   const canWriteChat = hasFeature("chat") && hasCapability("room.chat.write") && !isWriteRestricted;
   const canDeleteOwnChat =
     hasFeature("chat") && hasCapability("room.chat.delete_own") && !isWriteRestricted;
-  const canViewNotes = hasFeature("notes") && hasCapability("room.notes.view");
-  const canEditNotes = hasFeature("notes") && hasCapability("room.notes.edit") && !isWriteRestricted;
+  const canViewNotes = hasFeature("notes") && (hasCapability("room.public_notes.view") || hasCapability("room.private_notes.view"));
+  const canEditNotes = hasFeature("notes") && hasCapability("room.public_notes.edit") && !isWriteRestricted;
+  const canEditPublicNotes = hasFeature("notes") && hasCapability("room.public_notes.edit") && !isWriteRestricted;
+  const canEditPrivateNotes = hasFeature("notes") && hasCapability("room.private_notes.edit") && !isWriteRestricted;
   const hasPollAccess =
     hasFeature("polls") &&
     (hasCapability("room.polls.create") ||
@@ -134,6 +138,8 @@ export const buildRoomAuthorization = (
     canDeleteOwnChat,
     canViewNotes,
     canEditNotes,
+    canEditPublicNotes,
+    canEditPrivateNotes,
     canViewPolls,
     canCreatePolls,
     canVotePolls,
@@ -148,8 +154,8 @@ export const buildRoomAuthorization = (
     canManageRoomPermissions,
     canModerateParticipants,
     canUseCodeCollaboration: canEditCodeEditor,
-    canUseWhiteboardCollaboration: canEditWhiteboard,
-    canUsePublicNoteCollaboration: canEditNotes,
+    canUseWhiteboardCollaboration: canViewWhiteboard,
+    canUsePublicNoteCollaboration: canEditPublicNotes,
     lifecycleLabel,
   };
 };

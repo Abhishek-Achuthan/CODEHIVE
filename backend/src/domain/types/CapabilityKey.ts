@@ -4,9 +4,13 @@ export enum CapabilityKey {
   ROOM_CHAT_WRITE = 'room.chat.write',
   ROOM_CHAT_DELETE_OWN = 'room.chat.delete_own',
 
-  // ── Notes ────────────────────────────────────────────
-  ROOM_NOTES_VIEW = 'room.notes.view',
-  ROOM_NOTES_EDIT = 'room.notes.edit',
+  // ── Notes (public) ───────────────────────────────────
+  ROOM_PUBLIC_NOTES_VIEW = 'room.public_notes.view',
+  ROOM_PUBLIC_NOTES_EDIT = 'room.public_notes.edit',
+
+  // ── Notes (private) ──────────────────────────────────
+  ROOM_PRIVATE_NOTES_VIEW = 'room.private_notes.view',
+  ROOM_PRIVATE_NOTES_EDIT = 'room.private_notes.edit',
 
   // ── Polls ────────────────────────────────────────────
   ROOM_POLLS_CREATE = 'room.polls.create',

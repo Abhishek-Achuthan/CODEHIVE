@@ -29,6 +29,12 @@ export interface TypingStoppedPayload {
   userId: string;
 }
 
+export interface ParticipantPermissionsUpdatedPayload {
+  roomId: string;
+  userId: string;
+  overrides: Record<string, boolean>;
+}
+
 export interface IRoomEventEmitter {
   emitMessageCreated(roomId: string, payload: SendMessageResponseDTO): void;
   emitMessageEdited(roomId: string, payload: MessageEditedPayload): void;
@@ -56,4 +62,8 @@ export interface IRoomEventEmitter {
     payload: TypingStoppedPayload,
   ): void;
   emitLifecycleChanged(roomId: string, lifecycleStatus: RoomLifeCycleStatus): void;
+  emitPermissionsUpdated(
+    roomId: string,
+    payload: ParticipantPermissionsUpdatedPayload,
+  ): void;
 }

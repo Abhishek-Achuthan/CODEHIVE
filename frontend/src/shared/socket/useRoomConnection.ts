@@ -7,12 +7,14 @@ import { useSocket } from "./useSocket";
 import { useRoomSocketEvent } from "./roomSocketEvents";
 import { toErrorMessage } from "./roomErrors";
 import type {
+  ParticipantPermissionsUpdatedPayload,
   RoomConnectionState,
   RoomLifecycleChangedPayload,
   RoomSnapshot,
   RoomSocket,
   RoomSubscribedPayload,
 } from "./roomTypes";
+import type { CapabilityKey } from "../types/api/room";
 
 interface RoomConnectionResult {
   connectionState: RoomConnectionState;
@@ -159,6 +161,34 @@ export const useRoomConnection = (
   );
 
   useRoomSocketEvent(roomSocket, "room:lifecycle-changed", handleLifecycleChanged);
+
+  const handlePermissionsUpdated = useCallback(
+    (payload: ParticipantPermissionsUpdatedPayload) => {
+      if (!roomId || payload.roomId !== roomId) return;
+      // Only patch capabilities when the event targets the current user.
+      // Other participants' overrides don't affect this client's capability state.
+      if (payload.userId !== currentUserId) return;
+
+      setSnapshot((current) => {
+        if (!current) return current;
+        // Merge the incoming overrides into the existing capabilities map.
+        // The server sends the full merged override map, so we apply each
+        // key directly — true/false overrides replace the role-default value.
+        const updatedCapabilities: Partial<Record<CapabilityKey, boolean>> = {
+          ...current.capabilities,
+          ...(payload.overrides as Partial<Record<CapabilityKey, boolean>>),
+        };
+        return { ...current, capabilities: updatedCapabilities };
+      });
+    },
+    [roomId, currentUserId],
+  );
+
+  useRoomSocketEvent(
+    roomSocket,
+    "participant:permissions-updated",
+    handlePermissionsUpdated,
+  );
 
   const handleSocketError = useCallback((payload: { message: string }) => {
     setError(payload.message);

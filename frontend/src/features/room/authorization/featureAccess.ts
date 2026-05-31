@@ -15,7 +15,7 @@ export function isPollsAccessible(auth: RoomAuthorizationState): boolean {
 }
 
 export function isWhiteboardAccessible(auth: RoomAuthorizationState): boolean {
-  return auth.canViewWhiteboard || auth.canEditWhiteboard;
+  return auth.canViewWhiteboard;
 }
 
 export function isCodeEditorAccessible(auth: RoomAuthorizationState): boolean {

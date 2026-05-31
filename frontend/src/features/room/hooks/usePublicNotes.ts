@@ -21,18 +21,15 @@ interface UsePublicNotesReturn {
   triggerSave: (html: string) => void;
 }
 
+
 export function usePublicNotes(
   roomId: string,
-  enableCollaboration: boolean,
+  canView: boolean,
+  canEdit: boolean,
 ): UsePublicNotesReturn {
-  const collabRef = useRef<ReturnType<typeof createPublicNoteProvider> | null>(
-    null,
-  );
-  const [collaborationError, setCollaborationError] = useState<string | null>(
-    null,
-  );
-  const ydoc = collabRef.current?.doc ?? null;
-  const provider = collabRef.current?.provider ?? null;
+  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
+  const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
+  const [collaborationError, setCollaborationError] = useState<string | null>(null);
 
   const [persistedHTML, setPersistedHTML] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -41,38 +38,37 @@ export function usePublicNotes(
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  if (enableCollaboration && !collabRef.current) {
-    collabRef.current = createPublicNoteProvider(roomId, {
-      onAuthenticationFailed: (reason) => {
-        setCollaborationError(
-          reason || "You are not allowed to edit shared notes in this room.",
-        );
-      },
-    });
-  }
 
   useEffect(() => {
-    setCollaborationError(null);
-
-    if (!enableCollaboration) {
-      collabRef.current?.provider.disconnect();
-      collabRef.current?.doc.destroy();
-      collabRef.current = null;
+    if (!canView) {
+      setYdoc(null);
+      setProvider(null);
+      setCollaborationError(null);
       return;
     }
 
-    const instance = collabRef.current;
-    if (!instance) return;
+    setCollaborationError(null);
+
+    const instance = createPublicNoteProvider(roomId, {
+      onAuthenticationFailed: (reason) => {
+        setCollaborationError(
+          reason || "You are not allowed to access shared notes in this room.",
+        );
+      },
+    });
+
+    setYdoc(instance.doc);
+    setProvider(instance.provider);
 
     return () => {
       instance.provider.disconnect();
       instance.doc.destroy();
-      if (collabRef.current === instance) {
-        collabRef.current = null;
-      }
+      setYdoc(null);
+      setProvider(null);
     };
-  }, [enableCollaboration, roomId]);
+  }, [canView, roomId]);
 
+  // ── Persisted content fetch ───────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
 
@@ -102,6 +98,7 @@ export function usePublicNotes(
     };
   }, [roomId]);
 
+  // ── Debounced save ────────────────────────────────────────────────────────
   const triggerSave = useCallback(
     (html: string) => {
       if (debounceTimer.current) {
@@ -111,7 +108,7 @@ export function usePublicNotes(
       setSaveStatus("saving");
 
       debounceTimer.current = setTimeout(async () => {
-        if (!enableCollaboration) {
+        if (!canEdit) {
           setSaveStatus("idle");
           return;
         }
@@ -126,7 +123,7 @@ export function usePublicNotes(
         }
       }, DEBOUNCE_MS);
     },
-    [enableCollaboration, roomId],
+    [canEdit, roomId],
   );
 
   useEffect(() => {

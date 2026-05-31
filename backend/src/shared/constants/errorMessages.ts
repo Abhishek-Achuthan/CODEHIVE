@@ -155,6 +155,7 @@ export const ERROR_MESSAGES = {
     ONLY_HOST_CAN_KICK: 'Only the room host can remove participants',
     CANNOT_KICK_HOST: 'The host cannot be removed from the room',
     CANNOT_KICK_SELF: 'Use leave room instead of removing yourself',
+    CANNOT_OVERRIDE_HOST: 'The host\'s permissions cannot be overridden',
   },
 
   POLL: {

@@ -36,6 +36,12 @@ export const regenerateRoomInvite = (roomId: string) =>
 export const kickParticipant = (roomId: string, userId: string) =>
     apiClient.post(API_ROUTES.ROOM.KICK_PARTICIPANT(roomId, userId));
 
+export const updateParticipantOverrides = (
+    roomId: string,
+    userId: string,
+    overrides: Record<string, boolean>,
+) => apiClient.put(API_ROUTES.ROOM.UPDATE_PARTICIPANT_OVERRIDES(roomId, userId), { overrides });
+
 export const createMessage = (roomId: string, data: CreateRoomMessageRequest) =>
     apiClient.post(API_ROUTES.ROOM.CREATE_MESSAGE(roomId), data);
 

@@ -165,10 +165,14 @@ import { IKickParticipantUseCase } from '../../application/useCase/interface/roo
 import { IGetRoomSettingsUseCase } from '../../application/useCase/interface/room/IGetRoomSettingsUseCase';
 import { GetRoomSettingsUseCase } from '../../application/useCase/room/GetRoomSettingsUseCase';
 import { KickParticipantUseCase } from '../../application/useCase/room/KickParticipantUseCase';
+import { IUpdateParticipantOverridesUseCase } from '../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
+import { UpdateParticipantOverridesUseCase } from '../../application/useCase/room/UpdateParticipantOverridesUseCase';
 import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
 import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
 import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
 import { AuthorizeCollaborationAccessUseCase } from '../../application/useCase/realtime/AuthorizeCollaborationAccessUseCase';
+import { IAuthorizeCollaborationWriteUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationWriteUseCase';
+import { AuthorizeCollaborationWriteUseCase } from '../../application/useCase/realtime/AuthorizeCollaborationWriteUseCase';
 import { ICreatePollUseCase } from '../../application/useCase/interface/poll/ICreatePollUseCase';
 import { CreatePollUseCase } from '../../application/useCase/poll/CreatePollUseCase';
 import { ISubmitPollVoteUseCase } from '../../application/useCase/interface/poll/ISubmitPollVoteUseCase';
@@ -532,6 +536,13 @@ export class UseCaseModule {
       useClass: GetRoomSettingsUseCase,
     });
 
+    container.register<IUpdateParticipantOverridesUseCase>(
+      'IUpdateParticipantOverridesUseCase',
+      {
+        useClass: UpdateParticipantOverridesUseCase,
+      },
+    );
+
     container.register<ICreatePollUseCase>('ICreatePollUseCase', {
       useClass: CreatePollUseCase,
     });
@@ -553,6 +564,13 @@ export class UseCaseModule {
       'IAuthorizeCollaborationAccessUseCase',
       {
         useClass: AuthorizeCollaborationAccessUseCase,
+      },
+    );
+
+    container.register<IAuthorizeCollaborationWriteUseCase>(
+      'IAuthorizeCollaborationWriteUseCase',
+      {
+        useClass: AuthorizeCollaborationWriteUseCase,
       },
     );
 

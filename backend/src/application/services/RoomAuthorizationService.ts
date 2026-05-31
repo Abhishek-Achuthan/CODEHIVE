@@ -17,6 +17,7 @@ import { FeatureKey } from '../../domain/types/FeatureKey';
 import { NotFoundError } from '../../core/errors/NotFoundError';
 import { ForbiddenError } from '../../core/errors/ForbiddenError';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
+import type { ILoggerService } from '../ports/logging/ILoggerService';
 
 export type RoomAccessMode = 'read' | 'write' | 'join' | 'collaboration';
 
@@ -44,6 +45,8 @@ export class RoomAuthorizationService {
     private readonly _roomInviteService: RoomInviteService,
     @inject(PermissionService)
     private readonly _permissionService: PermissionService,
+    @inject('ILoggerService')
+    private readonly _logger: ILoggerService,
   ) {}
 
   async assertRoomAccess(
@@ -192,6 +195,64 @@ export class RoomAuthorizationService {
     );
   }
 
+  /**
+   * Returns whether the user may mutate a collaboration document.
+   * Used to set Hocuspocus connection readOnly at authenticate time.
+   */
+  async isCollaborationWriteAllowed(
+    userId: string,
+    documentName: string,
+  ): Promise<boolean> {
+    const writeCapability = this._resolveWriteCapability(documentName);
+    if (!writeCapability) {
+      return true;
+    }
+
+    const roomId = this._parseCollaborationRoomId(documentName);
+
+    try {
+      const room = await this._getRoom(roomId);
+      this.assertLifecycleAccess(room, 'collaboration');
+
+      const participant = await this._getParticipant(room, userId);
+      if (!participant) {
+        return false;
+      }
+
+      const overrideValue = participant.overrides[writeCapability];
+      const result = this._permissionService.canPerform(
+        participant,
+        room.featureSnapshot,
+        writeCapability,
+      );
+
+      this._logger.info('Collaboration write access check', {
+        documentName,
+        roomId,
+        userId,
+        writeCapability,
+        participantRole: participant.role,
+        storedOverrides: participant.overrides,
+        overrideValue,
+        result,
+      });
+
+      return result;
+    } catch {
+      return false;
+    }
+  }
+
+  async assertCollaborationWriteAccess(
+    userId: string,
+    documentName: string,
+  ): Promise<void> {
+    const allowed = await this.isCollaborationWriteAllowed(userId, documentName);
+    if (!allowed) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
+    }
+  }
+
   assertLifecycleAccess(room: RoomEntity, accessMode: RoomAccessMode): void {
     switch (room.lifecycleStatus) {
       case RoomLifeCycleStatus.ACTIVE:
@@ -257,33 +318,68 @@ export class RoomAuthorizationService {
     }
   }
 
-  private _parseCollaborationTarget(documentName: string): CollaborationTarget {
+  private _parseCollaborationRoomId(documentName: string): string {
     if (documentName.includes(':')) {
       const [type, resourceId] = documentName.split(':');
       if (type === 'room' && resourceId) {
-        return {
-          roomId: resourceId,
-          capability: CapabilityKey.ROOM_CODE_EDIT,
-        };
+        return resourceId;
       }
     }
 
     const whiteboardMatch = /^room-([^-]+)-whiteboard$/.exec(documentName);
     if (whiteboardMatch?.[1]) {
-      return {
-        roomId: whiteboardMatch[1],
-        capability: CapabilityKey.ROOM_WHITEBOARD_DRAW,
-      };
+      return whiteboardMatch[1];
     }
 
     const publicNoteMatch = /^room-([^-]+)-public-note$/.exec(documentName);
     if (publicNoteMatch?.[1]) {
+      return publicNoteMatch[1];
+    }
+
+    throw new ForbiddenError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME);
+  }
+
+  private _parseCollaborationTarget(documentName: string): CollaborationTarget {
+    const roomId = this._parseCollaborationRoomId(documentName);
+
+    if (documentName.includes(':')) {
       return {
-        roomId: publicNoteMatch[1],
-        capability: CapabilityKey.ROOM_NOTES_EDIT,
+        roomId,
+        capability: CapabilityKey.ROOM_CODE_EDIT,
+      };
+    }
+
+    if (/^room-[^-]+-whiteboard$/.test(documentName)) {
+      return {
+        roomId,
+        // Connection gate: view capability — write is enforced via connection readOnly.
+        capability: CapabilityKey.ROOM_WHITEBOARD_VIEW,
+      };
+    }
+
+    if (/^room-[^-]+-public-note$/.test(documentName)) {
+      return {
+        roomId,
+        capability: CapabilityKey.ROOM_PUBLIC_NOTES_VIEW,
       };
     }
 
     throw new ForbiddenError(ERROR_MESSAGES.COLLABORATION.INVALID_DOCUMENT_NAME);
+  }
+
+  /**
+   * Resolves the write-level capability for a collaboration document.
+   * Returns null for document types where the connection gate already
+   * implies write access (e.g. code editor requires ROOM_CODE_EDIT to connect).
+   */
+  private _resolveWriteCapability(documentName: string): CapabilityKey | null {
+    const whiteboardMatch = /^room-([^-]+)-whiteboard$/.exec(documentName);
+    if (whiteboardMatch) return CapabilityKey.ROOM_WHITEBOARD_DRAW;
+
+    const publicNoteMatch = /^room-([^-]+)-public-note$/.exec(documentName);
+    if (publicNoteMatch) return CapabilityKey.ROOM_PUBLIC_NOTES_EDIT;
+
+    // Code editor: connection already requires ROOM_CODE_EDIT — no separate write gate.
+    return null;
   }
 }

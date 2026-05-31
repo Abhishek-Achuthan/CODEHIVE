@@ -83,6 +83,12 @@ export class RoomRoutes {
       this._roomController.handleKickParticipant.bind(this._roomController),
     );
 
+    this._router.put(
+      '/:roomId/participants/:userId/overrides',
+      this._authMiddleware.check,
+      this._roomController.handleUpdateParticipantOverrides.bind(this._roomController),
+    );
+
     this._router.use('/:roomId/messages', new MessageRoutes().getRoutes());
     this._router.use('/:roomId/polls', new PollRoutes().getRoutes());
     this._router.use('/:roomId/private-notes', new PrivateNoteRoutes().getRoutes());

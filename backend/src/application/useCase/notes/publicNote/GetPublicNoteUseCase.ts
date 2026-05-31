@@ -22,7 +22,7 @@ export class GetPublicNoteUseCase implements IGetPublicNoteUseCase {
     await this._roomAuthorizationService.assertCapability(
       roomId,
       userId,
-      CapabilityKey.ROOM_NOTES_VIEW,
+      CapabilityKey.ROOM_PUBLIC_NOTES_VIEW,
     );
 
     const note = await this._publicNoteRepo.findByRoomId(roomId);
