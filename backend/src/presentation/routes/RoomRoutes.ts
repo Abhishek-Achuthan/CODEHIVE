@@ -54,6 +54,12 @@ export class RoomRoutes {
     );
 
     this._router.post(
+      '/:roomId/end',
+      this._authMiddleware.check,
+      this._roomController.handleEndRoom.bind(this._roomController),
+    );
+
+    this._router.post(
       '/:roomId/invites',
       this._authMiddleware.check,
       this._roomController.handleCreateRoomInvite.bind(this._roomController),

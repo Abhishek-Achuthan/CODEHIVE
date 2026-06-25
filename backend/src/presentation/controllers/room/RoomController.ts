@@ -14,6 +14,7 @@ import type { IListRoomInvitesUseCase } from '../../../application/useCase/inter
 import type { IKickParticipantUseCase } from '../../../application/useCase/interface/room/IKickParticipantUseCase';
 import type { IGetRoomSettingsUseCase } from '../../../application/useCase/interface/room/IGetRoomSettingsUseCase';
 import type { IUpdateParticipantOverridesUseCase } from '../../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
+import type { IEndRoomUseCase } from '../../../application/useCase/interface/room/IEndRoomUseCase';
 import type { IPresenceService } from '../../../application/ports/presence/IPresenceService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import {
@@ -50,6 +51,8 @@ export class RoomController {
     private readonly _getRoomSettingsUseCase: IGetRoomSettingsUseCase,
     @inject('IUpdateParticipantOverridesUseCase')
     private readonly _updateParticipantOverridesUseCase: IUpdateParticipantOverridesUseCase,
+    @inject('IEndRoomUseCase')
+    private readonly _endRoomUseCase: IEndRoomUseCase,
   ) {}
 
   async handleCreateRoom(req: Request, res: Response, next: NextFunction) {
@@ -225,6 +228,21 @@ export class RoomController {
       await this._leaveRoomUseCase.execute({
         roomId,
         userId,
+      });
+
+      res.status(HttpStatus.NoContent).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleEndRoom(req: Request, res: Response, next: NextFunction) {
+    try {
+      const roomId = this.getRequiredParam(req, 'roomId');
+
+      await this._endRoomUseCase.execute({
+        roomId,
+        hostUserId: req.user.id,
       });
 
       res.status(HttpStatus.NoContent).send();

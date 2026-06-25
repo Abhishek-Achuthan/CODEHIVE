@@ -27,6 +27,9 @@ export const joinRoom = (roomId: string) =>
 export const leaveRoom = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.LEAVE_ROOM(roomId));
 
+export const endRoom = (roomId: string) =>
+    apiClient.post(API_ROUTES.ROOM.END_ROOM(roomId));
+
 export const createRoomInvite = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.CREATE_INVITE(roomId));
 

@@ -167,6 +167,8 @@ import { GetRoomSettingsUseCase } from '../../application/useCase/room/GetRoomSe
 import { KickParticipantUseCase } from '../../application/useCase/room/KickParticipantUseCase';
 import { IUpdateParticipantOverridesUseCase } from '../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import { UpdateParticipantOverridesUseCase } from '../../application/useCase/room/UpdateParticipantOverridesUseCase';
+import { IEndRoomUseCase } from '../../application/useCase/interface/room/IEndRoomUseCase';
+import { EndRoomUseCase } from '../../application/useCase/room/EndRoomUseCase';
 import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
 import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
 import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
@@ -542,6 +544,10 @@ export class UseCaseModule {
         useClass: UpdateParticipantOverridesUseCase,
       },
     );
+
+    container.register<IEndRoomUseCase>('IEndRoomUseCase', {
+      useClass: EndRoomUseCase,
+    });
 
     container.register<ICreatePollUseCase>('ICreatePollUseCase', {
       useClass: CreatePollUseCase,

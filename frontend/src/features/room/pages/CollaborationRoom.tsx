@@ -1,7 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useRoomSocket } from '../../../shared/socket/useRoomSocket';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
+import { RoomService } from '../../../services/roomService';
+import { BaseError } from '../../../shared/errors/BaseError';
 
 import type {
   RoomMessage,
@@ -15,6 +18,7 @@ import ParticipantsSidebar from '../components/ParticipantsSidebar';
 import EditorArea from '../components/EditorArea';
 import RightSidebar from '../components/RightSidebar';
 import { RoomSettingsModal } from '../components/RoomSettingsModal';
+import { EndRoomDialog } from '../components/EndRoomDialog';
 
 import { Loader2, AlertCircle } from 'lucide-react';
 import { getLifecycleBannerMessage } from '../authorization/lifecycleMessages';
@@ -40,6 +44,7 @@ const CollaborationRoom: React.FC = () => {
     closePoll,
     emitTyping,
     leaveRoom,
+    refreshRoom,
     typingUsers,
     hasRoomSnapshot,
     isRealtimeReady,
@@ -47,12 +52,31 @@ const CollaborationRoom: React.FC = () => {
   } = useRoomSocket(roomId || null);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [endRoomOpen, setEndRoomOpen] = useState(false);
+  const [endRoomLoading, setEndRoomLoading] = useState(false);
 
   const roomName = 'Project Collaboration Room';
 
   const handleLeaveRoom = () => {
     leaveRoom();
     navigate('/rooms');
+  };
+
+  const handleConfirmEndRoom = async () => {
+    if (!roomId) return;
+
+    setEndRoomLoading(true);
+    try {
+      await RoomService.endRoom(roomId);
+      await refreshRoom();
+      setEndRoomOpen(false);
+      toast.success('Room ended');
+    } catch (err) {
+      const message = err instanceof BaseError ? err.message : 'Failed to end room';
+      toast.error(message);
+    } finally {
+      setEndRoomLoading(false);
+    }
   };
 
   // Current user
@@ -138,6 +162,9 @@ const CollaborationRoom: React.FC = () => {
     );
   }, [formattedParticipants, user, currentUser]);
 
+  const canEndRoom =
+    authorization.isActive && finalCurrentUser?.role === 'HOST';
+
   const lifecycleBanner = getLifecycleBannerMessage(authorization);
 
   // Error state
@@ -183,7 +210,9 @@ const CollaborationRoom: React.FC = () => {
           roomName={roomName}
           roomId={roomId!}
           showInviteControls={authorization.canManageRoomPermissions}
+          showEndRoomControl={canEndRoom}
           onOpenSettings={() => setSettingsOpen(true)}
+          onEndRoom={() => setEndRoomOpen(true)}
           onLeave={handleLeaveRoom}
         />
 
@@ -191,6 +220,13 @@ const CollaborationRoom: React.FC = () => {
           roomId={roomId!}
           open={settingsOpen}
           onOpenChange={setSettingsOpen}
+        />
+
+        <EndRoomDialog
+          open={endRoomOpen}
+          loading={endRoomLoading}
+          onConfirm={handleConfirmEndRoom}
+          onClose={() => setEndRoomOpen(false)}
         />
 
         {lifecycleBanner && (

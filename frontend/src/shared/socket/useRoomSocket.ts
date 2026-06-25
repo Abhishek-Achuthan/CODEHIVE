@@ -20,6 +20,7 @@ export const useRoomSocket = (roomId: string | null) => {
     snapshot,
     error: connectionError,
     leaveRoom,
+    refreshRoom,
   } = useRoomConnection(roomId);
   const authorization = useMemo(() => buildRoomAuthorization(snapshot), [snapshot]);
 
@@ -97,6 +98,7 @@ export const useRoomSocket = (roomId: string | null) => {
     closePoll,
     emitTyping,
     leaveRoom,
+    refreshRoom,
     hasRoomSnapshot,
     isRealtimeReady,
     error: connectionError ?? featureError,

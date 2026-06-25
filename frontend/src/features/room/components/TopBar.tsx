@@ -7,7 +7,9 @@ interface TopBarProps {
   roomName: string;
   roomId: string;
   showInviteControls?: boolean;
+  showEndRoomControl?: boolean;
   onOpenSettings?: () => void;
+  onEndRoom?: () => void;
   onLeave: () => void;
 }
 
@@ -15,7 +17,9 @@ const TopBar: React.FC<TopBarProps> = ({
   roomName,
   roomId,
   showInviteControls = false,
+  showEndRoomControl = false,
   onOpenSettings,
+  onEndRoom,
   onLeave,
 }) => {
   const authorization = useRoomAuthorization();
@@ -84,6 +88,16 @@ const TopBar: React.FC<TopBarProps> = ({
           </button>
         </div>
         
+        {showEndRoomControl && (
+          <button
+            type="button"
+            onClick={onEndRoom}
+            className="flex items-center gap-2 px-3 py-1.5 bg-amber-600/10 hover:bg-amber-600/20 text-amber-400 rounded-lg text-sm font-medium transition-colors border border-amber-500/20"
+          >
+            <span>End Room</span>
+          </button>
+        )}
+
         <button
           onClick={onLeave}
           className="flex items-center gap-2 px-3 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-lg text-sm font-medium transition-colors border border-red-500/20"

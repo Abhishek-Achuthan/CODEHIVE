@@ -156,6 +156,8 @@ export const ERROR_MESSAGES = {
     CANNOT_KICK_HOST: 'The host cannot be removed from the room',
     CANNOT_KICK_SELF: 'Use leave room instead of removing yourself',
     CANNOT_OVERRIDE_HOST: 'The host\'s permissions cannot be overridden',
+    ONLY_CUSTOM_ROOMS_CAN_BE_ENDED: 'Only custom rooms can be ended manually',
+    CANNOT_END_ROOM: 'This room cannot be ended in its current state',
   },
 
   POLL: {

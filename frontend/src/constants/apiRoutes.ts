@@ -325,6 +325,7 @@ export const API_ROUTES = {
     GET_SETTINGS: (roomId: string) => `/rooms/${roomId}/settings`,
     JOIN_ROOM: (roomId: string) => `/rooms/${roomId}/join`,
     LEAVE_ROOM: (roomId: string) => `/rooms/${roomId}/leave`,
+    END_ROOM: (roomId: string) => `/rooms/${roomId}/end`,
     CREATE_MESSAGE: (roomId: string) => `/rooms/${roomId}/messages`,
     EDIT_MESSAGE: (roomId: string, messageId: string) =>
       `/rooms/${roomId}/messages/${messageId}`,

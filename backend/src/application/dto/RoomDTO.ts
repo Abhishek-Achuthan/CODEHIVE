@@ -63,6 +63,11 @@ export interface KickParticipantDTO {
   targetUserId: string;
 }
 
+export interface EndRoomDTO {
+  roomId: string;
+  hostUserId: string;
+}
+
 export interface UpdateParticipantOverridesDTO {
   roomId: string;
   executorUserId: string;

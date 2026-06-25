@@ -83,6 +83,14 @@ export class RoomService {
     }
   }
 
+  static async endRoom(roomId: string): Promise<void> {
+    try {
+      await RoomAPI.endRoom(roomId);
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   static async updateParticipantOverrides(
     roomId: string,
     userId: string,

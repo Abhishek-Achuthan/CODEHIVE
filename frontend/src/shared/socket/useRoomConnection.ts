@@ -21,6 +21,7 @@ interface RoomConnectionResult {
   snapshot: RoomSnapshot | null;
   error: string | null;
   leaveRoom: () => void;
+  refreshRoom: () => Promise<void>;
 }
 
 export const useRoomConnection = (
@@ -210,11 +211,27 @@ export const useRoomConnection = (
     setConnectionState("idle");
   }, [connectionState, isConnected, roomId, roomSocket]);
 
+  const refreshRoom = useCallback(async () => {
+    if (!roomId || !currentUserId) return;
+
+    try {
+      const response = await RoomAPI.joinRoom(roomId);
+      const nextSnapshot = response.data as RoomSnapshot;
+      if (nextSnapshot.roomId !== roomId) return;
+
+      setSnapshot(nextSnapshot);
+      setError(null);
+    } catch (refreshError: unknown) {
+      setError(toErrorMessage(refreshError));
+    }
+  }, [currentUserId, roomId]);
+
   return {
     connectionState,
     snapshot,
     error,
     leaveRoom,
+    refreshRoom,
   };
 };
 

@@ -51,6 +51,7 @@ import { PresenceSocketHandler } from '../../presentation/socket/PresenceSocketH
 import { IRoomEventEmitter } from '../../application/ports/realtime/IRoomEventEmitter';
 import { RoomEventEmitter } from '../../infrastructure/realtime/RoomEventEmitter';
 import { PermissionService } from '../../domain/services/PermissionService';
+import { RoomLifecycleTransitionService } from '../../domain/services/RoomLifecycleTransitionService';
 import { IMessageQueueService } from '../../application/ports/queue/IMessageQueueService';
 import { RabbitMQService } from '../../infrastructure/adapters/queue/RabbitMQService';
 import { ISessionActivationPublisher } from '../../application/ports/queue/ISessionActivationPublisher';
@@ -187,6 +188,10 @@ export class ServiceModule {
 
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);
+    container.registerSingleton(
+      RoomLifecycleTransitionService,
+      RoomLifecycleTransitionService,
+    );
     container.registerSingleton(RoomAuthorizationService, RoomAuthorizationService);
     container.register('frontendUrl', { useValue: env.frontendUrl ?? 'http://localhost:5173' });
     container.register('invitePepper', { useValue: env.secretKey ?? 'codehive-invite' });
