@@ -6,6 +6,7 @@ import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository
 import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import type { IPollRepository } from '../../../domain/interfaces/IPollRepository';
+import type { IRoomBanRepository } from '../../../domain/interfaces/IRoomBanRepository';
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { RoomRole } from '../../../domain/types/RoomRole';
@@ -26,6 +27,8 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     private readonly userRepository: IUserRepository,
     @inject('IPollRepository')
     private readonly pollRepository: IPollRepository,
+    @inject('IRoomBanRepository')
+    private readonly roomBanRepository: IRoomBanRepository,
     @inject(RoomAuthorizationService)
     private readonly roomAuthorizationService: RoomAuthorizationService,
     @inject(RoomInviteService)
@@ -68,6 +71,10 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
 
         if (joinAuthorization.validatedInvite) {
           await this.roomInviteService.recordInviteUse(joinAuthorization.validatedInvite.id);
+        }
+
+        if (joinAuthorization.liftBan) {
+          await this.roomBanRepository.delete(room.id, data.userId);
         }
       } catch (error: unknown) {
         if (this._isDuplicateKeyError(error)) {

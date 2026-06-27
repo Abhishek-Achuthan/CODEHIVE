@@ -45,9 +45,11 @@ export class PreviewInviteUseCase implements IPreviewInviteUseCase {
     let canJoin = !isFull;
 
     if (userId !== undefined) {
-      const isBanned = await this._roomBanRepository.exists(room.id, userId);
-      if (isBanned) {
-        canJoin = false;
+      const ban = await this._roomBanRepository.findByRoomAndUser(room.id, userId);
+      if (ban) {
+        if (invite.createdAt <= ban.bannedAt) {
+          canJoin = false;
+        }
       }
     }
 

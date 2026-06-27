@@ -124,51 +124,58 @@ export class RoomAuthorizationService {
     existingParticipant: ParticipantEntity | null;
     shouldCreateParticipant: boolean;
     validatedInvite?: RoomInviteEntity;
+    liftBan?: boolean;
   }> {
     const room = await this._getRoom(roomId);
 
-    if (await this._roomBanRepository.exists(roomId, userId)) {
-      throw new ForbiddenError(ERROR_MESSAGES.ROOM.REMOVED_FROM_ROOM);
-    }
-
-    const existingParticipant = await this._getParticipant(room, userId);
-    if (existingParticipant) {
-      return { room, existingParticipant, shouldCreateParticipant: false };
-    }
-
-    this.assertLifecycleAccess(room, 'join');
-
+    let validatedInvite: RoomInviteEntity | undefined;
     const requiresInvite =
       room.visibility === RoomVisibility.PRIVATE ||
       room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY ||
       room.admissionPolicy === RoomAdmissionPolicy.BOOKING_ONLY;
 
-    if (room.admissionPolicy === RoomAdmissionPolicy.CLOSED) {
-      throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
-    }
-
-    if (requiresInvite) {
-      if (!options?.inviteCode) {
-        throw new ForbiddenError(ERROR_MESSAGES.ROOM.INVITE_REQUIRED);
-      }
-
-      const validatedInvite = await this._roomInviteService.validateInviteCode(
+    if (options?.inviteCode) {
+      validatedInvite = await this._roomInviteService.validateInviteCode(
         options.inviteCode,
         roomId,
       );
+    } else if (requiresInvite) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.INVITE_REQUIRED);
+    }
 
+    let liftBan = false;
+    const ban = await this._roomBanRepository.findByRoomAndUser(roomId, userId);
+    if (ban) {
+      if (validatedInvite && validatedInvite.createdAt > ban.bannedAt) {
+        liftBan = true;
+      } else {
+        throw new ForbiddenError(ERROR_MESSAGES.ROOM.REMOVED_FROM_ROOM);
+      }
+    }
+
+    const existingParticipant = await this._getParticipant(room, userId);
+    if (existingParticipant) {
       return {
         room,
-        existingParticipant: null,
-        shouldCreateParticipant: true,
-        validatedInvite,
+        existingParticipant,
+        shouldCreateParticipant: false,
+        ...(validatedInvite && { validatedInvite }),
+        ...(liftBan && { liftBan }),
       };
+    }
+
+    this.assertLifecycleAccess(room, 'join');
+
+    if (room.admissionPolicy === RoomAdmissionPolicy.CLOSED) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);
     }
 
     return {
       room,
       existingParticipant: null,
       shouldCreateParticipant: true,
+      ...(validatedInvite && { validatedInvite }),
+      ...(liftBan && { liftBan }),
     };
   }
 

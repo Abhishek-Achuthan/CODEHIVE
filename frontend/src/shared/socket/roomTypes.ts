@@ -74,6 +74,11 @@ export interface RoomUserLeftPayload {
   userId: string;
 }
 
+export interface RoomParticipantRemovedPayload {
+  roomId: string;
+  userId: string;
+}
+
 export interface TypingStartPayload {
   roomId?: string;
   userId: string;
@@ -103,6 +108,7 @@ export interface ServerToClientRoomEvents {
   'message:deleted': (payload: MessageDeletedResponse) => void;
   'room:user-joined': (payload: RoomUserJoinedPayload) => void;
   'room:user-left': (payload: RoomUserLeftPayload) => void;
+  'room:participant-removed': (payload: RoomParticipantRemovedPayload) => void;
   'typing:start': (payload: TypingStartPayload) => void;
   'typing:stop': (payload: TypingStopPayload) => void;
   'poll:created': (payload: Poll) => void;

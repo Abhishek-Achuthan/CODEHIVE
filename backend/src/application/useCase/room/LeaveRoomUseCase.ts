@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { ILeaveRoomUseCase } from '../interface/room/ILeaveRoomUseCase';
+import type { IRoomEventEmitter } from '../../ports/realtime/IRoomEventEmitter';
 import { JoinRoomDTO } from '../../dto/RoomDTO';
 import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
@@ -13,6 +14,8 @@ export class LeaveRoomUseCase implements ILeaveRoomUseCase {
     private readonly roomRepository: IRoomRepository,
     @inject('IParticipantRepository')
     private readonly participantRepository: IParticipantRepository,
+    @inject('IRoomEventEmitter')
+    private readonly roomEventEmitter: IRoomEventEmitter,
   ) {}
 
   async execute(data: JoinRoomDTO): Promise<void> {
@@ -33,5 +36,9 @@ export class LeaveRoomUseCase implements ILeaveRoomUseCase {
     await this.participantRepository.removeByRoomAndUser(data.roomId, data.userId);
 
     await this.roomRepository.decrementParticipantCount(data.roomId);
+
+    this.roomEventEmitter.emitParticipantRemoved(data.roomId, {
+      userId: data.userId,
+    });
   }
 }

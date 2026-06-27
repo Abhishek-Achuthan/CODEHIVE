@@ -6,6 +6,7 @@ import type {
   RoomSocket,
   RoomUserJoinedPayload,
   RoomUserLeftPayload,
+  RoomParticipantRemovedPayload,
 } from './roomTypes';
 import type { RoomRole } from '../types/api/room';
 
@@ -106,6 +107,25 @@ export const useRoomPresence = ({
   );
 
   useRoomSocketEvent(socket, 'room:user-left', handleUserLeft);
+
+  const handleParticipantRemoved = useCallback(
+    (payload: RoomParticipantRemovedPayload) => {
+      if (payload.roomId !== roomId) return;
+
+      setParticipants((current) =>
+        current.filter((p) => p.id !== payload.userId)
+      );
+
+      setOnlineUserIds((current) => {
+        const next = new Set(current);
+        next.delete(payload.userId);
+        return next;
+      });
+    },
+    [roomId]
+  );
+
+  useRoomSocketEvent(socket, 'room:participant-removed', handleParticipantRemoved);
 
   const participantsWithPresence = useMemo<Participant[]>(
     () =>

@@ -5,6 +5,9 @@ import { useRoomSocket } from '../../../shared/socket/useRoomSocket';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
 import { RoomService } from '../../../services/roomService';
 import { BaseError } from '../../../shared/errors/BaseError';
+import { useSocket } from '../../../shared/socket/useSocket';
+import { useRoomSocketEvent } from '../../../shared/socket/roomSocketEvents';
+import type { RoomSocket } from '../../../shared/socket/roomTypes';
 
 import type {
   RoomMessage,
@@ -29,6 +32,8 @@ const CollaborationRoom: React.FC = () => {
   const navigate = useNavigate();
 
   const user = useAppSelector((state) => state.auth.user);
+  const { socket } = useSocket();
+  const roomSocket = socket as RoomSocket | null;
 
   const {
     snapshot,
@@ -61,6 +66,18 @@ const CollaborationRoom: React.FC = () => {
     leaveRoom();
     navigate('/rooms');
   };
+
+  useRoomSocketEvent(
+    roomSocket,
+    'room:participant-removed',
+    (payload) => {
+      if (user && payload.userId === user.id && payload.roomId === roomId) {
+        toast.error('You have been removed from the room.');
+        leaveRoom();
+        navigate('/rooms');
+      }
+    }
+  );
 
   const handleConfirmEndRoom = async () => {
     if (!roomId) return;

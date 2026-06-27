@@ -51,6 +51,10 @@ export interface IRoomEventEmitter {
     roomId: string,
     payload: Pick<RoomUserPresencePayload, 'userId'>,
   ): void;
+  emitParticipantRemoved(
+    roomId: string,
+    payload: { userId: string },
+  ): void;
   emitTypingStarted(
     roomId: string,
     excludedSocketId: string,

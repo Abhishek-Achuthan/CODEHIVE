@@ -47,6 +47,13 @@ export class RoomBanRepository implements IRoomBanRepository {
     return doc ? this._leanToEntity(doc) : null;
   }
 
+  async delete(roomId: string, userId: string): Promise<void> {
+    await this._model.deleteOne({
+      roomId: new Types.ObjectId(roomId),
+      userId: new Types.ObjectId(userId),
+    });
+  }
+
   private _toEntity(doc: RoomBanDocument): RoomBanEntity {
     return {
       id: doc._id.toString(),

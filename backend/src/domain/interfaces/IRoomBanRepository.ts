@@ -6,4 +6,6 @@ export interface IRoomBanRepository {
   exists(roomId: string, userId: string): Promise<boolean>;
 
   findByRoomAndUser(roomId: string, userId: string): Promise<RoomBanEntity | null>;
+
+  delete(roomId: string, userId: string): Promise<void>;
 }

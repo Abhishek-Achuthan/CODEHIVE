@@ -76,6 +76,16 @@ export class RoomEventEmitter implements IRoomEventEmitter {
     });
   }
 
+  emitParticipantRemoved(
+    roomId: string,
+    payload: { userId: string },
+  ): void {
+    this._socketService.emitToRoom(roomId, 'room:participant-removed', {
+      roomId,
+      ...payload,
+    });
+  }
+
   emitTypingStarted(
     roomId: string,
     excludedSocketId: string,

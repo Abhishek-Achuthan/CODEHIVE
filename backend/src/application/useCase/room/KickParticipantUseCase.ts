@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IKickParticipantUseCase } from '../interface/room/IKickParticipantUseCase';
+import type { IRoomEventEmitter } from '../../ports/realtime/IRoomEventEmitter';
 import { KickParticipantDTO } from '../../dto/RoomDTO';
 import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
@@ -21,6 +22,8 @@ export class KickParticipantUseCase implements IKickParticipantUseCase {
     private readonly _roomRepository: IRoomRepository,
     @inject('IRoomBanRepository')
     private readonly _roomBanRepository: IRoomBanRepository,
+    @inject('IRoomEventEmitter')
+    private readonly _roomEventEmitter: IRoomEventEmitter,
   ) {}
 
   async execute(data: KickParticipantDTO): Promise<void> {
@@ -70,5 +73,9 @@ export class KickParticipantUseCase implements IKickParticipantUseCase {
     );
 
     await this._roomRepository.decrementParticipantCount(data.roomId);
+
+    this._roomEventEmitter.emitParticipantRemoved(data.roomId, {
+      userId: data.targetUserId,
+    });
   }
 }
