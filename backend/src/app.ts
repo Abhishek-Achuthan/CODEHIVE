@@ -29,6 +29,7 @@ import { initializeRabbitMQConnection } from './config/rabbitMQConfig';
 import { RoomRoutes } from './presentation/routes/RoomRoutes';
 import { InviteRoutes } from './presentation/routes/InviteRoutes';
 import { PlanRoute } from './presentation/routes/PlanRoutes';
+import { CodeRoutes } from './presentation/routes/CodeRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -88,6 +89,7 @@ export class App {
     const inviteRoutes = new InviteRoutes();
     const planRoute = new PlanRoute();
     const subscriptionRoute = new SubscriptionRoutes();
+    const codeRoutes = new CodeRoutes();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -100,6 +102,7 @@ export class App {
     this._app.use('/api/invites', inviteRoutes.getRoutes());
     this._app.use('/api/plans', planRoute.getRoutes());
     this._app.use('/api/subscriptions', subscriptionRoute.getRoutes());
+    this._app.use('/api/code', codeRoutes.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

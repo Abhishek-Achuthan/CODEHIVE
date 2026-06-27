@@ -22,6 +22,10 @@ import {
   getCollaborationLockDescription,
   getCollaborationLockTitle,
 } from '../authorization/lifecycleMessages';
+import { useCodeExecution } from '../hooks/useCodeExecution';
+import TerminalPanel from './TerminalPanel';
+import { Language } from '../../../api/endpoints/codeAPI';
+import type * as monaco from 'monaco-editor';
 
 type ViewMode = 'editor' | 'whiteboard';
 
@@ -31,8 +35,15 @@ interface EditorAreaProps {
 
 const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>(Language.TYPESCRIPT);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  
   const user = useAppSelector((state) => state.auth.user);
   const authorization = useRoomAuthorization();
+  
+  // Use a ref to access the editor instance for fetching code content
+  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const { run, isRunning, result, error } = useCodeExecution(roomId);
 
   if (!roomId || !user) {
     return <div className="text-white p-4">Invalid session</div>;
@@ -42,6 +53,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
   const whiteboardAccessible = isWhiteboardAccessible(authorization);
   const collabLockTitle = getCollaborationLockTitle(authorization);
   const collabLockDescription = getCollaborationLockDescription(authorization);
+
 
   const views: {
     id: ViewMode;
@@ -90,6 +102,9 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
           canCollaborate={authorization.canUseCodeCollaboration}
           lockTitle={collabLockTitle}
           lockDescription={collabLockDescription}
+          language={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
+          editorRef={editorRef}
         />
       );
     }
@@ -104,6 +119,13 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
         lockDescription={collabLockDescription}
       />
     );
+  };
+
+  const handleRunCode = () => {
+    if (!editorRef.current) return;
+    const sourceCode = editorRef.current.getValue();
+    setIsTerminalOpen(true);
+    run(sourceCode, selectedLanguage);
   };
 
   return (
@@ -138,18 +160,31 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
 
         <div className="flex items-center gap-4">
           {viewMode === 'editor' && editorAccessible && (
-            <button
-              type="button"
-              disabled={!authorization.canRunCode}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border ${
-                authorization.canRunCode
-                  ? 'bg-green-600/20 text-green-500 hover:bg-green-600/30 border-green-500/20'
-                  : 'bg-gray-800 text-gray-600 border-gray-700 cursor-not-allowed'
-              }`}
-            >
-              <Play className="w-3 h-3 fill-current" />
-              <span>Run Code</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value as Language)}
+                className="bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded border border-gray-700 outline-none"
+              >
+                {Object.values(Language).map((lang) => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+              
+              <button
+                type="button"
+                onClick={handleRunCode}
+                disabled={!authorization.canRunCode || isRunning}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border ${
+                  authorization.canRunCode && !isRunning
+                    ? 'bg-green-600/20 text-green-500 hover:bg-green-600/30 border-green-500/20'
+                    : 'bg-gray-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                }`}
+              >
+                <Play className="w-3 h-3 fill-current" />
+                <span>{isRunning ? 'Running...' : 'Run Code'}</span>
+              </button>
+            </div>
           )}
 
           <button
@@ -161,8 +196,17 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-hidden group">
+      <div className="flex-1 relative overflow-hidden group flex flex-col">
         {renderMainContent()}
+
+        {isTerminalOpen && viewMode === 'editor' && (
+          <TerminalPanel 
+            result={result}
+            error={error}
+            isRunning={isRunning}
+            onClose={() => setIsTerminalOpen(false)}
+          />
+        )}
 
         {viewMode === 'editor' && editorAccessible && (
           <div className="absolute bottom-6 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -175,6 +219,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
               </button>
               <button
                 type="button"
+                onClick={() => setIsTerminalOpen(!isTerminalOpen)}
                 className="p-2 hover:bg-gray-700 rounded-md text-gray-400 hover:text-white"
               >
                 <Terminal className="w-4 h-4" />

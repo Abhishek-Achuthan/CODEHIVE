@@ -37,4 +37,10 @@ export const env = {
   roomArchiveGracePeriodMs: Number(
     process.env.ROOM_ARCHIVE_GRACE_PERIOD_MS || 7 * 24 * 60 * 60 * 1000,
   ),
+  judge0Url: process.env.JUDGE0_URL || 'http://localhost:2358',
+  judge0AuthToken: process.env.JUDGE0_AUTH_TOKEN || '',
+  judge0CpuTimeLimit: Number(process.env.JUDGE0_CPU_TIME_LIMIT || 2.0),
+  judge0MemoryLimit: Number(process.env.JUDGE0_MEMORY_LIMIT || 128000),
+  judge0WallTimeLimit: Number(process.env.JUDGE0_WALL_TIME_LIMIT || 5.0),
+  maxSourceCodeSize: Number(process.env.MAX_SOURCE_CODE_SIZE || 50000),
 };

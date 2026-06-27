@@ -5,11 +5,16 @@ import type * as monaco from 'monaco-editor';
 import { MonacoBinding } from 'y-monaco';
 import { createCollabProvider } from '../../collaboration/yjs/provider';
 
+import { Language } from '../../../api/endpoints/codeAPI';
+
 interface Props {
   roomId: string;
   canCollaborate: boolean;
   lockTitle: string;
   lockDescription: string;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
+  editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>;
 }
 
 const CollaborativeEditor: React.FC<Props> = ({
@@ -17,15 +22,18 @@ const CollaborativeEditor: React.FC<Props> = ({
   canCollaborate,
   lockTitle,
   lockDescription,
+  language,
+  onLanguageChange,
+  editorRef,
 }) => {
   const collabRef = useRef<ReturnType<typeof createCollabProvider> | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const localEditorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [collaborationError, setCollaborationError] = React.useState<string | null>(null);
 
   const bindEditor = useCallback(() => {
     const collab = collabRef.current;
-    const editor = editorRef.current;
+    const editor = localEditorRef.current;
     const model = editor?.getModel();
 
     if (!collab || !editor || !model || bindingRef.current) return;
@@ -53,9 +61,22 @@ const CollaborativeEditor: React.FC<Props> = ({
     });
     collabRef.current = collab;
 
+    // Observe language changes from other collaborators
+    const yMeta = collab.doc.getMap('meta');
+    const handleLanguageChange = () => {
+      const sharedLanguage = yMeta.get('language') as Language | undefined;
+      if (sharedLanguage && Object.values(Language).includes(sharedLanguage)) {
+        onLanguageChange(sharedLanguage);
+      }
+    };
+
+    yMeta.observe(handleLanguageChange);
+    handleLanguageChange();
+
     bindEditor();
 
     return () => {
+      yMeta.unobserve(handleLanguageChange);
       bindingRef.current?.destroy();
       bindingRef.current = null;
       collab.provider.destroy();
@@ -64,7 +85,17 @@ const CollaborativeEditor: React.FC<Props> = ({
         collabRef.current = null;
       }
     };
-  }, [roomId, bindEditor, canCollaborate]);
+  }, [roomId, bindEditor, canCollaborate, onLanguageChange]);
+
+  useEffect(() => {
+    if (canCollaborate && collabRef.current) {
+      const yMeta = collabRef.current.doc.getMap('meta');
+      if (yMeta.get('language') !== language) {
+        yMeta.set('language', language);
+      }
+    }
+  }, [language, canCollaborate]);
+
 
   if (!canCollaborate) {
     return (
@@ -97,10 +128,11 @@ const CollaborativeEditor: React.FC<Props> = ({
   return (
     <Editor
       height="100%"
-      defaultLanguage="typescript"
+      language={language}
       defaultValue=""
       onMount={(editor) => {
-        editorRef.current = editor;
+        localEditorRef.current = editor;
+        editorRef.current = editor; // Pass it up to EditorArea
         bindEditor();
       }}
       theme="vs-dark"

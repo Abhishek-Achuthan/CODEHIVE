@@ -65,6 +65,8 @@ import { RoomAuthorizationService } from '../../application/services/RoomAuthori
 import { RoomInviteService } from '../../application/services/RoomInviteService';
 import { EntitlementResolutionService } from '../../application/services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../application/services/RoomFeatureSnapshotFactory';
+import { ICodeExecutionService } from '../../application/ports/code/ICodeExecutionService';
+import { Judge0Adapter } from '../../infrastructure/adapters/code/Judge0Adapter';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -139,6 +141,10 @@ export class ServiceModule {
 
     container.register<IStripeWebhookDispatcher>('IStripeWebhookDispatcher', {
       useClass: StripeWebhookDispatcher,
+    });
+
+    container.register<ICodeExecutionService>('ICodeExecutionService', {
+      useClass: Judge0Adapter,
     });
 
     container.registerSingleton<ISocketService>('ISocketService', SocketService);
