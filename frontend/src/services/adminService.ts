@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import * as AdminApi from "../api/endpoints/adminApi";
 import { AxiosError } from "axios";
-import type { ListUsersApiResponse, ListMentorApplicationsApiResponse, ListPlansApiResponse, PlanApiResponse } from "../shared/types/api/admin";
+import type { ListUsersApiResponse, ListMentorApplicationsApiResponse } from "../shared/types/api/admin";
 
 export class AdminService {
   static async listUsers(
@@ -29,6 +29,33 @@ export class AdminService {
   static async updateUserStatus(id: string, status: boolean) {
     try {
       const response = await AdminApi.updateUserStatus(id, status);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  static async banUser(userId: string, durationInDays: number | null, reason: string) {
+    try {
+      const response = await AdminApi.banUser(userId, durationInDays, reason);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  static async unbanUser(userId: string) {
+    try {
+      const response = await AdminApi.unbanUser(userId);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  static async warnUser(userId: string, reason: string) {
+    try {
+      const response = await AdminApi.warnUser(userId, reason);
       return response.data;
     } catch (error) {
       this.handleError(error);

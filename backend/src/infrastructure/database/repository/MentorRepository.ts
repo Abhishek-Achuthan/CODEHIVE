@@ -103,6 +103,11 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
       ...(doc.primaryExpertise !== undefined && { primaryExpertise: doc.primaryExpertise }),
       ...(doc.experienceLevel !== undefined && { experienceLevel: doc.experienceLevel }),
       ...(doc.mentorAppliedAt !== undefined && { mentorAppliedAt: doc.mentorAppliedAt }),
+      ...(doc.banExpirationDate !== undefined ? { banExpirationDate: doc.banExpirationDate } : {}),
+      ...(doc.banReason !== undefined ? { banReason: doc.banReason } : {}),
+      ...(doc.bannedAt !== undefined ? { bannedAt: doc.bannedAt } : {}),
+      ...(doc.bannedBy !== undefined ? { bannedBy: doc.bannedBy ? doc.bannedBy.toString() : null } : {}),
+      warnCount: doc.warnCount ?? 0,
     };
   }
 
@@ -128,6 +133,11 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
     if (data.mentorAppliedAt !== undefined) doc.mentorAppliedAt = data.mentorAppliedAt;
     if (data.mentorStatus !== undefined) doc.mentorStatus = data.mentorStatus;
     if (data.role !== undefined) doc.role = data.role;
+    if (data.banExpirationDate !== undefined) doc.banExpirationDate = data.banExpirationDate;
+    if (data.banReason !== undefined) doc.banReason = data.banReason;
+    if (data.bannedAt !== undefined) doc.bannedAt = data.bannedAt;
+    if (data.bannedBy !== undefined) doc.bannedBy = data.bannedBy ? new mongoose.Types.ObjectId(data.bannedBy) : null;
+    if (data.warnCount !== undefined) doc.warnCount = data.warnCount;
     return doc;
   }
 
@@ -155,6 +165,11 @@ export class MentorRepository extends GenericRepository<UserDocument, UserEntity
       ...(data.githubUrl !== undefined && { githubUrl: data.githubUrl }),
       ...(data.linkedInUrl !== undefined && { linkedInUrl: data.linkedInUrl }),
       ...(data.websiteUrl !== undefined && { websiteUrl: data.websiteUrl }),
+      ...(data.banExpirationDate !== undefined ? { banExpirationDate: data.banExpirationDate } : {}),
+      ...(data.banReason !== undefined ? { banReason: data.banReason } : {}),
+      ...(data.bannedAt !== undefined ? { bannedAt: data.bannedAt } : {}),
+      ...(data.bannedBy !== undefined ? { bannedBy: data.bannedBy ? data.bannedBy.toString() : null } : {}),
+      warnCount: data.warnCount ?? 0,
     };
   }
 }

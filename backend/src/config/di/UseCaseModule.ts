@@ -129,7 +129,19 @@ import { IApplyForMentorUseCase } from '../../application/useCase/interface/user
 import { ApplyForMentorUseCase } from '../../application/useCase/user/ApplyForMentorUseCase';
 import { IListMentorApplicationUseCase } from '../../application/useCase/interface/admin/IListMentorApplicationUseCase';
 import { ListMentorApplicationUseCase } from '../../application/useCase/admin/ListMentorApplicationUseCase';
-import { IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
+import { type IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
+import { IGetAdminReportsUseCase } from '../../application/useCase/admin/GetAdminReportsUseCase';
+import { GetAdminReportsUseCase } from '../../application/useCase/admin/GetAdminReportsUseCase';
+import { IUpdateReportStatusUseCase } from '../../application/useCase/admin/UpdateReportStatusUseCase';
+import { UpdateReportStatusUseCase } from '../../application/useCase/admin/UpdateReportStatusUseCase';
+import { IGetAdminRoomChatHistoryUseCase } from '../../application/useCase/admin/GetAdminRoomChatHistoryUseCase';
+import { GetAdminRoomChatHistoryUseCase } from '../../application/useCase/admin/GetAdminRoomChatHistoryUseCase';
+import { IBanUserUseCase } from '../../application/useCase/admin/BanUserUseCase';
+import { BanUserUseCase } from '../../application/useCase/admin/BanUserUseCase';
+import { IUnbanUserUseCase } from '../../application/useCase/admin/UnbanUserUseCase';
+import { UnbanUserUseCase } from '../../application/useCase/admin/UnbanUserUseCase';
+import { IWarnUserUseCase } from '../../application/useCase/admin/WarnUserUseCase';
+import { WarnUserUseCase } from '../../application/useCase/admin/WarnUserUseCase';
 import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
 import { IViewMentorProfileUseCase } from '../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
 import { ViewMentorProfileUseCase } from '../../application/useCase/mentor/ViewMentorProfileUseCase';
@@ -167,6 +179,8 @@ import { GetRoomSettingsUseCase } from '../../application/useCase/room/GetRoomSe
 import { KickParticipantUseCase } from '../../application/useCase/room/KickParticipantUseCase';
 import { IUpdateParticipantOverridesUseCase } from '../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import { UpdateParticipantOverridesUseCase } from '../../application/useCase/room/UpdateParticipantOverridesUseCase';
+import { IReportParticipantUseCase } from '../../application/useCase/interface/room/IReportParticipantUseCase';
+import { ReportParticipantUseCase } from '../../application/useCase/room/ReportParticipantUseCase';
 import { IEndRoomUseCase } from '../../application/useCase/interface/room/IEndRoomUseCase';
 import { EndRoomUseCase } from '../../application/useCase/room/EndRoomUseCase';
 import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
@@ -308,6 +322,30 @@ export class UseCaseModule {
         useClass: UpdateMentorStatusUseCase,
       },
     );
+
+    container.register<IGetAdminReportsUseCase>('IGetAdminReportsUseCase', {
+      useClass: GetAdminReportsUseCase,
+    });
+
+    container.register<IUpdateReportStatusUseCase>('IUpdateReportStatusUseCase', {
+      useClass: UpdateReportStatusUseCase,
+    });
+
+    container.register<IGetAdminRoomChatHistoryUseCase>('IGetAdminRoomChatHistoryUseCase', {
+      useClass: GetAdminRoomChatHistoryUseCase,
+    });
+
+    container.register<IBanUserUseCase>('IBanUserUseCase', {
+      useClass: BanUserUseCase,
+    });
+
+    container.register<IUnbanUserUseCase>('IUnbanUserUseCase', {
+      useClass: UnbanUserUseCase,
+    });
+
+    container.register<IWarnUserUseCase>('IWarnUserUseCase', {
+      useClass: WarnUserUseCase,
+    });
 
     //----------------------------------QnA----------------------------------------//
 
@@ -544,6 +582,10 @@ export class UseCaseModule {
         useClass: UpdateParticipantOverridesUseCase,
       },
     );
+
+    container.register<IReportParticipantUseCase>('IReportParticipantUseCase', {
+      useClass: ReportParticipantUseCase,
+    });
 
     container.register<IEndRoomUseCase>('IEndRoomUseCase', {
       useClass: EndRoomUseCase,

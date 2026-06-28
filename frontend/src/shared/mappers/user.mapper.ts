@@ -15,6 +15,10 @@ export function mapAdminUserListItemToView(
     email: user.email,
     role: user.role as UserRole,
     isBlocked: user.isBlocked,
+    banExpirationDate: user.banExpirationDate,
+    banReason: user.banReason,
+    bannedAt: user.bannedAt,
+    warnCount: user.warnCount || 0,
   };
 }
 

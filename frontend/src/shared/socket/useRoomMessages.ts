@@ -72,7 +72,11 @@ export const useRoomMessages = ({
     if (payload.roomId !== roomId) return;
 
     setMessages((current) =>
-      current.filter((message) => message.id !== payload.messageId)
+      current.map((message) =>
+        message.id === payload.messageId
+          ? { ...message, isDeleted: true }
+          : message
+      )
     );
   }, [roomId]);
 
@@ -136,7 +140,11 @@ export const useRoomMessages = ({
       RoomAPI.deleteMessage(roomId, messageId)
         .then(() => {
           setMessages((current) =>
-            current.filter((message) => message.id !== messageId)
+            current.map((message) =>
+              message.id === messageId
+                ? { ...message, isDeleted: true }
+                : message
+            )
           );
         })
         .catch((messageError: unknown) => {

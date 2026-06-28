@@ -135,6 +135,7 @@ const CollaborationRoom: React.FC = () => {
         hour: '2-digit',
         minute: '2-digit',
       }),
+      isDeleted: msg.isDeleted,
       isEdited: msg.isEdited,
     }));
   }, [socketMessages, user]);

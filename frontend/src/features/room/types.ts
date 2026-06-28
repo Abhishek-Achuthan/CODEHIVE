@@ -19,6 +19,7 @@ export interface RoomMessage {
   parentMessageId?: string;
   content: string;
   timestamp: string;
+  isDeleted?: boolean;
   isEdited?: boolean;
 }
 

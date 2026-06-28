@@ -27,6 +27,11 @@ export interface UserDocument extends Document {
   experienceLevel: string;
   /** Reference to the active subscription Plan. Null = no paid plan. */
   planId?: Types.ObjectId | null;
+  banExpirationDate?: Date | null;
+  banReason?: string | null;
+  bannedAt?: Date | null;
+  bannedBy?: Types.ObjectId | null;
+  warnCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +60,11 @@ export type UserLeanDoc = {
   experienceLevel: string;
   /** Reference to the active subscription Plan. Null = no paid plan. */
   planId?: Types.ObjectId | null;
+  banExpirationDate?: Date | null;
+  banReason?: string | null;
+  bannedAt?: Date | null;
+  bannedBy?: Types.ObjectId | null;
+  warnCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -107,6 +117,11 @@ export const UserSchema = new Schema<UserDocument>(
     primaryExpertise: { type: String, required: false },
     experienceLevel: { type: String, required: false },
     planId: { type: Schema.Types.ObjectId, ref: 'Plan', required: false, default: null, index: true },
+    banExpirationDate: { type: Date, required: false, default: null },
+    banReason: { type: String, required: false, default: null },
+    bannedAt: { type: Date, required: false, default: null },
+    bannedBy: { type: Schema.Types.ObjectId, ref: 'User', required: false, default: null },
+    warnCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

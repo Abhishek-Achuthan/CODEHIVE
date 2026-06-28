@@ -39,6 +39,8 @@ import { IRoomInviteRepository } from '../../domain/interfaces/IRoomInviteReposi
 import { RoomInviteRepository } from '../../infrastructure/database/repository/RoomInviteRepository';
 import { IRoomBanRepository } from '../../domain/interfaces/IRoomBanRepository';
 import { RoomBanRepository } from '../../infrastructure/database/repository/RoomBanRepository';
+import { IRoomReportRepository } from '../../domain/interfaces/IRoomReportRepository';
+import { RoomReportRepository } from '../../infrastructure/database/repository/RoomReportRepository';
 import { IMessageRepository } from '../../domain/interfaces/IMessageRepository';
 import { MessageRepository } from '../../infrastructure/database/repository/MessageRepository';
 import { IPollRepository } from '../../domain/interfaces/IPollRepository';
@@ -121,6 +123,10 @@ export class RepositoryModule {
 
     container.register<IRoomBanRepository>('IRoomBanRepository', {
       useClass: RoomBanRepository,
+    });
+
+    container.register<IRoomReportRepository>('IRoomReportRepository', {
+      useClass: RoomReportRepository,
     });
 
     container.register<IMessageRepository>('IMessageRepository', {

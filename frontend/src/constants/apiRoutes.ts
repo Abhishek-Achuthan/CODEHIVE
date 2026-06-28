@@ -53,6 +53,18 @@ export const API_ROUTES = {
       return `/admin/list-applications?${query.toString()}`;
     },
     UPDATE_MENTOR_STATUS: `/admin/update-mentor-status`,
+    REPORTS: (params: { page?: number; limit?: number }) => {
+      const query = new URLSearchParams({
+        page: (params.page ?? 1).toString(),
+        limit: (params.limit ?? 10).toString(),
+      });
+      return `/admin/reports?${query.toString()}`;
+    },
+    UPDATE_REPORT_STATUS: (id: string) => `/admin/reports/${id}/status`,
+    ROOM_CHAT_HISTORY: (roomId: string) => `/admin/reports/rooms/${roomId}/chat-history`,
+    BAN_USER: (userId: string) => `/admin/users/${userId}/ban`,
+    UNBAN_USER: (userId: string) => `/admin/users/${userId}/unban`,
+    WARN_USER: (userId: string) => `/admin/users/${userId}/warn`,
   },
 
   SUBSCRIPTIONS: {
@@ -349,6 +361,8 @@ export const API_ROUTES = {
       `/rooms/${roomId}/participants/${userId}/kick`,
     UPDATE_PARTICIPANT_OVERRIDES: (roomId: string, userId: string) =>
       `/rooms/${roomId}/participants/${userId}/overrides`,
+    REPORT_PARTICIPANT: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/report`,
   },
 
   INVITE: {

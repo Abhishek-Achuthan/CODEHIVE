@@ -7,6 +7,7 @@ export interface MessageDocument extends Document {
   senderId: Types.ObjectId;
   parentMessageId?: Types.ObjectId;
   content: string;
+  isDeleted: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +20,7 @@ export type MessageLeanDoc = {
   senderId: Types.ObjectId;
   parentMessageId?: Types.ObjectId;
   content: string;
+  isDeleted: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -48,6 +50,10 @@ export const MessageSchema = new Schema(
       required: true,
       trim: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true }
 );

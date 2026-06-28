@@ -45,6 +45,9 @@ export const updateParticipantOverrides = (
     overrides: Record<string, boolean>,
 ) => apiClient.put(API_ROUTES.ROOM.UPDATE_PARTICIPANT_OVERRIDES(roomId, userId), { overrides });
 
+export const reportParticipant = (roomId: string, userId: string, data: { reason: string; description?: string }) =>
+    apiClient.post(API_ROUTES.ROOM.REPORT_PARTICIPANT(roomId, userId), data);
+
 export const createMessage = (roomId: string, data: CreateRoomMessageRequest) =>
     apiClient.post(API_ROUTES.ROOM.CREATE_MESSAGE(roomId), data);
 

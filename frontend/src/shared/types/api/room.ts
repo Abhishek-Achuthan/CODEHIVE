@@ -103,6 +103,7 @@ export interface RoomMessageResponse {
   avatarUrl?: string;
   parentMessageId?: string;
   content: string;
+  isDeleted?: boolean;
   createdAt: string;
   isEdited?: boolean;
 }

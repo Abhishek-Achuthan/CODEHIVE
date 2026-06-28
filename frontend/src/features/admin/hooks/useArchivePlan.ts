@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { AdminService } from "../../../services/adminService";
+import { PlanService } from "../../../services/planService";
 import toast from "react-hot-toast";
 
 export function useArchivePlan() {
@@ -8,7 +8,7 @@ export function useArchivePlan() {
   const archivePlan = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      const data = await AdminService.archivePlan(id);
+      const data = await PlanService.archivePlan(id);
       toast.success("Plan archived successfully");
       return { success: true, data };
     } catch (error) {

@@ -83,6 +83,14 @@ export class RoomService {
     }
   }
 
+  static async reportParticipant(roomId: string, userId: string, reason: string, description?: string): Promise<void> {
+    try {
+      await RoomAPI.reportParticipant(roomId, userId, { reason, description });
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   static async endRoom(roomId: string): Promise<void> {
     try {
       await RoomAPI.endRoom(roomId);

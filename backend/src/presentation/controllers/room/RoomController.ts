@@ -15,6 +15,7 @@ import type { IKickParticipantUseCase } from '../../../application/useCase/inter
 import type { IGetRoomSettingsUseCase } from '../../../application/useCase/interface/room/IGetRoomSettingsUseCase';
 import type { IUpdateParticipantOverridesUseCase } from '../../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import type { IEndRoomUseCase } from '../../../application/useCase/interface/room/IEndRoomUseCase';
+import type { IReportParticipantUseCase } from '../../../application/useCase/interface/room/IReportParticipantUseCase';
 import type { IPresenceService } from '../../../application/ports/presence/IPresenceService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import {
@@ -51,6 +52,8 @@ export class RoomController {
     private readonly _getRoomSettingsUseCase: IGetRoomSettingsUseCase,
     @inject('IUpdateParticipantOverridesUseCase')
     private readonly _updateParticipantOverridesUseCase: IUpdateParticipantOverridesUseCase,
+    @inject('IReportParticipantUseCase')
+    private readonly _reportParticipantUseCase: IReportParticipantUseCase,
     @inject('IEndRoomUseCase')
     private readonly _endRoomUseCase: IEndRoomUseCase,
   ) {}
@@ -246,6 +249,30 @@ export class RoomController {
       });
 
       res.status(HttpStatus.NoContent).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleReportParticipant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const roomId = this.getRequiredParam(req, 'roomId');
+      const reportedUserId = this.getRequiredParam(req, 'userId');
+      const { reason, description } = req.body;
+      
+      if (!reason) {
+        throw new BadRequestError('Reason is required for reporting');
+      }
+
+      await this._reportParticipantUseCase.execute(
+        roomId,
+        req.user.id,
+        reportedUserId,
+        reason,
+        description
+      );
+
+      res.status(HttpStatus.Created).send();
     } catch (error) {
       next(error);
     }

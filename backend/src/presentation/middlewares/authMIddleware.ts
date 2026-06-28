@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IJWTService } from '../../application/ports/security/IJWTService';
 import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
+import { ForbiddenError } from '../../core/errors/ForbiddenError';
 import { JwtPayload } from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
 import { UserRole } from '../../domain/types/UserRole';
@@ -40,8 +41,26 @@ export class AuthMiddleware {
 
       const user = await this._userRepository.find(decoded.sub);
 
-      if (!user || user.isBlocked) {
+      if (!user) {
         return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED));
+      }
+
+      if (user.isBlocked) {
+        if (user.banExpirationDate && user.banExpirationDate < new Date()) {
+          user.isBlocked = false;
+          user.banExpirationDate = null;
+          user.banReason = null;
+          user.bannedAt = null;
+          user.bannedBy = null;
+          await this._userRepository.update(user.id, user);
+        } else {
+          const reasonMsg = user.banReason ? ` Reason: ${user.banReason}` : '';
+          const expirationMsg = user.banExpirationDate 
+            ? `until ${user.banExpirationDate.toLocaleDateString()}` 
+            : 'permanently';
+          
+          return next(new ForbiddenError(`Your account has been suspended ${expirationMsg}.${reasonMsg}`));
+        }
       }
 
       req.user = {

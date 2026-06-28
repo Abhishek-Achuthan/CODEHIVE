@@ -1,15 +1,17 @@
 import apiClient from '../apiClient';
 
-export enum Language {
-  JAVASCRIPT = 'javascript',
-  TYPESCRIPT = 'typescript',
-  PYTHON = 'python',
-  JAVA = 'java',
-  CPP = 'cpp',
-  C = 'c',
-  GO = 'go',
-  RUST = 'rust',
-}
+export const Language = {
+  JAVASCRIPT: 'javascript',
+  TYPESCRIPT: 'typescript',
+  PYTHON: 'python',
+  JAVA: 'java',
+  CPP: 'cpp',
+  C: 'c',
+  GO: 'go',
+  RUST: 'rust',
+} as const;
+
+export type Language = typeof Language[keyof typeof Language];
 
 export interface CodeExecutionResult {
   stdout: string | null;

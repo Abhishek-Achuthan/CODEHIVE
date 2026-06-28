@@ -89,6 +89,12 @@ export class RoomRoutes {
       this._roomController.handleKickParticipant.bind(this._roomController),
     );
 
+    this._router.post(
+      '/:roomId/participants/:userId/report',
+      this._authMiddleware.check,
+      this._roomController.handleReportParticipant.bind(this._roomController),
+    );
+
     this._router.put(
       '/:roomId/participants/:userId/overrides',
       this._authMiddleware.check,

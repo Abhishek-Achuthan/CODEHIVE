@@ -4,6 +4,7 @@ export interface MessageEntity {
     senderId: string;
     parentMessageId?: string;
     content: string;
+    isDeleted?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

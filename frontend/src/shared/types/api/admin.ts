@@ -10,6 +10,10 @@ export interface AdminUserListItemApi {
   role: string;
   isBlocked: boolean;
   createdAt?: string;
+  banExpirationDate?: string | null;
+  banReason?: string | null;
+  bannedAt?: string | null;
+  warnCount?: number;
 }
 
 

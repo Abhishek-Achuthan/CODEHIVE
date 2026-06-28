@@ -26,4 +26,10 @@ export interface UserEntity {
   role: UserRole;
 
   planId?: string | null;
+
+  banExpirationDate?: Date | null;
+  banReason?: string | null;
+  bannedAt?: Date | null;
+  bannedBy?: string | null;
+  warnCount: number;
 }

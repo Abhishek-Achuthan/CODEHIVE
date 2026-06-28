@@ -28,6 +28,7 @@ const UserManagementPage = lazy(() => import("../features/admin/pages/UserManage
 const MentorManagementPage = lazy(() => import("../features/admin/pages/MentorManagementPage").then(module => ({ default: module.MentorManagementPage })));
 const MentorApplicationsManagementPage = lazy(() => import("../features/admin/pages/MentorApplicationsManagementPage").then(module => ({ default: module.MentorApplicationsManagementPage })));
 const PlanManagementPage = lazy(() => import("../features/admin/pages/PlanManagementPage").then(module => ({ default: module.PlanManagementPage })));
+const ReportsManagementPage = lazy(() => import("../features/admin/pages/ReportsManagementPage").then(module => ({ default: module.ReportsManagementPage })));
 
 // QnA pages
 const QnaLandigPage = lazy(() => import("../features/qna/page/QnaLandingPage"));
@@ -136,6 +137,7 @@ export default function AppRoutes() {
             <Route path="/admin/mentors" element={<MentorManagementPage />} />
             <Route path="/admin/applications" element={<MentorApplicationsManagementPage />} />
             <Route path="/admin/plans" element={<PlanManagementPage />} />
+            <Route path="/admin/reports" element={<ReportsManagementPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

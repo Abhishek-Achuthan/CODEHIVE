@@ -13,6 +13,7 @@ export interface SendMessageResponseDTO {
     avatarUrl?:string;
     parentMessageId?: string;
     content:string;
+    isDeleted?:boolean;
     createdAt:Date;
 }
 

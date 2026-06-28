@@ -5,7 +5,7 @@ import UserModel from '../models/UserModel';
 import { UserDocument, UserLeanDoc } from '../schemas/UserSchema';
 import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
 
 export class UserRepository
@@ -106,6 +106,11 @@ export class UserRepository
       githubId,
       experienceLevel,
       primaryExpertise,
+      banExpirationDate,
+      banReason,
+      bannedAt,
+      bannedBy,
+      warnCount,
     } = data;
     const doc: Partial<UserDocument> = {};
     if (email !== undefined) doc.email = email;
@@ -128,6 +133,11 @@ export class UserRepository
     if (githubId !== undefined) doc.githubId = githubId;
     if (experienceLevel !== undefined) doc.experienceLevel = experienceLevel;
     if (primaryExpertise !== undefined) doc.primaryExpertise = primaryExpertise;
+    if (banExpirationDate !== undefined) doc.banExpirationDate = banExpirationDate;
+    if (banReason !== undefined) doc.banReason = banReason;
+    if (bannedAt !== undefined) doc.bannedAt = bannedAt;
+    if (bannedBy !== undefined) doc.bannedBy = bannedBy ? new Types.ObjectId(bannedBy) : null;
+    if (warnCount !== undefined) doc.warnCount = warnCount;
 
     return doc;
   }
@@ -159,6 +169,11 @@ export class UserRepository
       mentorStatus: doc.mentorStatus,
       ...(doc.primaryExpertise !== undefined ? { primaryExpertise: doc.primaryExpertise } : {}),
       ...(doc.experienceLevel !== undefined ? { experienceLevel: doc.experienceLevel } : {}),
+      ...(doc.banExpirationDate !== undefined ? { banExpirationDate: doc.banExpirationDate } : {}),
+      ...(doc.banReason !== undefined ? { banReason: doc.banReason } : {}),
+      ...(doc.bannedAt !== undefined ? { bannedAt: doc.bannedAt } : {}),
+      ...(doc.bannedBy !== undefined ? { bannedBy: doc.bannedBy ? doc.bannedBy.toString() : null } : {}),
+      warnCount: doc.warnCount ?? 0,
     };
   }
 
@@ -189,6 +204,11 @@ export class UserRepository
       ...(doc.mentorAppliedAt !== undefined
         ? { mentorAppliedAt: doc.mentorAppliedAt }
         : {}),
+      ...(doc.banExpirationDate !== undefined ? { banExpirationDate: doc.banExpirationDate } : {}),
+      ...(doc.banReason !== undefined ? { banReason: doc.banReason } : {}),
+      ...(doc.bannedAt !== undefined ? { bannedAt: doc.bannedAt } : {}),
+      ...(doc.bannedBy !== undefined ? { bannedBy: doc.bannedBy ? doc.bannedBy.toString() : null } : {}),
+      warnCount: doc.warnCount ?? 0,
     };
   }
 }

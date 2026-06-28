@@ -99,7 +99,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
     setValue,
     formState: { errors, isValid },
   } = useForm<PlanFormValues>({
-    resolver: zodResolver(planFormSchema),
+    resolver: zodResolver(planFormSchema) as any,
     mode: "onChange",
     defaultValues: {
       name: "",
@@ -236,7 +236,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
 
         {/* Form */}
         <form
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={handleSubmit(handleFormSubmit as any)}
           className="modal-scrollbar overflow-y-auto overflow-x-hidden max-h-[70vh] px-6 py-5 space-y-6 min-w-0"
         >
           {/* Basic Info */}

@@ -247,9 +247,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         {messages.map((m) => {
           const isMe = m.senderId === currentUser.id;
           const canDeleteMessage = isMe
-            ? authorization.canDeleteOwnChat
-            : authorization.canModerateParticipants;
-          const canEditMessage = isMe && authorization.canWriteChat;
+            ? authorization.canDeleteOwnChat && !m.isDeleted
+            : authorization.canModerateParticipants && !m.isDeleted;
+          const canEditMessage = isMe && authorization.canWriteChat && !m.isDeleted;
 
           const parentMsg =
             m.parentMessageId
@@ -262,8 +262,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             ? currentUser.avatar
             : `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.senderId}`;
 
-          const messageData =
-            getVisibleContent(
+          const messageData = m.isDeleted 
+            ? { text: 'This message was deleted.', hasMore: false, visibleLines: 1 }
+            : getVisibleContent(
               m.id,
               m.content
             );
@@ -352,32 +353,34 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 {/* Bubble Area */}
                <div className="relative flex items-start group/bubble">
                   {/* Menu Trigger */}
-                  {isMe ? (
-                    <div className="absolute top-0 -left-8 opacity-0 group-hover/bubble:opacity-100 transition-opacity">
-                      <button
-                        onClick={() =>
-                          setContextMenuMessageId(
-                            m.id
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-300 rounded hover:bg-[#3e3e42]"
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="absolute top-0 -right-8 opacity-0 group-hover/bubble:opacity-100 transition-opacity">
-                      <button
-                        onClick={() =>
-                          setContextMenuMessageId(
-                            m.id
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-300 rounded hover:bg-[#3e3e42]"
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </div>
+                  {!m.isDeleted && (
+                    isMe ? (
+                      <div className="absolute top-0 -left-8 opacity-0 group-hover/bubble:opacity-100 transition-opacity">
+                        <button
+                          onClick={() =>
+                            setContextMenuMessageId(
+                              m.id
+                            )
+                          }
+                          className="p-1 text-gray-500 hover:text-gray-300 rounded hover:bg-[#3e3e42]"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="absolute top-0 -right-8 opacity-0 group-hover/bubble:opacity-100 transition-opacity">
+                        <button
+                          onClick={() =>
+                            setContextMenuMessageId(
+                              m.id
+                            )
+                          }
+                          className="p-1 text-gray-500 hover:text-gray-300 rounded hover:bg-[#3e3e42]"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )
                   )}
 
                   {/* Context Menu */}
@@ -436,7 +439,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                         : 'bg-gray-100 text-gray-800 rounded-tl-none border border-gray-200'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap break-words break-all leading-6">
+                    <p className={`whitespace-pre-wrap break-words break-all leading-6 ${m.isDeleted ? 'italic text-gray-500' : ''}`}>
                       {messageData.text}
                     </p>
 

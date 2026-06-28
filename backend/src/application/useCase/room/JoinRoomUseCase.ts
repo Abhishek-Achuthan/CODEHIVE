@@ -105,6 +105,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
             : 'Unknown User',
           content: msg.content,
           createdAt: msg.createdAt,
+          ...(msg.isDeleted !== undefined && { isDeleted: msg.isDeleted }),
           isEdited:
             msg.updatedAt &&
             msg.createdAt &&

@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 import { RoomService } from '../../../services/roomService';
 import ParticipantPermissionsPanel from './ParticipantPermissionsPanel';
+import ReportParticipantModal from './ReportParticipantModal';
+import { Flag } from 'lucide-react';
 
 interface ParticipantsSidebarProps {
   participants: Participant[];
@@ -17,6 +19,7 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
   const [participantOverrides, setParticipantOverrides] = useState<
     Record<string, Record<string, boolean>>
   >({});
+  const [reportingParticipant, setReportingParticipant] = useState<{ id: string; name: string } | null>(null);
 
   const onlineCount = participants.filter(p => p.status === 'online').length;
   const authorization = useRoomAuthorization();
@@ -81,6 +84,10 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
               !participant.isCurrentUser &&
               participant.role !== 'HOST';
 
+            const canReportThisParticipant =
+              !isCollapsed &&
+              !participant.isCurrentUser;
+
             return (
               <div key={participant.id}>
                 {/* Participant row */}
@@ -121,10 +128,11 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
                     )}
                   </div>
 
-                  {/* Action buttons — only shown when not collapsed and not the HOST */}
-                  {canManageThisParticipant && (
+                  {/* Action buttons */}
+                  {((canManageThisParticipant) || (canReportThisParticipant)) && (
                     <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       {/* Permission management toggle */}
+                      {canManageThisParticipant && (
                       <button
                         type="button"
                         title="Manage permissions"
@@ -137,6 +145,19 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
                       >
                         <SlidersHorizontal className="w-3.5 h-3.5" />
                       </button>
+                      )}
+
+                      {/* Report button */}
+                      {canReportThisParticipant && (
+                        <button
+                          type="button"
+                          title="Report participant"
+                          onClick={() => setReportingParticipant({ id: participant.id, name: participant.name })}
+                          className="p-1 text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          <Flag className="w-3.5 h-3.5" />
+                        </button>
+                      )}
 
                       {/* Kick button */}
                       {authorization.canModerateParticipants && (
@@ -177,6 +198,16 @@ const ParticipantsSidebar: React.FC<ParticipantsSidebarProps> = ({ participants,
           })}
         </div>
       </div>
+
+      {reportingParticipant && (
+        <ReportParticipantModal
+          isOpen={!!reportingParticipant}
+          onClose={() => setReportingParticipant(null)}
+          roomId={roomId}
+          participantId={reportingParticipant.id}
+          participantName={reportingParticipant.name}
+        />
+      )}
 
       <div className={`p-4 border-t border-gray-800 bg-[#161b22]/30 flex items-center transition-all ${
         isCollapsed ? 'justify-center' : 'justify-between'
