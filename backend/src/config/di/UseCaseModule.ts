@@ -140,8 +140,9 @@ import { IBanUserUseCase } from '../../application/useCase/admin/BanUserUseCase'
 import { BanUserUseCase } from '../../application/useCase/admin/BanUserUseCase';
 import { IUnbanUserUseCase } from '../../application/useCase/admin/UnbanUserUseCase';
 import { UnbanUserUseCase } from '../../application/useCase/admin/UnbanUserUseCase';
-import { IWarnUserUseCase } from '../../application/useCase/admin/WarnUserUseCase';
-import { WarnUserUseCase } from '../../application/useCase/admin/WarnUserUseCase';
+import { IWarnUserUseCase, WarnUserUseCase } from '../../application/useCase/admin/WarnUserUseCase';
+import { IGetDashboardMetricsUseCase } from '../../application/useCase/admin/GetDashboardMetricsUseCase';
+import { GetDashboardMetricsUseCase } from '../../application/useCase/admin/GetDashboardMetricsUseCase';
 import { UpdateMentorStatusUseCase } from '../../application/useCase/admin/UpdateMentorStatusUseCase';
 import { IViewMentorProfileUseCase } from '../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
 import { ViewMentorProfileUseCase } from '../../application/useCase/mentor/ViewMentorProfileUseCase';
@@ -345,6 +346,10 @@ export class UseCaseModule {
 
     container.register<IWarnUserUseCase>('IWarnUserUseCase', {
       useClass: WarnUserUseCase,
+    });
+
+    container.register<IGetDashboardMetricsUseCase>('IGetDashboardMetricsUseCase', {
+      useClass: GetDashboardMetricsUseCase,
     });
 
     //----------------------------------QnA----------------------------------------//

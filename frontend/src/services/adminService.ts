@@ -86,6 +86,16 @@ export class AdminService {
     }
   }
 
+  static async getDashboardMetrics(timeFilterUser?: string, timeFilterRevenue?: string) {
+    try {
+      const response = await AdminApi.getDashboardMetrics(timeFilterUser, timeFilterRevenue);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
   private static handleError(error: unknown) {
     if (error instanceof AxiosError) {
       toast.error(error.response?.data?.message || "Something went wrong");

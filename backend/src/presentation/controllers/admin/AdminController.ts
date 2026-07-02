@@ -14,6 +14,7 @@ import type { IGetAdminRoomChatHistoryUseCase } from '../../../application/useCa
 import type { IBanUserUseCase } from '../../../application/useCase/admin/BanUserUseCase';
 import type { IUnbanUserUseCase } from '../../../application/useCase/admin/UnbanUserUseCase';
 import type { IWarnUserUseCase } from '../../../application/useCase/admin/WarnUserUseCase';
+import type { IGetDashboardMetricsUseCase } from '../../../application/useCase/admin/GetDashboardMetricsUseCase';
 
 @injectable()
 export class AdminController {
@@ -38,6 +39,8 @@ export class AdminController {
     private readonly _unbanUserUseCase: IUnbanUserUseCase,
     @inject('IWarnUserUseCase')
     private readonly _warnUserUseCase: IWarnUserUseCase,
+    @inject('IGetDashboardMetricsUseCase')
+    private readonly _getDashboardMetricsUseCase: IGetDashboardMetricsUseCase,
   ) { }
 
   async handleListUsers(req: Request, res: Response, next: NextFunction) {
@@ -204,6 +207,17 @@ export class AdminController {
 
       const updatedUser = await this._warnUserUseCase.execute(userId, reason);
       res.status(HttpStatus.OK).json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetDashboardMetrics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const timeFilterUser = req.query.timeFilterUser as string || '30';
+      const timeFilterRevenue = req.query.timeFilterRevenue as string || '30';
+      const data = await this._getDashboardMetricsUseCase.execute(timeFilterUser, timeFilterRevenue);
+      res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }

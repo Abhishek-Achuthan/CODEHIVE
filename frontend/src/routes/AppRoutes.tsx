@@ -24,6 +24,7 @@ const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
 const WalletPage = lazy(() => import("../features/wallet/pages/WalletPage"));
 
 // Admin pages
+const AdminDashboardPage = lazy(() => import("../features/admin/pages/AdminDashboardPage").then(module => ({ default: module.AdminDashboardPage })));
 const UserManagementPage = lazy(() => import("../features/admin/pages/UserManagementPage").then(module => ({ default: module.UserManagementPage })));
 const MentorManagementPage = lazy(() => import("../features/admin/pages/MentorManagementPage").then(module => ({ default: module.MentorManagementPage })));
 const MentorApplicationsManagementPage = lazy(() => import("../features/admin/pages/MentorApplicationsManagementPage").then(module => ({ default: module.MentorApplicationsManagementPage })));
@@ -133,6 +134,7 @@ export default function AppRoutes() {
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
+            <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/mentors" element={<MentorManagementPage />} />
             <Route path="/admin/applications" element={<MentorApplicationsManagementPage />} />

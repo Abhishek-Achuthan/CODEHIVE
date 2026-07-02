@@ -65,6 +65,7 @@ export const API_ROUTES = {
     BAN_USER: (userId: string) => `/admin/users/${userId}/ban`,
     UNBAN_USER: (userId: string) => `/admin/users/${userId}/unban`,
     WARN_USER: (userId: string) => `/admin/users/${userId}/warn`,
+    DASHBOARD: "/admin/dashboard",
   },
 
   SUBSCRIPTIONS: {

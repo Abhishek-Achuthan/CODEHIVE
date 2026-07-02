@@ -56,3 +56,13 @@ export const unbanUser = (userId: string) => {
 export const warnUser = (userId: string, reason: string) => {
   return apiClient.patch(API_ROUTES.ADMIN.WARN_USER(userId), { reason });
 };
+
+export const getDashboardMetrics = (timeFilterUser?: string, timeFilterRevenue?: string) => {
+  const query = new URLSearchParams();
+  if (timeFilterUser) query.append('timeFilterUser', timeFilterUser);
+  if (timeFilterRevenue) query.append('timeFilterRevenue', timeFilterRevenue);
+  const qStr = query.toString() ? `?${query.toString()}` : '';
+  
+  const baseUrl = typeof API_ROUTES.ADMIN.DASHBOARD === 'function' ? API_ROUTES.ADMIN.DASHBOARD() : `${API_ROUTES.ADMIN.DASHBOARD}${qStr}`;
+  return apiClient.get(baseUrl);
+};

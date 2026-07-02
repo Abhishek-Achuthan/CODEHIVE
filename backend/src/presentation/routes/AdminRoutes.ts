@@ -14,6 +14,12 @@ export class AdminRoute {
 
   private setRoutes() {
     this._router.get(
+      '/dashboard',
+      authMiddleware.check,
+      roleMiddleware.authorize([UserRole.ADMIN]),
+      this._adminController.handleGetDashboardMetrics.bind(this._adminController)
+    );
+    this._router.get(
       '/users',
       authMiddleware.check,
       roleMiddleware.authorize([UserRole.ADMIN]),

@@ -53,6 +53,8 @@ import { PublicNoteRepository } from '../../infrastructure/database/repository/P
 import { IPublicNoteRepository } from '../../domain/interfaces/IPublicNoteRepository';
 import { ISubscriptionRepository } from '../../domain/interfaces/ISubscriptionRepository';
 import { SubscriptionRepository } from '../../infrastructure/database/repository/SubscriptionRepository';
+import { IAdminDashboardRepository } from '../../domain/interfaces/IAdminDashboardRepository';
+import { AdminDashboardRepository } from '../../infrastructure/database/repository/AdminDashboardRepository';
 
 export class RepositoryModule {
   static registerModules(): void {
@@ -61,6 +63,10 @@ export class RepositoryModule {
 
     container.register<IUserRepository>('IUserRepository', {
       useClass: UserRepository
+    });
+
+    container.register<IAdminDashboardRepository>('IAdminDashboardRepository', {
+      useClass: AdminDashboardRepository
     });
 
     //-------------------------------QuestionRepo----------------------------------//
