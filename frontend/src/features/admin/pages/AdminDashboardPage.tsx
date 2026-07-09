@@ -292,7 +292,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={subscriptionDistribution} innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="value" stroke="none">
-                      {subscriptionDistribution.map((entry: any, index: number) => (
+                      {subscriptionDistribution.map((_entry: { name: string; value: number }, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

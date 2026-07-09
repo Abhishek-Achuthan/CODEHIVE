@@ -73,6 +73,9 @@ export const planController = container.resolve(PlanController);
 
 export const subscriptionController = container.resolve(SubscriptionController);
 
+import { NotificationController } from '../../presentation/controllers/notifications/NotificationController';
+export const notificationController = container.resolve(NotificationController);
+
 export const socketHandlers: ISocketHandler[] = [
   container.resolve(RoomSocketHandler),
   container.resolve(ChatSocketHandler),

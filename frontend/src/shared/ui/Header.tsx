@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { MdPersonOutline } from "react-icons/md";
 import { IoWalletOutline, IoLogOutOutline, IoChevronDown } from "react-icons/io5";
+import { NotificationBell } from "../../features/notifications/components/NotificationBell";
 
 export default function Header() {
   const { logOut, user } = useLogout();
@@ -69,8 +70,10 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* User Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Notifications & User Dropdown */}
+          <div className="flex items-center space-x-4">
+            {user && <NotificationBell />}
+            <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 group"
@@ -121,6 +124,7 @@ export default function Header() {
                 </div>
               </div>
             )}
+          </div>
           </div>
         </div>
       </div>

@@ -7,6 +7,10 @@ import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
+import { SessionModel } from '../models/session/SessionModel';
+import ParticipantModel from '../models/room/ParicipantModel';
+import QuestionModel from '../models/qna/QuestionModel';
+import AnswerModel from '../models/qna/AnswerModel';
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
@@ -21,6 +25,24 @@ export class UserRepository
     if (!userDoc) return null;
 
     return this.toEntity(userDoc);
+  }
+
+  async getUserActivityStats(userId: string): Promise<{ totalSessionsTaken: number, joinedRooms: number, qnaContributions: number }> {
+    const objId = new Types.ObjectId(userId);
+
+
+    const [totalSessionsTaken,joinedRooms,questionsCount,answersCount] = await Promise.all([
+      SessionModel.countDocuments({$or:[{userId: objId},{mentorId:objId}]}),
+      ParticipantModel.countDocuments({userId:objId}),
+      QuestionModel.countDocuments({authorId:objId}),
+      AnswerModel.countDocuments({authorId:objId})
+    ])
+
+    return {
+      totalSessionsTaken,
+      joinedRooms,
+      qnaContributions: questionsCount + answersCount
+    };
   }
 
   async findMentorApplications(currentPage?:number ,pageSize?:number,search?:string): Promise<PaginationResult<UserEntity>> {

@@ -25,6 +25,7 @@ import Footer from "../../../shared/ui/Footer";
 
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
+import { useMyActivity } from "../hooks/useMyActivity";
 
 import type { MentorChecklist, ProfileUser } from "../types";
 import { MentorStatus } from "../types";
@@ -37,6 +38,7 @@ export default function ProfilePage() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
   const { subscription, loading: subscriptionLoading } = useMySubscription();
+  const { activity } = useMyActivity();
 
   const billingInfo = useMemo(() => {
     if (subscription) {
@@ -191,9 +193,9 @@ export default function ProfilePage() {
             right={
               <RightColumn>
                 <ActivityCard
-                  totalSessionsLabel="5"
-                  joinedRoomsLabel="10"
-                  qnaContributionsLabel="7"
+                  totalSessionsLabel={activity?.totalSessionsTaken?.toString() ?? "0"}
+                  joinedRoomsLabel={activity?.joinedRooms?.toString() ?? "0"}
+                  qnaContributionsLabel={activity?.qnaContributions?.toString() ?? "0"}
                 />
 
                 <PlanBillingCard

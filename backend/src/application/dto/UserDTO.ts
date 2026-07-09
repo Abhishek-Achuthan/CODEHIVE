@@ -80,6 +80,12 @@ interface IUserProfileResponseDTO {
   experienceLevel?: string | undefined;
 }
 
+interface IUserActivityStatsDTO {
+  totalSessionsTaken: number;
+  joinedRooms: number;
+  qnaContributions: number;
+}
+
 
 export type {
   IUserRegisterInputDTO,
@@ -87,7 +93,8 @@ export type {
   IUserLoginResponseDTO,
   IUserListResponseDTO,
   UpdateUserProfileDTO,
-  IUserProfileResponseDTO
+  IUserProfileResponseDTO,
+  IUserActivityStatsDTO
 };
 
 

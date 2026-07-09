@@ -56,6 +56,7 @@ export const ERROR_MESSAGES = {
   USER: {
     ALREADY_EXIST: 'User already exist',
     NOT_FOUND: 'User not found',
+    ID_REQUIRED: 'User ID is required',
     UPDATE_FAILED: 'Failed to update user status',
     ALREADY_MENTOR: 'User is already a mentor',
     APPLY_FOR_MENTOR_FAILED: 'Failed to apply for mentor',

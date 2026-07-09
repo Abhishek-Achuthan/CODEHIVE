@@ -127,6 +127,8 @@ import { IAddAvailabilityExceptionUseCase } from '../../application/useCase/inte
 import { AddAvailabilityExceptionUseCase } from '../../application/useCase/mentor/AddAvailabilityExceptionUseCase';
 import { IApplyForMentorUseCase } from '../../application/useCase/interface/user/IApplyForMentorUseCase';
 import { ApplyForMentorUseCase } from '../../application/useCase/user/ApplyForMentorUseCase';
+import { IGetUserActivityUseCase } from '../../application/useCase/interface/user/IGetUserActivityUseCase';
+import { GetUserActivityUseCase } from '../../application/useCase/user/GetUserActivityUseCase';
 import { IListMentorApplicationUseCase } from '../../application/useCase/interface/admin/IListMentorApplicationUseCase';
 import { ListMentorApplicationUseCase } from '../../application/useCase/admin/ListMentorApplicationUseCase';
 import { type IUpdateMentorStatusUseCase } from '../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
@@ -749,6 +751,10 @@ export class UseCaseModule {
 
     container.register<IApplyForMentorUseCase>('IApplyForMentorUseCase', {
       useClass: ApplyForMentorUseCase,
+    });
+
+    container.register<IGetUserActivityUseCase>('IGetUserActivityUseCase', {
+      useClass: GetUserActivityUseCase,
     });
 
     //---------------------------------Poll---------------------------------------//

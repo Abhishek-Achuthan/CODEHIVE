@@ -63,6 +63,6 @@ export const getDashboardMetrics = (timeFilterUser?: string, timeFilterRevenue?:
   if (timeFilterRevenue) query.append('timeFilterRevenue', timeFilterRevenue);
   const qStr = query.toString() ? `?${query.toString()}` : '';
   
-  const baseUrl = typeof API_ROUTES.ADMIN.DASHBOARD === 'function' ? API_ROUTES.ADMIN.DASHBOARD() : `${API_ROUTES.ADMIN.DASHBOARD}${qStr}`;
+  const baseUrl = `${API_ROUTES.ADMIN.DASHBOARD}${qStr}`;
   return apiClient.get(baseUrl);
 };

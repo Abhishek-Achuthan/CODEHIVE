@@ -67,6 +67,8 @@ import { EntitlementResolutionService } from '../../application/services/Entitle
 import { RoomFeatureSnapshotFactory } from '../../application/services/RoomFeatureSnapshotFactory';
 import { ICodeExecutionService } from '../../application/ports/code/ICodeExecutionService';
 import { Judge0Adapter } from '../../infrastructure/adapters/code/Judge0Adapter';
+import { INotificationService } from '../../application/ports/notifications/INotificationService';
+import { NotificationService } from '../../application/services/NotificationService';
 
 export class ServiceModule {
   static registerModules(): void {
@@ -202,7 +204,8 @@ export class ServiceModule {
     container.register('frontendUrl', { useValue: env.frontendUrl ?? 'http://localhost:5173' });
     container.register('invitePepper', { useValue: env.secretKey ?? 'codehive-invite' });
     container.registerSingleton(RoomInviteService, RoomInviteService);
-    container.registerSingleton(EntitlementResolutionService, EntitlementResolutionService);
     container.registerSingleton(RoomFeatureSnapshotFactory, RoomFeatureSnapshotFactory);
+    container.registerSingleton<INotificationService>('INotificationService', NotificationService);
   }
 }
+

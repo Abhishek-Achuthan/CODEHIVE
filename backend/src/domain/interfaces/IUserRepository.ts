@@ -15,5 +15,7 @@ export interface IUserRepository
     search?: string
   ): Promise<PaginationResult<UserEntity>>;
 
-  findMentorApplications(currentPage?:number,pageSize?:number,search?:string):Promise<PaginationResult<UserEntity>>
+  findMentorApplications(currentPage?:number,pageSize?:number,search?:string):Promise<PaginationResult<UserEntity>>;
+
+  getUserActivityStats(userId: string): Promise<{ totalSessionsTaken: number, joinedRooms: number, qnaContributions: number }>;
 }

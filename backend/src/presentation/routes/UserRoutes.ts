@@ -43,12 +43,19 @@ export class UserRoute {
       this._userController
     )
    );
-   this._router.post('/me/mentor-applications',
-    this._authMiddleware.check,
-    this._userController.handleApplyForMentor.bind(
-      this._userController
-    )
-   )
+    this._router.post('/me/mentor-applications',
+      this._authMiddleware.check,
+      this._userController.handleApplyForMentor.bind(
+        this._userController
+      )
+    );
+    this._router.get(
+      '/me/activity',
+      this._authMiddleware.check,
+      this._userController.handleGetMyActivity.bind(
+        this._userController
+      )
+    );
 
   }
 

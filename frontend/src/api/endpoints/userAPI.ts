@@ -8,3 +8,6 @@ export const updateMyProfile = (data: UpdateMyProfileRequest) =>
 export const applyForMentor = () => 
   apiClient.post(API_ROUTES.USER.APPLY_FOR_MENTOR);
 
+export const getMyActivity = () =>
+  apiClient.get(API_ROUTES.USER.GET_MY_ACTIVITY);
+

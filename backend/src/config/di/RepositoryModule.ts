@@ -55,9 +55,14 @@ import { ISubscriptionRepository } from '../../domain/interfaces/ISubscriptionRe
 import { SubscriptionRepository } from '../../infrastructure/database/repository/SubscriptionRepository';
 import { IAdminDashboardRepository } from '../../domain/interfaces/IAdminDashboardRepository';
 import { AdminDashboardRepository } from '../../infrastructure/database/repository/AdminDashboardRepository';
+import { INotificationRepository } from '../../domain/interfaces/INotificationRepository';
+import { NotificationRepository } from '../../infrastructure/database/repository/NotificationRepository';
 
 export class RepositoryModule {
   static registerModules(): void {
+    container.register<INotificationRepository>('INotificationRepository', {
+      useClass: NotificationRepository
+    });
 
     //-------------------------------UserRepo--------------------------------------//
 

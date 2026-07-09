@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
     response =>response,
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig;
-        if(error.response?.status === HttpStatusCode.Unauthorized && originalRequest && !originalRequest._retry) {
+        if(error.response?.status === HttpStatusCode.Unauthorized && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
             originalRequest._retry = true;
             try {
 
@@ -51,7 +51,7 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
                
             } catch (refreshError) {
-                if(refreshError instanceof AxiosError && refreshError.response?.status===HttpStatusCode.Forbidden){
+                if(refreshError instanceof AxiosError && (refreshError.response?.status===HttpStatusCode.Forbidden || refreshError.response?.status===HttpStatusCode.Unauthorized)){
                     store.dispatch(logout());
                 }
                 return Promise.reject(refreshError);

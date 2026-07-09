@@ -30,6 +30,7 @@ import { RoomRoutes } from './presentation/routes/RoomRoutes';
 import { InviteRoutes } from './presentation/routes/InviteRoutes';
 import { PlanRoute } from './presentation/routes/PlanRoutes';
 import { CodeRoutes } from './presentation/routes/CodeRoutes';
+import { NotificationRoute } from './presentation/routes/NotificationRoutes';
 
 export class App {
   private readonly _app: Express;
@@ -90,6 +91,7 @@ export class App {
     const planRoute = new PlanRoute();
     const subscriptionRoute = new SubscriptionRoutes();
     const codeRoutes = new CodeRoutes();
+    const notificationRoute = new NotificationRoute();
     this._app.use('/api/auth', authRoute.getRoutes());
     this._app.use('/api/admin', adminRoute.getRoutes());
     this._app.use('/api/qna', qnaRoutes.getRoutes());
@@ -103,6 +105,7 @@ export class App {
     this._app.use('/api/plans', planRoute.getRoutes());
     this._app.use('/api/subscriptions', subscriptionRoute.getRoutes());
     this._app.use('/api/code', codeRoutes.getRoutes());
+    this._app.use('/api/notifications', notificationRoute.getRoutes());
   }
 
   private configErrorHanldingMiddleWares() {

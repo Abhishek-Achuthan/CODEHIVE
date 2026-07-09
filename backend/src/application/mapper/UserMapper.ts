@@ -1,5 +1,5 @@
 import { UserEntity } from '../../domain/entities/UserEntity';
-import { IUserListResponseDTO, IUserLoginResponseDTO, IUserProfileResponseDTO } from '../dto/UserDTO';
+import { IUserActivityStatsDTO, IUserListResponseDTO, IUserLoginResponseDTO, IUserProfileResponseDTO } from '../dto/UserDTO';
 
 export class UserMapper {
   public static toLoginResponse(
@@ -66,6 +66,16 @@ export class UserMapper {
 
   public static toUserListArray(users: UserEntity[]): IUserListResponseDTO[] {
     return users.map((user) => this.toUserListResponse(user));
+  }
+
+  public static toUserActivityStatsDTO(
+    stats: { totalSessionsTaken: number; joinedRooms: number; qnaContributions: number }
+  ): IUserActivityStatsDTO {
+    return {
+      totalSessionsTaken: stats.totalSessionsTaken,
+      joinedRooms: stats.joinedRooms,
+      qnaContributions: stats.qnaContributions,
+    };
   }
 
 }

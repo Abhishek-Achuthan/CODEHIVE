@@ -19,7 +19,8 @@ export const API_ROUTES = {
 
   USER: {
     UPDATE_MY_PROFILE: "/users/me/profile",
-    APPLY_FOR_MENTOR: "/users/me/mentor-applications"
+    APPLY_FOR_MENTOR: "/users/me/mentor-applications",
+    GET_MY_ACTIVITY: "/users/me/activity",
   },
 
   ADMIN: {
@@ -369,5 +370,17 @@ export const API_ROUTES = {
   INVITE: {
     PREVIEW: (code: string) => `/invites/${code}`,
     JOIN: (code: string) => `/invites/${code}/join`,
+  },
+  
+  NOTIFICATIONS: {
+    LIST: (params?: { page?: number; limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      const query = qp.toString();
+      return query ? `/notifications?${query}` : `/notifications`;
+    },
+    MARK_AS_READ: (id: string) => `/notifications/${id}/read`,
+    MARK_ALL_AS_READ: "/notifications/read-all",
   },
 };
