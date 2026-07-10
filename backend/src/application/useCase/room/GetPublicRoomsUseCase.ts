@@ -15,7 +15,7 @@ export class GetPublicRoomsUseCase implements IGetPublicRoomsUseCase {
   async execute(
     data: GetPublicRoomsDTO,
   ): Promise<PaginationResult<RoomListItemDTO>> {
-    const result = await this.roomRepository.findAllPublic(data.page, data.limit, data.search);
+    const result = await this.roomRepository.findAllPublic(data.page, data.limit, data.search, data.dateFrom, data.status);
 
     return {
       ...result,

@@ -28,6 +28,8 @@ function useEffectiveSearch(searchTerm: string, delay: number): string {
 
 export function useMyRooms(enabled: boolean) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const effectiveSearch = useEffectiveSearch(searchTerm, SEARCH_DEBOUNCE_MS);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +66,8 @@ export function useMyRooms(enabled: boolean) {
           page: currentPage,
           limit: DEFAULT_LIMIT,
           search: effectiveSearch || undefined,
+          dateFrom: dateFilter || undefined,
+          status: statusFilter || undefined,
         });
         setData(result);
       } catch (err) {
@@ -77,7 +81,7 @@ export function useMyRooms(enabled: boolean) {
     };
 
     void fetchRooms();
-  }, [enabled, currentPage, effectiveSearch]);
+  }, [enabled, currentPage, effectiveSearch, dateFilter, statusFilter]);
 
   const rooms = useMemo(() => {
     if (!data) return data;
@@ -109,6 +113,10 @@ export function useMyRooms(enabled: boolean) {
     searchTerm,
     setSearchTerm,
     debouncedSearch: effectiveSearch,
+    dateFilter,
+    setDateFilter,
+    statusFilter,
+    setStatusFilter,
     currentPage,
     setCurrentPage,
     visibility,
@@ -123,6 +131,8 @@ export function useMyRooms(enabled: boolean) {
           page: currentPage,
           limit: DEFAULT_LIMIT,
           search: effectiveSearch || undefined,
+          dateFrom: dateFilter || undefined,
+          status: statusFilter || undefined,
         });
         setData(result);
       } catch (err) {

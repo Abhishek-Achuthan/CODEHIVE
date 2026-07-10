@@ -59,7 +59,9 @@ export class RoomRepository
   async findAllPublic(
     page: number,
     limit: number,
-    search?: string
+    search?: string,
+    dateFrom?: string,
+    status?: string
   ): Promise<PaginationResult<RoomEntity>> {
     let query: FilterQuery<RoomDocument> = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
 
@@ -67,6 +69,28 @@ export class RoomRepository
       query.$or = [
         { title: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    if (dateFrom) {
+      const start = new Date(dateFrom);
+      if (!Number.isNaN(start.getTime())) {
+        start.setUTCHours(0, 0, 0, 0);
+        const end = new Date(dateFrom);
+        end.setUTCHours(23, 59, 59, 999);
+        query.createdAt = { $gte: start, $lte: end };
+      }
+    }
+
+    if (status) {
+      if (status === 'ACTIVE') {
+        query.lifecycleStatus = RoomLifeCycleStatus.ACTIVE;
+      } else if (status === 'INACTIVE') {
+        query.lifecycleStatus = { $in: [RoomLifeCycleStatus.ARCHIVED, RoomLifeCycleStatus.READONLY] };
+      } else {
+        query.lifecycleStatus = status as RoomLifeCycleStatus;
+      }
+    } else {
+      query.lifecycleStatus = { $ne: RoomLifeCycleStatus.PURGED };
     }
 
     const [docs, totalItems] = await Promise.all([
@@ -90,19 +114,42 @@ export class RoomRepository
     hostId: string,
     page: number,
     limit: number,
-    search?:string
+    search?:string,
+    dateFrom?: string,
+    status?: string
   ): Promise<PaginationResult<RoomEntity>> {
 
     let query: FilterQuery<RoomDocument> = {};
 
     query.hostId = new Types.ObjectId(hostId);
-    query.lifecycleStatus = {$ne : RoomLifeCycleStatus.PURGED};
     query.type = {$ne : RoomType.SESSION};
     
-    if(search) {
+    if (search) {
       query.$or = [
         {title: {$regex:search,$options:'i'}}
       ]
+    }
+
+    if (dateFrom) {
+      const start = new Date(dateFrom);
+      if (!Number.isNaN(start.getTime())) {
+        start.setUTCHours(0, 0, 0, 0);
+        const end = new Date(dateFrom);
+        end.setUTCHours(23, 59, 59, 999);
+        query.createdAt = { $gte: start, $lte: end };
+      }
+    }
+
+    if (status) {
+      if (status === 'ACTIVE') {
+        query.lifecycleStatus = RoomLifeCycleStatus.ACTIVE;
+      } else if (status === 'INACTIVE') {
+        query.lifecycleStatus = { $in: [RoomLifeCycleStatus.ARCHIVED, RoomLifeCycleStatus.READONLY] };
+      } else {
+        query.lifecycleStatus = status as RoomLifeCycleStatus;
+      }
+    } else {
+      query.lifecycleStatus = {$ne : RoomLifeCycleStatus.PURGED};
     }
 
     const [docs, totalItems] = await Promise.all([

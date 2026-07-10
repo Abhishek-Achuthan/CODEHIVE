@@ -113,12 +113,16 @@ export interface GetPublicRoomsDTO {
   page: number;
   limit: number;
   search?: string;
+  dateFrom?: string;
+  status?: string;
 }
 
 export interface GetMyRoomsDTO {
   page: number;
   limit: number;
   search?: string;
+  dateFrom?: string;
+  status?: string;
 }
 
 export interface RoomListItemDTO {

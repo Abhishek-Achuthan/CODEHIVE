@@ -83,6 +83,8 @@ export class RoomController {
       const searchParam = req.query.search;
       const search =
         typeof searchParam === 'string' ? searchParam.trim() : undefined;
+      const dateFrom = typeof req.query.dateFrom === 'string' ? req.query.dateFrom : undefined;
+      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
 
       const page = pageParam || 1;
       const limit = limitParam || 5
@@ -91,6 +93,8 @@ export class RoomController {
         page,
         limit,
         ...(search ? { search } : {}),
+        ...(dateFrom ? { dateFrom } : {}),
+        ...(status ? { status } : {}),
       });
 
       res.status(HttpStatus.OK).json(rooms);
@@ -106,6 +110,8 @@ export class RoomController {
       const searchParam = req.query.search;
       const search =
         typeof searchParam === 'string' ? searchParam.trim() : undefined;
+      const dateFrom = typeof req.query.dateFrom === 'string' ? req.query.dateFrom : undefined;
+      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
 
       const page = pageParam || 1;
       const limit = limitParam || 12;
@@ -114,6 +120,8 @@ export class RoomController {
         page,
         limit,
         ...(search ? { search } : {}),
+        ...(dateFrom ? { dateFrom } : {}),
+        ...(status ? { status } : {}),
       });
 
       res.status(HttpStatus.OK).json(rooms);

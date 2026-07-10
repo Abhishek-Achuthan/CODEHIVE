@@ -21,6 +21,8 @@ export class GetMyRoomsUseCase implements IGetMyRoomsUseCase {
       data.page,
       data.limit,
       data.search,
+      data.dateFrom,
+      data.status
     );
 
     return {

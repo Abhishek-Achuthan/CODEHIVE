@@ -17,7 +17,11 @@ import { useDebounce } from "../../../shared/hooks/useDebounce";
 const RoomsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<RoomListTab>("public");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [publicSearchTerm, setPublicSearchTerm] = useState("");
+  const [publicDateFilter, setPublicDateFilter] = useState("");
+  const [publicStatusFilter, setPublicStatusFilter] = useState("");
+
   const trimmedPublicSearch = publicSearchTerm.trim();
   const debouncedPublicSearch = useDebounce(trimmedPublicSearch, 500);
   const effectivePublicSearch = trimmedPublicSearch === "" ? "" : debouncedPublicSearch;
@@ -27,7 +31,16 @@ const RoomsPage: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   const publicRooms = useRooms(
-    useMemo(() => ({ page: 1, limit: 12, search: effectivePublicSearch || undefined }), [effectivePublicSearch])
+    useMemo(
+      () => ({
+        page: 1,
+        limit: 12,
+        search: effectivePublicSearch || undefined,
+        dateFrom: publicDateFilter || undefined,
+        status: publicStatusFilter || undefined,
+      }),
+      [effectivePublicSearch, publicDateFilter, publicStatusFilter]
+    )
   );
   const myRoomsEnabled = activeTab === "mine" && Boolean(user);
   const myRooms = useMyRooms(myRoomsEnabled);
@@ -111,6 +124,10 @@ const RoomsPage: React.FC = () => {
                 showSearch={activeTab === "public" || Boolean(user)}
                 searchTerm={isPublicTab ? publicSearchTerm : myRooms.searchTerm}
                 onSearchChange={isPublicTab ? setPublicSearchTerm : myRooms.setSearchTerm}
+                dateFilter={isPublicTab ? publicDateFilter : myRooms.dateFilter}
+                onDateFilterChange={isPublicTab ? setPublicDateFilter : myRooms.setDateFilter}
+                statusFilter={isPublicTab ? publicStatusFilter : myRooms.statusFilter}
+                onStatusFilterChange={isPublicTab ? setPublicStatusFilter : myRooms.setStatusFilter}
                 searchPlaceholder={isPublicTab ? "Search public rooms..." : "Search your rooms..."}
                 onCreateRoom={() => setIsModalOpen(true)}
               />

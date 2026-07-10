@@ -90,6 +90,8 @@ export interface PublicRoomsListParams {
   page?: number;
   limit?: number;
   search?: string;
+  dateFrom?: string;
+  status?: string;
 }
 
 export interface MyRoomsListParams extends PublicRoomsListParams {
