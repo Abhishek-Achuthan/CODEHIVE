@@ -80,11 +80,18 @@ export class RoomController {
     try {
       const pageParam = Number(req.query.page);
       const limitParam = Number(req.query.limit);
+      const searchParam = req.query.search;
+      const search =
+        typeof searchParam === 'string' ? searchParam.trim() : undefined;
 
       const page = pageParam || 1;
       const limit = limitParam || 5
 
-      const rooms = await this._getPublicRoomsUseCase.execute({page,limit});
+      const rooms = await this._getPublicRoomsUseCase.execute({
+        page,
+        limit,
+        ...(search ? { search } : {}),
+      });
 
       res.status(HttpStatus.OK).json(rooms);
     } catch (error) {

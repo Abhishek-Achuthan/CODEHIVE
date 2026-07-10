@@ -154,9 +154,6 @@ export default function ProfilePage() {
                   user={profileUser}
                   onSaveAvatar={uploadAvatar}
                   onSaveProfileHeader={(values) => updateProfile(values)}
-                  onClickMentor={() => { }}
-                  onClickDashboard={() => { }}
-                  onClickSessions={() => { }}
                   onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
                   onClickGitHub={() => openUrl(authUser?.githubUrl)}
                   onClickWebsite={() => openUrl(authUser?.websiteUrl)}

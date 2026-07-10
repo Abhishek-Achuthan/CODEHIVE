@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, Lock, Globe, Clock, ArrowRight } from 'lucide-react';
 import { timeAgo, parseDate } from '../../../shared/utils/dateUtils';
 import type { GetPublicRoomsResponse } from '../../../shared/types/api/room';
 
@@ -11,56 +12,69 @@ interface RoomCardProps {
 export const RoomCard: React.FC<RoomCardProps> = ({ room, actionLabel = "Join Room" }) => {
     const navigate = useNavigate();
     const createdAtDate = parseDate(room.createdAt);
+    const isPrivate = room.visibility === "PRIVATE";
 
     const handleJoin = (e: React.MouseEvent) => {
         e.stopPropagation();
-        // Navigation handler (stubbed for now as per requirements)
         navigate(`/room/${room.id}`);
     };
 
     return (
         <div 
-            className="group relative flex flex-col h-full bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:bg-zinc-800/50 hover:border-indigo-500/30 transition-all duration-300 shadow-xl overflow-hidden"
+            onClick={handleJoin}
+            className="group relative flex flex-col h-full bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl p-6 hover:bg-zinc-800/60 hover:border-indigo-500/40 transition-all duration-500 shadow-2xl overflow-hidden cursor-pointer"
         >
             {/* Background Glow Effect on Hover */}
-            <div className="absolute -inset-px bg-linear-to-r from-indigo-500/0 via-indigo-500/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-indigo-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            <div className="relative flex-1 flex flex-col gap-4">
+            <div className="relative flex-1 flex flex-col gap-5">
+                {/* Header: Title and Visibility Badge */}
                 <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-1">
+                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-2 leading-tight capitalize">
                         {room.title}
                     </h3>
-                    <span
-                      className={`shrink-0 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${
-                        room.visibility === "PRIVATE"
+                    <div
+                      className={`shrink-0 flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border backdrop-blur-md ${
+                        isPrivate
                           ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                           : "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
                       }`}
                     >
-                        {room.visibility === "PRIVATE" ? "Private" : "Public"}
-                    </span>
+                        {isPrivate ? <Lock className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
+                        {isPrivate ? "Private" : "Public"}
+                    </div>
                 </div>
 
-                <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                    {room.description || "No description provided."}
+                {/* Description */}
+                <p className="text-sm text-zinc-400 leading-relaxed line-clamp-3 flex-1 min-h-[4.5rem]">
+                    {room.description || "No description provided for this room."}
                 </p>
 
-                <div className="flex items-center text-[10px] font-medium text-zinc-500 uppercase tracking-widest mt-auto">
-                    <span className="flex items-center gap-1.5">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {timeAgo(createdAtDate)}
-                    </span>
+                {/* Metadata row */}
+                <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-zinc-400 mt-auto pt-4 border-t border-white/5">
+                    <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5">
+                        <Users className="w-4 h-4 text-indigo-400" />
+                        <span className="text-zinc-300">
+                            <span className="text-white font-bold">{room.participantCount}</span>
+                            <span className="opacity-60"> / {room.maxParticipants}</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5">
+                        <Clock className="w-4 h-4 text-indigo-400" />
+                        <span className="text-zinc-300 capitalize">{timeAgo(createdAtDate)}</span>
+                    </div>
                 </div>
             </div>
 
-            <button
-                onClick={handleJoin}
-                className="relative w-full mt-6 px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-lg active:scale-[0.98]"
-            >
-                {actionLabel}
-            </button>
+            {/* Action Button */}
+            <div className="mt-6">
+                <button
+                    className="relative w-full flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-indigo-600/90 hover:bg-indigo-500 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.15)] hover:shadow-[0_0_25px_rgba(79,70,229,0.3)] active:scale-[0.98] group-hover:bg-indigo-500"
+                >
+                    {actionLabel}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </button>
+            </div>
         </div>
     );
 };

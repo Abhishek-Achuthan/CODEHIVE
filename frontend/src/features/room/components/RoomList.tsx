@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { RoomCard } from "./RoomCard";
 import { Pagination } from "../../../shared/ui/Pagination";
 import type { GetPublicRoomsPaginatedResponse } from "../../../shared/types/api/room";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface RoomListPagination {
   currentPage: number;
@@ -79,15 +80,12 @@ export const RoomList: React.FC<RoomListProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-zinc-900/40 py-20 text-center backdrop-blur-xl"
       >
-        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-white/5 bg-zinc-800/50 text-zinc-600">
-          <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            />
-          </svg>
+        <div className="mb-2 h-50 w-50 opacity-80 mix-blend-screen pointer-events-none">
+          <DotLottieReact
+            src="https://lottie.host/9d307f91-dcbe-455c-a55b-6dbee5cc7d7e/0Xxj3oIGoj.lottie"
+            loop
+            autoplay
+          />
         </div>
         <h3 className="mb-3 text-2xl font-bold text-white">{emptyTitle}</h3>
         <p className="max-w-sm text-zinc-500">{emptyDescription}</p>

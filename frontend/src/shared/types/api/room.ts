@@ -89,6 +89,7 @@ export type GetPublicRoomsPaginatedResponse =
 export interface PublicRoomsListParams {
   page?: number;
   limit?: number;
+  search?: string;
 }
 
 export interface MyRoomsListParams extends PublicRoomsListParams {

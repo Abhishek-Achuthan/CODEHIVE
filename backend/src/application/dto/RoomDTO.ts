@@ -112,6 +112,7 @@ export interface JoinRoomSnapshotDTO {
 export interface GetPublicRoomsDTO {
   page: number;
   limit: number;
+  search?: string;
 }
 
 export interface GetMyRoomsDTO {

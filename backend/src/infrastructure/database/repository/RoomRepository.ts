@@ -59,8 +59,15 @@ export class RoomRepository
   async findAllPublic(
     page: number,
     limit: number,
+    search?: string
   ): Promise<PaginationResult<RoomEntity>> {
-    const query = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
+    let query: FilterQuery<RoomDocument> = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } }
+      ];
+    }
 
     const [docs, totalItems] = await Promise.all([
       this._model
@@ -203,13 +210,6 @@ export class RoomRepository
     });
   }
 
-  /**
-   * Atomically increments participantCount by 1 only when the room exists and
-   * its current count is strictly below maxParticipants.
-   *
-   * The capacity guard lives entirely inside the MongoDB filter — no separate
-   * read is needed, so concurrent joins cannot race past the limit.
-   */
   async incrementParticipantCount(
     roomId: string,
     maxParticipants: number,
@@ -226,11 +226,7 @@ export class RoomRepository
     return updated ? this.toEntity(updated as RoomDocument) : null;
   }
 
-  /**
-   * Atomically decrements participantCount by 1, floored at 0.
-   * The floor guard prevents the counter from going negative if a leave
-   * arrives after the count was already corrected by another operation.
-   */
+
   async decrementParticipantCount(roomId: string): Promise<RoomEntity | null> {
     const updated = await this._model.findOneAndUpdate(
       {
