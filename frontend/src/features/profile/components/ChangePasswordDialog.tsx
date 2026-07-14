@@ -40,48 +40,48 @@ export default function ChangePasswordDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-gray-800 bg-black text-white">
-        <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
+      <DialogContent className="border border-zinc-800 bg-[#121214] text-zinc-100 p-0 overflow-hidden sm:max-w-md shadow-2xl">
+        <DialogHeader className="px-6 py-4 border-b border-zinc-800 bg-[#09090b]/50">
+          <DialogTitle className="text-lg font-semibold tracking-tight">Change Password</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-3">
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">Current password</span>
+        <div className="p-6 grid gap-5">
+          <label className="grid gap-1.5">
+            <span className="text-sm font-medium text-zinc-300">Current Password</span>
             <input
               type="password"
               value={previousPass}
               onChange={(e) => setPreviousPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+              className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
             />
           </label>
 
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">New password</span>
+          <label className="grid gap-1.5">
+            <span className="text-sm font-medium text-zinc-300">New Password</span>
             <input
               type="password"
               value={newPass}
               onChange={(e) => setNewPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+              className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
             />
           </label>
 
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">Confirm new password</span>
+          <label className="grid gap-1.5">
+            <span className="text-sm font-medium text-zinc-300">Confirm New Password</span>
             <input
               type="password"
               value={confirmNewPass}
               onChange={(e) => setConfirmNewPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+              className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
             />
           </label>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 py-4 border-t border-zinc-800 bg-[#09090b]/50 flex gap-3">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors w-full sm:w-auto"
             disabled={saving}
           >
             Cancel
@@ -89,10 +89,10 @@ export default function ChangePasswordDialog({
           <button
             type="button"
             onClick={submit}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            className="w-full sm:w-auto rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50"
             disabled={saving}
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : "Update Password"}
           </button>
         </DialogFooter>
       </DialogContent>

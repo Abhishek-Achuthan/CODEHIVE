@@ -13,7 +13,7 @@ const ResetPasswordPage = lazy(() => import("../features/auth/pages/ResetPasswor
 const AuthCallbackPage = lazy(() => import("../features/auth/pages/AuthCallbackPage"));
 
 // Home
-const LandingPage = lazy(() => import("../features/home/components/LandingPage"));
+const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const PricingPage = lazy(() => import("../features/home/components/PricingPage"));
 const SubscriptionSuccessPage = lazy(
   () => import("../features/home/pages/SubscriptionSuccessPage"),
@@ -60,6 +60,7 @@ const JoinViaInvitePage = lazy(() => import("../features/room/pages/JoinViaInvit
 
 // Layout
 const SessionsLayout = lazy(() => import("../features/session/components/SessionsLayout"));
+const AppLayout = lazy(() => import("../layouts/AppLayout"));
 
 export default function AppRoutes() {
   return (
@@ -79,45 +80,48 @@ export default function AppRoutes() {
               <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.MENTOR]} />
             }
           >
-            <Route path="/home" element={<LandingPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/pricing/success" element={<SubscriptionSuccessPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/wallet" element={<WalletPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/home" element={<DashboardPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/pricing/success" element={<SubscriptionSuccessPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/wallet" element={<WalletPage />} />
 
-            <Route path="/qna" element={<QnaLandigPage />} />
-            <Route path="/qna/ask-question" element={<AskQuestionPage />} />
-            <Route path="/qna/question/:questionId" element={<QuestionDetailsPage />} />
-            <Route path="/qna/question/:questionId/edit" element={<EditQuestionPage />} />
-            <Route path="/qna/answers/:answerId/edit" element={<EditAnswerPage />} />
-            <Route path="/qna/answered-by-me" element={<AnsweredByMePage />} />
-            <Route path="/qna/my-questions" element={<MyQuestionsPage />} />
-            <Route path="/qna/saved" element={<SavedQuestionsPage />} />
-            <Route path="/qna/ai-assist" element={<AiAssistPage />} />
+              <Route path="/qna" element={<QnaLandigPage />} />
+              <Route path="/qna/ask-question" element={<AskQuestionPage />} />
+              <Route path="/qna/question/:questionId" element={<QuestionDetailsPage />} />
+              <Route path="/qna/question/:questionId/edit" element={<EditQuestionPage />} />
+              <Route path="/qna/answers/:answerId/edit" element={<EditAnswerPage />} />
+              <Route path="/qna/answered-by-me" element={<AnsweredByMePage />} />
+              <Route path="/qna/my-questions" element={<MyQuestionsPage />} />
+              <Route path="/qna/saved" element={<SavedQuestionsPage />} />
+              <Route path="/qna/ai-assist" element={<AiAssistPage />} />
 
-            <Route path="/sessions" element={<SessionsLayout />}>
-              <Route index element={<Navigate to="/sessions/discover" replace />} />
-              <Route path="discover" element={<MentorListingPage />} />
-              <Route path="my-sessions" element={<MySessionsPage />} />
-              <Route
-                element={
-                  <ProtectedRoute
-                    allowedRoles={[UserRole.MENTOR]}
-                    requireApprovedMentor
-                  />
-                }
-              >
-                <Route path="hosting" element={<MentorSessionsPage />} />
-                <Route path="availability" element={<MentorAvailabilityPage />} />
+              <Route path="/sessions" element={<SessionsLayout />}>
+                <Route index element={<Navigate to="/sessions/discover" replace />} />
+                <Route path="discover" element={<MentorListingPage />} />
+                <Route path="my-sessions" element={<MySessionsPage />} />
+                <Route
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={[UserRole.MENTOR]}
+                      requireApprovedMentor
+                    />
+                  }
+                >
+                  <Route path="hosting" element={<MentorSessionsPage />} />
+                  <Route path="availability" element={<MentorAvailabilityPage />} />
+                </Route>
               </Route>
+
+              <Route path="/mentors/:mentorId" element={<MentorProfilePage />} />
+              <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
+              <Route path="/mentors/:mentorId/book/payment" element={<PaymentPage />} />
+              <Route path="/mentors/:mentorId/book/success" element={<BookingSuccessPage />} />
+
+              <Route path="/rooms" element={<RoomsPage />} />
             </Route>
 
-            <Route path="/mentors/:mentorId" element={<MentorProfilePage />} />
-            <Route path="/mentors/:mentorId/book" element={<BookingPage />} />
-            <Route path="/mentors/:mentorId/book/payment" element={<PaymentPage />} />
-            <Route path="/mentors/:mentorId/book/success" element={<BookingSuccessPage />} />
-
-            <Route path="/rooms" element={<RoomsPage />} />
             <Route path="/join/:inviteCode" element={<JoinViaInvitePage />} />
             <Route path="/room/:roomId" element={<CollaborationRoom />} />
           </Route>

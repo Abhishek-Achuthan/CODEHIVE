@@ -27,12 +27,12 @@ function ChecklistRow({ label, done, onClick }: ChecklistRowProps) {
       className={`flex w-full items-center justify-between py-2.5 px-3 rounded-lg transition-all duration-200
         ${done
           ? 'cursor-default'
-          : 'hover:bg-gray-800/50 cursor-pointer hover:scale-[1.01]'
+          : 'hover:bg-zinc-800/50 cursor-pointer hover:scale-[1.01]'
         }`}
     >
-      <span className="text-sm text-gray-300 font-medium">{label}</span>
-      <span className={`text-xs font-semibold ${done ? 'text-green-400' : 'text-gray-500'}`}>
-        {done ? '✅ Complete' : '❌ Missing'}
+      <span className="text-[13px] text-zinc-300 font-medium">{label}</span>
+      <span className={`text-[11px] font-semibold tracking-wide uppercase ${done ? 'text-emerald-500' : 'text-zinc-500'}`}>
+        {done ? 'Complete' : 'Missing'}
       </span>
     </button>
   );
@@ -40,16 +40,16 @@ function ChecklistRow({ label, done, onClick }: ChecklistRowProps) {
 
 function ProgressBar({ percentage }: { percentage: number }) {
   return (
-    <div className="space-y-1.5">
-      <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span className="text-xs font-medium text-zinc-400">Profile Completion</span>
+        <span className="text-xs font-bold text-zinc-200">{percentage}%</span>
+      </div>
+      <div className="w-full bg-zinc-900 border border-zinc-800 rounded-full h-2.5 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500 ease-out"
+          className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-500 ease-out"
           style={{ width: `${percentage}%` }}
         />
-      </div>
-      <div className="flex justify-between items-center">
-        <span className="text-xs text-gray-400">Profile Completion</span>
-        <span className="text-xs font-semibold text-gray-300">{percentage}%</span>
       </div>
     </div>
   );
@@ -78,31 +78,29 @@ export default function MentorCard({
   const renderButton = () => {
     if (status === MentorStatusValues.PENDING) {
       return (
-        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-          <svg className="w-4 h-4 text-yellow-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="text-sm font-semibold text-yellow-400">Application Under Review</span>
+        <div className="flex items-center justify-center gap-2 py-3 px-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+          <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span className="text-[13px] font-semibold text-amber-500">Application Under Review</span>
         </div>
       );
     }
 
     if (status === MentorStatusValues.APPROVED) {
       return (
-        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+        <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
           <span className="text-lg">🎉</span>
-          <span className="text-sm font-semibold text-green-400">You're a Mentor!</span>
+          <span className="text-[13px] font-semibold text-emerald-500">You're a Mentor!</span>
         </div>
       );
     }
 
     if (status === MentorStatusValues.REJECTED) {
       return (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {rejectionReason && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <p className="text-xs text-red-400">
-                <span className="font-semibold">Rejection reason:</span> {rejectionReason}
+            <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg">
+              <p className="text-[13px] text-rose-400 leading-relaxed">
+                <span className="font-semibold block mb-1">Rejection reason:</span> {rejectionReason}
               </p>
             </div>
           )}
@@ -110,10 +108,10 @@ export default function MentorCard({
             type="button"
             onClick={onApply}
             disabled={!isProfileComplete || isApplying}
-            className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200
+            className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm
               ${isProfileComplete && !isApplying
-                ? 'bg-purple-600 hover:bg-purple-700 text-white hover:scale-[1.02]'
-                : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                ? 'bg-indigo-600 hover:bg-indigo-500 text-white hover:scale-[1.01]'
+                : 'bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed'
               }`}
           >
             {isApplying ? 'Submitting...' : 'Reapply for Mentor Role'}
@@ -128,10 +126,10 @@ export default function MentorCard({
         type="button"
         onClick={onApply}
         disabled={!isProfileComplete || isApplying}
-        className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200
+        className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm
           ${isProfileComplete && !isApplying
-            ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white hover:scale-[1.02] shadow-lg shadow-purple-500/20'
-            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+            ? 'bg-indigo-600 hover:bg-indigo-500 text-white hover:scale-[1.01]'
+            : 'bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed'
           }`}
       >
         {isApplying ? 'Submitting...' : isProfileComplete ? 'Apply for Review' : 'Complete Profile to Apply'}
@@ -141,24 +139,24 @@ export default function MentorCard({
 
   return (
     <SectionCard title="🎓 Become a Mentor">
-      <div className="space-y-4">
-        <p className="text-sm text-gray-400 leading-relaxed">
+      <div className="space-y-6">
+        <p className="text-[13px] text-zinc-400 leading-relaxed">
           Share your expertise and help others grow. Complete your profile to apply for mentor status.
         </p>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3 space-y-1">
+        <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 p-2 space-y-0.5">
           <ChecklistRow
-            label="About"
+            label="About Section"
             done={checklist.aboutComplete}
             onClick={!checklist.aboutComplete ? () => onScrollToSection('about') : undefined}
           />
           <ChecklistRow
-            label="Skills"
+            label="Skills Added"
             done={checklist.skillsComplete}
             onClick={!checklist.skillsComplete ? () => onScrollToSection('skills') : undefined}
           />
           <ChecklistRow
-            label="Experience"
+            label="Experience Details"
             done={checklist.experienceComplete}
             onClick={!checklist.experienceComplete ? () => onScrollToSection('experience') : undefined}
           />
@@ -166,7 +164,9 @@ export default function MentorCard({
 
         <ProgressBar percentage={completionPercentage} />
 
-        {renderButton()}
+        <div className="pt-2">
+          {renderButton()}
+        </div>
       </div>
     </SectionCard>
   );

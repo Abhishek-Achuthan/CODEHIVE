@@ -95,81 +95,92 @@ export default function ProfileHeaderEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-gray-800 bg-black text-white">
-        <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+      <DialogContent className="border border-zinc-800 bg-[#121214] text-zinc-100 p-0 overflow-hidden sm:max-w-xl shadow-2xl">
+        <DialogHeader className="px-6 py-4 border-b border-zinc-800 bg-[#09090b]/50">
+          <DialogTitle className="text-lg font-semibold tracking-tight">Edit Profile</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-5">
-          <section className="grid gap-3">
-            <div className="text-xs font-semibold text-gray-300">Name & Phone</div>
+        <div className="p-6 grid gap-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          <section className="grid gap-4">
+            <div className="text-[13px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+              Personal Information
+            </div>
+            
+            <div className="grid sm:grid-cols-2 gap-4">
+              <label className="grid gap-1.5">
+                <span className="text-sm font-medium text-zinc-300">First Name</span>
+                <input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+                />
+              </label>
 
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">First name</span>
-              <input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
-              />
-            </label>
+              <label className="grid gap-1.5">
+                <span className="text-sm font-medium text-zinc-300">Last Name</span>
+                <input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+                />
+              </label>
+            </div>
 
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">Last name</span>
-              <input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
-              />
-            </label>
-
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">Phone</span>
+            <label className="grid gap-1.5 mt-1">
+              <span className="text-sm font-medium text-zinc-300">Phone Number</span>
               <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91..."
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+                placeholder="+1 (555) 000-0000"
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
               />
             </label>
           </section>
 
-          <section className="grid gap-3">
-            <div className="text-xs font-semibold text-gray-300">Profile links</div>
+          <div className="h-px w-full bg-zinc-800/50" />
 
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">GitHub</span>
+          <section className="grid gap-4">
+            <div className="text-[13px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+              Social Links
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-sm font-medium text-zinc-300">GitHub Profile</span>
               <input
                 value={githubUrl}
                 onChange={(e) => setGithubUrl(e.target.value)}
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+                placeholder="https://github.com/username"
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
               />
             </label>
 
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">LinkedIn</span>
+            <label className="grid gap-1.5">
+              <span className="text-sm font-medium text-zinc-300">LinkedIn Profile</span>
               <input
                 value={linkedInUrl}
                 onChange={(e) => setLinkedInUrl(e.target.value)}
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+                placeholder="https://linkedin.com/in/username"
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
               />
             </label>
 
-            <label className="grid gap-1">
-              <span className="text-xs text-gray-400">Website</span>
+            <label className="grid gap-1.5">
+              <span className="text-sm font-medium text-zinc-300">Personal Website</span>
               <input
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
+                placeholder="https://yourwebsite.com"
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
               />
             </label>
           </section>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 py-4 border-t border-zinc-800 bg-[#09090b]/50 flex gap-3">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors w-full sm:w-auto"
             disabled={saving}
           >
             Cancel
@@ -177,10 +188,10 @@ export default function ProfileHeaderEditDialog({
           <button
             type="button"
             onClick={submit}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            className="w-full sm:w-auto rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50"
             disabled={saving}
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </DialogFooter>
       </DialogContent>

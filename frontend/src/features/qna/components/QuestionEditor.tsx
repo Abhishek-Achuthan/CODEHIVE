@@ -43,14 +43,14 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
   }, [editor, value]);
 
   return (
-    <div className="border rounded-b-lg bg-zinc-900/50 border-zinc-800">
-      <div className="p-2 border-b border-zinc-800/40">
-        <div className="flex gap-2">
+    <div className="rounded-xl border border-zinc-800 bg-[#121214] overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/50 transition-all">
+      <div className="p-2 border-b border-zinc-800 bg-[#09090b]">
+        <div className="flex gap-1">
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleBold().run()}
             aria-label="Bold"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             <strong>B</strong>
           </button>
@@ -58,15 +58,16 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
             type="button"
             onClick={() => editor?.chain().focus().toggleItalic().run()}
             aria-label="Italic"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             <em>I</em>
           </button>
+          <div className="w-px h-5 bg-zinc-800 my-auto mx-1" />
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
             aria-label="Heading"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 font-semibold transition-colors"
           >
             H2
           </button>
@@ -74,15 +75,16 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
             type="button"
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
             aria-label="Bullet list"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             •
           </button>
+          <div className="w-px h-5 bg-zinc-800 my-auto mx-1" />
           <button
             type="button"
             onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
             aria-label="Code block"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-10 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors text-xs font-mono"
           >
             {"</>"}
           </button>
@@ -90,14 +92,14 @@ export default function QuestionEditor({ value, onChange, placeholder }: Props) 
             type="button"
             onClick={() => editor?.chain().focus().setHorizontalRule().run()}
             aria-label="Section separator"
-            className="p-2 rounded hover:bg-zinc-800 text-gray-300"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors tracking-tighter"
           >
             ---
           </button>
         </div>
       </div>
 
-      <EditorContent editor={editor} className="p-4 min-h-48 text-sm" />
+      <EditorContent editor={editor} className="p-4 min-h-[250px] text-zinc-200 prose prose-invert max-w-none prose-sm" />
     </div>
   );
  }

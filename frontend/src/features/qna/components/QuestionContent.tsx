@@ -20,7 +20,7 @@ export function QuestionContent({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <p className="text-gray-400 font-medium">Loading questions...</p>
+        <p className="text-zinc-500 font-medium">Loading questions...</p>
       </div>
     );
   }
@@ -30,10 +30,10 @@ export function QuestionContent({
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-black/40 backdrop-blur-md rounded-2xl min-h-[300px]"
+        className="flex flex-col items-center justify-center py-20 text-center border border-zinc-800 border-dashed bg-[#121214] rounded-2xl min-h-[300px]"
       >
         {typeof emptyMessage === 'string' || !emptyMessage ? (
-          <p className="text-gray-400 font-medium max-w-sm">
+          <p className="text-zinc-500 font-medium max-w-sm">
             {emptyMessage ?? "No questions found. Try adjusting your filters."}
           </p>
         ) : (

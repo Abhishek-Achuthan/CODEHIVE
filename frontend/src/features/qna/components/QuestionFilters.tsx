@@ -21,17 +21,10 @@ export function QuestionFilters({
   ];
 
   const buttonClass = (key: string): string =>
-    `px-4 py-2.5 text-xs font-semibold transition-all duration-300 focus:outline-none ${
+    `px-3 py-2 text-sm font-medium transition-colors relative ${
       activeFilter === key
-        ? "bg-indigo-500/15 text-indigo-400 shadow-[inset_0_-2px_0_rgba(99,102,241,1)]"
-        : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
-    }`;
-
-  const filterButtonClass = (active: boolean): string =>
-    `inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-semibold transition-all duration-300 ${
-      active
-        ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.2)]"
-        : "border-white/10 bg-black/40 text-gray-400 hover:border-white/20 hover:text-gray-200"
+        ? "text-indigo-400"
+        : "text-zinc-400 hover:text-zinc-200"
     }`;
 
   const handleSelect = (key: string): void => {
@@ -39,26 +32,29 @@ export function QuestionFilters({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <div className="inline-flex overflow-hidden rounded-lg border border-zinc-800 divide-x divide-zinc-800 bg-zinc-900/50 backdrop-blur-xl">
-        {filters.map((f, idx) => (
+    <div className="flex flex-wrap items-center justify-between w-full gap-4">
+      <div className="flex items-center gap-2">
+        {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => handleSelect(f.key)}
-            className={[
-              buttonClass(f.key),
-              idx === 0 ? "rounded-l-lg" : "",
-              idx === filters.length - 1 ? "rounded-r-lg" : "",
-            ].join(" ")}
+            className={buttonClass(f.key)}
           >
             {f.label}
+            {activeFilter === f.key && (
+              <span className="absolute bottom-[-16px] left-0 w-full h-[2px] bg-indigo-500 rounded-t-full" />
+            )}
           </button>
         ))}
       </div>
 
       <button
         onClick={onOpenAdvanced}
-        className={filterButtonClass(activeFilter === "filter")}
+        className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+          activeFilter === "filter"
+            ? "bg-indigo-500/10 text-indigo-400"
+            : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+        }`}
       >
         <Sliders className="h-4 w-4" />
         <span className="hidden sm:inline">Advanced Filter</span>

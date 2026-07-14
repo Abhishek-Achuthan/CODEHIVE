@@ -20,8 +20,6 @@ import {
 } from "../../home/hooks/useMySubscription";
 import toast from "react-hot-toast";
 
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
 
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
@@ -137,8 +135,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header />
+    <div className="h-full bg-transparent text-white">
 
       <ChangePasswordDialog
         open={changePasswordOpen}
@@ -222,7 +219,6 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

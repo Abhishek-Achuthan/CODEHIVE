@@ -113,18 +113,17 @@ export function OTPModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md">
+      <DialogContent className="border-zinc-800 bg-[#121214]/95 backdrop-blur-xl sm:max-w-md shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl">{title}</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="text-center text-2xl font-semibold tracking-tight text-white">{title}</DialogTitle>
+          <DialogDescription className="text-center text-sm text-zinc-400 mt-2">
             {description}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-8 py-6">
           <div className="relative">
-            <div className="absolute inset-0 -m-4 rounded-2xl bg-linear-to-br from-primary/20 via-accent/10 to-primary/20 opacity-50 blur-2xl" />
-            <div className="absolute inset-0 -m-2 rounded-xl bg-linear-to-br from-primary/30 via-transparent to-primary/30 opacity-30 blur-xl" />
+            <div className="absolute inset-0 -m-4 rounded-2xl bg-linear-to-br from-indigo-500/10 via-purple-500/5 to-indigo-500/10 opacity-50 blur-2xl pointer-events-none" />
 
             <div className="relative flex gap-3">
               {otp.map((digit, index) => (
@@ -141,42 +140,40 @@ export function OTPModal({
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   className={cn(
-                    "size-12 rounded-lg border-2 bg-background/50 text-center text-xl font-semibold transition-all duration-200 outline-none backdrop-blur-sm sm:size-14 sm:text-2xl",
+                    "size-12 rounded-lg border-2 bg-[#09090b] text-center text-xl font-semibold text-white transition-all duration-200 outline-none sm:size-14 sm:text-2xl",
                     digit
-                      ? "border-primary shadow-[0_0_20px_rgba(255,255,255,0.1)] shadow-primary/50"
-                      : "border-border/50 hover:border-border",
-                    "focus:border-primary focus:shadow-[0_0_25px_rgba(255,255,255,0.15)] focus:shadow-primary/60 focus:ring-2 focus:ring-primary/20"
+                      ? "border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.1)] shadow-indigo-500/30"
+                      : "border-zinc-800 hover:border-zinc-700",
+                    "focus:border-indigo-500 focus:shadow-[0_0_25px_rgba(99,102,241,0.15)] focus:shadow-indigo-500/40 focus:ring-2 focus:ring-indigo-500/20"
                   )}
                 />
               ))}
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3">
+          <div className="flex w-full flex-col gap-4 mt-2">
             <button
               onClick={handleVerify}
               disabled={!isComplete}
-              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 font-medium
-               text-gray-800 shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md
-                hover:shadow-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-500 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Verify Code
             </button>
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center justify-center pt-2">
               {timeLeftSeconds > 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-zinc-500 font-medium">
                   Resend code in{" "}
-                  <span className="font-medium text-primary">{formatTime(timeLeftSeconds)}</span>
+                  <span className="text-indigo-400">{formatTime(timeLeftSeconds)}</span>
                 </p>
               ) : (
                 <button
                   onClick={() => void handleResend()}
                   disabled={isResending}
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="text-sm font-medium text-zinc-400 hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isResending ? "Resending..." : "Didn't receive the code?"}{" "}
-                  <span className="text-primary font-medium underline-offset-4 hover:underline">
+                  <span className="text-indigo-400 hover:text-indigo-300 hover:underline underline-offset-4">
                     {isResending ? "Please wait" : "Resend"}
                   </span>
                 </button>

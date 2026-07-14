@@ -46,7 +46,7 @@ export function MyRoomsToolbar({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "relative z-40 mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
+        "relative z-40 mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
       )}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">

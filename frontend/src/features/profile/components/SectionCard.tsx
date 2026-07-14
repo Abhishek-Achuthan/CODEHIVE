@@ -22,17 +22,17 @@ export default function SectionCard({
   return (
     <section
       className={cn(
-        "rounded-xl border border-gray-700 bg-black text-white",
+        "rounded-xl border border-zinc-800 bg-[#121214] text-zinc-200",
         className
       )}
     >
       {showHeader ? (
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <h2 className="text-sm font-semibold tracking-wide">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#09090b]/50 rounded-t-xl">
+          <h2 className="text-base font-semibold text-zinc-100 tracking-tight">{title}</h2>
           {rightAction ? <div>{rightAction}</div> : null}
         </div>
       ) : null}
-      <div className={cn("px-4 py-3", contentClassName)}>{children}</div>
+      <div className={cn("px-6 py-5", contentClassName)}>{children}</div>
     </section>
   );
 }

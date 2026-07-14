@@ -5,8 +5,6 @@ import { RoomList } from "../components/RoomList";
 import { useRooms } from "../hooks/useRooms";
 import { useMyRooms } from "../hooks/useMyRooms";
 import { QnaBackgroundGlow } from "../../../shared/ui/QnaBackgroundGlow";
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
 import CreateRoomModal from "../components/CreateRoomModal";
 import { RoomViewTabs, type RoomListTab } from "../components/RoomViewTabs";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
@@ -17,16 +15,18 @@ import { useDebounce } from "../../../shared/hooks/useDebounce";
 const RoomsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<RoomListTab>("public");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [publicSearchTerm, setPublicSearchTerm] = useState("");
   const [publicDateFilter, setPublicDateFilter] = useState("");
   const [publicStatusFilter, setPublicStatusFilter] = useState("");
 
   const trimmedPublicSearch = publicSearchTerm.trim();
   const debouncedPublicSearch = useDebounce(trimmedPublicSearch, 500);
-  const effectivePublicSearch = trimmedPublicSearch === "" ? "" : debouncedPublicSearch;
+  const effectivePublicSearch =
+    trimmedPublicSearch === "" ? "" : debouncedPublicSearch;
 
-  const isPublicSearchPending = trimmedPublicSearch !== "" && trimmedPublicSearch !== effectivePublicSearch;
+  const isPublicSearchPending =
+    trimmedPublicSearch !== "" && trimmedPublicSearch !== effectivePublicSearch;
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -39,15 +39,18 @@ const RoomsPage: React.FC = () => {
         dateFrom: publicDateFilter || undefined,
         status: publicStatusFilter || undefined,
       }),
-      [effectivePublicSearch, publicDateFilter, publicStatusFilter]
-    )
+      [effectivePublicSearch, publicDateFilter, publicStatusFilter],
+    ),
   );
   const myRoomsEnabled = activeTab === "mine" && Boolean(user);
   const myRooms = useMyRooms(myRoomsEnabled);
 
   const isPublicTab = activeTab === "public";
-  const { isLoading, error } = isPublicTab 
-    ? { isLoading: publicRooms.isLoading || isPublicSearchPending, error: publicRooms.error }
+  const { isLoading, error } = isPublicTab
+    ? {
+        isLoading: publicRooms.isLoading || isPublicSearchPending,
+        error: publicRooms.error,
+      }
     : myRooms;
 
   const handleTabChange = (tab: RoomListTab) => {
@@ -94,19 +97,18 @@ const RoomsPage: React.FC = () => {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <Header />
+    <div className="flex h-full flex-col">
       <div className="relative flex-1">
         <QnaBackgroundGlow />
 
         <div className="flex flex-1 justify-center">
-          <main className="relative w-full max-w-7xl flex-1 overflow-y-auto">
+          <main className="relative w-full max-w-7xl flex-1 pb-10">
             <div className="relative w-full p-6 lg:p-8">
-              <div className="flex flex-col items-center text-center mb-12 mt-8">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white bg-linear-to-r from-white via-white to-white/40 bg-clip-text text-transparent italic mb-4">
+              <div className="mb-6 flex flex-col items-start border-b border-white/10 pb-4">
+                <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">
                   {headerCopy.title}
                 </h1>
-                <p className="mt-3 text-lg sm:text-xl leading-relaxed text-zinc-300 max-w-2xl font-medium">
+                <p className="text-sm text-zinc-400">
                   {headerCopy.description}
                 </p>
               </div>
@@ -123,12 +125,24 @@ const RoomsPage: React.FC = () => {
                 onVisibilityChange={myRooms.setVisibility}
                 showSearch={activeTab === "public" || Boolean(user)}
                 searchTerm={isPublicTab ? publicSearchTerm : myRooms.searchTerm}
-                onSearchChange={isPublicTab ? setPublicSearchTerm : myRooms.setSearchTerm}
+                onSearchChange={
+                  isPublicTab ? setPublicSearchTerm : myRooms.setSearchTerm
+                }
                 dateFilter={isPublicTab ? publicDateFilter : myRooms.dateFilter}
-                onDateFilterChange={isPublicTab ? setPublicDateFilter : myRooms.setDateFilter}
-                statusFilter={isPublicTab ? publicStatusFilter : myRooms.statusFilter}
-                onStatusFilterChange={isPublicTab ? setPublicStatusFilter : myRooms.setStatusFilter}
-                searchPlaceholder={isPublicTab ? "Search public rooms..." : "Search your rooms..."}
+                onDateFilterChange={
+                  isPublicTab ? setPublicDateFilter : myRooms.setDateFilter
+                }
+                statusFilter={
+                  isPublicTab ? publicStatusFilter : myRooms.statusFilter
+                }
+                onStatusFilterChange={
+                  isPublicTab ? setPublicStatusFilter : myRooms.setStatusFilter
+                }
+                searchPlaceholder={
+                  isPublicTab
+                    ? "Search public rooms..."
+                    : "Search your rooms..."
+                }
                 onCreateRoom={() => setIsModalOpen(true)}
               />
 
@@ -155,12 +169,16 @@ const RoomsPage: React.FC = () => {
                   actionLabel={isPublicTab ? "Join Room" : "Open Room"}
                   emptyTitle={
                     isPublicTab
-                      ? (effectivePublicSearch ? "No rooms match your search" : "No public rooms available")
+                      ? effectivePublicSearch
+                        ? "No rooms match your search"
+                        : "No public rooms available"
                       : myRoomsEmptyCopy.title
                   }
                   emptyDescription={
                     isPublicTab
-                      ? (effectivePublicSearch ? "Try a different title or clear the search field." : "Be the first to create one! Use Create Room to start a collaborative space.")
+                      ? effectivePublicSearch
+                        ? "Try a different title or clear the search field."
+                        : "Be the first to create one! Use Create Room to start a collaborative space."
                       : myRoomsEmptyCopy.description
                   }
                   pagination={
@@ -179,7 +197,6 @@ const RoomsPage: React.FC = () => {
           </main>
         </div>
       </div>
-      <Footer />
 
       <CreateRoomModal
         open={isModalOpen}

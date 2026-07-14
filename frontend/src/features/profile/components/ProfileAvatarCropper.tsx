@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
-import { Pencil, X } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { APP_MESSAGES } from "../../../shared/constants/messages";
 
@@ -13,7 +13,7 @@ export interface ProfileAvatarCropperProps {
 }
 
 const DEFAULT_AVATAR =
-  "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=374151";
+  "https://ui-avatars.com/api/?name=User&background=18181b&color=71717a";
 
 export default function ProfileAvatarCropper({
   onSave,
@@ -140,21 +140,21 @@ export default function ProfileAvatarCropper({
   return (
     <>
       {/* Avatar */}
-      <div className="relative w-32 h-32">
+      <div className="relative group w-[104px] h-[104px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-[#121214] bg-[#121214] shadow-xl ring-1 ring-zinc-800/50">
         <img
           src={url || DEFAULT_AVATAR}
           alt="Profile avatar"
-          className="w-full h-full rounded-full object-cover border"
+          className="w-full h-full rounded-full object-cover transition-opacity group-hover:opacity-80"
         />
 
         {!readonly && (
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-1 right-1 rounded-full bg-black/70 p-2 text-white hover:bg-black"
+            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300 shadow-sm transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"
             disabled={saving}
           >
-            <Pencil size={16} />
+            <Camera className="w-4 h-4" />
           </button>
         )}
 
@@ -171,17 +171,20 @@ export default function ProfileAvatarCropper({
 
       {/*crop modal */}
       {mode === "cropping" && imageSrc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="relative w-[90vw] max-w-md rounded-lg border border-gray-800 bg-black p-4 text-white">
-            <button
-              className="absolute right-3 top-3 text-gray-400"
-              onClick={reset}
-              disabled={saving}
-            >
-              <X size={18} />
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="relative w-[90vw] max-w-md overflow-hidden rounded-xl border border-zinc-800 bg-[#121214] shadow-2xl">
+            <div className="px-5 py-4 border-b border-zinc-800 bg-[#09090b]/50 flex justify-between items-center">
+               <h3 className="text-[15px] font-semibold text-zinc-100 tracking-tight">Adjust Image</h3>
+               <button
+                  className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"
+                  onClick={reset}
+                  disabled={saving}
+               >
+                  <X className="w-4 h-4" />
+               </button>
+            </div>
 
-            <div className="relative h-64 w-full bg-gray-100">
+            <div className="relative h-[300px] w-full bg-[#09090b]">
               <Cropper
                 image={imageSrc}
                 crop={crop}
@@ -191,23 +194,24 @@ export default function ProfileAvatarCropper({
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
+                classes={{ containerClassName: 'bg-[#09090b]' }}
               />
             </div>
 
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="px-5 py-4 border-t border-zinc-800 bg-[#09090b]/50 flex justify-end gap-3">
               <button
-                className="rounded px-4 py-2 text-sm text-gray-300"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
                 onClick={reset}
                 disabled={saving}
               >
                 Cancel
               </button>
               <button
-                className="rounded bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50"
                 onClick={handleSave}
                 disabled={saving}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Saving..." : "Save Image"}
               </button>
             </div>
           </div>

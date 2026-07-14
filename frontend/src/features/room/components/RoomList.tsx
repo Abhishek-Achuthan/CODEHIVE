@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { RoomCard } from "./RoomCard";
 import { Pagination } from "../../../shared/ui/Pagination";
+import { EmptyState } from "../../../shared/ui/EmptyState";
 import type { GetPublicRoomsPaginatedResponse } from "../../../shared/types/api/room";
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface RoomListPagination {
   currentPage: number;
@@ -78,17 +78,12 @@ export const RoomList: React.FC<RoomListProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-zinc-900/40 py-20 text-center backdrop-blur-xl"
+        className="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-[#121214] py-10 text-center"
       >
-        <div className="mb-2 h-50 w-50 opacity-80 mix-blend-screen pointer-events-none">
-          <DotLottieReact
-            src="https://lottie.host/9d307f91-dcbe-455c-a55b-6dbee5cc7d7e/0Xxj3oIGoj.lottie"
-            loop
-            autoplay
-          />
-        </div>
-        <h3 className="mb-3 text-2xl font-bold text-white">{emptyTitle}</h3>
-        <p className="max-w-sm text-zinc-500">{emptyDescription}</p>
+        <EmptyState
+            title={emptyTitle}
+            description={emptyDescription}
+        />
       </motion.div>
     );
   }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2, X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
 import Timeline from "@mui/lab/Timeline";
@@ -49,9 +49,9 @@ const EMPTY_FORM: ExperienceDraftItem = {
 const typeLabel: Record<ExperienceType, string> = {
   job: "Job",
   freelance: "Freelance",
-  open_source: "Open source",
+  open_source: "Open Source",
   teaching: "Teaching",
-  self_learning: "Self learning",
+  self_learning: "Self Learning",
 };
 
 /* --------------------------- Component ---------------------------- */
@@ -74,7 +74,6 @@ export default function ExperienceSection({
     }
   }, [initialItems, isEditing]);
 
-  
   const openAdd = () => {
     const id =
       "randomUUID" in crypto
@@ -84,8 +83,6 @@ export default function ExperienceSection({
     setForm({ ...EMPTY_FORM, id });
     setDialogOpen(true);
   };
-
-  
 
   const openEdit = (id: string) => {
     const found = items.find((i) => i.id === id);
@@ -208,14 +205,14 @@ export default function ExperienceSection({
           isEditing ? (
             <button
               onClick={() => setIsEditing(false)}
-              className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
+              className="inline-flex items-center justify-center rounded-lg p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="rounded-md border border-gray-700 p-2 hover:bg-gray-900"
+              className="inline-flex items-center justify-center rounded-lg p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
             >
               <Pencil className="h-4 w-4" />
             </button>
@@ -224,26 +221,23 @@ export default function ExperienceSection({
       }
     >
       {viewItems.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-700 bg-gray-950/30 px-4 py-4">
-          <div className="text-sm font-semibold text-gray-200">
+        <div className="w-full rounded-xl border border-dashed border-zinc-800 bg-[#09090b]/50 px-6 py-8 text-center">
+          <div className="text-sm font-medium text-zinc-400">
             No experience added yet
           </div>
-          <div className="mt-1 text-xs text-gray-400">
-            Add roles, internships, freelance work, open-source, or learning milestones.
+          <div className="mt-2 text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
+            Add roles, internships, freelance work, open-source contributions, or learning milestones.
           </div>
 
-          {isEditing ? (
+          {isEditing && (
             <button
               type="button"
               onClick={openAdd}
-              className="mt-3 rounded-md border border-gray-600 px-4 py-2 text-xs text-white hover:bg-gray-900"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100 transition-colors shadow-sm"
             >
-              Add your first experience
+              <Plus className="h-4 w-4" />
+              Add Experience
             </button>
-          ) : (
-            <div className="mt-3 text-xs text-gray-400">
-              Click the pencil to start adding.
-            </div>
           )}
         </div>
       ) : (
@@ -259,35 +253,43 @@ export default function ExperienceSection({
             {viewItems.map((it, idx) => (
               <TimelineItem key={it.id}>
                 <TimelineOppositeContent
-                  sx={{ flex: 0.28, fontSize: 12, color: "rgb(156,163,175)" }}
+                  sx={{ flex: 0.28, fontSize: 13, fontWeight: 500, color: "#a1a1aa", paddingTop: "12px" }}
                 >
                   {it.dateRange}
                 </TimelineOppositeContent>
 
                 <TimelineSeparator>
-                  <TimelineDot variant="outlined" />
-                  {idx < viewItems.length - 1 && <TimelineConnector />}
+                  <TimelineDot sx={{ bgcolor: "#27272a", borderColor: "#3f3f46", borderWidth: 2, boxShadow: 'none' }} variant="outlined" />
+                  {idx < viewItems.length - 1 && <TimelineConnector sx={{ bgcolor: "#27272a" }} />}
                 </TimelineSeparator>
 
-                <TimelineContent>
-                  <div className="rounded-lg border border-gray-700 bg-black px-3 py-2">
-                    <div className="flex justify-between gap-4">
+                <TimelineContent sx={{ pb: 3 }}>
+                  <div className="rounded-xl border border-zinc-800 bg-[#09090b] px-5 py-4 shadow-sm relative group">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4">
                       <div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-[11px] font-semibold tracking-wider uppercase text-indigo-400 mb-1">
                           {typeLabel[it.type]}
                         </div>
-                        <div className="text-sm font-semibold">{it.title}</div>
-                        <div className="text-sm text-gray-300">
+                        <div className="text-sm font-semibold text-zinc-100 tracking-tight">{it.title}</div>
+                        <div className="text-[13px] text-zinc-400 mt-0.5">
                           {it.organization}
                         </div>
                       </div>
 
                       {isEditing && !readonly && (
-                        <div className="flex gap-2">
-                          <button type="button" onClick={() => openEdit(it.id)}>
+                        <div className="flex items-start gap-1">
+                          <button 
+                            type="button" 
+                            onClick={() => openEdit(it.id)}
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded-md transition-colors"
+                          >
                             <Pencil className="h-4 w-4" />
                           </button>
-                          <button type="button" onClick={() => remove(it.id)}>
+                          <button 
+                            type="button" 
+                            onClick={() => remove(it.id)}
+                            className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -302,18 +304,18 @@ export default function ExperienceSection({
       )}
 
       {isEditing && (
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-6 pt-5 border-t border-zinc-800 flex justify-end gap-3">
           <button
             onClick={openAdd}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100 transition-colors shadow-sm"
           >
-            Add
+            <Plus className="h-4 w-4" /> Add Experience
           </button>
           <button
             onClick={saveAll}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50"
           >
-            Save
+            Save Changes
           </button>
         </div>
       )}

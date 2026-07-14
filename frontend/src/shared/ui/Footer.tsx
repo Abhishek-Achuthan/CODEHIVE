@@ -1,46 +1,46 @@
 export default function Footer() {
   return (
-    <footer className="bg-black border-t border-gray-800 ">
+    <footer className="bg-[#09090b] border-t border-zinc-800 ">
       <div className="max-w-7xl mx-auto px-8 py-12">
         <div className="grid grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <span className="text-2xl font-bold bg-linear-to-r from-purple-400 via-purple-600 to-purple-800 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-linear-to-r from-indigo-400 via-indigo-600 to-indigo-800 bg-clip-text text-transparent">
                 CODEHIVE
               </span>
             </div>
 
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-zinc-400 text-sm mb-6">
               Empowering real-time collaboration for developers and teams.
             </p>
-            <p className="text-gray-500 text-xs">© 2025 CodeHive.</p>
+            <p className="text-zinc-500 text-xs">© 2025 CodeHive.</p>
           </div>
 
           <div>
             <h3 className="text-white font-semibold mb-4">Quick links</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
+            <ul className="space-y-2 text-zinc-400 text-sm">
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Home
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Features
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Pricing
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   FAQ
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Contact Us
                 </a>
               </li>
@@ -48,48 +48,48 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-white font-semibold mb-4">Proudcts</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
+            <h3 className="text-white font-semibold mb-4">Products</h3>
+            <ul className="space-y-2 text-zinc-400 text-sm">
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Code Editor
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Whiteboard
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Screen Sharing
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Video Calling
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Chat
                 </a>
               </li>
             </ul>
             <h3 className="text-white font-semibold mb-4 mt-6">Company</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
+            <ul className="space-y-2 text-zinc-400 text-sm">
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Terms of Service
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Privacy Policy
                 </a>
               </li>
@@ -98,24 +98,24 @@ export default function Footer() {
 
           <div>
             <h3 className="text-white font-semibold mb-4">Help and support</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
+            <ul className="space-y-2 text-zinc-400 text-sm">
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Help Center
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Report a Bug
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Feature Requests
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="hover:text-white transition-colors">
                   Community
                 </a>
               </li>
@@ -124,7 +124,7 @@ export default function Footer() {
               Social Media & Contact
             </h3>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-zinc-400 hover:text-white transition-colors">
                 <svg
                   className="w-6 h-6"
                   fill="currentColor"
@@ -133,7 +133,7 @@ export default function Footer() {
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                 </svg>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-zinc-400 hover:text-white transition-colors">
                 <svg
                   className="w-6 h-6"
                   fill="currentColor"
@@ -142,7 +142,7 @@ export default function Footer() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-zinc-400 hover:text-white transition-colors">
                 <svg
                   className="w-6 h-6"
                   fill="currentColor"

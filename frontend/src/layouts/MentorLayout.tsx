@@ -10,12 +10,12 @@ interface MentorLayoutProps {
 
 export default function MentorLayout({ children }: MentorLayoutProps) {
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-[#09090b] text-white">
             <Header />
 
             <div className="flex">
                 {/* Mentor Sidebar */}
-                <aside className="w-64 border-r border-gray-800 min-h-[calc(100vh-64px)]">
+                <aside className="w-64 border-r border-zinc-800 min-h-[calc(100vh-64px)] bg-[#121214]">
                     <div className="p-6">
                         <h2 className="text-lg font-bold text-indigo-400 mb-6">Mentor Panel</h2>
 
@@ -25,7 +25,7 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                                         ? "bg-indigo-500/10 text-indigo-400"
-                                        : "text-gray-400 hover:bg-gray-900 hover:text-white"
+                                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
                                     }`
                                 }
                             >
@@ -38,7 +38,7 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                                         ? "bg-indigo-500/10 text-indigo-400"
-                                        : "text-gray-400 hover:bg-gray-900 hover:text-white"
+                                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
                                     }`
                                 }
                             >
@@ -51,7 +51,7 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                                         ? "bg-indigo-500/10 text-indigo-400"
-                                        : "text-gray-400 hover:bg-gray-900 hover:text-white"
+                                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
                                     }`
                                 }
                             >
@@ -61,12 +61,12 @@ export default function MentorLayout({ children }: MentorLayoutProps) {
                         </nav>
 
                         {/* Divider */}
-                        <div className="my-6 border-t border-gray-800"></div>
+                        <div className="my-6 border-t border-zinc-800"></div>
 
                         {/* Back to User View */}
                         <NavLink
                             to="/sessions"
-                            className="flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-900 hover:text-white transition-colors text-sm"
+                            className="flex items-center gap-3 p-3 rounded-lg text-zinc-400 hover:bg-zinc-800/50 hover:text-white transition-colors text-sm"
                         >
                             ← Back to User View
                         </NavLink>

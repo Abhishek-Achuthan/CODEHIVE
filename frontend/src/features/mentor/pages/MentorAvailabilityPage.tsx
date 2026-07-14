@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 import { BaseError } from '../../../shared/errors/BaseError';
 import { CalendarPlus, ListTodo } from 'lucide-react';
 import { ManageRulesSection } from '../components/ManageRulesSection';
-import { PageHeader } from '../../../shared/ui/PageHeader';
 import { APP_MESSAGES } from '../../../shared/constants/messages';
+import { Button } from "../../../shared/ui";
 
 type TabType = 'create' | 'manage';
 
@@ -70,41 +70,30 @@ const MentorAvailabilityPage: React.FC = () => {
 
     return (
         <div className="flex flex-col">
-            <PageHeader
-                title="Availability"
-                description="Set up your schedule so students can book mentorship sessions with you. Create recurring schedules or add specific dates."
-            />
-
             {/* Tab Navigation */}
-            <div className="mb-10">
+            <div className="mb-6">
                 <div className="inline-flex rounded-2xl bg-white/[0.03] border border-white/5 p-1.5 backdrop-blur-xl shadow-2xl relative">
                     <div className="absolute inset-0 bg-indigo-500/5 blur-2xl rounded-full -z-10" />
-                    <button
+                    <Button
+                        variant={activeTab === 'create' ? 'primary' : 'secondary'}
                         onClick={() => setActiveTab('create')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-500 ${activeTab === 'create'
-                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25'
-                                : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
-                            }`}
+                        leftIcon={<CalendarPlus className="h-4 w-4" />}
                     >
-                        <CalendarPlus className="h-4 w-4" />
                         Create Slots
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant={activeTab === 'manage' ? 'primary' : 'secondary'}
                         onClick={() => setActiveTab('manage')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-500 ${activeTab === 'manage'
-                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25'
-                                : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
-                            }`}
+                        leftIcon={<ListTodo className="h-4 w-4" />}
                     >
-                        <ListTodo className="h-4 w-4" />
                         Active Rules
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Create Tab Content */}
             {activeTab === 'create' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 pb-20">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 pb-12">
                     <AvailabilityForm
                         onSubmit={handleSubmit}
                         isLoading={isLoading}
@@ -123,13 +112,13 @@ const MentorAvailabilityPage: React.FC = () => {
                             <h2 className="text-lg font-semibold text-white mb-1">Active Rulesets</h2>
                             <p className="text-sm text-gray-500">Your currently configured booking windows</p>
                         </div>
-                        <button
+                        <Button
+                            variant="secondary"
                             onClick={() => setActiveTab('create')}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-sm font-semibold hover:bg-gray-200 transition-all shadow-lg"
+                            leftIcon={<CalendarPlus className="h-4 w-4" />}
                         >
-                            <CalendarPlus className="h-4 w-4" />
                             New Slot
-                        </button>
+                        </Button>
                     </div>
                     <ManageRulesSection
                         key={rulesKey}

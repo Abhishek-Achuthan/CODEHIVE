@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Loader2, Calendar, Filter, X } from "lucide-react";
+import { Search, Loader2, Filter, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useFetchSessions } from "../hooks/useFetchSessions";
@@ -7,11 +7,11 @@ import { SessionCard } from "../components/SessionCard";
 import { CancelSessionDialog } from "../components/CancelSessionDialog";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
+import { EmptyState } from "../../../shared/ui/EmptyState";
 import { useCancelSession } from "../hooks/useCancelSession";
-import { PageHeader } from "../../../shared/ui/PageHeader";
 import type { BookedSessionResponse } from "../../../shared/types/api/session";
 import { useNavigate } from "react-router-dom";
-
+import { Button, Input } from "../../../shared/ui";
 const REFUND_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function getTimeDiffMs(startTime: string): number {
@@ -118,45 +118,32 @@ export default function MySessionsPage() {
 
     return (
         <div className="flex flex-col">
-            <PageHeader
-                title="My Sessions"
-                description="Sessions you've booked as a user"
-            >
-            </PageHeader>
-
-            <div className="relative z-40 mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative z-40 mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <StatusTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
                 <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row">
-                    <div className="group relative w-full sm:w-80">
-                        <div className="absolute inset-0 bg-indigo-500/5 blur-lg transition-colors group-focus-within:bg-indigo-500/10" />
-                        <input
-                            type="text"
+                    <div className="w-full sm:w-80">
+                        <Input
                             placeholder="Search your sessions..."
+                            leftIcon={<Search className="w-4 h-4" />}
                             value={searchQuery}
                             onChange={(e) => handleSearchChange(e.target.value)}
-                            className="relative w-full rounded-xl border border-white/5 bg-white/[0.03] py-2.5 pl-10 pr-4 text-sm font-medium text-white transition-all placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                         />
-                        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600 transition-colors group-focus-within:text-indigo-400" />
                     </div>
                     
                     <div className="relative">
-                        <button
+                        <Button
+                            variant={showFilters || activeFilterCount > 0 ? "primary" : "secondary"}
+                            leftIcon={<Filter className="w-4 h-4" />}
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`flex h-full w-full sm:w-auto items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
-                                showFilters || activeFilterCount > 0
-                                    ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
-                                    : "border-white/5 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.05]"
-                            }`}
                         >
-                            <Filter className="h-4 w-4" />
-                            <span>Filters</span>
+                            Filters
                             {activeFilterCount > 0 && (
-                                <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500 text-[10px] font-bold text-white">
+                                <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-[10px] font-bold text-white">
                                     {activeFilterCount}
                                 </span>
                             )}
-                        </button>
+                        </Button>
 
                         <AnimatePresence>
                             {showFilters && (
@@ -290,23 +277,21 @@ export default function MySessionsPage() {
                     <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
                 </div>
             ) : sessions.length === 0 ? (
-                <div className="flex min-h-[400px] flex-col items-center justify-center py-16 bg-white/[0.01] rounded-3xl border border-dashed border-white/10">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-900 border border-white/5 shadow-2xl relative">
-                        <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full" />
-                        <Calendar className="h-10 w-10 text-zinc-500 relative z-10" />
-                    </div>
-                    <div className="mt-6 text-base font-bold text-white text-center">
-                        No {activeTab} sessions
-                        <p className="mt-2 text-sm text-zinc-500 font-medium italic">
-                            {activeTab === "upcoming"
-                                ? "Time to explore new mentorship opportunities!"
-                                : `You don't have any ${activeTab} sessions listed.`}
-                        </p>
-                    </div>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-[#121214] py-10 text-center"
+                >
+                    <EmptyState
+                        title={`No ${activeTab} sessions`}
+                        description={activeTab === "upcoming"
+                            ? "Time to explore new mentorship opportunities!"
+                            : `You don't have any ${activeTab} sessions listed.`}
+                    />
+                </motion.div>
             ) : (
                 <>
-                    <div className="mt-10 grid gap-6 sm:grid-cols-2">
+                    <div className="mt-6 grid gap-6 sm:grid-cols-2">
                         {sessions.map((session) => (
                             <SessionCard
                                 key={session.id}

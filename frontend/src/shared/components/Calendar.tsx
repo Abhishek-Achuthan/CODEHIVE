@@ -66,9 +66,9 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
                     disabled={isPast}
                     className={`
                         relative flex h-10 w-10 items-center justify-center rounded-full text-sm transition-all
-                        ${isSelected ? 'bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-500/30' : 'text-gray-300 hover:bg-gray-800'}
-                        ${isToday && !isSelected ? 'border border-indigo-500 text-indigo-400' : ''}
-                        ${isPast ? 'text-gray-600 cursor-not-allowed hover:bg-transparent' : ''}
+                        ${isSelected ? 'bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-500/30' : 'text-zinc-300 hover:bg-zinc-800'}
+                        ${isToday && !isSelected ? 'border border-indigo-500/50 text-indigo-400' : ''}
+                        ${isPast ? 'text-zinc-600 cursor-not-allowed hover:bg-transparent' : ''}
                     `}
                 >
                     {day}
@@ -79,16 +79,16 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
     };
 
     return (
-        <div className="w-full max-w-sm rounded-2xl border border-gray-800 bg-black p-6">
+        <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-[#121214] p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-white tracking-tight">
                     {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h2>
                 <div className="flex gap-2">
-                    <button onClick={handlePrevMonth} className="rounded-full p-2 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                    <button onClick={handlePrevMonth} className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
                         <ChevronLeft className="h-5 w-5" />
                     </button>
-                    <button onClick={handleNextMonth} className="rounded-full p-2 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                    <button onClick={handleNextMonth} className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
                         <ChevronRight className="h-5 w-5" />
                     </button>
                 </div>
@@ -96,7 +96,7 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
 
             <div className="mb-2 grid grid-cols-7 text-center">
                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                    <div key={day} className="text-xs font-medium text-gray-500 py-2">
+                    <div key={day} className="text-xs font-medium text-zinc-500 py-2 uppercase tracking-wider">
                         {day}
                     </div>
                 ))}
@@ -107,14 +107,14 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
             </div>
 
             {showRecurringOption && (
-                <div className="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-6">
+                <div className="mt-6 flex flex-col gap-3 border-t border-zinc-800 pt-6">
                     <button
                         onClick={() => onSelectDate(null)}
                         className={`
                         w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors
                         ${selectedDate === null
-                                ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
-                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-sm'
+                                : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                             }
                     `}
                     >

@@ -45,29 +45,29 @@ export default function CreateSavedListModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md">
+      <DialogContent className="border-zinc-800 bg-[#121214] sm:max-w-md p-6">
         <DialogHeader>
-          <DialogTitle>Create new list</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-zinc-100 text-lg">Create new list</DialogTitle>
+          <DialogDescription className="text-zinc-400 text-sm">
             Give your list a name to organize saved questions.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
-          <label className="text-sm text-foreground/80">List name</label>
+        <div className="space-y-3 mt-4 mb-6">
+          <label className="text-sm font-medium text-zinc-300">List name</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. React Interview"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+            className="w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors shadow-sm"
           />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="px-4 py-2 rounded-lg border border-border text-sm text-foreground/80 hover:bg-card/80"
+            className="px-4 py-2 rounded-lg border border-zinc-800 bg-transparent text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
             disabled={submitting}
           >
             Cancel
@@ -76,9 +76,9 @@ export default function CreateSavedListModal({
             type="button"
             onClick={handleCreate}
             disabled={submitting || !name.trim()}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 border border-white disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Creating..." : "Create"}
+            {submitting ? "Creating..." : "Create List"}
           </button>
         </DialogFooter>
       </DialogContent>

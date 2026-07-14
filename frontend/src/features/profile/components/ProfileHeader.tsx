@@ -38,8 +38,8 @@ export default function ProfileHeader({
   return (
     <SectionCard
       showHeader={false}
-      className="mb-5 relative"
-      contentClassName="py-4"
+      className="mb-2 relative border-none bg-transparent"
+      contentClassName="p-0"
     >
       {!readonly && onSaveProfileHeader && (
         <ProfileHeaderEditDialog
@@ -58,34 +58,46 @@ export default function ProfileHeader({
         />
       )}
 
-
-
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 bg-[#121214] p-6 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden">
+        {/* Subtle background glow effect */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 z-10">
           <ProfileAvatarCropper
             url={user.avatarUrl}
             onSave={onSaveAvatar ?? (async () => undefined)}
             readonly={readonly}
           />
 
-          <div className="flex flex-col justify-center">
-            <div className="text-xl font-bold leading-tight">
+          <div className="flex flex-col items-center sm:items-start pt-1">
+            <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
               {user.displayName}
-            </div>
+            </h1>
+            
+            {user.roleTitle && (
+              <div className="text-sm font-medium text-indigo-400 mt-1 uppercase tracking-wide">
+                {user.roleTitle}
+              </div>
+            )}
 
-            <div className="text-sm text-gray-400 mt-1">{user.email}</div>
-            {user.phone ? (
-              <div className="text-sm text-gray-400">{user.phone}</div>
-            ) : null}
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-3 text-sm text-zinc-400">
+              <span>{user.email}</span>
+              {user.phone && (
+                <>
+                  <span className="hidden sm:inline text-zinc-700">•</span>
+                  <span>{user.phone}</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 z-10 w-full sm:w-auto">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClickLinkedIn}
-              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-zinc-800 bg-[#09090b] p-2.5 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-colors"
               aria-label="LinkedIn"
               title={user.linkedInUrl ?? ""}
             >
@@ -94,7 +106,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={onClickGitHub}
-              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-zinc-800 bg-[#09090b] p-2.5 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-colors"
               aria-label="GitHub"
               title={user.githubUrl ?? ""}
             >
@@ -103,7 +115,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={onClickWebsite}
-              className="inline-flex items-center justify-center rounded-md border border-gray-700 p-2 text-gray-200 hover:bg-gray-900 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-zinc-800 bg-[#09090b] p-2.5 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-colors"
               aria-label="Website"
               title={user.websiteUrl ?? ""}
             >
@@ -115,7 +127,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={() => setEditOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-white text-black px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-colors shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-indigo-500 transition-all shadow-sm"
               aria-label="Edit profile"
             >
               <Pencil className="h-4 w-4" />
