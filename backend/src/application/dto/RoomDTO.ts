@@ -131,6 +131,8 @@ export interface RoomListItemDTO {
   description?: string;
   visibility: RoomVisibility;
   hostId: string;
+  hostName?: string;
+  hostAvatarUrl?: string;
   maxParticipants: number;
   participantCount: number;
   createdAt: Date;

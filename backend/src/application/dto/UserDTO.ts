@@ -1,6 +1,7 @@
 
 import { Experience } from '../../domain/types/ExperienceType';
 import { MentorStatus } from '../../domain/types/MentorStatus';
+import { UserLanguage } from '../../domain/types/UserLanguage';
 interface IUserRegisterInputDTO {
   firstName: string;
   lastName: string;
@@ -24,6 +25,7 @@ interface IUserLoginResponseDTO {
   phone?: string | undefined;
   about?: string | undefined;
   skills: string[];
+  languages: UserLanguage[];
   experience: Experience[];
   avatarUrl?: string | undefined;
   githubUrl?: string | undefined;
@@ -54,6 +56,7 @@ interface UpdateUserProfileDTO {
   phone?: string | undefined;
   about?: string | undefined;
   skills?: string[] | undefined;
+  languages?: UserLanguage[] | undefined;
   experience?: Experience[] | undefined;
   avatarUrl?: string | undefined;
   githubUrl?: string | undefined;
@@ -70,6 +73,7 @@ interface IUserProfileResponseDTO {
   phone?: string | undefined;
   about?: string | undefined;
   skills: string[];
+  languages: UserLanguage[];
   experience: Experience[];
   avatarUrl?: string | undefined;
   githubUrl?: string | undefined;

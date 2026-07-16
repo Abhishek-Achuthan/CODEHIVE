@@ -47,6 +47,7 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     avatarUrl: user.avatarUrl,
     about: user.about,
     skills: user.skills,
+    languages: user.languages ?? [],
     experience: user.experience,
     githubUrl: user.githubUrl,
     linkedInUrl: user.linkedInUrl,

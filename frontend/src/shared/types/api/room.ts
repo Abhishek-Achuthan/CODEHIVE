@@ -77,6 +77,8 @@ export interface GetPublicRoomsResponse {
   description?: string;
   visibility: RoomVisibility;
   hostId: string;
+  hostName?: string;
+  hostAvatarUrl?: string;
   maxParticipants: number;
   participantCount: number;
   createdAt: string;

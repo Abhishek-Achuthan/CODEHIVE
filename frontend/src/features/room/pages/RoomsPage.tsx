@@ -19,6 +19,7 @@ const RoomsPage: React.FC = () => {
   const [publicSearchTerm, setPublicSearchTerm] = useState("");
   const [publicDateFilter, setPublicDateFilter] = useState("");
   const [publicStatusFilter, setPublicStatusFilter] = useState("");
+  const [publicCurrentPage, setPublicCurrentPage] = useState(1);
 
   const trimmedPublicSearch = publicSearchTerm.trim();
   const debouncedPublicSearch = useDebounce(trimmedPublicSearch, 500);
@@ -33,13 +34,13 @@ const RoomsPage: React.FC = () => {
   const publicRooms = useRooms(
     useMemo(
       () => ({
-        page: 1,
-        limit: 12,
+        page: publicCurrentPage,
+        limit: 6,
         search: effectivePublicSearch || undefined,
         dateFrom: publicDateFilter || undefined,
         status: publicStatusFilter || undefined,
       }),
-      [effectivePublicSearch, publicDateFilter, publicStatusFilter],
+      [publicCurrentPage, effectivePublicSearch, publicDateFilter, publicStatusFilter],
     ),
   );
   const myRoomsEnabled = activeTab === "mine" && Boolean(user);
@@ -59,11 +60,17 @@ const RoomsPage: React.FC = () => {
       myRooms.setCurrentPage(1);
     } else {
       myRooms.resetSearch();
+      setPublicCurrentPage(1);
     }
   };
 
   const handleMyRoomsPageChange = (page: number) => {
     myRooms.setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePublicRoomsPageChange = (page: number) => {
+    setPublicCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -77,6 +84,22 @@ const RoomsPage: React.FC = () => {
       myRooms.setCurrentPage(myRooms.totalPages);
     }
   }, [myRoomsEnabled, myRooms.rooms, myRooms.currentPage, myRooms.totalPages]);
+
+  useEffect(() => {
+    if (
+      isPublicTab &&
+      publicRooms.data &&
+      publicCurrentPage > publicRooms.data.totalPages &&
+      publicRooms.data.totalPages >= 1
+    ) {
+      setPublicCurrentPage(publicRooms.data.totalPages);
+    }
+  }, [isPublicTab, publicRooms.data, publicCurrentPage]);
+
+  // Reset public page to 1 when filters change
+  useEffect(() => {
+    setPublicCurrentPage(1);
+  }, [effectivePublicSearch, publicDateFilter, publicStatusFilter]);
 
   const headerCopy =
     activeTab === "public"
@@ -170,16 +193,34 @@ const RoomsPage: React.FC = () => {
                   emptyTitle={
                     isPublicTab
                       ? effectivePublicSearch
-                        ? "No rooms match your search"
+                        ? "No rooms found"
                         : "No public rooms available"
                       : myRoomsEmptyCopy.title
                   }
                   emptyDescription={
                     isPublicTab
                       ? effectivePublicSearch
-                        ? "Try a different title or clear the search field."
-                        : "Be the first to create one! Use Create Room to start a collaborative space."
+                        ? "No rooms match your search or filters. Try another keyword or clear your filters."
+                        : "There are no public rooms available right now. Create one or check back later."
                       : myRoomsEmptyCopy.description
+                  }
+                  emptyActionLabel={
+                    (effectivePublicSearch || (!isPublicTab && myRooms.searchTerm)) 
+                      ? "Clear Filters"
+                      : "Create Room"
+                  }
+                  onEmptyAction={
+                    (effectivePublicSearch || (!isPublicTab && myRooms.searchTerm))
+                      ? () => {
+                          if (isPublicTab) {
+                            setPublicSearchTerm("");
+                            setPublicDateFilter("");
+                            setPublicStatusFilter("");
+                          } else {
+                            myRooms.resetSearch();
+                          }
+                        }
+                      : () => setIsModalOpen(true)
                   }
                   pagination={
                     !isPublicTab
@@ -189,7 +230,14 @@ const RoomsPage: React.FC = () => {
                           totalItems: myRooms.totalItems,
                           onPageChange: handleMyRoomsPageChange,
                         }
-                      : undefined
+                      : publicRooms.data
+                        ? {
+                            currentPage: publicCurrentPage,
+                            totalPages: publicRooms.data.totalPages,
+                            totalItems: publicRooms.data.totalItems,
+                            onPageChange: handlePublicRoomsPageChange,
+                          }
+                        : undefined
                   }
                 />
               )}
@@ -217,30 +265,28 @@ function getMyRoomsEmptyCopy(
 ) {
   if (debouncedSearch) {
     return {
-      title: "No rooms match your search",
-      description: "Try a different title or clear the search field.",
+      title: "No rooms found",
+      description: "No rooms match your search or filters. Try another keyword or clear your filters.",
     };
   }
 
   if (visibility === "private") {
     return {
       title: "No private rooms yet",
-      description:
-        "Create a private room to collaborate via invite links only.",
+      description: "Create your first private room and invite collaborators to start coding together.",
     };
   }
 
   if (visibility === "public") {
     return {
-      title: "No public rooms yet",
-      description: "Create a public room to let others request to join.",
+      title: "No public rooms available",
+      description: "There are no public rooms available right now. Create one or check back later.",
     };
   }
 
   return {
-    title: "You have not created any rooms yet",
-    description:
-      "Create a public or private room to start collaborating with your team.",
+    title: "No rooms yet",
+    description: "Start your first coding workspace and collaborate with developers in real time.",
   };
 }
 

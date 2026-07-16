@@ -7,7 +7,7 @@ import type {
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import type { MyRoomsVisibilityFilter } from "../components/MyRoomsVisibilityTabs";
 
-const DEFAULT_LIMIT = 5;
+const DEFAULT_LIMIT = 6;
 const SEARCH_DEBOUNCE_MS = 500;
 
 export const MY_ROOMS_PAGE_SIZE = DEFAULT_LIMIT;

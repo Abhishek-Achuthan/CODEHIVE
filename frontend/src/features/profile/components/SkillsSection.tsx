@@ -89,7 +89,7 @@ export default function SkillsSection({
         )
       }
     >
-      <div className="flex flex-wrap gap-2.5">
+      <div className="flex flex-wrap gap-3">
         {skills.length === 0 ? (
           <div className="w-full rounded-xl border border-dashed border-zinc-800 bg-[#09090b]/50 px-6 py-8 text-center">
             <div className="text-sm font-medium text-zinc-400">

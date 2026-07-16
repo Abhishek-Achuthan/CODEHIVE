@@ -96,14 +96,26 @@ export class RoomRepository
     const [docs, totalItems] = await Promise.all([
       this._model
         .find(query)
+        .populate('hostId', 'firstName lastName avatarUrl username')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .lean<RoomLeanDoc[]>(),
+        .lean(),
       this._model.countDocuments(query),
     ]);
 
-    const items = docs.map((doc) => this.leanToEntity(doc));
+    const items = docs.map((doc: any) => {
+       const entity = this.leanToEntity(doc);
+       if (doc.hostId && typeof doc.hostId === 'object') {
+           entity.hostId = doc.hostId._id.toString();
+           const fName = doc.hostId.firstName || '';
+           const lName = doc.hostId.lastName || '';
+           const fullName = `${fName} ${lName}`.trim();
+           entity.hostName = fullName || doc.hostId.username || 'Unknown';
+           entity.hostAvatarUrl = doc.hostId.avatarUrl;
+       }
+       return entity;
+    });
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -155,14 +167,26 @@ export class RoomRepository
     const [docs, totalItems] = await Promise.all([
       this._model
         .find(query)
+        .populate('hostId', 'firstName lastName avatarUrl username')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .lean<RoomLeanDoc[]>(),
+        .lean(),
       this._model.countDocuments(query),
     ]);
 
-    const items = docs.map((doc) => this.leanToEntity(doc));
+    const items = docs.map((doc: any) => {
+       const entity = this.leanToEntity(doc);
+       if (doc.hostId && typeof doc.hostId === 'object') {
+           entity.hostId = doc.hostId._id.toString();
+           const fName = doc.hostId.firstName || '';
+           const lName = doc.hostId.lastName || '';
+           const fullName = `${fName} ${lName}`.trim();
+           entity.hostName = fullName || doc.hostId.username || 'Unknown';
+           entity.hostAvatarUrl = doc.hostId.avatarUrl;
+       }
+       return entity;
+    });
     const totalPages = Math.ceil(totalItems / limit);
 
     return { items, totalItems, totalPages };

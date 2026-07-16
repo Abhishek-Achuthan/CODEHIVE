@@ -140,7 +140,7 @@ export default function ProfileAvatarCropper({
   return (
     <>
       {/* Avatar */}
-      <div className="relative group w-[104px] h-[104px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-[#121214] bg-[#121214] shadow-xl ring-1 ring-zinc-800/50">
+      <div className="relative group w-[88px] h-[88px] sm:w-[96px] sm:h-[96px] rounded-full border-[3px] border-[#121214] bg-[#121214] shadow-xl ring-1 ring-zinc-800/50 shrink-0">
         <img
           src={url || DEFAULT_AVATAR}
           alt="Profile avatar"
@@ -151,7 +151,7 @@ export default function ProfileAvatarCropper({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300 shadow-sm transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"
+            className="absolute bottom-0 right-0 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border-2 border-[#121214] bg-zinc-800 text-zinc-300 shadow-sm transition-all hover:scale-105 hover:bg-zinc-700 hover:text-white"
             disabled={saving}
           >
             <Camera className="w-4 h-4" />

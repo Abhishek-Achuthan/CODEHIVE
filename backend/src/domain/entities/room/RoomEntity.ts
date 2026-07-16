@@ -20,6 +20,8 @@ export interface RoomEntity {
   description?: string;
 
   hostId: string;
+  hostName?: string;
+  hostAvatarUrl?: string;
 
   type: RoomType;
 

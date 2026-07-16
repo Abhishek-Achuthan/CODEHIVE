@@ -21,6 +21,8 @@ export class RoomMapper {
       ...(room.description !== undefined ? { description: room.description } : {}),
       visibility: room.visibility,
       hostId: room.hostId,
+      ...(room.hostName !== undefined ? { hostName: room.hostName } : {}),
+      ...(room.hostAvatarUrl !== undefined ? { hostAvatarUrl: room.hostAvatarUrl } : {}),
       maxParticipants: room.maxParticipants,
       participantCount: room.participantCount,
       createdAt: room.createdAt,

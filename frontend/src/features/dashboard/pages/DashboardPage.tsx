@@ -171,9 +171,6 @@ export default function DashboardPage() {
                         {q.tags?.[0] && (
                           <span className="px-2 py-0.5 rounded-md bg-white/5">{q.tags[0]}</span>
                         )}
-                        {q.createdAt && (
-                          <span>{formatDistanceToNow(new Date(q.createdAt))} ago</span>
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-zinc-400">

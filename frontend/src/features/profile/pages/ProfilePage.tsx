@@ -9,6 +9,7 @@ import PlanBillingCard from "../components/PlanBillingCard";
 import ProfileHeader from "../components/ProfileHeader";
 import RightColumn from "../components/RightColumn";
 import SkillsSection from "../components/SkillsSection";
+import LanguagesSection from "../components/LanguagesSection";
 import AccountSecurityCard from "../components/AccountSecurityCard";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 
@@ -82,6 +83,7 @@ export default function ProfilePage() {
       linkedInUrl: authUser?.linkedInUrl,
       githubUrl: authUser?.githubUrl,
       websiteUrl: authUser?.websiteUrl,
+      languages: authUser?.languages,
     };
   }, [authUser]);
 
@@ -176,6 +178,12 @@ export default function ProfilePage() {
                     onSave={(skills) => updateProfile({ skills })}
                   />
                 </div>
+
+                <LanguagesSection 
+                  initialLanguages={authUser?.languages ?? []} 
+                  onSave={(langs) => updateProfile({ languages: langs })}
+                  role={authUser?.role}
+                />
 
                 <ExpertiseSection
                   initialPrimaryExpertise={authUser?.primaryExpertise}

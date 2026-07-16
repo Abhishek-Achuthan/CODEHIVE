@@ -1,6 +1,7 @@
 import { UserRole } from '../types/UserRole';
 import { Experience } from '../types/ExperienceType';
 import { MentorStatus } from '../types/MentorStatus';
+import { UserLanguage } from '../types/UserLanguage';
 
 export interface UserEntity {
   id: string;
@@ -9,6 +10,7 @@ export interface UserEntity {
   email: string;
   about?: string;
   skills: string[];
+  languages?: UserLanguage[];
   experience: Experience[];
   avatarUrl?: string;
   githubUrl?: string;

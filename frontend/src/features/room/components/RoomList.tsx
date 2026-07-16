@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 import { RoomCard } from "./RoomCard";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { EmptyState } from "../../../shared/ui/EmptyState";
@@ -17,6 +18,8 @@ interface RoomListProps {
   error: string | null;
   emptyTitle?: string;
   emptyDescription?: string;
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
   actionLabel?: string;
   pagination?: RoomListPagination;
 }
@@ -34,16 +37,56 @@ export const RoomList: React.FC<RoomListProps> = ({
   error,
   emptyTitle = "No public rooms available",
   emptyDescription = "Be the first to create one! Use the Create Room button to start your own space.",
+  emptyActionLabel,
+  onEmptyAction,
   actionLabel,
   pagination,
 }) => {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const stateRef = useRef({ hoveredIdx, expandedIdx });
+  useEffect(() => {
+    stateRef.current = { hoveredIdx, expandedIdx };
+  }, [hoveredIdx, expandedIdx]);
+
+  const handleMouseEnter = (idx: number) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    const { expandedIdx: currentExpanded } = stateRef.current;
+    const columns = 3;
+    const compactIdx = currentExpanded !== null 
+      ? (currentExpanded < columns ? currentExpanded + columns : currentExpanded - columns) 
+      : null;
+
+    if (currentExpanded !== null && (idx === currentExpanded || idx === compactIdx)) {
+      setHoveredIdx(currentExpanded);
+      return;
+    }
+
+    setHoveredIdx(idx);
+    setExpandedIdx(null);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setHoveredIdx(null);
+      setExpandedIdx(null);
+    }, 150);
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-48 animate-pulse rounded-2xl border border-white/5 bg-zinc-800/50"
+            className="h-[280px] animate-pulse rounded-2xl border border-white/5 bg-zinc-800/50"
           />
         ))}
       </div>
@@ -75,16 +118,13 @@ export const RoomList: React.FC<RoomListProps> = ({
 
   if (!rooms || rooms.items.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-[#121214] py-10 text-center"
-      >
-        <EmptyState
-            title={emptyTitle}
-            description={emptyDescription}
-        />
-      </motion.div>
+      <EmptyState
+        animationSrc="https://lottie.host/f1339a20-18d2-4ccd-bb99-eddc7535ae8a/05ml6h8rIZ.json"
+        title={emptyTitle}
+        description={emptyDescription}
+        actionLabel={emptyActionLabel}
+        onAction={onEmptyAction}
+      />
     );
   }
 
@@ -98,18 +138,61 @@ export const RoomList: React.FC<RoomListProps> = ({
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
-          {rooms.items.map((room, idx) => (
-            <motion.div
-              key={room.id}
-              layout
-              initial={listMotion.initial}
-              animate={listMotion.animate}
-              exit={listMotion.exit}
-              transition={{ ...listMotion.transition, delay: idx * 0.04 }}
-            >
-              <RoomCard room={room} actionLabel={actionLabel} />
-            </motion.div>
-          ))}
+          {rooms.items.map((room, idx) => {
+            const isHovered = hoveredIdx === idx;
+            const isExpanded = expandedIdx === idx;
+            
+            // Only apply interaction on 3-column desktop layout
+            const columns = 3;
+            let compactIdx: number | null = null;
+            let expandDirection: "up" | "down" | null = null;
+            let compactAlign: "top" | "bottom" | null = null;
+
+            if (expandedIdx !== null) {
+              if (expandedIdx < columns) {
+                // Top row expands down, shrinks card below
+                expandDirection = "down";
+                if (idx === expandedIdx + columns) {
+                  compactIdx = idx;
+                  compactAlign = "bottom";
+                }
+              } else {
+                // Other rows expand up, shrink card above
+                expandDirection = "up";
+                if (idx === expandedIdx - columns) {
+                  compactIdx = idx;
+                  compactAlign = "top";
+                }
+              }
+            }
+
+            const isCompact = compactIdx === idx;
+
+            return (
+              <motion.div
+                key={room.id}
+                layout
+                initial={listMotion.initial}
+                animate={listMotion.animate}
+                exit={listMotion.exit}
+                transition={{ ...listMotion.transition, delay: idx * 0.04 }}
+                className={`w-full lg:h-[280px] relative ${isExpanded ? 'z-50' : isHovered ? 'z-20' : 'z-10'}`}
+              >
+                <RoomCard 
+                  room={room} 
+                  actionLabel={actionLabel} 
+                  isHovered={isHovered}
+                  isExpanded={isExpanded}
+                  isCompact={isCompact}
+                  expandDirection={expandDirection}
+                  compactAlign={compactAlign}
+                  onMouseEnter={() => handleMouseEnter(idx)}
+                  onMouseLeave={() => handleMouseLeave()}
+                  onExpandRequest={() => setExpandedIdx(idx)}
+                />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
 

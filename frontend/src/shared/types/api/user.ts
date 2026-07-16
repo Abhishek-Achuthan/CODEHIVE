@@ -1,4 +1,5 @@
 import type { ExperienceApi } from "./auth";
+import type { UserLanguage } from "../domain/language.types";
 
 export type UpdateMyProfileRequest = {
   firstName?: string;
@@ -6,6 +7,7 @@ export type UpdateMyProfileRequest = {
   phone?: string;
   about?: string;
   skills?: string[];
+  languages?: UserLanguage[];
   experience?: ExperienceApi[];
   avatarUrl?: string;
   githubUrl?: string;
@@ -22,6 +24,7 @@ export type UserProfileApi = {
   phone?: string;
   about?: string;
   skills: string[];
+  languages: UserLanguage[];
   experience: ExperienceApi[];
   avatarUrl?: string;
   githubUrl?: string;

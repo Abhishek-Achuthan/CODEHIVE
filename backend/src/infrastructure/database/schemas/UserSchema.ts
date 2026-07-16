@@ -2,6 +2,7 @@ import { Document, Schema, Types } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
 import { Experience } from '../../../domain/types/ExperienceType';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
+import { UserLanguage } from '../../../domain/types/UserLanguage';
 
 export interface UserDocument extends Document {
   _id: Types.ObjectId;
@@ -20,6 +21,7 @@ export interface UserDocument extends Document {
   mentorStatus: MentorStatus;
   mentorAppliedAt?: Date;
   skills: string[];
+  languages: UserLanguage[];
   experience: Experience[];
   role: UserRole;
   isBlocked: boolean;
@@ -53,6 +55,7 @@ export type UserLeanDoc = {
   mentorStatus: MentorStatus;
   mentorAppliedAt?: Date;
   skills: string[];
+  languages: UserLanguage[];
   experience: Experience[];
   role: UserRole;
   isBlocked: boolean;
@@ -90,6 +93,19 @@ export const UserSchema = new Schema<UserDocument>(
     },
     mentorAppliedAt: { type: Date, required: false },
     skills: { type: [String], default: [] },
+    languages: {
+      type: [
+        {
+          language: { type: String, required: true },
+          proficiency: { 
+            type: String, 
+            enum: ['Native', 'Fluent', 'Professional', 'Intermediate', 'Basic'],
+            required: true 
+          }
+        }
+      ],
+      default: []
+    },
     experience: {
       type: [
         {

@@ -52,6 +52,11 @@ export const ExperienceItemSchema = z
     }
   });
 
+export const UserLanguageSchema = z.object({
+  language: z.string().trim().min(1, { message: 'Language is required' }),
+  proficiency: z.enum(['Native', 'Fluent', 'Professional', 'Intermediate', 'Basic'], { message: 'Invalid proficiency' })
+});
+
 export const UpdateUserProfileSchema = z
   .object({
     firstName: z.string().min(1).optional(),
@@ -63,6 +68,16 @@ export const UpdateUserProfileSchema = z
       .transform((val) => val.replace(/\s+/g, ' ').trim())
       .optional(),
     skills: z.array(SkillSchema).max(SKILLS_MAX_ITEMS).optional(),
+    languages: z.array(UserLanguageSchema)
+      .max(10, { message: 'Maximum 10 languages allowed' })
+      .refine(
+        (langs) => {
+          const uniqueLangs = new Set(langs.map(l => l.language.toLowerCase()));
+          return uniqueLangs.size === langs.length;
+        },
+        { message: 'Duplicate languages are not allowed' }
+      )
+      .optional(),
     experience: z
       .array(
         ExperienceItemSchema

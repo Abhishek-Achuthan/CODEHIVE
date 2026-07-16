@@ -12,6 +12,7 @@ export const useMentorSessions = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
     const [searchQuery, setSearchQuery] = useState("");
+    const [dateFilter, setDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -28,7 +29,10 @@ export const useMentorSessions = () => {
                 page: currentPage,
                 limit: itemsPerPage,
                 search: searchQuery,
-                filter: { status: activeTab }
+                filter: { 
+                    status: activeTab,
+                    ...(dateFilter ? { dateFrom: dateFilter, dateTo: dateFilter } : {})
+                }
             });
             setSessions(data.items || []);
             setTotalPages(data.totalPages || 1);
@@ -42,7 +46,7 @@ export const useMentorSessions = () => {
 
     useEffect(() => {
         fetchMentorSessions();
-    }, [currentPage, activeTab, searchQuery]);
+    }, [currentPage, activeTab, searchQuery, dateFilter]);
 
     const paginatedSessions = sessions;
 
@@ -68,6 +72,11 @@ export const useMentorSessions = () => {
         setCurrentPage(1);
     };
 
+    const handleDateChange = (value: string) => {
+        setDateFilter(value);
+        setCurrentPage(1);
+    };
+
     return {
         loading,
         sessions: paginatedSessions,
@@ -76,10 +85,12 @@ export const useMentorSessions = () => {
         cancelLoading,
         activeTab,
         searchQuery,
+        dateFilter,
 
         setCurrentPage,
         handleTabChange,
         handleSearchChange,
+        handleDateChange,
         handleCancelSession,
     };
 };

@@ -1,6 +1,6 @@
 import { Wallet, ArrowUpRight, ArrowDownLeft, RefreshCw, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { EmptyState } from "../../../shared/ui/EmptyState";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import { useWallet } from "../hooks/useWallet";
 import { useWalletTransactions } from "../hooks/useWalletTransactions";
@@ -174,14 +174,24 @@ export default function WalletPage() {
                 </div>
               ) : transactions.length === 0 ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center h-full text-center"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center h-full py-12 text-center"
                 >
-                  <EmptyState
-                      title="No transactions yet"
-                      description="Your wallet activity will appear here once you start booking or hosting mentoring sessions."
-                  />
+                  <div className="w-[200px] h-[200px] mb-4">
+                    <DotLottieReact
+                      src="https://lottie.host/93ce92ed-9711-4d14-a2df-42a1af8102bc/0HYAvTvFIi.json"
+                      loop
+                      autoplay
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
+                    No transactions yet
+                  </h3>
+                  <p className="text-sm text-zinc-400 max-w-sm mx-auto leading-relaxed">
+                    Your wallet activity will appear here once you start booking or hosting mentoring sessions.
+                  </p>
                 </motion.div>
               ) : (
                 <div className="flex flex-col">{transactions.map(renderTransaction)}</div>

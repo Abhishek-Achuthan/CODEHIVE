@@ -1,4 +1,5 @@
 // Request DTOs
+import type { UserLanguage } from "../domain/language.types";
 export type RegisterData = {
   firstName: string;
   lastName: string;
@@ -52,6 +53,7 @@ export interface UserApi {
   avatarUrl?: string;
   about?: string;
   skills?: string[];
+  languages?: UserLanguage[];
   experience?: ExperienceApi[];
   githubUrl?: string;
   linkedInUrl?: string;

@@ -121,6 +121,7 @@ export class UserRepository
       mentorStatus,
       mentorAppliedAt,
       skills,
+      languages,
       experience,
       role,
       isBlocked,
@@ -148,6 +149,7 @@ export class UserRepository
     if (mentorStatus !== undefined) doc.mentorStatus = mentorStatus;
     if (mentorAppliedAt !== undefined) doc.mentorAppliedAt = mentorAppliedAt;
     if (skills !== undefined) doc.skills = skills;
+    if (languages !== undefined) doc.languages = languages;
     if (experience !== undefined) doc.experience = experience;
     if (role !== undefined) doc.role = role;
     if (isBlocked !== undefined) doc.isBlocked = isBlocked;
@@ -177,6 +179,7 @@ export class UserRepository
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
       skills: doc.skills,
+      languages: doc.languages ?? [],
       experience: doc.experience,
       ...(doc.about !== undefined ? { about: doc.about } : {}),
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
@@ -212,6 +215,7 @@ export class UserRepository
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
       skills: doc.skills,
+      languages: doc.languages ?? [],
       experience: doc.experience,
       mentorStatus: doc.mentorStatus,
       experienceLevel: doc.experienceLevel,
