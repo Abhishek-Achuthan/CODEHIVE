@@ -100,6 +100,8 @@ export class MentorAvailabilityRepository
     if (data.bufferMinutes !== undefined)
       doc.bufferMinutes = data.bufferMinutes;
     if (data.slotPrice !== undefined) doc.slotPrice = data.slotPrice;
+    if (data.sessionType !== undefined) doc.sessionType = data.sessionType;
+    if (data.maxGuests !== undefined) doc.maxGuests = data.maxGuests;
     return doc;
   }
 
@@ -115,6 +117,8 @@ export class MentorAvailabilityRepository
       isActive: doc.isActive,
       bufferMinutes: doc.bufferMinutes,
       slotPrice: doc.slotPrice,
+      sessionType: doc.sessionType,
+      maxGuests: doc.maxGuests,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };

@@ -3,6 +3,7 @@ import { useAppSelector } from '../../../shared/hooks/storeHooks';
 import { useMyRooms } from '../../room/hooks/useMyRooms';
 import { useFetchSessions } from '../../session/hooks/useFetchSessions';
 import { useQuestionsList } from '../../qna/hooks/useListQuestions';
+import { UserRole, MentorStatus } from '../../../shared/constants/auth';
 import {
   ArrowRight,
   Calendar,
@@ -12,12 +13,16 @@ import {
   TerminalSquare,
   Sparkles,
   Clock,
-  Play
+  Play,
+  Star,
+  TrendingUp,
+  ChevronRight
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
 export default function DashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
+  const isMentor = user?.role === UserRole.MENTOR && user?.mentorStatus === MentorStatus.APPROVED;
   
   const { rooms, isLoading: roomsLoading } = useMyRooms(true);
   const { sessions } = useFetchSessions({ limit: 3 });
@@ -143,51 +148,132 @@ export default function DashboardPage() {
             )}
           </section>
 
-          {/* Community Snapshot */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-medium text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                Community
-              </h2>
-              <Link to="/qna" className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
-                Browse all <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-            
-            {questionsLoading ? (
-              <div className="h-32 rounded-[16px] bg-white/5 animate-pulse border border-white/5" />
-            ) : recentQuestions.length > 0 ? (
-              <div className="rounded-[16px] bg-[#111214] border border-white/5 divide-y divide-white/5">
-                {recentQuestions.map((q) => (
-                  <Link 
-                    to={`/qna/${q.id}`} 
-                    key={q.id}
-                    className="flex items-start justify-between p-4 hover:bg-[#17181C] transition-colors"
-                  >
-                    <div>
-                      <h4 className="text-sm font-medium text-zinc-200 mb-1.5 line-clamp-1">{q.title}</h4>
-                      <div className="flex items-center gap-2 text-xs text-zinc-500">
-                        {q.tags?.[0] && (
-                          <span className="px-2 py-0.5 rounded-md bg-white/5">{q.tags[0]}</span>
-                        )}
+          {isMentor ? (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-medium text-white flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-indigo-400" />
+                  Mentor Insights
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Student Feedback Card */}
+                <div className="p-4 rounded-[16px] bg-[#111214] border border-white/5 flex flex-col h-full hover:border-white/10 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-white">Student Feedback</h3>
+                  </div>
+                  
+                  <div className="flex items-end gap-3 mb-6">
+                    <div className="flex items-center gap-1.5">
+                      <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      <span className="text-2xl font-semibold text-white leading-none">4.8</span>
+                    </div>
+                    <span className="text-xs text-zinc-500 mb-0.5">124 Reviews</span>
+                  </div>
+
+                  <div className="space-y-2 mb-6 flex-1">
+                    {[
+                      { stars: 5, pct: 82 },
+                      { stars: 4, pct: 13 },
+                      { stars: 3, pct: 5 },
+                      { stars: 2, pct: 0 },
+                      { stars: 1, pct: 0 }
+                    ].map((rating) => (
+                      <div key={rating.stars} className="flex items-center gap-2 text-xs">
+                        <span className="text-zinc-400 w-[50px] shrink-0 tracking-[2px] text-[10px] flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span key={i} className={i < rating.stars ? "text-amber-400/90" : "text-zinc-700"}>★</span>
+                          ))}
+                        </span>
+                        <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-full bg-amber-400/80 rounded-full" style={{ width: `${rating.pct}%` }} />
+                        </div>
+                        <span className="text-zinc-500 w-8 text-right text-[10px]">{rating.pct}%</span>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>{q.answerCount || 0}</span>
-                    </div>
+                    ))}
+                  </div>
+
+                  <Link to="/sessions/hosting" className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-auto">
+                    View Reviews <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
-                ))}
+                </div>
+
+                {/* Session Performance Card */}
+                <div className="p-4 rounded-[16px] bg-[#111214] border border-white/5 flex flex-col h-full hover:border-white/10 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-white">Session Performance</h3>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="flex justify-between items-end mb-2">
+                      <span className="text-xs text-zinc-400">Completion Rate</span>
+                      <span className="text-xl font-semibold text-white leading-none">92%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: '92%' }} />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                      <span className="text-xs text-zinc-400">Completed Sessions</span>
+                      <span className="text-sm font-medium text-white">28</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                      <span className="text-xs text-zinc-400">Cancelled / No-show</span>
+                      <span className="text-sm font-medium text-zinc-300">2</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="p-6 rounded-[16px] bg-[#111214] border border-white/5 text-center flex flex-col items-center justify-center min-h-[140px]">
-                <MessageSquare className="w-6 h-6 text-zinc-600 mb-2" />
-                <h3 className="text-sm text-zinc-300 font-medium mb-1">No recent activity</h3>
-                <p className="text-xs text-zinc-500">Be the first to ask a question.</p>
+            </section>
+          ) : (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-medium text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  Community
+                </h2>
+                <Link to="/qna" className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
+                  Browse all <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-            )}
-          </section>
+              
+              {questionsLoading ? (
+                <div className="h-32 rounded-[16px] bg-white/5 animate-pulse border border-white/5" />
+              ) : recentQuestions.length > 0 ? (
+                <div className="rounded-[16px] bg-[#111214] border border-white/5 divide-y divide-white/5">
+                  {recentQuestions.map((q) => (
+                    <Link 
+                      to={`/qna/${q.id}`} 
+                      key={q.id}
+                      className="flex items-start justify-between p-4 hover:bg-[#17181C] transition-colors"
+                    >
+                      <div>
+                        <h4 className="text-sm font-medium text-zinc-200 mb-1.5 line-clamp-1">{q.title}</h4>
+                        <div className="flex items-center gap-2 text-xs text-zinc-500">
+                          {q.tags?.[0] && (
+                            <span className="px-2 py-0.5 rounded-md bg-white/5">{q.tags[0]}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{q.answerCount || 0}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 rounded-[16px] bg-[#111214] border border-white/5 text-center flex flex-col items-center justify-center min-h-[140px]">
+                  <MessageSquare className="w-6 h-6 text-zinc-600 mb-2" />
+                  <h3 className="text-sm text-zinc-300 font-medium mb-1">No recent activity</h3>
+                  <p className="text-xs text-zinc-500">Be the first to ask a question.</p>
+                </div>
+              )}
+            </section>
+          )}
 
         </div>
 

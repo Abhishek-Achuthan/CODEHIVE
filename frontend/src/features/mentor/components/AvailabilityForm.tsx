@@ -29,6 +29,8 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
             occurrenceCount: 12,
             date: '',
             endDate: '',
+            sessionType: 'ONE_TO_ONE',
+            maxGuests: 0,
         }
     });
 
@@ -54,8 +56,12 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
     const bufferMinutes = watch('bufferMinutes');
     const selectedDays = watch('selectedDays');
     const durationType = watch('durationType');
+    const sessionType = watch('sessionType');
 
     const handleFormSubmit: SubmitHandler<AvailabilityFormSchema> = async (data) => {
+        if (data.sessionType === 'ONE_TO_ONE') {
+            data.maxGuests = 0;
+        }
         await onSubmit(data as AvailabilityFormData);
     };
 
@@ -221,6 +227,49 @@ export const AvailabilityForm: React.FC<AvailabilityFormProps> = ({ onSubmit, is
                                 {errors.slotPrice && <p className="text-red-400 text-xs mt-1">{errors.slotPrice.message}</p>}
                             </div>
                         </div>
+                    </div>
+
+                    {/* Section: Session Settings */}
+                    <div className="space-y-6">
+                        <h3 className="text-base font-bold text-white border-b border-white/5 pb-3">Session Settings</h3>
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Session Type</label>
+                            <div className="flex gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        value="ONE_TO_ONE"
+                                        {...register("sessionType")}
+                                        className="text-indigo-600 focus:ring-indigo-500 bg-zinc-900 border-zinc-700"
+                                    />
+                                    <span className="text-sm text-zinc-300 font-semibold">One-on-One</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        value="PRIVATE_SESSION"
+                                        {...register("sessionType")}
+                                        className="text-indigo-600 focus:ring-indigo-500 bg-zinc-900 border-zinc-700"
+                                    />
+                                    <span className="text-sm text-zinc-300 font-semibold">Private Session</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {sessionType === 'PRIVATE_SESSION' && (
+                            <div className="space-y-2 max-w-xs">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Maximum Guests</label>
+                                <input
+                                    type="number"
+                                    {...register('maxGuests')}
+                                    min="1"
+                                    max="20"
+                                    className="w-full rounded-xl border border-white/5 bg-black/50 px-4 py-3 text-sm font-semibold text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                                />
+                                {errors.maxGuests && <p className="text-red-400 text-xs mt-1">{errors.maxGuests.message}</p>}
+                                <p className="text-xs text-zinc-500">The booking owner may invite up to this many guests into the private session.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Section: Recurring Rules */}

@@ -1,6 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 import { BookingReservationStatus } from '../../../../domain/types/BookingReservationStatus';
 import { RefundStatus } from '../../../../domain/types/RefundStatus';
+import { SessionType } from '../../../../domain/types/SessionType';
 
 export interface BookingReservationDoc extends Document {
   _id: Schema.Types.ObjectId;
@@ -19,7 +20,8 @@ export interface BookingReservationDoc extends Document {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
-  guestCount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,7 +43,8 @@ export interface BookingReservationLeanDoc {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
-  guestCount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -75,7 +78,8 @@ export const BookingReservationSchema = new Schema<BookingReservationDoc>(
       default: RefundStatus.NONE,
       required: true,
     },
-    guestCount: { type: Number, default: 0, min: 0 },
+    sessionType: { type: String, enum: Object.values(SessionType), required: true, default: SessionType.ONE_TO_ONE },
+    maxGuests: { type: Number, required: true, default: 0, min: 0 },
   },
   { timestamps: true }
 );

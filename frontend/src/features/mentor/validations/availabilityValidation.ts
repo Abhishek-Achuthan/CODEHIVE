@@ -19,6 +19,8 @@ export const availabilityFormSchema = z.object({
     durationType: z.enum(['forever', 'until', 'count']).optional().default('forever'),
     endDate: z.string().optional(),
     occurrenceCount: z.coerce.number().min(1).max(52).optional().default(12),
+    sessionType: z.enum(['ONE_TO_ONE', 'PRIVATE_SESSION']).default('ONE_TO_ONE'),
+    maxGuests: z.coerce.number().min(0).max(20).default(0),
 }).superRefine((data, ctx) => {
     if (data.startTime && data.endTime) {
         const [startH, startM] = data.startTime.split(':').map(Number);

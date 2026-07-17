@@ -46,7 +46,6 @@ export class SessionController {
         endTime: parsed.endTime,
         topic: parsed.topic,
         clientRequestId: parsed.clientRequestId,
-        guestCount: parsed.guestCount ?? 0,
       });
       res.status(HttpStatus.Created).json(result);
     } catch (error) {

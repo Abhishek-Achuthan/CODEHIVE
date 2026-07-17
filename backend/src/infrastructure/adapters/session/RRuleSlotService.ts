@@ -76,7 +76,9 @@ export class RRuleSlotService implements IRRuleSlotService {
         date: slotStart.toISOString().split('T')[0]!,
         startTime: this.formatTime(slotStart),
         endTime: this.formatTime(slotEnd),
-        price: availability.slotPrice
+        price: availability.slotPrice,
+        sessionType: availability.sessionType,
+        maxGuests: availability.maxGuests
       });
 
       current.setMinutes(

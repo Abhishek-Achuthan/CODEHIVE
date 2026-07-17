@@ -1,6 +1,7 @@
 import { PaymentSource } from '../types/PaymentSource';
 import { SessionPaymentStatus } from '../types/SessionPaymentStatus';
 import { SessionStatus } from '../types/SessionStatus';
+import { SessionType } from '../types/SessionType';
 
 export interface SessionEntity {
   id: string;
@@ -15,9 +16,10 @@ export interface SessionEntity {
   paymentSource: PaymentSource;
   paymentReferenceId: string | null;
   amount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   createdAt: Date;
   updatedAt: Date;
   roomId?: string | undefined;
-  guestCount: number;
   joinUrl?: string | undefined;
 }

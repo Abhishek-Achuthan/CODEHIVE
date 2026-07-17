@@ -49,7 +49,6 @@ const MentorAvailabilityPage = lazy(() => import("../features/mentor/pages/Mento
 const BookingPage = lazy(() => import("../features/session/pages/BookingPage"));
 const PaymentPage = lazy(() => import("../features/session/pages/PaymentPage"));
 const MySessionsPage = lazy(() => import("../features/session/pages/MySessionsPage"));
-const MentorDashboardPage = lazy(() => import("../features/session/pages/MentorDashboardPage"));
 const MentorSessionsPage = lazy(() => import("../features/session/pages/MentorSessionsPage"));
 const BookingSuccessPage = lazy(() => import("../features/session/pages/BookingSuccessPage"));
 
@@ -126,16 +125,7 @@ export default function AppRoutes() {
             <Route path="/room/:roomId" element={<CollaborationRoom />} />
           </Route>
 
-          <Route
-            element={
-              <ProtectedRoute
-                allowedRoles={[UserRole.MENTOR]}
-                requireApprovedMentor
-              />
-            }
-          >
-            <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
-          </Route>
+
 
           <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />

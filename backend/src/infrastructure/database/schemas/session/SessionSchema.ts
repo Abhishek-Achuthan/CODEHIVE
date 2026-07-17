@@ -3,6 +3,7 @@ import { Document, Schema } from 'mongoose';
 import { SessionStatus } from '../../../../domain/types/SessionStatus';
 import { SessionPaymentStatus } from '../../../../domain/types/SessionPaymentStatus';
 import { PaymentSource } from '../../../../domain/types/PaymentSource';
+import { SessionType } from '../../../../domain/types/SessionType';
 
 export interface SessionDoc extends Document {
     _id: Schema.Types.ObjectId,
@@ -18,7 +19,8 @@ export interface SessionDoc extends Document {
     paymentReferenceId: string | null;
     amount: number;
     topic: string;
-    guestCount: number;
+    sessionType: SessionType;
+    maxGuests: number;
     joinUrl?: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -38,7 +40,8 @@ export interface SessionLeanDoc {
     paymentReferenceId: string | null;
     amount: number;
     topic: string;
-    guestCount: number;
+    sessionType: SessionType;
+    maxGuests: number;
     joinUrl?: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -58,7 +61,8 @@ export const SessionSchema = new Schema({
     paymentReferenceId: { type: String, default: null },
     status: { type: String, enum: Object.values(SessionStatus), default: SessionStatus.UPCOMING },
     topic: { type: String, required: true },
-    guestCount: { type: Number, default: 0, min: 0 },
+    sessionType: { type: String, enum: Object.values(SessionType), required: true, default: SessionType.ONE_TO_ONE },
+    maxGuests: { type: Number, required: true, default: 0, min: 0 },
     joinUrl: { type: String, default: null },
 }, {
     timestamps: true

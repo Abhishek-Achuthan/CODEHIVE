@@ -59,8 +59,8 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     );
     const featureSnapshot = this._roomFeatureSnapshotFactory.create(entitlements);
 
-    const guestCount = session.guestCount ?? 0;
-    const desiredCapacity = SESSION_ROOM_BASE_PARTICIPANTS + guestCount;
+    const maxGuests = session.maxGuests ?? 0;
+    const desiredCapacity = SESSION_ROOM_BASE_PARTICIPANTS + maxGuests;
     const planMaxParticipants =
       entitlements.limits[LimitKey.MAX_PARTICIPANTS] ?? SESSION_ROOM_BASE_PARTICIPANTS;
     const maxParticipants = Math.min(desiredCapacity, planMaxParticipants);

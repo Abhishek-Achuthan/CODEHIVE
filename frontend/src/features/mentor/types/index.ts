@@ -13,4 +13,6 @@ export interface AvailabilityFormData {
     durationType?: 'forever' | 'until' | 'count';
     endDate?: string; // YYYY-MM-DD for 'until' type
     occurrenceCount?: number; // For 'count' type
+    sessionType: 'ONE_TO_ONE' | 'PRIVATE_SESSION';
+    maxGuests: number;
 }

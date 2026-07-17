@@ -10,6 +10,8 @@ export interface CreateMentorAvailabilityRequest {
     slotDurationMinutes: number;
     bufferMinutes?: number;
     slotPrice: number;
+    sessionType: "ONE_TO_ONE" | "PRIVATE_SESSION";
+    maxGuests: number;
 }
 
 export interface MentorAvailabilityResponse {
@@ -23,6 +25,8 @@ export interface MentorAvailabilityResponse {
     bufferMinutes: number;
     slotPrice: number;
     isActive: boolean;
+    sessionType: "ONE_TO_ONE" | "PRIVATE_SESSION";
+    maxGuests: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -46,6 +50,8 @@ export interface AvailableSlotResponse {
     startTime: string;
     endTime: string;
     price: number;
+    sessionType: "ONE_TO_ONE" | "PRIVATE_SESSION";
+    maxGuests: number;
 }
 
 

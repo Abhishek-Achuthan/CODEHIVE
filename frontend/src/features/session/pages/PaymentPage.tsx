@@ -141,7 +141,6 @@ const PaymentPage: React.FC = () => {
           endTime: slot.endTime,
           topic,
           clientRequestId: storedBooking.clientRequestId,
-          guestCount: storedBooking.guestCount ?? 0,
         });
 
         sessionStorage.removeItem(PAYMENT_BOOKING_STORAGE_KEY);
@@ -175,7 +174,6 @@ const PaymentPage: React.FC = () => {
         endTime: slot.endTime,
         topic,
         clientRequestId: storedBooking.clientRequestId,
-        guestCount: storedBooking.guestCount ?? 0,
       });
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);

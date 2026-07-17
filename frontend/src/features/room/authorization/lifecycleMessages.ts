@@ -11,7 +11,7 @@ export function formatRoomAccessError(message: string): string {
     return message;
   }
   if (message.toLowerCase().includes("full")) {
-    return message;
+    return "This session has reached the maximum number of guests allowed by the mentor.";
   }
   return message;
 }

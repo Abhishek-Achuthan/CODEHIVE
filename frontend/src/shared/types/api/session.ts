@@ -33,7 +33,6 @@ export interface BookSessionRequest {
     endTime: string;
     topic: string;
     clientRequestId: string;
-    guestCount?: number;
 }
 
 export interface BookingReservationResponse {
@@ -55,7 +54,8 @@ export interface BookedSessionResponse extends SessionResponse {
     mentor: UserSummary;
     user: UserSummary;
     roomId?: string;
-    guestCount?: number;
+    sessionType: 'ONE_TO_ONE' | 'PRIVATE_SESSION';
+    maxGuests: number;
     joinUrl?: string;
 }
 
@@ -90,5 +90,4 @@ export interface PaymentPageState {
     date: string;
     topic: string;
     clientRequestId: string;
-    guestCount?: number;
 }

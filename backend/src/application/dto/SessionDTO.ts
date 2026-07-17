@@ -4,6 +4,7 @@ import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { SessionStatus } from '../../domain/types/SessionStatus';
 import { BookingReservationStatus } from '../../domain/types/BookingReservationStatus';
 import { RefundStatus } from '../../domain/types/RefundStatus';
+import { SessionType } from '../../domain/types/SessionType';
 
 export interface CreateMentorAvailabilityDTO {
   mentorId: string;
@@ -12,6 +13,8 @@ export interface CreateMentorAvailabilityDTO {
   endTime: string;
   slotDurationMinutes: number;
   bufferMinutes?: number;
+  sessionType: SessionType;
+  maxGuests: number;
 }
 
 export interface BookSessionDTO {
@@ -22,7 +25,6 @@ export interface BookSessionDTO {
   endTime: string;
   topic: string;
   clientRequestId: string;
-  guestCount?: number;
 }
 
 export interface MentorListInputDTO {
@@ -67,7 +69,8 @@ export interface ISessionResponseDTO {
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
   topic: string;
-  guestCount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   createdAt: string;
   updatedAt: string;
   amount: number;
@@ -93,8 +96,9 @@ export interface IBookedSessionResponseDTO {
   topic: string;
   paymentSource: PaymentSource;
   paymentStatus: SessionPaymentStatus;
-  amount: number,
-  guestCount: number;
+  amount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   joinUrl?: string;
   createdAt: string;
   updatedAt: string;
@@ -104,6 +108,8 @@ export interface AvailableSlotDTO {
   startTime: string;
   endTime: string;
   price: number;
+  sessionType: SessionType;
+  maxGuests: number;
 }
 
 export interface IBookingReservationResponseDTO {

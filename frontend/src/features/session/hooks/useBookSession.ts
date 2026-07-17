@@ -9,7 +9,6 @@ type BookSessionParams = {
   endTime: string;
   topic: string;
   clientRequestId: string;
-  guestCount?: number;
 };
 
 export const useBookSession = () => {

@@ -49,7 +49,6 @@ const BookingPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlotResponse | null>(null);
   const [topic, setTopic] = useState("");
-  const [guestCount, setGuestCount] = useState(0);
 
   const {
     slots,
@@ -79,7 +78,6 @@ const BookingPage: React.FC = () => {
         date: dateStr,
         topic,
         clientRequestId: createClientRequestId(),
-        guestCount,
       })
     );
 
@@ -268,29 +266,21 @@ const BookingPage: React.FC = () => {
                     {mentor?.firstName}.
                   </p>
 
-                  <div>
-                    <label
-                      htmlFor="guest-count"
-                      className="mb-1 block text-sm font-medium text-zinc-300"
-                    >
-                      Friends joining (optional)
-                    </label>
-                    <p className="mb-2 text-xs text-zinc-500">
-                      How many friends will join via your session invite link (not including you).
-                    </p>
-                    <input
-                      id="guest-count"
-                      type="number"
-                      min={0}
-                      max={20}
-                      value={guestCount}
-                      onChange={(e) =>
-                        setGuestCount(
-                          Math.max(0, Math.min(20, Number(e.target.value) || 0)),
-                        )
-                      }
-                      className="w-24 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white"
-                    />
+                  <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50">
+                    {selectedSlot.sessionType === "ONE_TO_ONE" ? (
+                      <p className="text-sm text-zinc-400">
+                        This session does not allow additional participants.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-sm font-medium text-zinc-300">
+                          Guests Allowed: Up to {selectedSlot.maxGuests}
+                        </p>
+                        <p className="mt-1 text-xs text-zinc-500">
+                          After booking, you can invite friends using the session invite link until this limit is reached.
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-4 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/50">

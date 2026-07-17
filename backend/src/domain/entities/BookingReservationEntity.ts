@@ -1,5 +1,6 @@
 import { BookingReservationStatus } from '../types/BookingReservationStatus';
 import { RefundStatus } from '../types/RefundStatus';
+import { SessionType } from '../types/SessionType';
 
 export interface BookingReservationEntity {
   id: string;
@@ -18,7 +19,8 @@ export interface BookingReservationEntity {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
-  guestCount: number;
+  sessionType: SessionType;
+  maxGuests: number;
   createdAt: Date;
   updatedAt: Date;
 }

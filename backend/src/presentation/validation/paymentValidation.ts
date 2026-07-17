@@ -19,7 +19,6 @@ export const bookSessionWithStripeSchema = z.object({
   endTime: z.string().regex(timeFormatRegex, 'endTime must be HH:mm'),
   topic: z.string().trim().min(1).max(100),
   clientRequestId: z.string().trim().min(1).max(100),
-  guestCount: z.coerce.number().int().min(0).max(20).optional(),
 });
 
 export const bookingReservationParamsSchema = z.object({

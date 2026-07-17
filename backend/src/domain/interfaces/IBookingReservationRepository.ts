@@ -19,7 +19,8 @@ export interface CreateBookingReservationInput {
   expiresAt: Date;
   lastStripeEventId: string | null;
   refundStatus: RefundStatus;
-  guestCount: number;
+  sessionType: 'ONE_TO_ONE' | 'PRIVATE_SESSION';
+  maxGuests: number;
 }
 
 export interface IBookingReservationRepository {

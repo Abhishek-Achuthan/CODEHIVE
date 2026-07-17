@@ -85,6 +85,8 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase {
       startTime: slot.startTime,
       endTime: slot.endTime,
       price: slot.price,
+      sessionType: slot.sessionType,
+      maxGuests: slot.maxGuests,
     }));
   }
 }

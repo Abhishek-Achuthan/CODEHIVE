@@ -12,6 +12,7 @@ import { BookingReservationEntity } from '../../domain/entities/BookingReservati
 import { SessionStatus } from '../../domain/types/SessionStatus';
 import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
 import { PaymentSource } from '../../domain/types/PaymentSource';
+import { SessionType } from '../../domain/types/SessionType';
 
 export class SessionMapper {
   static toResponse(session: SessionEntity): ISessionResponseDTO {
@@ -27,7 +28,8 @@ export class SessionMapper {
       amount: session.amount,
       paymentSource:session.paymentSource,
       paymentStatus:session.paymentStatus,
-      guestCount: session.guestCount,
+      sessionType: session.sessionType,
+      maxGuests: session.maxGuests,
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };
@@ -62,7 +64,8 @@ export class SessionMapper {
       paymentStatus:session.paymentStatus,
       ...(session.roomId && { roomId: session.roomId }),
       ...(session.joinUrl !== undefined && { joinUrl: session.joinUrl }),
-      guestCount: session.guestCount,
+      sessionType: session.sessionType,
+      maxGuests: session.maxGuests,
       createdAt: session.createdAt.toISOString(),
       updatedAt: session.updatedAt.toISOString(),
     };
@@ -123,7 +126,8 @@ export class SessionMapper {
       paymentSource: PaymentSource.STRIPE,
       paymentReferenceId: reservation.stripePaymentIntentId ?? null,
       amount: reservation.amount,
-      guestCount: 0,
+      sessionType: SessionType.ONE_TO_ONE,
+      maxGuests: 0,
       createdAt: reservation.createdAt,
       updatedAt: reservation.updatedAt,
     };
