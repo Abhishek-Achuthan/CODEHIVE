@@ -32,4 +32,4 @@ export interface IClosePollInputDTO {
     userId: string;
 }
 
-export interface IClosePollOutputDTO extends PollEntity {}
+export type IClosePollOutputDTO = PollEntity;

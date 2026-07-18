@@ -6,6 +6,7 @@ import { FilterChip, FilterPopover } from "../../../shared/ui/filters";
 import { useFetchSessions } from "../hooks/useFetchSessions";
 import { SessionCard } from "../components/SessionCard";
 import { CancelSessionDialog } from "../components/CancelSessionDialog";
+import { ReviewModal } from "../components/ReviewModal";
 import { StatusTabs, type StatusFilter } from "../components/StatusTabs";
 import { Pagination } from "../../../shared/ui/Pagination";
 import { useCancelSession } from "../hooks/useCancelSession";
@@ -14,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 import { Button, Input } from "../../../shared/ui";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
+import { addReview } from "../../../api/endpoints/sessionAPI";
+
 const REFUND_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function getTimeDiffMs(startTime: string): number {
@@ -34,6 +37,10 @@ export default function MySessionsPage() {
     useState<BookedSessionResponse | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isRefundEligible, setIsRefundEligible] = useState(false);
+  
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
   const navigate = useNavigate();
 
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
@@ -140,6 +147,32 @@ export default function MySessionsPage() {
       await refetch();
     } catch {
       // Error already handled in hook
+    }
+  };
+
+  const openReviewModal = (session: BookedSessionResponse) => {
+    setSelectedSession(session);
+    setIsReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setIsReviewModalOpen(false);
+    setSelectedSession(null);
+  };
+
+  const handleConfirmReview = async (rating: number, reviewText: string) => {
+    if (!selectedSession) return;
+    
+    setReviewSubmitting(true);
+    try {
+      await addReview(selectedSession.id, rating, reviewText);
+      toast.success("Review submitted successfully");
+      closeReviewModal();
+      await refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to submit review");
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -352,6 +385,7 @@ export default function MySessionsPage() {
                   key={session.id}
                   session={session}
                   onCancel={() => openCancelModal(session)}
+                  onReview={() => openReviewModal(session)}
                   onJoinRoom={() => {
                     navigate(`/room/${session.roomId}`);
                   }}
@@ -385,6 +419,13 @@ export default function MySessionsPage() {
         loading={cancelLoading}
         onConfirm={handleConfirmCancel}
         onClose={closeCancelModal}
+      />
+
+      <ReviewModal 
+        open={isReviewModalOpen}
+        onClose={closeReviewModal}
+        onSubmit={handleConfirmReview}
+        loading={reviewSubmitting}
       />
     </div>
   );

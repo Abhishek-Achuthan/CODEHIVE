@@ -133,7 +133,7 @@ export class App {
       this._httpServer.listen(env.port, () => {
         this._logger.info(`server started at port ${env.port}`)
       }); 
-    } catch (error) {``
+    } catch (error) {
       if(error instanceof Error) {
         this._logger.error(error.message);
       }else {

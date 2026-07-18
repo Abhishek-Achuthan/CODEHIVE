@@ -39,8 +39,8 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
     const isMonthly = days > 60;
     
     const groupBy = isMonthly 
-      ? { $dateToString: { format: "%Y-%m", date: "$createdAt" } }
-      : { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
+      ? { $dateToString: { format: '%Y-%m', date: '$createdAt' } }
+      : { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
     
     const results = await UserModel.aggregate([
       { $match: { createdAt: { $gte: startDate } } },
@@ -75,8 +75,8 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
     const isMonthly = days > 60;
     
     const groupBy = isMonthly 
-      ? { $dateToString: { format: "%Y-%m", date: "$createdAt" } }
-      : { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
+      ? { $dateToString: { format: '%Y-%m', date: '$createdAt' } }
+      : { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
     
     const results = await SubscriptionModel.aggregate([
       { $match: { createdAt: { $gte: startDate }, status: 'ACTIVE' } },
@@ -88,16 +88,16 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
           as: 'plan'
         }
       },
-      { $unwind: "$plan" },
+      { $unwind: '$plan' },
       {
         $group: {
           _id: groupBy,
           revenue: { 
              $sum: { 
                $cond: [
-                 { $eq: ["$billingInterval", "yearly"] },
-                 { $divide: [{ $ifNull: ["$plan.pricing.yearly", 0] }, 12] },
-                 { $ifNull: ["$plan.pricing.monthly", 0] }
+                 { $eq: ['$billingInterval', 'yearly'] },
+                 { $divide: [{ $ifNull: ['$plan.pricing.yearly', 0] }, 12] },
+                 { $ifNull: ['$plan.pricing.monthly', 0] }
                ] 
              } 
           }
@@ -148,10 +148,10 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
           as: 'plan'
         }
       },
-      { $unwind: "$plan" },
+      { $unwind: '$plan' },
       {
         $group: {
-          _id: "$plan.name",
+          _id: '$plan.name',
           value: { $sum: 1 }
         }
       },

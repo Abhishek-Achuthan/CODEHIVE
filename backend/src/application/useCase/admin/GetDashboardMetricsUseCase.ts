@@ -88,7 +88,7 @@ export class GetDashboardMetricsUseCase implements IGetDashboardMetricsUseCase {
       ...recentUsers.map((u: any) => ({ id: `usr_${u._id}`, type: 'user', text: `New user registered (${u.firstName} ${u.lastName})`, createdAt: u.createdAt })),
       ...recentMentors.map((m: any) => ({ id: `mnt_${m._id}`, type: 'mentor', text: `Mentor application submitted by ${m.firstName} ${m.lastName}`, createdAt: m.mentorAppliedAt || m.createdAt })),
       ...recentRooms.map((r: any) => ({ id: `rm_${r._id}`, type: 'room', text: `New room created (${r.title})`, createdAt: r.createdAt })),
-      ...recentSubs.map((s: any) => ({ id: `sub_${s._id}`, type: 'subscription', text: `Subscription purchased`, createdAt: s.createdAt })),
+      ...recentSubs.map((s: any) => ({ id: `sub_${s._id}`, type: 'subscription', text: 'Subscription purchased', createdAt: s.createdAt })),
       ...recentReports.map((r: any) => ({ id: `rep_${r._id}`, type: 'report', text: `New report submitted (${r.reason})`, createdAt: r.createdAt })),
     ];
 

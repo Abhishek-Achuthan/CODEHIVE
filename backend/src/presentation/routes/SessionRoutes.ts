@@ -51,6 +51,12 @@ export class SessionRoutes {
             this._sessionController.handleCancelSession.bind(this._sessionController)
         );
 
+        this._router.post(
+            '/:id/reviews',
+            this._authMiddleware.check,
+            this._sessionController.handleAddReview.bind(this._sessionController)
+        );
+
     }
 
     public getRoutes(): Router {

@@ -6,6 +6,7 @@ import type { IGetBookedSessionsUseCase } from '../../../application/useCase/int
 import type { ICancelSessionUseCase } from '../../../application/useCase/interface/session/ICancelSessionUseCase';
 import type { ICancelBookingReservationUseCase } from '../../../application/useCase/interface/session/ICancelBookingReservationUseCase';
 import type { IGetBookingReservationStatusUseCase } from '../../../application/useCase/interface/session/IGetBookingReservationStatusUseCase';
+import type { IAddReviewUseCase } from '../../../application/useCase/interface/session/IAddReviewUseCase';
 import {
   bookingReservationParamsSchema,
   bookedSessionsQuerySchema,
@@ -27,7 +28,9 @@ export class SessionController {
     @inject('ICancelBookingReservationUseCase')
     private readonly _cancelBookingReservation: ICancelBookingReservationUseCase,
     @inject('IGetBookingReservationStatusUseCase')
-    private readonly _getBookingReservationStatus: IGetBookingReservationStatusUseCase
+    private readonly _getBookingReservationStatus: IGetBookingReservationStatusUseCase,
+    @inject('IAddReviewUseCase')
+    private readonly _addReview: IAddReviewUseCase
   ) {}
 
   async handleBookSessionWithStripe(
@@ -129,5 +132,21 @@ export class SessionController {
     }
   }
 
-
+  async handleAddReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.user;
+      const { id: sessionId } = req.params;
+      const { rating, reviewText } = req.body;
+      const result = await this._addReview.execute({
+        sessionId: sessionId!,
+        mentorId: '', // Use case fetches mentorId from session
+        studentId: id,
+        rating,
+        reviewText
+      });
+      res.status(HttpStatus.Created).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

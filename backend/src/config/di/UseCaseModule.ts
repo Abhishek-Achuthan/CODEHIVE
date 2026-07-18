@@ -99,6 +99,12 @@ import { IListMentorsUseCase } from '../../application/useCase/interface/mentor/
 import { ListMentorsUseCase } from '../../application/useCase/mentor/ListMentorsUseCase';
 import { IGetBookedSessionsUseCase } from '../../application/useCase/interface/session/IGetBookedSessionsUseCase';
 import { GetBookedSessionsUseCase } from '../../application/useCase/session/GetBookedSessionsUseCase';
+import { IAddReviewUseCase } from '../../application/useCase/interface/session/IAddReviewUseCase';
+import { AddReviewUseCase } from '../../application/useCase/session/AddReviewUseCase';
+import { IGetMentorInsightsUseCase } from '../../application/useCase/interface/session/IGetMentorInsightsUseCase';
+import { GetMentorInsightsUseCase } from '../../application/useCase/session/GetMentorInsightsUseCase';
+import { IGetMentorReviewsUseCase } from '../../application/useCase/interface/session/IGetMentorReviewsUseCase';
+import { GetMentorReviewsUseCase } from '../../application/useCase/session/GetMentorReviewsUseCase';
 import { ICreateMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/ICreateMentorAvailabilityUseCase';
 import { CreateMentorAvailabilityUseCase } from '../../application/useCase/mentor/CreateMentorAvailabilityUseCase';
 import { IGetMentorAvailabilityUseCase } from '../../application/useCase/interface/mentor/IGetMentorAvailabilityUseCase';
@@ -637,6 +643,18 @@ export class UseCaseModule {
 
     container.register<IGetBookedSessionsUseCase>('IGetBookedSessionsUseCase', {
       useClass: GetBookedSessionsUseCase,
+    });
+
+    container.register<IAddReviewUseCase>('IAddReviewUseCase', {
+      useClass: AddReviewUseCase,
+    });
+
+    container.register<IGetMentorInsightsUseCase>('IGetMentorInsightsUseCase', {
+      useClass: GetMentorInsightsUseCase,
+    });
+
+    container.register<IGetMentorReviewsUseCase>('IGetMentorReviewsUseCase', {
+      useClass: GetMentorReviewsUseCase,
     });
 
     container.register<ICreateMentorAvailabilityUseCase>(

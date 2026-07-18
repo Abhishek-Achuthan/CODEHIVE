@@ -11,6 +11,7 @@ interface SessionCardProps {
     session: BookedSessionResponse;
     onJoinRoom: () => void;
     onCancel: () => void;
+    onReview?: () => void;
     isCancelling?: boolean;
     cancelDisabled?: boolean;
     cancelDisabledReason?: string;
@@ -22,6 +23,7 @@ export function SessionCard({
     session,
     onJoinRoom,
     onCancel,
+    onReview,
     isCancelling,
     cancelDisabled,
     cancelDisabledReason,
@@ -146,9 +148,19 @@ export function SessionCard({
                         </>
                     )}
                     {session.status === "completed" && (
-                        <span className="rounded-lg bg-green-500/10 px-4 py-2 text-xs font-medium text-green-400">
-                            Completed
-                        </span>
+                        <div className="flex gap-2">
+                            {context === "user" && onReview && (
+                                <button
+                                    onClick={onReview}
+                                    className="inline-flex items-center justify-center rounded-lg bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-400 transition-all hover:bg-indigo-500/20"
+                                >
+                                    Review
+                                </button>
+                            )}
+                            <span className="rounded-lg bg-green-500/10 px-4 py-2 text-xs font-medium text-green-400 flex items-center">
+                                Completed
+                            </span>
+                        </div>
                     )}
                     {session.status === "cancelled" && (
                         <span className="rounded-lg bg-red-500/10 px-4 py-2 text-xs font-medium text-red-400">

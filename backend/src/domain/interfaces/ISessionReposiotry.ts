@@ -34,4 +34,5 @@ export interface ISessionRepository extends IGenericRepository<SessionEntity> {
   }): Promise<PaginationResult<SessionWithParticipants>>;
   findByPaymentReference(referenceId: string): Promise<SessionEntity | null>
   findUpcomingSessions(): Promise<SessionEntity[]>
+  countSessionStats(mentorId: string): Promise<{ completed: number, cancelled: number }>;
 }

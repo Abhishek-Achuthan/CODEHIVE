@@ -111,9 +111,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
     if (balance < amount) throw new BadRequestError(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
 
-    let session;
-    try {
-      session = await this._sessionRepo.create({
+    let session = await this._sessionRepo.create({
         mentorId,
         userId,
         date,
@@ -204,13 +202,10 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
             error: queueError.message,
             stack: queueError.stack,
           });
-        }
       }
-
-      return SessionMapper.toResponse(updated);
-    } catch (error) {
-      throw error;
     }
+
+    return SessionMapper.toResponse(updated);
   }
 
   private isDuplicateKeyError(error: unknown): boolean {

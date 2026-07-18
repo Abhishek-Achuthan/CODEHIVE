@@ -23,6 +23,8 @@ import { IMentorAvailabilityRepository } from '../../domain/interfaces/IMentorAv
 import { MentorAvailabilityRepository } from '../../infrastructure/database/repository/MentorAvailabilityRepository';
 import { ISessionRepository } from '../../domain/interfaces/ISessionReposiotry';
 import { SessionRepository } from '../../infrastructure/database/repository/SessionRepository';
+import { IReviewRepository } from '../../domain/interfaces/IReviewRepository';
+import { ReviewRepository } from '../../infrastructure/database/repository/ReviewRepository';
 import { IWalletRepository } from '../../domain/interfaces/IWalletRepository';
 import { WalletRepository } from '../../infrastructure/database/repository/WalletRepository';
 import { IStripeWebhookEventRepository } from '../../domain/interfaces/IStripeWebhookEventRepository';
@@ -153,6 +155,10 @@ export class RepositoryModule {
 
     container.register<ISessionRepository>('ISessionRepository', {
       useClass: SessionRepository
+    });
+
+    container.register<IReviewRepository>('IReviewRepository', {
+      useClass: ReviewRepository
     });
 
     container.register<IWalletRepository>('IWalletRepository', {

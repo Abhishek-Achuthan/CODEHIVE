@@ -274,6 +274,8 @@ export const API_ROUTES = {
 
   MENTOR: {
     GET_PROFILE: (id: string) => `/mentors/${id}`,
+    GET_MY_INSIGHTS: "/mentors/me/insights",
+    GET_MY_REVIEWS: "/mentors/me/reviews",
     SET_AVAILABILITY: "/mentors/availability",
     GET_MY_AVAILABILITY: "/mentors/me/availability",
     DELETE_AVAILABILITY: (id: string) => `/mentors/availability/${id}`,
@@ -311,7 +313,8 @@ export const API_ROUTES = {
       return query ? `/sessions?${query}` : `/sessions`;
     },
     GET_BOOKING_RESERVATION: (reservationId: string) => `/sessions/reservations/${reservationId}`,
-    CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`
+    CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`,
+    ADD_REVIEW: (sessionId: string) => `/sessions/${sessionId}/reviews`
   },
 
   WALLET: {

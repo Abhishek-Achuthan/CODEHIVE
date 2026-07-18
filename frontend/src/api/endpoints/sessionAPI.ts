@@ -16,3 +16,6 @@ export const getBookingReservation = (reservationId: string) =>
 
 export const cancelSession = (sessionId:string) => 
     apiClient.delete(API_ROUTES.SESSION.CANCEL_SESSION(sessionId));
+
+export const addReview = (sessionId: string, rating: number, reviewText?: string) =>
+    apiClient.post(API_ROUTES.SESSION.ADD_REVIEW(sessionId), { rating, reviewText });

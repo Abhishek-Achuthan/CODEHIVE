@@ -24,3 +24,9 @@ export const listMentors = (params?: MentorListingParams) => {
     const url = API_ROUTES.MENTOR.LIST_MENTORS(params);
     return apiClient.get(url);
 };
+
+export const getMyInsights = () => 
+    apiClient.get(API_ROUTES.MENTOR.GET_MY_INSIGHTS);
+
+export const getMyReviews = () => 
+    apiClient.get(API_ROUTES.MENTOR.GET_MY_REVIEWS);

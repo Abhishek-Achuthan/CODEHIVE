@@ -3,6 +3,7 @@ import { useAppSelector } from '../../../shared/hooks/storeHooks';
 import { useMyRooms } from '../../room/hooks/useMyRooms';
 import { useFetchSessions } from '../../session/hooks/useFetchSessions';
 import { useQuestionsList } from '../../qna/hooks/useListQuestions';
+import { useMentorInsights } from '../../session/hooks/useMentorInsights';
 import { UserRole, MentorStatus } from '../../../shared/constants/auth';
 import {
   ArrowRight,
@@ -27,6 +28,8 @@ export default function DashboardPage() {
   const { rooms, isLoading: roomsLoading } = useMyRooms(true);
   const { sessions } = useFetchSessions({ limit: 3 });
   const { questions, loading: questionsLoading } = useQuestionsList();
+  
+  const { insights, loading: insightsLoading } = useMentorInsights(isMentor);
 
   const activeRooms = rooms?.items?.slice(0, 4) || [];
   const upcomingSessions = sessions?.slice(0, 3) || [];
@@ -164,37 +167,45 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-medium text-white">Student Feedback</h3>
                   </div>
                   
-                  <div className="flex items-end gap-3 mb-6">
-                    <div className="flex items-center gap-1.5">
-                      <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                      <span className="text-2xl font-semibold text-white leading-none">4.8</span>
+                  {insightsLoading ? (
+                    <div className="h-full flex flex-col justify-center gap-4 animate-pulse">
+                      <div className="h-10 bg-white/5 rounded-md w-1/2" />
+                      <div className="h-24 bg-white/5 rounded-md" />
                     </div>
-                    <span className="text-xs text-zinc-500 mb-0.5">124 Reviews</span>
-                  </div>
-
-                  <div className="space-y-2 mb-6 flex-1">
-                    {[
-                      { stars: 5, pct: 82 },
-                      { stars: 4, pct: 13 },
-                      { stars: 3, pct: 5 },
-                      { stars: 2, pct: 0 },
-                      { stars: 1, pct: 0 }
-                    ].map((rating) => (
-                      <div key={rating.stars} className="flex items-center gap-2 text-xs">
-                        <span className="text-zinc-400 w-[50px] shrink-0 tracking-[2px] text-[10px] flex">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <span key={i} className={i < rating.stars ? "text-amber-400/90" : "text-zinc-700"}>★</span>
-                          ))}
-                        </span>
-                        <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
-                          <div className="h-full bg-amber-400/80 rounded-full" style={{ width: `${rating.pct}%` }} />
+                  ) : (
+                    <>
+                      <div className="flex items-end gap-3 mb-6">
+                        <div className="flex items-center gap-1.5">
+                          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                          <span className="text-2xl font-semibold text-white leading-none">{insights?.averageRating.toFixed(1) || '0.0'}</span>
                         </div>
-                        <span className="text-zinc-500 w-8 text-right text-[10px]">{rating.pct}%</span>
+                        <span className="text-xs text-zinc-500 mb-0.5">{insights?.totalReviews || 0} Reviews</span>
                       </div>
-                    ))}
-                  </div>
 
-                  <Link to="/sessions/hosting" className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-auto">
+                      <div className="space-y-2 mb-6 flex-1">
+                        {[5, 4, 3, 2, 1].map((stars) => {
+                          const count = insights?.ratingDistribution[stars as 1|2|3|4|5] || 0;
+                          const total = insights?.totalReviews || 1;
+                          const pct = insights?.totalReviews ? Math.round((count / total) * 100) : 0;
+                          return (
+                            <div key={stars} className="flex items-center gap-2 text-xs">
+                              <span className="text-zinc-400 w-[50px] shrink-0 tracking-[2px] text-[10px] flex">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <span key={i} className={i < stars ? "text-amber-400/90" : "text-zinc-700"}>★</span>
+                                ))}
+                              </span>
+                              <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                                <div className="h-full bg-amber-400/80 rounded-full" style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className="text-zinc-500 w-8 text-right text-[10px]">{pct}%</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  <Link to="/sessions/reviews" className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-auto">
                     View Reviews <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -205,26 +216,35 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-medium text-white">Session Performance</h3>
                   </div>
                   
-                  <div className="mb-6">
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs text-zinc-400">Completion Rate</span>
-                      <span className="text-xl font-semibold text-white leading-none">92%</span>
+                  {insightsLoading ? (
+                    <div className="h-full flex flex-col justify-center gap-4 animate-pulse">
+                      <div className="h-8 bg-white/5 rounded-md w-3/4 mb-4" />
+                      <div className="h-20 bg-white/5 rounded-md" />
                     </div>
-                    <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: '92%' }} />
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="mb-6">
+                        <div className="flex justify-between items-end mb-2">
+                          <span className="text-xs text-zinc-400">Completion Rate</span>
+                          <span className="text-xl font-semibold text-white leading-none">{insights?.completionRate || 0}%</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${insights?.completionRate || 0}%` }} />
+                        </div>
+                      </div>
 
-                  <div className="flex flex-col gap-2 mt-auto">
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                      <span className="text-xs text-zinc-400">Completed Sessions</span>
-                      <span className="text-sm font-medium text-white">28</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                      <span className="text-xs text-zinc-400">Cancelled / No-show</span>
-                      <span className="text-sm font-medium text-zinc-300">2</span>
-                    </div>
-                  </div>
+                      <div className="flex flex-col gap-2 mt-auto">
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                          <span className="text-xs text-zinc-400">Completed Sessions</span>
+                          <span className="text-sm font-medium text-white">{insights?.completedSessions || 0}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                          <span className="text-xs text-zinc-400">Cancelled / No-show</span>
+                          <span className="text-sm font-medium text-zinc-300">{insights?.cancelledSessions || 0}</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </section>

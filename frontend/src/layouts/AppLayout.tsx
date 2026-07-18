@@ -96,10 +96,6 @@ export default function AppLayout() {
       icon: MessageSquare
     },
     { name: 'Wallet', path: '/wallet', icon: Wallet },
-  ];
-
-  const bottomNavItems = [
-    { name: 'Settings', path: '/settings', icon: Settings },
     { name: 'Profile', path: '/profile', icon: CircleUser },
   ];
 
@@ -264,10 +260,6 @@ export default function AppLayout() {
         <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 scrollbar-hide">
           <div className="space-y-1">
             {topNavItems.map(renderNavItem)}
-          </div>
-          
-          <div className="mt-4 pt-4 border-t border-white/5 space-y-1">
-            {bottomNavItems.map(renderNavItem)}
           </div>
         </div>
       </aside>

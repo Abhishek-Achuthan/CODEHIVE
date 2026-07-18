@@ -1,6 +1,6 @@
-import { Router } from "express";
-import { authMiddleware, subscriptionController } from "../../config/di/resolver";
-import { injectable } from "tsyringe";
+import { Router } from 'express';
+import { authMiddleware, subscriptionController } from '../../config/di/resolver';
+import { injectable } from 'tsyringe';
 
 
 @injectable()

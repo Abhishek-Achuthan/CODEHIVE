@@ -63,7 +63,7 @@ export class RoomRepository
     dateFrom?: string,
     status?: string
   ): Promise<PaginationResult<RoomEntity>> {
-    let query: FilterQuery<RoomDocument> = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
+    const query: FilterQuery<RoomDocument> = { visibility: 'PUBLIC_REQUEST' as RoomVisibility };
 
     if (search) {
       query.$or = [
@@ -131,7 +131,7 @@ export class RoomRepository
     status?: string
   ): Promise<PaginationResult<RoomEntity>> {
 
-    let query: FilterQuery<RoomDocument> = {};
+    const query: FilterQuery<RoomDocument> = {};
 
     query.hostId = new Types.ObjectId(hostId);
     query.type = {$ne : RoomType.SESSION};

@@ -7,6 +7,8 @@ import { type IGetAvailableSlotsUseCase } from '../../../application/useCase/int
 import { type IDeleteMentorAvailabilityUseCase } from '../../../application/useCase/interface/mentor/IDeleteMentorAvailabilityUseCase';
 import { type IAddAvailabilityExceptionUseCase } from '../../../application/useCase/interface/mentor/IAddAvailabilityExceptionUseCase';
 import { type IViewMentorProfileUseCase } from '../../../application/useCase/interface/mentor/IViewMentorProfileUseCase';
+import { type IGetMentorInsightsUseCase } from '../../../application/useCase/interface/session/IGetMentorInsightsUseCase';
+import { type IGetMentorReviewsUseCase } from '../../../application/useCase/interface/session/IGetMentorReviewsUseCase';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import {
@@ -33,7 +35,11 @@ export class MentorController {
     @inject('IAddAvailabilityExceptionUseCase')
     private readonly _addException: IAddAvailabilityExceptionUseCase,
     @inject('IViewMentorProfileUseCase')
-    private readonly _viewMentorProfile: IViewMentorProfileUseCase
+    private readonly _viewMentorProfile: IViewMentorProfileUseCase,
+    @inject('IGetMentorInsightsUseCase')
+    private readonly _getInsights: IGetMentorInsightsUseCase,
+    @inject('IGetMentorReviewsUseCase')
+    private readonly _getReviews: IGetMentorReviewsUseCase
   ) { }
 
   async handleListMentors(req: Request, res: Response, next: NextFunction) {
@@ -129,6 +135,26 @@ export class MentorController {
     try {
       const { mentorId } = req.params;
       const result = await this._viewMentorProfile.execute(mentorId as string);
+      res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetMyInsights(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.user;
+      const result = await this._getInsights.execute(id);
+      res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetMyReviews(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.user;
+      const result = await this._getReviews.execute(id);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

@@ -61,6 +61,20 @@ export class MentorRoutes {
         
 
         this._router.get(
+            '/me/insights',
+            this._authMiddleware.check,
+            this._roleMiddleware.authorize([UserRole.MENTOR]),
+            this._mentorController.handleGetMyInsights.bind(this._mentorController)
+        );
+
+        this._router.get(
+            '/me/reviews',
+            this._authMiddleware.check,
+            this._roleMiddleware.authorize([UserRole.MENTOR]),
+            this._mentorController.handleGetMyReviews.bind(this._mentorController)
+        );
+
+        this._router.get(
             '/:mentorId',
             this._authMiddleware.check,
             this._mentorController.handleViewMentorProfile.bind(this._mentorController)

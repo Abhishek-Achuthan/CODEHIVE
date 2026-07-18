@@ -323,6 +323,21 @@ export class SessionRepository
 
     return doc.map((doc) => this.leanToEntity(doc));
   }
+
+  async countSessionStats(mentorId: string): Promise<{ completed: number, cancelled: number }> {
+    const stats = await SessionModel.aggregate([
+      { $match: { mentorId: new Types.ObjectId(mentorId) } },
+      {
+        $group: {
+          _id: null,
+          completed: { $sum: { $cond: [{ $eq: ['$status', SessionStatus.COMPLETED] }, 1, 0] } },
+          cancelled: { $sum: { $cond: [{ $eq: ['$status', SessionStatus.CANCELLED] }, 1, 0] } }
+        }
+      }
+    ]);
+    return stats.length > 0 ? { completed: stats[0].completed, cancelled: stats[0].cancelled } : { completed: 0, cancelled: 0 };
+  }
+
   protected toEntity(doc: SessionDoc): SessionEntity {
     return {
       id: doc._id.toString(),
