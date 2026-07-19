@@ -52,7 +52,9 @@ const MentorAvailabilityPage: React.FC = () => {
                 endTime: data.endTime,
                 slotDurationMinutes: Number(data.slotDurationMinutes),
                 bufferMinutes: Number(data.bufferMinutes),
-                slotPrice: data.slotPrice
+                slotPrice: data.slotPrice,
+                sessionType: data.sessionType,
+                maxGuests: Number(data.maxGuests)
             };
 
             await MentorshipService.setAvailability(payload);

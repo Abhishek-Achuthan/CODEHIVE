@@ -53,7 +53,6 @@ export default function ProfileHeader({
             linkedInUrl: user.linkedInUrl,
             websiteUrl: user.websiteUrl,
             avatarUrl: user.avatarUrl,
-            languages: user.languages
           }}
           onSave={onSaveProfileHeader}
         />

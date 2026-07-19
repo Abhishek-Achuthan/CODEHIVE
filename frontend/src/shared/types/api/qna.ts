@@ -229,3 +229,24 @@ export type QuestionListPaginatedResponse =
 
 export type PaginatedAnswerResponse = PaginatedResponse<AnswerWithAuthorAPI>;
 
+export interface CommentAuthor {
+  id: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  profileImage?: string;
+  reputation: number;
+}
+
+export interface CommentAPI {
+  id: string;
+  answerId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  author: CommentAuthor;
+}
+
+export type CreateCommentRequest = {
+  content: string;
+};

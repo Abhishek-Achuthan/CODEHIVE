@@ -45,6 +45,9 @@ export const questionController = container.resolve(QuestionController);
 
 export const answerController = container.resolve(AnswerController);
 
+import { CommentController } from '../../presentation/controllers/qna/CommentController';
+export const commentController = container.resolve(CommentController);
+
 export const savedController = container.resolve(SavedController);
 
 export const userController = container.resolve(UserController);

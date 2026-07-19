@@ -1,4 +1,5 @@
-import { ReactNode, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
@@ -10,7 +11,7 @@ interface FilterPopoverProps {
 
 export function FilterPopover({ trigger, children, className = "" }: FilterPopoverProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const popoverRef = useRef<HTMLDivElement>(null);
+    const popoverRef = useRef<HTMLDivElement>(null as unknown as HTMLDivElement);
 
     useOnClickOutside(popoverRef, () => setIsOpen(false));
 

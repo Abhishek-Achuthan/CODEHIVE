@@ -3,6 +3,7 @@ import { GiCheckMark } from "react-icons/gi";
 import { QnaRichContent } from "./QnaRichContent";
 import { useMemo, useState } from "react";
 import ConfirmAcceptedAnswerModal from "./ConfirmAcceptedAnswerModal";
+import { CommentSection } from "./CommentSection";
 
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Pagination } from "../../../shared/ui/Pagination";
@@ -292,6 +293,8 @@ export function QuestionAnswersSection(props: Props) {
                         </div>
                       </div>
                     </div>
+                    
+                    <CommentSection answerId={a.id} currentUserId={currentUserId} />
                   </div>
                 </div>
               </article>

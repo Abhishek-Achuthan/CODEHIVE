@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { MentorCard } from '../components/MentorCard';
-import { Search, Loader2, Filter, X } from 'lucide-react';
+import { Search, Loader2, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FilterChip, FilterPopover } from "../../../shared/ui/filters";
 import { useFetchMentors } from '../hooks/useFetchMentors';

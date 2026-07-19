@@ -80,7 +80,7 @@ export function ReviewModal({ open, onClose, onSubmit, loading }: ReviewModalPro
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 bg-black/20 border-t border-white/5">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={onClose}
             disabled={loading}
             className="border-white/10 text-white hover:bg-white/5"

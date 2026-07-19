@@ -270,6 +270,12 @@ export const API_ROUTES = {
     EDIT_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     GET_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     VOTE_ANSWER: (answerId: string) => `/qna/answers/${answerId}/vote`,
+
+    //-------------------------------Comment URL----------------------------------//
+    CREATE_COMMENT: (answerId: string) => `/qna/answers/${answerId}/comments`,
+    GET_COMMENTS: (answerId: string) => `/qna/answers/${answerId}/comments`,
+    UPDATE_COMMENT: (commentId: string) => `/qna/comments/${commentId}`,
+    DELETE_COMMENT: (commentId: string) => `/qna/comments/${commentId}`,
   },
 
   MENTOR: {

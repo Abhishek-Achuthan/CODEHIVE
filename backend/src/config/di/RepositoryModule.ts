@@ -5,6 +5,8 @@ import { IQuestionRepository } from '../../domain/interfaces/IQuestionRepository
 import { QuestionRepository } from '../../infrastructure/database/repository/QuestionRepository';
 import { IAnswerRepository } from '../../domain/interfaces/IAnswerRepository';
 import { AnswerRepository } from '../../infrastructure/database/repository/AnswerRepository';
+import { ICommentRepository } from '../../domain/interfaces/ICommentRepository';
+import { CommentRepository } from '../../infrastructure/database/repository/CommentRepository';
 import { ISavedQuestionRepository } from '../../domain/interfaces/ISavedQuestionRepository';
 import { SavedQuestionRepository } from '../../infrastructure/database/repository/SavedQuestionRepository';
 import { IQuestionViewRepository } from '../../domain/interfaces/IQuestionViewRepository';
@@ -86,6 +88,10 @@ export class RepositoryModule {
 
     container.register<IAnswerRepository>('IAnswerRepository', {
       useClass: AnswerRepository
+    });
+
+    container.register<ICommentRepository>('ICommentRepository', {
+      useClass: CommentRepository
     });
 
     //-------------------------Saved Question Repository------------------------//

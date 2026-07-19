@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getMyReviews } from '../../../api/endpoints/mentorAPI';
-import type { ReviewEntity } from '../../../../../backend/src/domain/session/ReviewEntity'; // Just use any or simple interface
+
 
 export interface MentorReview {
   id: string;
