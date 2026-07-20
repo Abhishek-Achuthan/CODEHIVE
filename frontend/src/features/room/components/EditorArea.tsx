@@ -7,6 +7,7 @@ import {
   Search,
   Layout,
   Lock,
+  Settings,
 } from 'lucide-react';
 import CollaborativeEditor from './CollaborativeEditor';
 import Whiteboard from './whiteboard/Whiteboard';
@@ -23,6 +24,7 @@ import {
   getCollaborationLockTitle,
 } from '../authorization/lifecycleMessages';
 import { useCodeExecution } from '../hooks/useCodeExecution';
+import { useOnClickOutside } from '../../../shared/hooks/useOnClickOutside';
 import TerminalPanel from './TerminalPanel';
 import { Language } from '../../../api/endpoints/codeAPI';
 import type * as monaco from 'monaco-editor';
@@ -37,6 +39,14 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(Language.TYPESCRIPT);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [editorInstance, setEditorInstance] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  
+  const [cursorPos, setCursorPos] = useState({ lineNumber: 1, column: 1 });
+  const [indentInfo, setIndentInfo] = useState({ type: 'Spaces', size: 2 });
+  
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const settingsContainerRef = React.useRef<HTMLDivElement>(null);
+  useOnClickOutside(settingsContainerRef, () => setIsSettingsOpen(false));
   
   const user = useAppSelector((state) => state.auth.user);
   const authorization = useRoomAuthorization();
@@ -44,6 +54,70 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
   // Use a ref to access the editor instance for fetching code content
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const { run, isRunning, result, error } = useCodeExecution(roomId);
+
+  React.useEffect(() => {
+    if (!editorInstance) return;
+
+    const saved = localStorage.getItem('codehive_editor_indent_prefs');
+    if (saved) {
+      try {
+        const prefs = JSON.parse(saved);
+        const model = editorInstance.getModel();
+        if (model) {
+          model.updateOptions({
+            insertSpaces: prefs.type === 'Spaces',
+            tabSize: prefs.size,
+          });
+        }
+      } catch (e) {}
+    }
+  }, [editorInstance]);
+
+  const handleIndentChange = (type: 'Spaces' | 'Tabs', size: number) => {
+    if (editorInstance) {
+      const model = editorInstance.getModel();
+      if (model) {
+        model.updateOptions({
+          insertSpaces: type === 'Spaces',
+          tabSize: size,
+        });
+      }
+      localStorage.setItem('codehive_editor_indent_prefs', JSON.stringify({ type, size }));
+    }
+  };
+
+  React.useEffect(() => {
+    if (!editorInstance) return;
+
+    const updateCursor = () => {
+      const pos = editorInstance.getPosition();
+      if (pos) {
+        setCursorPos({ lineNumber: pos.lineNumber, column: pos.column });
+      }
+    };
+
+    const updateIndent = () => {
+      const model = editorInstance.getModel();
+      if (model) {
+        const opts = model.getOptions();
+        setIndentInfo({
+          type: opts.insertSpaces ? 'Spaces' : 'Tabs',
+          size: opts.tabSize,
+        });
+      }
+    };
+
+    updateCursor();
+    updateIndent();
+
+    const cursorDisposable = editorInstance.onDidChangeCursorPosition(updateCursor);
+    const optionsDisposable = editorInstance.onDidChangeModelOptions(updateIndent);
+
+    return () => {
+      cursorDisposable.dispose();
+      optionsDisposable.dispose();
+    };
+  }, [editorInstance]);
 
   if (!roomId || !user) {
     return <div className="text-white p-4">Invalid session</div>;
@@ -105,6 +179,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
           language={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
           editorRef={editorRef}
+          onEditorMount={setEditorInstance}
         />
       );
     }
@@ -158,9 +233,46 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
           })}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {viewMode === 'editor' && editorAccessible && (
-            <div className="flex items-center gap-2">
+            <>
+              <div className="relative flex items-center" ref={settingsContainerRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className={`flex items-center justify-center p-1.5 rounded-md border transition-colors ${
+                    isSettingsOpen
+                      ? 'bg-gray-800 text-white border-gray-700'
+                      : 'bg-transparent text-gray-400 border-transparent hover:bg-gray-800 hover:text-gray-300'
+                  }`}
+                  title="Editor Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+                {isSettingsOpen && (
+                  <div className="absolute top-full right-0 mt-2 bg-[#161b22] border border-gray-800 rounded-lg shadow-2xl p-3 text-xs w-48 z-50">
+                    <h4 className="text-gray-400 font-semibold mb-2">Editor Settings</h4>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-gray-500 mb-1 mt-1 font-medium">Indentation</span>
+                      <button 
+                        type="button"
+                        onClick={() => handleIndentChange('Spaces', 2)}
+                        className={`text-left px-2 py-1.5 rounded-md transition-colors ${indentInfo.type === 'Spaces' && indentInfo.size === 2 ? 'bg-blue-500/10 text-blue-400' : 'text-gray-300 hover:bg-gray-800'}`}
+                      >
+                        Spaces: 2
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => handleIndentChange('Spaces', 4)}
+                        className={`text-left px-2 py-1.5 rounded-md transition-colors ${indentInfo.type === 'Spaces' && indentInfo.size === 4 ? 'bg-blue-500/10 text-blue-400' : 'text-gray-300 hover:bg-gray-800'}`}
+                      >
+                        Spaces: 4
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="w-px h-4 bg-gray-800 mx-1"></div>
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value as Language)}
@@ -184,15 +296,8 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
                 <Play className="w-3 h-3 fill-current" />
                 <span>{isRunning ? 'Running...' : 'Run Code'}</span>
               </button>
-            </div>
+            </>
           )}
-
-          <button
-            type="button"
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md"
-          >
-            <Search className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -207,44 +312,16 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
             onClose={() => setIsTerminalOpen(false)}
           />
         )}
-
-        {viewMode === 'editor' && editorAccessible && (
-          <div className="absolute bottom-6 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="bg-[#161b22]/90 border border-gray-800 p-1.5 rounded-lg shadow-2xl flex items-center gap-1">
-              <button
-                type="button"
-                className="p-2 hover:bg-gray-700 rounded-md text-gray-400 hover:text-white"
-              >
-                <Info className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-                className="p-2 hover:bg-gray-700 rounded-md text-gray-400 hover:text-white"
-              >
-                <Terminal className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="h-6 border-t border-gray-800 bg-[#0d1117] flex items-center justify-between px-3 text-[10px] text-gray-500 uppercase">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-            {viewMode === 'editor' ? 'UTF-8' : 'Collaborative Canvas'}
-          </span>
-          <span>{viewMode === 'editor' ? 'TypeScript JSX' : 'Real-time'}</span>
-        </div>
-        <div className="flex items-center gap-4">
-          {viewMode === 'editor' && editorAccessible && (
-            <>
-              <span>Line 1</span>
-              <span>Spaces: 2</span>
-            </>
-          )}
-        </div>
+      <div className="h-6 border-t border-gray-800 bg-[#0d1117] flex items-center gap-4 px-3 text-[10px] text-gray-500 uppercase">
+        {viewMode === 'editor' && editorAccessible && editorInstance && (
+          <>
+            <span>{selectedLanguage}</span>
+            <span>Ln {cursorPos.lineNumber}, Col {cursorPos.column}</span>
+            <span>{indentInfo.type}: {indentInfo.size}</span>
+          </>
+        )}
       </div>
     </main>
   );

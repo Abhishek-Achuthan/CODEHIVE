@@ -15,6 +15,7 @@ interface Props {
   language: Language;
   onLanguageChange: (lang: Language) => void;
   editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>;
+  onEditorMount?: (editor: monaco.editor.IStandaloneCodeEditor) => void;
 }
 
 const CollaborativeEditor: React.FC<Props> = ({
@@ -25,6 +26,7 @@ const CollaborativeEditor: React.FC<Props> = ({
   language,
   onLanguageChange,
   editorRef,
+  onEditorMount,
 }) => {
   const collabRef = useRef<ReturnType<typeof createCollabProvider> | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
@@ -133,6 +135,7 @@ const CollaborativeEditor: React.FC<Props> = ({
       onMount={(editor) => {
         localEditorRef.current = editor;
         editorRef.current = editor; // Pass it up to EditorArea
+        onEditorMount?.(editor);
         bindEditor();
       }}
       theme="vs-dark"
