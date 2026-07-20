@@ -180,6 +180,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
           onLanguageChange={setSelectedLanguage}
           editorRef={editorRef}
           onEditorMount={setEditorInstance}
+          user={{ id: user.id, name: `${user.firstName} ${user.lastName}` }}
         />
       );
     }
