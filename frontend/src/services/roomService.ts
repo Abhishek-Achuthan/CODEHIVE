@@ -153,6 +153,16 @@ export class RoomService {
     }
   }
 
+  static async getClosedPoll(roomId: string) {
+    try {
+      const response = await RoomAPI.getClosedPoll(roomId);
+
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   private static handleError(error: unknown): never {
     if (error instanceof AxiosError) {
       const msg =

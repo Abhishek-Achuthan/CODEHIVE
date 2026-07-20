@@ -239,6 +239,8 @@ import { ICreateSubscriptionCheckoutSessionUseCase } from '../../application/use
 import { CreateSubscriptionCheckoutSessionUseCase } from '../../application/useCase/subscription/CreateSubscriptionCheckoutSessionUseCase';
 import { GetActiveSubscriptionUseCase } from '../../application/useCase/subscription/GetActiveSubscriptionUseCase';
 import { IGetActiveSubscriptionUseCase } from '../../application/useCase/interface/subscription/IGetActiveSubscriptionUseCase';
+import { GetClosePollUseCase } from '../../application/useCase/poll/GetClosePollUseCase';
+import { IGetClosePollUseCase } from '../../application/useCase/interface/poll/IGetClosePollUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
@@ -783,6 +785,10 @@ export class UseCaseModule {
 
     container.register<IClosePollUseCase>('IClosePollUseCase', {
       useClass: ClosePollUseCase,
+    });
+
+    container.register<IGetClosePollUseCase>('IGetClosePollUseCase', {
+      useClass: GetClosePollUseCase,
     });
 
     //---------------------------------Notes--------------------------------------//

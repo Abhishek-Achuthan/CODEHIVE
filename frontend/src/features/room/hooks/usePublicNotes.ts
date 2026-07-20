@@ -5,7 +5,6 @@ import { createPublicNoteProvider } from "../../collaboration/yjs/createPublicNo
 import { RoomService } from "../../../services/roomService";
 import type { SaveStatus } from "./usePrivateNotes";
 
-// Re-export SaveStatus so PublicNotes.tsx can import from one place.
 export type { SaveStatus };
 
 const DEBOUNCE_MS = 3000;

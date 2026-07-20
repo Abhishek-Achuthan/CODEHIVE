@@ -131,6 +131,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       case 'polls':
         return (
           <PollsPanel
+            roomId={roomId}
             polls={polls}
             onCreatePoll={onCreatePoll}
             onVotePoll={onVotePoll}

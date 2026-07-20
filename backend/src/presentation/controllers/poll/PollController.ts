@@ -13,6 +13,7 @@ import {
 import type { IGetActivePollUseCase } from '../../../application/useCase/interface/poll/IGetActivePollUseCase';
 import type { IClosePollUseCase } from '../../../application/useCase/interface/poll/IClosePollUseCase';
 import { PollEntity } from '../../../domain/entities/room/PollEntity';
+import type { IGetClosePollUseCase } from '../../../application/useCase/interface/poll/IGetClosePollUseCase';
 
 @injectable()
 export class PollController {
@@ -27,6 +28,8 @@ export class PollController {
     private readonly _getActivePollUseCase: IGetActivePollUseCase,
     @inject('IClosePollUseCase')
     private readonly _closePollUseCase: IClosePollUseCase,
+    @inject('IGetClosePollUseCase')
+    private readonly _getClosePollUseCase: IGetClosePollUseCase,
   ) {}
 
   async handleCreatePoll(req: Request, res: Response, next: NextFunction) {
@@ -105,6 +108,16 @@ export class PollController {
       this._roomEventEmitter.emitPollEnded((poll as PollEntity).roomId,poll as PollEntity);
 
       res.status(HttpStatus.OK).json(poll);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetClosedPoll(req: Request, res: Response,next : NextFunction) {
+    try {
+      const roomId = this.getRequiredParam(req,'roomId');
+      const closedPolls = await this._getClosePollUseCase.execute(roomId);
+      res.status(HttpStatus.OK).json(closedPolls)
     } catch (error) {
       next(error);
     }

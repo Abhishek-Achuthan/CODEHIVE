@@ -81,3 +81,6 @@ export const getPublicNote = (roomId: string) =>
 export const savePublicNote = (roomId: string, content: string) =>
     apiClient.put(API_ROUTES.ROOM.SAVE_PUBLIC_NOTE(roomId), { content });
 
+export const getClosedPoll = (roomId: string) =>
+    apiClient.get(API_ROUTES.ROOM.GET_CLOSED_POLL(roomId));
+

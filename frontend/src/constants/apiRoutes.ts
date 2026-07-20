@@ -364,6 +364,7 @@ export const API_ROUTES = {
       `/rooms/${roomId}/polls/${pollId}/votes`,
     CLOSE_POLL: (roomId: string, pollId: string) =>
       `/rooms/${roomId}/polls/${pollId}/close`,
+    GET_CLOSED_POLL: (roomId: string) => `/rooms/${roomId}/polls/closed`,
     GET_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
     SAVE_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
     GET_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`,

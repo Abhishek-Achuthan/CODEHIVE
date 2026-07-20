@@ -60,6 +60,11 @@ export class PollRepository extends GenericRepository<PollDocument, PollEntity> 
     return updated ? this.toEntity(updated as PollDocument) : null;
   }
 
+  async findClosedPollsByRoomId(roomId: string, isActive: boolean): Promise<PollEntity[] | []> {
+    const closed = await this._model.find({roomId:new Types.ObjectId(roomId),isActive:false});
+    return closed.map(doc => this.toEntity(doc as PollDocument));
+  }
+
   protected toEntity(doc: PollDocument): PollEntity {
     return {
       id: doc._id.toString(),

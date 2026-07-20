@@ -36,6 +36,12 @@ export class PollRoutes {
       this._authMiddleware.check,
       this._pollController.handleClosePoll.bind(this._pollController),
     );
+
+    this._router.get(
+      '/closed',
+      this._authMiddleware.check,
+      this._pollController.handleGetClosedPoll.bind(this._pollController),
+    );
   }
 
   public getRoutes(): Router {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, BarChart2, History } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, BarChart2, History, Loader2 } from 'lucide-react';
 import type {  Participant } from '../types';
 import type { CreatePollRequest } from '../../../shared/types/api/room';
 import type { Poll as SocketPoll } from '../../../shared/socket/roomTypes';
@@ -7,8 +7,11 @@ import PollCard from './PollCard';
 import CreatePollModal from './CreatePollModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
+import { RoomService } from '../../../services/roomService';
+import toast from 'react-hot-toast';
 
 interface PollsPanelProps {
+  roomId: string;
   polls: SocketPoll[];
   onCreatePoll: (poll: CreatePollRequest) => void;
   onVotePoll: (pollId: string, optionIds: string[]) => void;
@@ -17,6 +20,7 @@ interface PollsPanelProps {
 }
 
 const PollsPanel: React.FC<PollsPanelProps> = ({
+  roomId,
   polls,
   onCreatePoll,
   onVotePoll,
@@ -25,12 +29,39 @@ const PollsPanel: React.FC<PollsPanelProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<'active' | 'closed'>('active');
+  const [fetchedClosedPolls, setFetchedClosedPolls] = useState<SocketPoll[]>([]);
+  const [isLoadingClosed, setIsLoadingClosed] = useState(false);
   const authorization = useRoomAuthorization();
 
-  const activePolls = polls.filter(p => p.isActive && (!p.expiresAt || new Date(p.expiresAt) > new Date()));
-  const closedPolls = polls.filter(p => !p.isActive || (p.expiresAt && new Date(p.expiresAt) <= new Date()));
+  useEffect(() => {
+    if (filter === 'closed') {
+      setIsLoadingClosed(true);
+      RoomService.getClosedPoll(roomId)
+        .then((data) => {
+          setFetchedClosedPolls(data);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error('Failed to load closed polls');
+        })
+        .finally(() => {
+          setIsLoadingClosed(false);
+        });
+    }
+  }, [filter, roomId]);
 
-  const currentPolls = filter === 'active' ? activePolls : closedPolls;
+  const activePolls = polls.filter(p => p.isActive && (!p.expiresAt || new Date(p.expiresAt) > new Date()));
+  const localClosedPolls = polls.filter(p => !p.isActive || (p.expiresAt && new Date(p.expiresAt) <= new Date()));
+
+  const allClosedPollsMap = new Map<string, SocketPoll>();
+  fetchedClosedPolls.forEach(p => allClosedPollsMap.set(p.id, p));
+  localClosedPolls.forEach(p => allClosedPollsMap.set(p.id, p));
+
+  const combinedClosedPolls = Array.from(allClosedPollsMap.values()).sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  const currentPolls = filter === 'active' ? activePolls : combinedClosedPolls;
 
   const canCreate = authorization.canCreatePolls;
 
@@ -49,11 +80,11 @@ const PollsPanel: React.FC<PollsPanelProps> = ({
           </button>
           <button
             onClick={() => setFilter('closed')}
-            className={`text-xs font-bold uppercase tracking-widest transition-all ${
+            className={`text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${
               filter === 'closed' ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            Closed ({closedPolls.length})
+            Closed ({combinedClosedPolls.length})
           </button>
         </div>
 
@@ -71,7 +102,17 @@ const PollsPanel: React.FC<PollsPanelProps> = ({
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
         <AnimatePresence mode="popLayout">
-          {currentPolls.length > 0 ? (
+          {filter === 'closed' && isLoadingClosed && fetchedClosedPolls.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center h-full space-y-4"
+            >
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              <p className="text-sm text-gray-500">Loading closed polls...</p>
+            </motion.div>
+          ) : currentPolls.length > 0 ? (
             currentPolls.map((poll) => (
               <PollCard
                 key={poll.id}
