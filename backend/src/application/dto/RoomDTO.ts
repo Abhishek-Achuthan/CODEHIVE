@@ -100,6 +100,7 @@ import { ICreatePollOutputDTO } from './PollDTO';
 
 export interface JoinRoomSnapshotDTO {
   roomId: string;
+  title: string;
   isNewParticipant: boolean;
   participants: ParticipantWithUserDTO[];
   messages: SendMessageResponseDTO[];

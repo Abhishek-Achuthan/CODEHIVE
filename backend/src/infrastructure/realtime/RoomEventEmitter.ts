@@ -53,17 +53,18 @@ export class RoomEventEmitter implements IRoomEventEmitter {
     payload: RoomUserPresencePayload,
     excludedSocketId?: string,
   ): void {
+    const fullPayload = { roomId, ...payload };
     if (excludedSocketId) {
       this._socketService.emitToRoomExcept(
         roomId,
         excludedSocketId,
         'room:user-joined',
-        payload,
+        fullPayload,
       );
       return;
     }
 
-    this._socketService.emitToRoom(roomId, 'room:user-joined', payload);
+    this._socketService.emitToRoom(roomId, 'room:user-joined', fullPayload);
   }
 
   emitUserLeft(

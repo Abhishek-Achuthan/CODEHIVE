@@ -122,6 +122,7 @@ export interface RoomParticipantResponse {
 
 export interface JoinRoomSnapshotResponse {
   roomId: string;
+  title: string;
   isNewParticipant: boolean;
   participants: RoomParticipantResponse[];
   messages: RoomMessageResponse[];

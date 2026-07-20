@@ -87,10 +87,11 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       }
     }
 
-    const [participants, recentMessages, activePoll] = await Promise.all([
+    const [participants, recentMessages, activePoll, hostUser] = await Promise.all([
       this.participantRepository.findByRoomIdWithUsers(data.roomId),
       this.messageRepository.findRecentByRoomId(data.roomId, 50),
       this.pollRepository.findActivePollByRoomId(data.roomId),
+      this.userRepository.find(room.hostId),
     ]);
 
     const messagesWithSenders = await Promise.all(
@@ -122,15 +123,27 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       'read',
     );
 
+    const mappedParticipants = participants.map((p) => ({
+      userId: p.userId,
+      name: p.name,
+      role: p.role,
+      ...(p.avatarUrl && { avatarUrl: p.avatarUrl }),
+    }));
+
+    if (hostUser && !mappedParticipants.some(p => p.userId === room.hostId)) {
+      mappedParticipants.push({
+        userId: hostUser.id,
+        name: `${hostUser.firstName} ${hostUser.lastName}`,
+        role: RoomRole.HOST,
+        ...(hostUser.avatarUrl && { avatarUrl: hostUser.avatarUrl }),
+      });
+    }
+
     return {
       roomId: room.id,
+      title: room.title,
       isNewParticipant,
-      participants: participants.map((p) => ({
-        userId: p.userId,
-        name: p.name,
-        role: p.role,
-        ...(p.avatarUrl && { avatarUrl: p.avatarUrl }),
-      })),
+      participants: mappedParticipants,
       messages: messagesWithSenders,
       activePoll,
       capabilities: authorizationContext.capabilities,

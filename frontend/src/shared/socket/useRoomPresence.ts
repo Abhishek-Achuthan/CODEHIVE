@@ -38,15 +38,19 @@ export const useRoomPresence = ({
       return;
     }
 
+    const onlineIds = new Set(snapshot.onlineUserIds ?? []);
+
     setParticipants(
-      snapshot.participants.map((participant) => ({
-        id: participant.userId,
-        name: participant.name,
-        avatar: participant.avatarUrl,
-        role: participant.role as RoomRole,
-      }))
+      snapshot.participants
+        .filter((participant) => onlineIds.has(participant.userId))
+        .map((participant) => ({
+          id: participant.userId,
+          name: participant.name,
+          avatar: participant.avatarUrl,
+          role: participant.role as RoomRole,
+        }))
     );
-    setOnlineUserIds(new Set(snapshot.onlineUserIds ?? []));
+    setOnlineUserIds(onlineIds);
   }, [roomId, snapshot]);
 
   const handleUserJoined = useCallback(
@@ -65,7 +69,7 @@ export const useRoomPresence = ({
                   ...participant,
                   name: payload.name,
                   avatar: payload.avatarUrl,
-                  role: payload.role,
+                  role: payload.role ?? participant.role,
                 }
               : participant
           );
@@ -77,7 +81,7 @@ export const useRoomPresence = ({
             id: payload.userId,
             name: payload.name,
             avatar: payload.avatarUrl,
-            role: payload.role,
+            role: payload.role as RoomRole,
           },
         ];
       });
@@ -96,6 +100,10 @@ export const useRoomPresence = ({
   const handleUserLeft = useCallback(
     (payload: RoomUserLeftPayload) => {
       if (payload.roomId !== roomId) return;
+
+      setParticipants((current) =>
+        current.filter((p) => p.id !== payload.userId)
+      );
 
       setOnlineUserIds((current) => {
         const next = new Set(current);

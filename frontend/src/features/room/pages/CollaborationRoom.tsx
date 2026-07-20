@@ -60,7 +60,7 @@ const CollaborationRoom: React.FC = () => {
   const [endRoomOpen, setEndRoomOpen] = useState(false);
   const [endRoomLoading, setEndRoomLoading] = useState(false);
 
-  const roomName = 'Project Collaboration Room';
+  const roomName = snapshot?.title || 'Untitled Room';
 
   const handleLeaveRoom = () => {
     leaveRoom();

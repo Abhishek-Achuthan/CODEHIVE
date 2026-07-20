@@ -4,7 +4,7 @@ import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext'
 import { RoomInviteShare } from './RoomInviteShare';
 
 interface TopBarProps {
-  roomName: string;
+  roomName?: string;
   roomId: string;
   showInviteControls?: boolean;
   showEndRoomControl?: boolean;
@@ -31,7 +31,11 @@ const TopBar: React.FC<TopBarProps> = ({
           <Share2 className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-sm font-semibold text-gray-100">{roomName}</h1>
+          {roomName ? (
+            <h1 className="text-sm font-semibold text-gray-100">{roomName}</h1>
+          ) : (
+            <div className="h-5 w-48 bg-gray-800/80 rounded animate-pulse mb-0.5" />
+          )}
           <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full ${authorization.isActive ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`}></span>
             <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
