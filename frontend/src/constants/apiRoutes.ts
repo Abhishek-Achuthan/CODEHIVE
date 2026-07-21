@@ -351,6 +351,7 @@ export const API_ROUTES = {
       return query ? `/rooms?${query}` : `/rooms`;
     },
     GET_SETTINGS: (roomId: string) => `/rooms/${roomId}/settings`,
+    UPDATE_ROOM_DETAILS: (roomId: string) => `/rooms/${roomId}/details`,
     JOIN_ROOM: (roomId: string) => `/rooms/${roomId}/join`,
     LEAVE_ROOM: (roomId: string) => `/rooms/${roomId}/leave`,
     END_ROOM: (roomId: string) => `/rooms/${roomId}/end`,

@@ -9,6 +9,7 @@ import type {
   MyRoomsListParams,
   PublicRoomsListParams,
   SavePrivateNoteResponse,
+  RoomVisibility,
 } from "../shared/types/api/room";
 import type { RoomSettingsResponse } from "../shared/types/api/roomSettings";
 import type { RoomInviteResponse } from "../shared/types/api/roomInvite";
@@ -51,6 +52,15 @@ export class RoomService {
   static async getRoomSettings(roomId: string): Promise<RoomSettingsResponse> {
     try {
       const response = await RoomAPI.getRoomSettings(roomId);
+      return response.data as RoomSettingsResponse;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async updateRoomDetails(roomId: string, data: { title?: string, description?: string, visibility?: RoomVisibility }): Promise<RoomSettingsResponse> {
+    try {
+      const response = await RoomAPI.updateRoomDetails(roomId, data);
       return response.data as RoomSettingsResponse;
     } catch (error) {
       throw this.handleError(error);

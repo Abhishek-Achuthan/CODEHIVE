@@ -13,6 +13,7 @@ import type { IRevokeRoomInviteUseCase } from '../../../application/useCase/inte
 import type { IListRoomInvitesUseCase } from '../../../application/useCase/interface/room/IListRoomInvitesUseCase';
 import type { IKickParticipantUseCase } from '../../../application/useCase/interface/room/IKickParticipantUseCase';
 import type { IGetRoomSettingsUseCase } from '../../../application/useCase/interface/room/IGetRoomSettingsUseCase';
+import type { IUpdateRoomDetailsUseCase } from '../../../application/useCase/interface/room/IUpdateRoomDetailsUseCase';
 import type { IUpdateParticipantOverridesUseCase } from '../../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import type { IEndRoomUseCase } from '../../../application/useCase/interface/room/IEndRoomUseCase';
 import type { IReportParticipantUseCase } from '../../../application/useCase/interface/room/IReportParticipantUseCase';
@@ -50,6 +51,8 @@ export class RoomController {
     private readonly _kickParticipantUseCase: IKickParticipantUseCase,
     @inject('IGetRoomSettingsUseCase')
     private readonly _getRoomSettingsUseCase: IGetRoomSettingsUseCase,
+    @inject('IUpdateRoomDetailsUseCase')
+    private readonly _updateRoomDetailsUseCase: IUpdateRoomDetailsUseCase,
     @inject('IUpdateParticipantOverridesUseCase')
     private readonly _updateParticipantOverridesUseCase: IUpdateParticipantOverridesUseCase,
     @inject('IReportParticipantUseCase')
@@ -194,6 +197,25 @@ export class RoomController {
     try {
       const roomId = this.getRequiredParam(req, 'roomId');
       const data = await this._getRoomSettingsUseCase.execute(roomId, req.user.id);
+      res.status(HttpStatus.OK).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleUpdateRoomDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const roomId = this.getRequiredParam(req, 'roomId');
+      const { title, description, visibility } = req.body;
+      
+      const data = await this._updateRoomDetailsUseCase.execute({
+        roomId,
+        hostUserId: req.user.id,
+        title,
+        description,
+        visibility
+      });
+      
       res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);

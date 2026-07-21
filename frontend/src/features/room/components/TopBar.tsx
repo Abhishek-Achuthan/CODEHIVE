@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, Video, LogOut, Settings, Monitor, Share2 } from 'lucide-react';
+import { Video, LogOut, Share2, Info } from 'lucide-react';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 import { RoomInviteShare } from './RoomInviteShare';
 
@@ -23,7 +23,6 @@ const TopBar: React.FC<TopBarProps> = ({
   onLeave,
 }) => {
   const authorization = useRoomAuthorization();
-  const canUseVideoAudio = authorization.hasFeature('video_audio') && authorization.isActive;
   return (
     <header className="h-14 border-b border-gray-800 bg-[#0d1117] flex items-center justify-between px-4 text-white">
       <div className="flex items-center gap-4">
@@ -49,46 +48,21 @@ const TopBar: React.FC<TopBarProps> = ({
         {showInviteControls && <RoomInviteShare roomId={roomId} />}
         <div className="flex items-center bg-[#161b22] rounded-lg p-1 mr-2 border border-gray-800">
           <button
-            disabled={!canUseVideoAudio}
-            className={`p-2 rounded-md transition-colors ${
-              canUseVideoAudio
-                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                : 'text-gray-700 cursor-not-allowed'
-            }`}
-            title={canUseVideoAudio ? 'Mute Mic' : 'Video/audio unavailable'}
+            type="button"
+            onClick={onOpenSettings}
+            className="flex items-center gap-1.5 p-1.5 px-3 rounded-md text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+            title="Room Details"
           >
-            <Mic className="w-4 h-4" />
-          </button>
-          <button
-            disabled={!canUseVideoAudio}
-            className={`p-2 rounded-md transition-colors ${
-              canUseVideoAudio
-                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                : 'text-gray-700 cursor-not-allowed'
-            }`}
-            title={canUseVideoAudio ? 'Toggle Video' : 'Video/audio unavailable'}
-          >
-            <Video className="w-4 h-4" />
-          </button>
-          <button
-            disabled={!authorization.canStartScreenshare}
-            className={`p-2 rounded-md transition-colors ${
-              authorization.canStartScreenshare
-                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                : 'text-gray-700 cursor-not-allowed'
-            }`}
-            title={authorization.canStartScreenshare ? 'Screen Share' : 'Screen sharing unavailable'}
-          >
-            <Monitor className="w-4 h-4" />
+            <Info className="w-4 h-4" />
+            <span className="text-xs font-medium hidden sm:inline">Details</span>
           </button>
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
           <button
-            type="button"
-            onClick={onOpenSettings}
-            className="p-2 rounded-md text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
-            title="Room settings"
+            disabled={true}
+            className="p-1.5 rounded-md text-gray-700 cursor-not-allowed transition-colors"
+            title="Video calls coming soon"
           >
-            <Settings className="w-4 h-4" />
+            <Video className="w-4 h-4" />
           </button>
         </div>
         

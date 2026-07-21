@@ -41,6 +41,12 @@ export class RoomRoutes {
       this._roomController.handleGetRoomSettings.bind(this._roomController),
     );
 
+    this._router.patch(
+      '/:roomId/details',
+      this._authMiddleware.check,
+      this._roomController.handleUpdateRoomDetails.bind(this._roomController),
+    );
+
     this._router.post(
       '/:roomId/join',
       this._authMiddleware.check,

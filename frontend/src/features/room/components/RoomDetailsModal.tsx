@@ -22,11 +22,13 @@ import { RoomService } from "../../../services/roomService";
 import type { RoomSettingsResponse } from "../../../shared/types/api/roomSettings";
 import { UserRole } from "../../../shared/constants/auth";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
+import type { RoomVisibility } from "../../../shared/types/api/room";
 
-interface RoomSettingsModalProps {
+interface RoomDetailsModalProps {
   roomId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDetailsUpdated?: () => void;
 }
 
 function formatCreatedAt(iso: string): string {
@@ -53,11 +55,12 @@ function getHostProfilePath(
   return null;
 }
 
-export const RoomSettingsModal = ({
+export const RoomDetailsModal = ({
   roomId,
   open,
   onOpenChange,
-}: RoomSettingsModalProps) => {
+  onDetailsUpdated,
+}: RoomDetailsModalProps) => {
   const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.auth.user);
 
@@ -66,12 +69,21 @@ export const RoomSettingsModal = ({
   const [linkLoading, setLinkLoading] = useState(false);
   const [cachedJoinUrl, setCachedJoinUrl] = useState<string | null>(null);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editVisibility, setEditVisibility] = useState<RoomVisibility>("PRIVATE");
+  const [savingDetails, setSavingDetails] = useState(false);
+
   const loadSettings = useCallback(async () => {
     setLoading(true);
     try {
       const data = await RoomService.getRoomSettings(roomId);
       setSettings(data);
       setCachedJoinUrl(data.joinUrl ?? null);
+      setEditTitle(data.title);
+      setEditDescription(data.description || "");
+      setEditVisibility(data.visibility);
     } catch {
       toast.error("Failed to load room settings");
       onOpenChange(false);
@@ -83,9 +95,11 @@ export const RoomSettingsModal = ({
   useEffect(() => {
     if (open) {
       void loadSettings();
+      setIsEditing(false);
     } else {
       setSettings(null);
       setCachedJoinUrl(null);
+      setIsEditing(false);
     }
   }, [open, loadSettings]);
 
@@ -134,6 +148,29 @@ export const RoomSettingsModal = ({
     navigate(path);
   };
 
+  const handleSaveDetails = async () => {
+    if (!editTitle.trim()) {
+      toast.error("Room name cannot be empty");
+      return;
+    }
+    setSavingDetails(true);
+    try {
+      const data = await RoomService.updateRoomDetails(roomId, {
+        title: editTitle,
+        description: editDescription,
+        visibility: editVisibility,
+      });
+      setSettings(data);
+      setIsEditing(false);
+      onDetailsUpdated?.();
+      toast.success("Room details updated");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update room details");
+    } finally {
+      setSavingDetails(false);
+    }
+  };
+
   const hostName = settings
     ? `${settings.host.firstName} ${settings.host.lastName}`.trim()
     : "";
@@ -141,14 +178,29 @@ export const RoomSettingsModal = ({
     settings?.host.avatarUrl ??
     (settings ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${settings.host.id}` : "");
 
+  const canEdit = settings?.host.id === currentUser?.id || settings?.canManageInviteLink;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto border-gray-800 bg-[#0d1117] text-gray-100 sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-gray-100">Room settings</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Details about this collaboration room.
-          </DialogDescription>
+          <div className="flex items-center justify-between mt-4">
+            <div>
+              <DialogTitle className="text-gray-100">Room Details</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                {isEditing ? "Update your collaboration room details." : "Details about this collaboration room."}
+              </DialogDescription>
+            </div>
+            {!loading && settings && canEdit && !isEditing && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="px-3 py-1.5 text-xs font-medium bg-[#161b22] text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800 rounded-md transition-colors mr-6"
+              >
+                Edit Room
+              </button>
+            )}
+          </div>
         </DialogHeader>
 
         {loading ? (
@@ -157,14 +209,72 @@ export const RoomSettingsModal = ({
           </div>
         ) : settings ? (
           <div className="space-y-6">
-            <section className="space-y-2">
-              <h3 className="text-lg font-semibold text-gray-100">{settings.title}</h3>
-              {settings.description ? (
-                <p className="text-sm leading-relaxed text-gray-400">{settings.description}</p>
-              ) : (
-                <p className="text-sm italic text-gray-600">No description</p>
-              )}
-            </section>
+            {isEditing ? (
+              <div className="space-y-4 border border-gray-800 rounded-lg p-4 bg-[#161b22]">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-400">Room Name</label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full bg-[#0d1117] border border-gray-800 rounded-md px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-400">Description</label>
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    rows={3}
+                    className="w-full bg-[#0d1117] border border-gray-800 rounded-md px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-400">Visibility</label>
+                  <select
+                    value={editVisibility}
+                    onChange={(e) => setEditVisibility(e.target.value as RoomVisibility)}
+                    className="w-full bg-[#0d1117] border border-gray-800 rounded-md px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                  >
+                    <option value="PRIVATE">Private</option>
+                    <option value="PUBLIC_REQUEST">Public</option>
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditTitle(settings.title);
+                      setEditDescription(settings.description || "");
+                      setEditVisibility(settings.visibility);
+                    }}
+                    disabled={savingDetails}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveDetails}
+                    disabled={savingDetails}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors disabled:opacity-50"
+                  >
+                    {savingDetails && <Loader2 className="w-3 h-3 animate-spin" />}
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <section className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-100">{settings.title}</h3>
+                {settings.description ? (
+                  <p className="text-sm leading-relaxed text-gray-400">{settings.description}</p>
+                ) : (
+                  <p className="text-sm italic text-gray-600">No description</p>
+                )}
+              </section>
+            )}
 
             <section className="grid gap-3 sm:grid-cols-2">
               <div className="flex items-center gap-2 rounded-lg border border-gray-800 bg-[#161b22] px-3 py-2.5">

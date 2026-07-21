@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   MessageSquare, StickyNote, BarChart2,
-  Search, Settings, ChevronRight, ChevronLeft, Lock,
+  ChevronRight, ChevronLeft, Lock,
 } from 'lucide-react';
 import type { TabType, RoomMessage as Message, Participant } from '../types';
 import ChatPanel from './ChatPanel';
@@ -33,7 +33,6 @@ interface RightSidebarProps {
   onVotePoll: (pollId: string, optionIds: string[]) => void;
   onClosePoll: (pollId: string) => void;
   roomId: string;
-  onOpenSettings?: () => void;
 }
 
 type SidebarTab = {
@@ -58,7 +57,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   onVotePoll,
   onClosePoll,
   roomId,
-  onOpenSettings,
 }) => {
   const authorization = useRoomAuthorization();
   const [activeTab, setActiveTab] = useState<TabType>('chat');
@@ -162,19 +160,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
              >
                {isCollapsed ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
              </button>
-             {!isCollapsed && (
-               <>
-                 <Search className="w-3.5 h-3.5 text-gray-500 hover:text-white cursor-pointer" />
-                 <button
-                   type="button"
-                   onClick={onOpenSettings}
-                   className="rounded p-0.5 text-gray-500 transition-colors hover:text-white"
-                   title="Room settings"
-                 >
-                   <Settings className="h-3.5 w-3.5" />
-                 </button>
-               </>
-             )}
            </div>
         </div>
 

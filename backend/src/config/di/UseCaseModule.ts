@@ -185,6 +185,8 @@ import { JoinRoomViaInviteUseCase } from '../../application/useCase/room/JoinRoo
 import { IKickParticipantUseCase } from '../../application/useCase/interface/room/IKickParticipantUseCase';
 import { IGetRoomSettingsUseCase } from '../../application/useCase/interface/room/IGetRoomSettingsUseCase';
 import { GetRoomSettingsUseCase } from '../../application/useCase/room/GetRoomSettingsUseCase';
+import { IUpdateRoomDetailsUseCase } from '../../application/useCase/interface/room/IUpdateRoomDetailsUseCase';
+import { UpdateRoomDetailsUseCase } from '../../application/useCase/room/UpdateRoomDetailsUseCase';
 import { KickParticipantUseCase } from '../../application/useCase/room/KickParticipantUseCase';
 import { IUpdateParticipantOverridesUseCase } from '../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import { UpdateParticipantOverridesUseCase } from '../../application/useCase/room/UpdateParticipantOverridesUseCase';
@@ -589,6 +591,10 @@ export class UseCaseModule {
 
     container.register<IGetRoomSettingsUseCase>('IGetRoomSettingsUseCase', {
       useClass: GetRoomSettingsUseCase,
+    });
+
+    container.register<IUpdateRoomDetailsUseCase>('IUpdateRoomDetailsUseCase', {
+      useClass: UpdateRoomDetailsUseCase,
     });
 
     container.register<IUpdateParticipantOverridesUseCase>(

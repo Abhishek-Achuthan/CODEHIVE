@@ -7,6 +7,7 @@ import type {
     EditRoomMessageRequest,
     MyRoomsListParams,
     PublicRoomsListParams,
+    RoomVisibility,
 } from "../../shared/types/api/room";
 
 export const createRoom = (data: CreateRoomRequest) =>
@@ -20,6 +21,9 @@ export const getMyRooms = (params?: MyRoomsListParams) =>
 
 export const getRoomSettings = (roomId: string) =>
     apiClient.get(API_ROUTES.ROOM.GET_SETTINGS(roomId));
+
+export const updateRoomDetails = (roomId: string, data: { title?: string, description?: string, visibility?: RoomVisibility }) =>
+    apiClient.patch(API_ROUTES.ROOM.UPDATE_ROOM_DETAILS(roomId), data);
 
 export const joinRoom = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.JOIN_ROOM(roomId));

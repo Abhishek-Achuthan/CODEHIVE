@@ -20,7 +20,7 @@ import TopBar from '../components/TopBar';
 import ParticipantsSidebar from '../components/ParticipantsSidebar';
 import EditorArea from '../components/EditorArea';
 import RightSidebar from '../components/RightSidebar';
-import { RoomSettingsModal } from '../components/RoomSettingsModal';
+import { RoomDetailsModal } from '../components/RoomDetailsModal';
 import { EndRoomDialog } from '../components/EndRoomDialog';
 
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -234,12 +234,14 @@ const CollaborationRoom: React.FC = () => {
           onLeave={handleLeaveRoom}
         />
 
-        <RoomSettingsModal
+        {/* Modals */}
+        <RoomDetailsModal
           roomId={roomId!}
           open={settingsOpen}
           onOpenChange={setSettingsOpen}
+          onDetailsUpdated={refreshRoom}
         />
-
+        
         <EndRoomDialog
           open={endRoomOpen}
           loading={endRoomLoading}
@@ -279,7 +281,6 @@ const CollaborationRoom: React.FC = () => {
             onVotePoll={votePoll}
             onClosePoll={closePoll}
             roomId={roomId || ''}
-            onOpenSettings={() => setSettingsOpen(true)}
           />
         </div>
       </div>
