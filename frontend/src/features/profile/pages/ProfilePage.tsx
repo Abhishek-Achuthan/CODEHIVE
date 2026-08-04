@@ -12,6 +12,7 @@ import SkillsSection from "../components/SkillsSection";
 import LanguagesSection from "../components/LanguagesSection";
 import AccountSecurityCard from "../components/AccountSecurityCard";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import SetPasswordDialog from "../components/SetPasswordDialog";
 
 import { useMemo, useRef, useState } from "react";
 import {
@@ -34,10 +35,12 @@ import { UserRole } from "../../../shared/constants/auth";
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { updateProfile, applyForMentor, uploadAvatar } = useProfileUpdater();
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
   const { subscription, loading: subscriptionLoading } = useMySubscription();
   const { activity } = useMyActivity();
+
+  const hasPassword = Boolean(authUser?.hasPassword);
 
   const billingInfo = useMemo(() => {
     if (subscription) {
@@ -139,10 +142,17 @@ export default function ProfilePage() {
   return (
     <div className="h-full bg-transparent text-white">
 
-      <ChangePasswordDialog
-        open={changePasswordOpen}
-        onOpenChange={setChangePasswordOpen}
-      />
+      {hasPassword ? (
+        <ChangePasswordDialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+        />
+      ) : (
+        <SetPasswordDialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+        />
+      )}
 
       <main>
         <div className="mx-auto max-w-6xl px-4 py-4">
@@ -210,7 +220,8 @@ export default function ProfilePage() {
                 />
 
                 <AccountSecurityCard
-                  onChangePassword={() => setChangePasswordOpen(true)}
+                  onChangePassword={() => setIsPasswordDialogOpen(true)}
+                  hasPassword={hasPassword}
                 />
 
                 {authUser && authUser.role !== UserRole.MENTOR && <MentorCard

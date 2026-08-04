@@ -38,6 +38,7 @@ interface IUserLoginResponseDTO {
 
   accessToken: string;
   refreshToken?: string | undefined;
+  hasPassword: boolean;
 }
 
 interface IUserListResponseDTO {
@@ -82,6 +83,7 @@ interface IUserProfileResponseDTO {
   mentorStatus: MentorStatus;
   primaryExpertise?: string | undefined;
   experienceLevel?: string | undefined;
+  hasPassword: boolean;
 }
 
 interface IUserActivityStatsDTO {

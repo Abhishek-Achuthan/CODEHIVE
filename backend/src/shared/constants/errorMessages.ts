@@ -7,6 +7,8 @@ export const ERROR_MESSAGES = {
     ACCOUNT_BLOCKED: 'Your account is blocked',
     PASSWORD_NOT_SET:
       'This account does not have a password. Please sign in using Google or set a password first.',
+    PASSWORD_ALREADY_SET: 'Password already set for this account.',
+    INVALID_PASS:"Invalid Password",
 
 
     // Token errors

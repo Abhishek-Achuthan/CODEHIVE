@@ -33,4 +33,5 @@ export type UserProfileApi = {
   mentorStatus: "none" | "pending" | "approved";
   primaryExpertise?: string;
   experienceLevel?: string;
+  hasPassword: boolean;
 };

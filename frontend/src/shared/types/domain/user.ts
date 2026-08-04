@@ -8,4 +8,5 @@ export interface User extends BaseEntity {
   role: UserRole;
   isBlocked: boolean;
   avatarUrl?: string;
+  hasPassword?: boolean;
 }

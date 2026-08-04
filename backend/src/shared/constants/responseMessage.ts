@@ -6,6 +6,7 @@ export const RESPONSE_MESSAGES = {
     REGISTER_SUCCESS: 'User registered successfully.',
     PASSWORD_RESET: 'Password reset successfully.',
     PASSWORD_CHANGED: 'Password changed successfully.',
+    PASSWORD_SET: 'Password set successfully.',
   },
   ADMIN: {
     USER_STATUS_UPDATE:'User blocked successfully.',

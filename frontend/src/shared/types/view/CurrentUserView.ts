@@ -29,4 +29,5 @@ export interface CurrentUserView {
   mentorAppliedAt?: string;
   primaryExpertise?: string;
   experienceLevel?: string;
+  hasPassword: boolean;
 }

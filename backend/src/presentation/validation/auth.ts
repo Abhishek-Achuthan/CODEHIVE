@@ -45,3 +45,10 @@ export const ChangePasswordSchema = z.object({
 
 export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
 
+export const SetPasswordSchema = z.object({
+  newPass: z.string().min(6,'Password must be at least 6 characters'),
+});
+
+export type SetPasswordInput = z.infer<typeof SetPasswordSchema>;
+
+

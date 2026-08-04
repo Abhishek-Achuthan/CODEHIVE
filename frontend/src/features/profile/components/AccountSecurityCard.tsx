@@ -4,10 +4,12 @@ import SectionCard from "./SectionCard";
 
 export interface AccountSecurityCardProps {
   onChangePassword: () => void;
+  hasPassword: boolean;
 }
 
 export default function AccountSecurityCard({
   onChangePassword,
+  hasPassword,
 }: AccountSecurityCardProps) {
   return (
     <SectionCard title="Account Security">
@@ -30,7 +32,7 @@ export default function AccountSecurityCard({
           className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-[#09090b] px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/50 hover:text-zinc-100 transition-colors shadow-sm"
         >
           <KeyRound className="h-4 w-4" />
-          Change Password
+          {hasPassword ? "Change Password" : "Set Password"}
         </button>
       </div>
     </SectionCard>

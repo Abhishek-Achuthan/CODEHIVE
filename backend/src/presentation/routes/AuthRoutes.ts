@@ -49,6 +49,12 @@ export class AuthRoute {
       this._authController.handleChangePassword.bind(this._authController)
     );
 
+    this._router.patch(
+      '/set-password',
+      authMiddleware.check,
+      this._authController.handleSetPassword.bind(this._authController)
+    );
+
     this._router.post(
       '/refresh',
       this._authController.handleRefreshAccessToken.bind(this._authController)

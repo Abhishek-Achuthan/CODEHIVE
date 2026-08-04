@@ -80,6 +80,15 @@ export class AuthService {
     }
   }
 
+  static async setPassword(data: AuthType.SetPasswordData) {
+    try {
+      const response = await AuthApi.setPassword(data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   static async logout() {
     try {
       await AuthApi.userLogout()

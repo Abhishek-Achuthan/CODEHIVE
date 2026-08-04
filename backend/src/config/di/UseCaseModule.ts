@@ -25,6 +25,8 @@ import { IGoogleLoginUseCase } from '../../application/useCase/interface/auth/IG
 import { GoogleLoginUseCase } from '../../application/useCase/auth/GoogleLoginUseCase';
 import { IChangePasswordUseCase } from '../../application/useCase/interface/auth/IChangePasswordUseCase';
 import { ChangePasswordUseCase } from '../../application/useCase/auth/ChangePasswordUseCase';
+import { ISetPasswordUseCase } from '../../application/useCase/interface/auth/ISetPasswordUseCase';
+import { SetPasswordUseCase } from '../../application/useCase/auth/SetPasswordUseCase';
 import { IGithubLoginUseCase } from '../../application/useCase/interface/auth/IGithubLoginUseCase';
 import { GithubLoginUseCase } from '../../application/useCase/auth/GithubLoginUseCase';
 import { IInitiateGithubOAuthUseCase } from '../../application/useCase/interface/auth/IInitiateGithubOAuthUseCase';
@@ -286,6 +288,10 @@ export class UseCaseModule {
 
     container.register<IChangePasswordUseCase>('IChangePasswordUseCase', {
       useClass: ChangePasswordUseCase,
+    });
+
+    container.register<ISetPasswordUseCase>('ISetPasswordUseCase', {
+      useClass: SetPasswordUseCase,
     });
 
     container.register<IUserLogoutUseCase>('IUserLogoutUseCase', {

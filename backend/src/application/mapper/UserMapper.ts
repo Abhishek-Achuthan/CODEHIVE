@@ -29,6 +29,7 @@ export class UserMapper {
       experienceLevel: user.experienceLevel,
       refreshToken: refreshToken,
       accessToken: accessToken,
+      hasPassword: Boolean(user.password && user.password.trim().length > 0),
     };
   }
 
@@ -63,6 +64,7 @@ export class UserMapper {
       mentorStatus: user.mentorStatus,
       primaryExpertise: user.primaryExpertise,
       experienceLevel: user.experienceLevel,
+      hasPassword: Boolean(user.password && user.password.trim().length > 0),
     };
   }
 

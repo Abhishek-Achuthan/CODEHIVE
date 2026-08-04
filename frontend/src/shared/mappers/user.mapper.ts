@@ -56,5 +56,6 @@ export function mapCurrentUserToView(user: UserApi): CurrentUserView {
     mentorAppliedAt: user.mentorAppliedAt,
     primaryExpertise: user.primaryExpertise,
     experienceLevel: user.experienceLevel,
+    hasPassword: user.hasPassword ?? false,
   };
 }
