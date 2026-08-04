@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { forgotPasswordSchema } from "../validations/authValidation";
@@ -17,6 +18,7 @@ export function ForgotPasswordForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
+    setValue,
   } = useForm<OtpRequestValues>({
     resolver: yupResolver(forgotPasswordSchema),
     defaultValues: {
@@ -31,6 +33,7 @@ export function ForgotPasswordForm({
     timeLeftSeconds,
     otpSessionVersion,
     isResending,
+    otpTarget,
     setOtpModalOpen,
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
@@ -46,6 +49,13 @@ export function ForgotPasswordForm({
     "otp-forgot-password-session"
   );
 
+  useEffect(() => {
+    if (otpTarget) {
+      setValue("email", otpTarget);
+    } else {
+      setValue("email", "");
+    }
+  }, [otpTarget, setValue]);
 
   const onSubmit = async (values: OtpRequestValues) => {
     try {

@@ -78,7 +78,13 @@ export function useOTP<
     setCurrentTimestamp(Date.now());
 
     const intervalId = window.setInterval(() => {
-      setCurrentTimestamp(Date.now());
+      const now = Date.now();
+      setCurrentTimestamp(now);
+      
+      // Clear session if it's been expired for more than 7 minutes (420000ms)
+      if (now > otpSession.otpExpiryTimestamp! + 7 * 60 * 1000) {
+        setOtpSession(DEFAULT_OTP_SESSION);
+      }
     }, 1000);
 
     return () => window.clearInterval(intervalId);
@@ -102,6 +108,19 @@ export function useOTP<
     const recipient = values[otpVia];
     if (!recipient) return;
 
+    if (
+      otpSession.otpSessionActive &&
+      otpSession.otpTarget === recipient &&
+      otpSession.otpExpiryTimestamp &&
+      otpSession.otpExpiryTimestamp > Date.now()
+    ) {
+      setOtpSession((prev) => ({
+        ...prev,
+        otpModalOpen: true,
+      }));
+      return;
+    }
+
     const payload = { [otpVia]: recipient } as Pick<TValues, TOtpVia>;
     const result = await onSend(payload);
 
@@ -120,7 +139,7 @@ export function useOTP<
   };
 
   const handleResend = async (values: TValues): Promise<void> => {
-    const recipient = values[otpVia];
+    const recipient = values[otpVia] || (otpSession.otpTarget as unknown as string);
     if (!recipient) return;
 
     setIsResending(true);
