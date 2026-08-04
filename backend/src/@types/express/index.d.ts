@@ -1,4 +1,5 @@
 type UserRole = import('../../domain/types/UserRole').UserRole;
+type MentorStatus = import('../../domain/types/MentorStatus').MentorStatus;
 
 declare global {
   namespace Express {
@@ -6,10 +7,10 @@ declare global {
       user: {
         id: string;
         role: UserRole;
+        mentorStatus: MentorStatus;
       };
     }
   }
 }
 
 export {};
-

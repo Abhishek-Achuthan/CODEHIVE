@@ -1,5 +1,7 @@
-import { UserEntity } from '../../domain/entities/UserEntity';
+
 import { Experience } from '../../domain/types/ExperienceType';
+import { MentorStatus } from '../../domain/types/MentorStatus';
+import { UserLanguage } from '../../domain/types/UserLanguage';
 interface IUserRegisterInputDTO {
   firstName: string;
   lastName: string;
@@ -13,9 +15,30 @@ interface IUserLoginInputDTO {
   password: string;
 }
 
-interface IUserLoginResponseDTO extends Omit<UserEntity, 'password'> {
+interface IUserLoginResponseDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  isBlocked: boolean;
+  phone?: string | undefined;
+  about?: string | undefined;
+  skills: string[];
+  languages: UserLanguage[];
+  experience: Experience[];
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
+  mentorStatus: MentorStatus;
+  mentorAppliedAt?: Date | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
+
   accessToken: string;
-  refreshToken?: string;
+  refreshToken?: string | undefined;
+  hasPassword: boolean;
 }
 
 interface IUserListResponseDTO {
@@ -23,10 +46,9 @@ interface IUserListResponseDTO {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
+  phone?: string | undefined;
   role: string;
   isBlocked: boolean;
-  createdAt?: Date;
 }
 
 interface UpdateUserProfileDTO {
@@ -35,26 +57,39 @@ interface UpdateUserProfileDTO {
   phone?: string | undefined;
   about?: string | undefined;
   skills?: string[] | undefined;
+  languages?: UserLanguage[] | undefined;
   experience?: Experience[] | undefined;
   avatarUrl?: string | undefined;
   githubUrl?: string | undefined;
   linkedInUrl?: string | undefined;
   websiteUrl?: string | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
 }
 
 interface IUserProfileResponseDTO {
   id: string;
   firstName: string;
   lastName: string;
-  phone?: string;
-  about?: string;
+  phone?: string | undefined;
+  about?: string | undefined;
   skills: string[];
+  languages: UserLanguage[];
   experience: Experience[];
-  avatarUrl?: string;
-  githubUrl?: string;
-  linkedInUrl?: string;
-  websiteUrl?: string;
-  mentorStatus: 'none' | 'pending' | 'approved';
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
+  mentorStatus: MentorStatus;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
+  hasPassword: boolean;
+}
+
+interface IUserActivityStatsDTO {
+  totalSessionsTaken: number;
+  joinedRooms: number;
+  qnaContributions: number;
 }
 
 
@@ -64,7 +99,8 @@ export type {
   IUserLoginResponseDTO,
   IUserListResponseDTO,
   UpdateUserProfileDTO,
-  IUserProfileResponseDTO
+  IUserProfileResponseDTO,
+  IUserActivityStatsDTO
 };
 
 

@@ -154,8 +154,8 @@ export const PostAnswerSchema = z.object({
 
 export const SaveQuestionSchema = z.object({
   questionId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid id' }),
-  userid: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid userid' }),
-}).transform((raw) => ({ questionId: raw.questionId, userid: raw.userid } as { questionId: string, userid: string }));
+  userId: z.string().refine(val => /^[0-9a-f]{24}$/i.test(val), { message: 'Invalid userid' }),
+}).transform((raw) => ({ questionId: raw.questionId, userId: raw.userId } as { questionId: string, userId: string }));
 
 export const EditQuestionSchema = z.object({
   title: z.string()

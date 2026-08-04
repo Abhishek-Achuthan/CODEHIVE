@@ -1,6 +1,7 @@
 import ActivityCard from "../components/ActivityCard";
 import AboutSection from "../components/AboutSection";
 import ExperienceSection from "../components/ExperienceSection";
+import ExpertiseSection from "../components/ExpertiseSection";
 import LeftColumn from "../components/LeftColumn";
 import MainContent from "../components/MainContent";
 import MentorCard from "../components/MentorCard";
@@ -8,25 +9,63 @@ import PlanBillingCard from "../components/PlanBillingCard";
 import ProfileHeader from "../components/ProfileHeader";
 import RightColumn from "../components/RightColumn";
 import SkillsSection from "../components/SkillsSection";
+import LanguagesSection from "../components/LanguagesSection";
 import AccountSecurityCard from "../components/AccountSecurityCard";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import SetPasswordDialog from "../components/SetPasswordDialog";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import {
+  formatBillingIntervalLabel,
+  formatSubscriptionDate,
+  useMySubscription,
+} from "../../home/hooks/useMySubscription";
 import toast from "react-hot-toast";
 
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
 
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useProfileUpdater } from "../hooks/useProfileUpdater";
+import { useMyActivity } from "../hooks/useMyActivity";
 
 import type { MentorChecklist, ProfileUser } from "../types";
+import { MentorStatus } from "../types";
 import { BaseError } from "../../../shared/errors/BaseError";
+import { UserRole } from "../../../shared/constants/auth";
 
 export default function ProfilePage() {
   const authUser = useAppSelector((state) => state.auth.user);
-  const { updateProfile } = useProfileUpdater();
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const { updateProfile, applyForMentor, uploadAvatar } = useProfileUpdater();
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isApplyingForMentor, setIsApplyingForMentor] = useState(false);
+  const { subscription, loading: subscriptionLoading } = useMySubscription();
+  const { activity } = useMyActivity();
+
+  const hasPassword = Boolean(authUser?.hasPassword);
+
+  const billingInfo = useMemo(() => {
+    if (subscription) {
+      return {
+        planLabel: `${subscription.plan.name} · ${formatBillingIntervalLabel(subscription.billingInterval)}`,
+        renewalLabel: formatSubscriptionDate(subscription.currentPeriodEnd),
+        statusLabel: subscription.status.toLowerCase().replace(/_/g, " "),
+        badgeLabel: subscription.plan.name.toUpperCase(),
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      };
+    }
+
+    return {
+      planLabel: "Free",
+      renewalLabel: "—",
+      statusLabel: undefined,
+      badgeLabel: "FREE",
+      cancelAtPeriodEnd: false,
+    };
+  }, [subscription]);
+
+  // Refs for scrolling to sections
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const skillsRef = useRef<HTMLDivElement>(null);
+  const experienceRef = useRef<HTMLDivElement>(null);
 
   //data
   const profileUser: ProfileUser = useMemo(() => {
@@ -47,6 +86,7 @@ export default function ProfilePage() {
       linkedInUrl: authUser?.linkedInUrl,
       githubUrl: authUser?.githubUrl,
       websiteUrl: authUser?.websiteUrl,
+      languages: authUser?.languages,
     };
   }, [authUser]);
 
@@ -68,163 +108,136 @@ export default function ProfilePage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const handleAvatarUpload = async (imageFile: File) => {
+
+  const scrollToSection = (section: 'about' | 'skills' | 'experience') => {
+    const refs = { about: aboutRef, skills: skillsRef, experience: experienceRef };
+    const targetRef = refs[section];
+
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      targetRef.current.classList.add('ring-2', 'ring-purple-500/50', 'rounded-lg');
+      setTimeout(() => {
+        targetRef.current?.classList.remove('ring-2', 'ring-purple-500/50', 'rounded-lg');
+      }, 2000);
+    }
+  };
+
+  const handleApplyForMentor = async () => {
     try {
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-      const maxBytes = 5 * 1024 * 1024;
+      setIsApplyingForMentor(true);
 
-      if (!allowedTypes.includes(imageFile.type)) {
-        throw new BaseError("Please select a JPG, PNG, or WEBP image");
-      }
-      if (imageFile.size > maxBytes) {
-        throw new BaseError("Image must be 5MB or less");
-      }
+      await applyForMentor();
 
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as
-        | string
-        | undefined;
-      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as
-        | string
-        | undefined;
-
-      if (!cloudName || !uploadPreset) {
-        throw new BaseError(
-          "Cloudinary is not configured. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET"
-        );
-      }
-
-      const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("upload_preset", uploadPreset);
-
-      const folder = import.meta.env.VITE_CLOUDINARY_FOLDER as string | undefined;
-      if (folder && folder.trim().length) {
-        formData.append("folder", folder.trim());
-      }
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
-
-      const json = (await res.json()) as unknown;
-      if (!res.ok) {
-        const message =
-          json &&
-          typeof json === "object" &&
-          json !== null &&
-          "error" in json &&
-          (json as { error?: unknown }).error &&
-          typeof (json as { error?: { message?: unknown } }).error?.message === "string"
-            ? ((json as { error: { message: string } }).error.message as string)
-            : "Failed to upload image";
-
-        throw new BaseError(message);
-      }
-
-      const secureUrl =
-        json &&
-        typeof json === "object" &&
-        json !== null &&
-        "secure_url" in json &&
-        typeof (json as { secure_url?: unknown }).secure_url === "string"
-          ? ((json as { secure_url: string }).secure_url as string)
-          : "";
-
-      if (!secureUrl) {
-        throw new BaseError("Cloudinary upload did not return a secure URL");
-      }
-
-      await updateProfile({ avatarUrl: secureUrl });
-      toast.success("Avatar updated");
+      toast.success('Application submitted! We\'ll review your profile shortly.');
     } catch (error) {
       if (error instanceof BaseError) toast.error(error.message);
       else if (error instanceof Error) toast.error(error.message);
-      else toast.error("Failed to update avatar");
-      throw error;
+      else toast.error('Failed to submit application');
+    } finally {
+      setIsApplyingForMentor(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header />
+    <div className="h-full bg-transparent text-white">
 
-      <ChangePasswordDialog
-        open={changePasswordOpen}
-        onOpenChange={setChangePasswordOpen}
-      />
+      {hasPassword ? (
+        <ChangePasswordDialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+        />
+      ) : (
+        <SetPasswordDialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+        />
+      )}
 
       <main>
         <div className="mx-auto max-w-6xl px-4 py-4">
-          {/* Header row */}
-          <div className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr]">
-            <ProfileHeader
-              user={profileUser}
-              onSaveAvatar={handleAvatarUpload}
-              onSaveProfileHeader={(values) => updateProfile(values)}
-              onClickMentor={() => {}}
-              onClickDashboard={() => {}}
-              onClickSessions={() => {}}
-              onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
-              onClickGitHub={() => openUrl(authUser?.githubUrl)}
-              onClickWebsite={() => openUrl(authUser?.websiteUrl)}
-            />
+          <MainContent
+            left={
+              <LeftColumn>
+                <ProfileHeader
+                  user={profileUser}
+                  onSaveAvatar={uploadAvatar}
+                  onSaveProfileHeader={(values) => updateProfile(values)}
+                  onClickLinkedIn={() => openUrl(authUser?.linkedInUrl)}
+                  onClickGitHub={() => openUrl(authUser?.githubUrl)}
+                  onClickWebsite={() => openUrl(authUser?.websiteUrl)}
+                />
 
-            <ActivityCard
-              totalSessionsLabel="5"
-              joinedRoomsLabel="10"
-              qnaContributionsLabel="7"
-            />
-          </div>
-
-          {/* Main content */}
-          <div className="mt-3">
-            <MainContent
-              left={
-                <LeftColumn>
+                <div ref={aboutRef}>
                   <AboutSection
                     initialText={authUser?.about ?? ""}
                     onSave={(text) => updateProfile({ about: text })}
                   />
+                </div>
 
+                <div ref={experienceRef}>
                   <ExperienceSection
                     initialItems={authUser?.experience ?? []}
                     onSave={(items) => updateProfile({ experience: items })}
                   />
+                </div>
 
+                <div ref={skillsRef}>
                   <SkillsSection
                     initialSkills={authUser?.skills ?? []}
                     onSave={(skills) => updateProfile({ skills })}
                   />
-                </LeftColumn>
-              }
-              right={
-                <RightColumn>
-                  <PlanBillingCard
-                    currentPlanLabel="PRO"
-                    renewalDateLabel="11/10/2025"
-                    badgeLabel="PRO"
-                  />
+                </div>
 
-                  <AccountSecurityCard
-                    onChangePassword={() => setChangePasswordOpen(true)}
-                  />
+                <LanguagesSection 
+                  initialLanguages={authUser?.languages ?? []} 
+                  onSave={(langs) => updateProfile({ languages: langs })}
+                  role={authUser?.role}
+                />
 
-                  <MentorCard
-                    checked={false}
-                    disabled={false}
-                    checklist={mentorChecklist}
-                    onToggle={() => {}}
-                  />
-                </RightColumn>
-              }
-            />
-          </div>
+                <ExpertiseSection
+                  initialPrimaryExpertise={authUser?.primaryExpertise}
+                  initialExperienceLevel={authUser?.experienceLevel}
+                  onSave={(data) => updateProfile(data)}
+                />
+              </LeftColumn>
+            }
+            right={
+              <RightColumn>
+                <ActivityCard
+                  totalSessionsLabel={activity?.totalSessionsTaken?.toString() ?? "0"}
+                  joinedRoomsLabel={activity?.joinedRooms?.toString() ?? "0"}
+                  qnaContributionsLabel={activity?.qnaContributions?.toString() ?? "0"}
+                />
+
+                <PlanBillingCard
+                  currentPlanLabel={billingInfo.planLabel}
+                  renewalDateLabel={billingInfo.renewalLabel}
+                  statusLabel={billingInfo.statusLabel}
+                  badgeLabel={billingInfo.badgeLabel}
+                  cancelAtPeriodEnd={billingInfo.cancelAtPeriodEnd}
+                  loading={subscriptionLoading}
+                />
+
+                <AccountSecurityCard
+                  onChangePassword={() => setIsPasswordDialogOpen(true)}
+                  hasPassword={hasPassword}
+                />
+
+                {authUser && authUser.role !== UserRole.MENTOR && <MentorCard
+                  checklist={mentorChecklist}
+                  status={authUser?.mentorStatus ?? MentorStatus.NONE}
+                  rejectionReason={undefined}
+                  onApply={handleApplyForMentor}
+                  onScrollToSection={scrollToSection}
+                  isApplying={isApplyingForMentor}
+                />}
+              </RightColumn>
+            }
+          />
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

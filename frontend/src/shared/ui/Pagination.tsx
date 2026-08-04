@@ -14,23 +14,23 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors flex items-center justify-center"
+        className="w-8 h-8 rounded-full hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors flex items-center justify-center text-zinc-400 hover:text-white"
         aria-label="Previous page"
       >
-        <ChevronLeftCircle className="w-4 h-4 text-white  hover:text-gray-700" />
+        <ChevronLeftCircle className="w-4 h-4" />
       </button>
 
-      <span className="text-sm text-gray-600 px-3">
+      <span className="text-sm font-medium text-zinc-500 px-3">
         {currentPage} / {totalPages}
       </span>
 
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors flex items-center justify-center"
+        className="w-8 h-8 rounded-full hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors flex items-center justify-center text-zinc-400 hover:text-white"
         aria-label="Next page"
       >
-        <ChevronRightCircle className="w-4 h-4 text-white hover:text-gray-700" />
+        <ChevronRightCircle className="w-4 h-4" />
       </button>
     </div>
   );

@@ -28,11 +28,9 @@ export class AnswerMapper {
       version: answer.version,
       createdAt: new Date(answer.createdAt).toISOString(),
       updatedAt: new Date(answer.updatedAt).toISOString(),
-      ...(answer.lastEditedAt ? { lastEditedAt: answer.lastEditedAt } : {}),
-      ...(answer.lastEditedBy !== undefined
-        ? { lastEditedBy: answer.lastEditedBy }
-        : {}),
-      ...(answer.editCount !== undefined ? { editCount: answer.editCount } : {}),
+      lastEditedAt: answer.lastEditedAt,
+      lastEditedBy: answer.lastEditedBy,
+      editCount: answer.editCount,
     };
   }
 

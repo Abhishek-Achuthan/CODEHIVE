@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { ICreateSavedListUseCase } from '../interface/qna/ICreateSavedListUseCase';
 import type { ISavedListRepository } from '../../../domain/interfaces/ISavedListRepository';
 import { ConflictError } from '../../../core/errors/ConflictError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class CreateSavedListUseCase implements ICreateSavedListUseCase {
@@ -14,7 +15,7 @@ export class CreateSavedListUseCase implements ICreateSavedListUseCase {
     const existing = await this._savedListRepository.findByUserAndName(userId, name);
 
     if (existing) {
-      throw new ConflictError('List already exists');
+      throw new ConflictError(ERROR_MESSAGES.QnA.LIST_ALREADY_EXISTS);
     }
 
     const created = await this._savedListRepository.create({ userId, name });

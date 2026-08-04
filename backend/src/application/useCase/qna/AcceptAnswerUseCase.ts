@@ -27,7 +27,7 @@ export class AcceptAnswerUseCase implements IAcceptAnswerUseCase {
 
         if (!answer) throw new NotFoundError(ERROR_MESSAGES.QnA.ANSWER_NOT_FOUND);
 
-        if (answer.questionId !== question.id) throw new ConflictError('Answer is not of this question')
+        if (answer.questionId !== question.id) throw new ConflictError(ERROR_MESSAGES.QnA.ANSWER_QUESTION_MISMATCH)
 
         if (question.askedBy !== data.userId) throw new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED);
 

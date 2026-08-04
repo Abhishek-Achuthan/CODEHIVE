@@ -1,11 +1,33 @@
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLogout } from "../../features/auth/hooks/useLogout";
 import { MdPersonOutline } from "react-icons/md";
+import { IoWalletOutline, IoLogOutOutline, IoChevronDown } from "react-icons/io5";
+import { NotificationBell } from "../../features/notifications/components/NotificationBell";
 
 export default function Header() {
   const { logOut, user } = useLogout();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    setIsDropdownOpen(false);
+    logOut();
+  };
+
   return (
-    <header className="bg-black border-b border-gray-600">
+    <header className="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-zinc-800/50 transition-all duration-300">
       <div className="max-w mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
           <div className="shrink-0 flex justify-center items-center">
@@ -18,50 +40,91 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <a
               href="#product"
-              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+              className="text-white hover:text-zinc-400 px-3 py-2 text-sm font-medium transition-colors"
             >
               Product
             </a>
-            <a
-              href="#features"
-              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+            <Link
+              to={"/rooms"}
+              className="text-white hover:text-zinc-400 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Features
-            </a>
+              Room
+            </Link>
             <Link
               to={"/qna"}
-              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+              className="text-white hover:text-zinc-400 px-3 py-2 text-sm font-medium transition-colors"
             >
               Q&A
             </Link>
-            <a
-              href="#customers"
-              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+            <Link
+              to={"/sessions"}
+              className="text-white hover:text-zinc-400 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Customers
-            </a>
-            <a
-              href="#pricing"
-              className="text-white hover:text-gray-400 px-3 py-2 text-sm font-medium"
+              Session
+            </Link>
+            <Link
+              to="/pricing"
+              className="text-white hover:text-zinc-400 px-3 py-2 text-sm font-medium transition-colors"
             >
               Pricing
-            </a>
+            </Link>
           </nav>
+
+          {/* Notifications & User Dropdown */}
           <div className="flex items-center space-x-4">
-            <span className="text-white text-sm flex items-center gap-2">
-              <Link to={"/profile"}>
-                <MdPersonOutline className="text-white w-6 h-6" />
-              </Link>
-
-              {user ? user.firstName : "Hello Guest"}
-            </span>
-
+            {user && <NotificationBell />}
+            <div className="relative" ref={dropdownRef}>
             <button
-              onClick={logOut}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800/50 transition-all duration-200 group"
             >
-              Logout
+              <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <MdPersonOutline className="text-white w-5 h-5" />
+              </div>
+              <span className="text-white text-sm font-medium hidden sm:block">
+                {user ? user.firstName : "Guest"}
+              </span>
+              <IoChevronDown
+                className={`text-zinc-400 w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                  }`}
+              />
             </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 origin-top-right">
+                <div className="rounded-xl border border-zinc-800 bg-[#121214]/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
+                  >
+                    <MdPersonOutline className="w-5 h-5 text-zinc-400" />
+                    <span>Profile</span>
+                  </Link>
+
+                  <Link
+                    to="/wallet"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
+                  >
+                    <IoWalletOutline className="w-5 h-5 text-zinc-400" />
+                    <span>Wallet</span>
+                  </Link>
+
+                  {user && (
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150"
+                    >
+                      <IoLogOutOutline className="w-5 h-5" />
+                      <span>Logout</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           </div>
         </div>
       </div>

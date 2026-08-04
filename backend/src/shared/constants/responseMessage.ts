@@ -6,9 +6,16 @@ export const RESPONSE_MESSAGES = {
     REGISTER_SUCCESS: 'User registered successfully.',
     PASSWORD_RESET: 'Password reset successfully.',
     PASSWORD_CHANGED: 'Password changed successfully.',
+    PASSWORD_SET: 'Password set successfully.',
   },
   ADMIN: {
-    USER_STATUS_UPDATE:'User blocked successfully.'
+    USER_STATUS_UPDATE:'User blocked successfully.',
+    MENTOR_APPLICATION_APPROVED: 'Mentor application approved successfully.',
+    MENTOR_APPLICATION_REJECTED: 'Mentor application rejected successfully.',
+  },
+  MENTOR: {
+    AVAILABILITY_RULE_DELETED: 'Availability rule deleted',
+    EXCEPTION_DATE_ADDED: 'Exception date added',
   },
   QA: {
     QUESTION_POSTED: 'Question posted successfully.',

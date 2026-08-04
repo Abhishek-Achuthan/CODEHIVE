@@ -1,0 +1,7 @@
+export enum RoomAdmissionPolicy {
+  BOOKING_ONLY = 'BOOKING_ONLY',
+  INVITE_ONLY = 'INVITE_ONLY',
+  REQUEST_TO_JOIN = 'REQUEST_TO_JOIN',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+}

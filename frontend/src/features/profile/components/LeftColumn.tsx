@@ -5,5 +5,5 @@ export interface LeftColumnProps {
 }
 
 export default function LeftColumn({ children }: LeftColumnProps) {
-  return <div className="grid gap-4">{children}</div>;
+  return <div className="grid gap-8">{children}</div>;
 }

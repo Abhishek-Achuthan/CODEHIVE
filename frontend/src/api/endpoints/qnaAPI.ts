@@ -112,3 +112,18 @@ export const deleteQuestion = (questionId: string) =>
 
 export const deleteAnswer = (answerId: string) =>
   apiClient.delete(API_ROUTES.QnA.GET_ANSWER(answerId));
+
+export const unsaveQuestion = (questionId:string) => 
+  apiClient.delete(API_ROUTES.QnA.UNSAVE_QUESTION(questionId));
+
+export const createComment = (answerId: string, content: string) =>
+  apiClient.post(API_ROUTES.QnA.CREATE_COMMENT(answerId), { content });
+
+export const getComments = (answerId: string) =>
+  apiClient.get(API_ROUTES.QnA.GET_COMMENTS(answerId));
+
+export const updateComment = (commentId: string, content: string) =>
+  apiClient.patch(API_ROUTES.QnA.UPDATE_COMMENT(commentId), { content });
+
+export const deleteComment = (commentId: string) =>
+  apiClient.delete(API_ROUTES.QnA.DELETE_COMMENT(commentId));

@@ -1,8 +1,5 @@
 import type { ReactNode } from "react";
 
-import Header from "../shared/ui/Header";
-import Footer from "../shared/ui/Footer";
-import Sidebar from "../features/qna/components/SideBar";
 import { QnaBackgroundGlow } from "../shared/ui/QnaBackgroundGlow";
 
 type QnaLayoutProps = {
@@ -17,37 +14,31 @@ export default function QnaLayout({
   children,
 }: QnaLayoutProps) {
   return (
-    <div className="dark min-h-screen bg-background relative">
+    <div className="dark h-full relative flex flex-col z-0">
       <QnaBackgroundGlow />
 
-      <Header />
-
-      <div className="flex relative z-0">
-        <Sidebar />
-
-        <main className="flex-1">
-          <div className="max-w-7xl mx-auto px-6 py-8">
-            {(title || description) && (
-              <div className="mb-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto pb-10">
+        <div className="w-full p-6 lg:p-8">
+          {(title || description) && (
+            <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-4">
+              <div>
                 {title && (
-                  <h1 className="text-3xl font-bold text-white mb-2">
+                  <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">
                     {title}
                   </h1>
                 )}
                 {description && (
-                  <p className="text-gray-400 text-base">
+                  <p className="text-sm text-zinc-400">
                     {description}
                   </p>
                 )}
               </div>
-            )}
+            </div>
+          )}
 
-            {children}
-          </div>
-        </main>
-      </div>
-
-      <Footer />
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

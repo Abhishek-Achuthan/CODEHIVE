@@ -1,3 +1,5 @@
+import { type MentorListingParams } from "../shared/types/api/mentor";
+import { type BookedSessionsParams } from "../shared/types/api/session";
 import type { AnswerListParams, QuestionListParams } from "../shared/types/api/qna";
 
 export const API_ROUTES = {
@@ -12,11 +14,14 @@ export const API_ROUTES = {
     USER_FORGOT_VERIFY_OTP: "/auth/forgot-password/verify-otp",
     USER_RESET_PASSWORD: "/auth/reset-password",
     USER_GOOGLE_LOGIN: "/auth/google-login",
-    USER_CHANGE_PASSWORD:"/auth/change-password"
+    USER_CHANGE_PASSWORD: "/auth/change-password",
+    USER_SET_PASSWORD: "/auth/set-password"
   },
 
   USER: {
     UPDATE_MY_PROFILE: "/users/me/profile",
+    APPLY_FOR_MENTOR: "/users/me/mentor-applications",
+    GET_MY_ACTIVITY: "/users/me/activity",
   },
 
   ADMIN: {
@@ -37,6 +42,52 @@ export const API_ROUTES = {
       return `/admin/users?${query.toString()}`;
     },
     UPDATE_USER_STATUS: `/admin/update-user-status`,
+    MENTOR_APPLICATIONS: (params: {
+      page?: number;
+      pageSize?: number;
+      search?: string;
+    }) => {
+      const query = new URLSearchParams({
+        currentPage: (params.page ?? 1).toString(),
+        pageSize: (params.pageSize ?? 10).toString(),
+        search: params.search ?? "",
+      });
+      return `/admin/list-applications?${query.toString()}`;
+    },
+    UPDATE_MENTOR_STATUS: `/admin/update-mentor-status`,
+    REPORTS: (params: { page?: number; limit?: number }) => {
+      const query = new URLSearchParams({
+        page: (params.page ?? 1).toString(),
+        limit: (params.limit ?? 10).toString(),
+      });
+      return `/admin/reports?${query.toString()}`;
+    },
+    UPDATE_REPORT_STATUS: (id: string) => `/admin/reports/${id}/status`,
+    ROOM_CHAT_HISTORY: (roomId: string) => `/admin/reports/rooms/${roomId}/chat-history`,
+    BAN_USER: (userId: string) => `/admin/users/${userId}/ban`,
+    UNBAN_USER: (userId: string) => `/admin/users/${userId}/unban`,
+    WARN_USER: (userId: string) => `/admin/users/${userId}/warn`,
+    DASHBOARD: "/admin/dashboard",
+  },
+
+  SUBSCRIPTIONS: {
+    CHECKOUT: "/subscriptions/checkout",
+    ME: "/subscriptions/me",
+  },
+
+  PLANS: {
+    LIST: (params?: { page?: number; limit?: number; search?: string }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params?.search) qp.append("search", params.search);
+      const query = qp.toString();
+      return query ? `/plans?${query}` : `/plans`;
+    },
+    CREATE: `/plans`,
+    UPDATE: (id: string) => `/plans/${id}`,
+    ARCHIVE: (id: string) => `/plans/${id}/archive`,
+    GET_BY_ID: (id: string) => `/plans/${id}`,
   },
 
   QnA: {
@@ -71,6 +122,7 @@ export const API_ROUTES = {
     RELATED_QUESTIONS: (questionId: string) =>
       `/qna/questions/${questionId}/related`,
     SAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
+    UNSAVE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/save`,
     VOTE_QUESTION: (questionId: string) => `/qna/questions/${questionId}/vote`,
     EDIT_QUESTION: (questionId: string) => `qna/questions/${questionId}`,
     ANSWERED_QUESTIONS: (params?: QuestionListParams) => {
@@ -219,5 +271,133 @@ export const API_ROUTES = {
     EDIT_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     GET_ANSWER: (answerId: string) => `/qna/answers/${answerId}`,
     VOTE_ANSWER: (answerId: string) => `/qna/answers/${answerId}/vote`,
+
+    //-------------------------------Comment URL----------------------------------//
+    CREATE_COMMENT: (answerId: string) => `/qna/answers/${answerId}/comments`,
+    GET_COMMENTS: (answerId: string) => `/qna/answers/${answerId}/comments`,
+    UPDATE_COMMENT: (commentId: string) => `/qna/comments/${commentId}`,
+    DELETE_COMMENT: (commentId: string) => `/qna/comments/${commentId}`,
+  },
+
+  MENTOR: {
+    GET_PROFILE: (id: string) => `/mentors/${id}`,
+    GET_MY_INSIGHTS: "/mentors/me/insights",
+    GET_MY_REVIEWS: "/mentors/me/reviews",
+    SET_AVAILABILITY: "/mentors/availability",
+    GET_MY_AVAILABILITY: "/mentors/me/availability",
+    DELETE_AVAILABILITY: (id: string) => `/mentors/availability/${id}`,
+    ADD_EXCEPTION: (id: string) => `/mentors/availability/${id}/exceptions`,
+    GET_AVAILABILITY: (mentorId: string) => `/mentors/${mentorId}/available`,
+    LIST_MENTORS: (params?: MentorListingParams) => {
+      const qp = new URLSearchParams();
+      if (params?.search) qp.append('search', params.search);
+      if (params?.page) qp.append('page', String(params.page));
+      if (params?.limit) qp.append('limit', String(params.limit));
+      if (params?.filter?.primaryExpertise) qp.append('filter.primaryExpertise', params.filter.primaryExpertise);
+      if (params?.filter?.experienceLevel) qp.append('filter.experienceLevel', params.filter.experienceLevel);
+      if (params?.filter?.skillsAny && params.filter.skillsAny.length > 0) qp.append('filter.skillsAny', params.filter.skillsAny.join(','));
+      if (params?.filter?.slotPriceMin !== undefined) qp.append('filter.slotPriceMin', String(params.filter.slotPriceMin));
+      if (params?.filter?.slotPriceMax !== undefined) qp.append('filter.slotPriceMax', String(params.filter.slotPriceMax));
+      if (params?.filter?.hasActiveAvailability !== undefined) qp.append('filter.hasActiveAvailability', String(params.filter.hasActiveAvailability));
+      const query = qp.toString();
+      return query ? `/mentors?${query}` : `/mentors`;
+    },
+  },
+  SESSION: {
+    BOOK_SESSION_STRIPE: "/sessions/stripe",
+    BOOK_SESSION_WALLET: "/sessions/wallet",
+    GET_BOOKED_SESSIONS: (params?: BookedSessionsParams) => {
+      const qp = new URLSearchParams();
+      if (params?.role) qp.append('role', params.role);
+      if (params?.page !== undefined) qp.append('page', String(params.page));
+      if (params?.limit !== undefined) qp.append('limit', String(params.limit));
+      if (params?.filter?.status) qp.append('filter.status', params.filter.status);
+      if (params?.filter?.dateFrom) qp.append('filter.dateFrom', params.filter.dateFrom);
+      if (params?.filter?.dateTo) qp.append('filter.dateTo', params.filter.dateTo);
+      if (params?.filter?.paymentSource) qp.append('filter.paymentSource', params.filter.paymentSource);
+      if (params?.filter?.refundableNow !== undefined) qp.append('filter.refundableNow', String(params.filter.refundableNow));
+      const query = qp.toString();
+      return query ? `/sessions?${query}` : `/sessions`;
+    },
+    GET_BOOKING_RESERVATION: (reservationId: string) => `/sessions/reservations/${reservationId}`,
+    CANCEL_SESSION: (sessionId: string) => `/sessions/${sessionId}`,
+    ADD_REVIEW: (sessionId: string) => `/sessions/${sessionId}/reviews`
+  },
+
+  WALLET: {
+    GET_MY_WALLET: "/wallet/me",
+    GET_WALLET_TRANSACTIONS: "/wallet/transactions",
+  },
+
+  ROOM: {
+    CREATE_ROOM: "/rooms",
+    GET_MY_ROOMS: (params?: { page?: number; limit?: number; search?: string; dateFrom?: string; status?: string; }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params?.search) qp.append("search", params.search);
+      if (params?.dateFrom) qp.append("dateFrom", params.dateFrom);
+      if (params?.status) qp.append("status", params.status);
+      const query = qp.toString();
+      return query ? `/rooms/mine?${query}` : "/rooms/mine";
+    },
+    GET_PUBLIC_ROOMS: (params?: { page?: number; limit?: number; search?: string; dateFrom?: string; status?: string; }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      if (params?.search) qp.append("search", params.search);
+      if (params?.dateFrom) qp.append("dateFrom", params.dateFrom);
+      if (params?.status) qp.append("status", params.status);
+      const query = qp.toString();
+      return query ? `/rooms?${query}` : `/rooms`;
+    },
+    GET_SETTINGS: (roomId: string) => `/rooms/${roomId}/settings`,
+    UPDATE_ROOM_DETAILS: (roomId: string) => `/rooms/${roomId}/details`,
+    JOIN_ROOM: (roomId: string) => `/rooms/${roomId}/join`,
+    LEAVE_ROOM: (roomId: string) => `/rooms/${roomId}/leave`,
+    END_ROOM: (roomId: string) => `/rooms/${roomId}/end`,
+    CREATE_MESSAGE: (roomId: string) => `/rooms/${roomId}/messages`,
+    EDIT_MESSAGE: (roomId: string, messageId: string) =>
+      `/rooms/${roomId}/messages/${messageId}`,
+    DELETE_MESSAGE: (roomId: string, messageId: string) =>
+      `/rooms/${roomId}/messages/${messageId}`,
+    CREATE_POLL: (roomId: string) => `/rooms/${roomId}/polls`,
+    VOTE_POLL: (roomId: string, pollId: string) =>
+      `/rooms/${roomId}/polls/${pollId}/votes`,
+    CLOSE_POLL: (roomId: string, pollId: string) =>
+      `/rooms/${roomId}/polls/${pollId}/close`,
+    GET_CLOSED_POLL: (roomId: string) => `/rooms/${roomId}/polls/closed`,
+    GET_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
+    SAVE_PRIVATE_NOTE: (roomId: string) => `/rooms/${roomId}/private-notes`,
+    GET_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`,
+    SAVE_PUBLIC_NOTE: (roomId: string) => `/rooms/${roomId}/public-notes`,
+    CREATE_INVITE: (roomId: string) => `/rooms/${roomId}/invites`,
+    REGENERATE_INVITE: (roomId: string) => `/rooms/${roomId}/invites/regenerate`,
+    LIST_INVITES: (roomId: string) => `/rooms/${roomId}/invites`,
+    REVOKE_INVITE: (roomId: string, inviteId: string) =>
+      `/rooms/${roomId}/invites/${inviteId}`,
+    KICK_PARTICIPANT: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/kick`,
+    UPDATE_PARTICIPANT_OVERRIDES: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/overrides`,
+    REPORT_PARTICIPANT: (roomId: string, userId: string) =>
+      `/rooms/${roomId}/participants/${userId}/report`,
+  },
+
+  INVITE: {
+    PREVIEW: (code: string) => `/invites/${code}`,
+    JOIN: (code: string) => `/invites/${code}/join`,
+  },
+  
+  NOTIFICATIONS: {
+    LIST: (params?: { page?: number; limit?: number }) => {
+      const qp = new URLSearchParams();
+      if (params?.page !== undefined) qp.append("page", String(params.page));
+      if (params?.limit !== undefined) qp.append("limit", String(params.limit));
+      const query = qp.toString();
+      return query ? `/notifications?${query}` : `/notifications`;
+    },
+    MARK_AS_READ: (id: string) => `/notifications/${id}/read`,
+    MARK_ALL_AS_READ: "/notifications/read-all",
   },
 };

@@ -1,0 +1,14 @@
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+src/features/mentor/pages/MentorListingPage.tsx(3,35): error TS6133: 'X' is declared but its value is never read.
+src/features/profile/components/ProfileHeader.tsx(56,13): error TS2353: Object literal may only specify known properties, and 'languages' does not exist in type 'ProfileHeaderEditDialogValues'.
+src/features/session/pages/MentorSessionsPage.tsx(5,1): error TS6133: 'motion' is declared but its value is never read.
+src/features/session/pages/MySessionsPage.tsx(2,27): error TS6133: 'Filter' is declared but its value is never read.
+src/features/session/pages/MySessionsPage.tsx(2,35): error TS6133: 'X' is declared but its value is never read.
+src/shared/hooks/useOnClickOutside.ts(1,21): error TS1484: 'RefObject' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/shared/ui/filters/FilterPopover.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/shared/ui/filters/FilterPopover.tsx(15,23): error TS2345: Argument of type 'RefObject<HTMLDivElement | null>' is not assignable to parameter of type 'RefObject<HTMLElement>'.
+  Type 'HTMLDivElement | null' is not assignable to type 'HTMLElement'.
+    Type 'null' is not assignable to type 'HTMLElement'.

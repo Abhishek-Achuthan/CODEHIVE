@@ -30,54 +30,60 @@ export const RelatedQuestionsSection: React.FC<RelatedQuestionsSectionProps> = (
 
   return (
     <aside className="w-full lg:w-80 shrink-0">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-white mb-4">
+      <div className="sticky top-6">
+        <h2 className="text-[13px] font-bold text-zinc-400 uppercase tracking-wider mb-4 px-1">
           Related Questions
         </h2>
         <div className="space-y-3">
           {visibleQuestions.map((relQ) => (
             <div
               key={relQ.id}
-              className="p-3 rounded-lg bg-zinc-900/30 border border-zinc-800/50 hover:border-zinc-700 transition-all cursor-pointer"
+              className="p-4 rounded-xl bg-[#121214] border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer group"
               onClick={() => navigate(`/qna/question/${relQ.id}`)}
             >
-              <h3 className="text-base font-semibold text-blue-400 mb-2 line-clamp-2">
+              <h3 className="text-sm font-medium text-zinc-200 group-hover:text-indigo-400 transition-colors mb-3 line-clamp-2 leading-snug">
                 {relQ.title}
               </h3>
 
-              <div className="flex items-center gap-3 text-xs text-zinc-400">
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-semibold">
+              <div className="flex items-center gap-4 text-xs text-zinc-500">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-300 font-medium">
                     {relQ.voteCount}
                   </span>
                   <span>votes</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-semibold">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-300 font-medium">
                     {relQ.views}
                   </span>
                   <span>views</span>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {relQ.tags &&
-                  relQ.tags.map((tag) => (
+              {relQ.tags && relQ.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {relQ.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 rounded-md bg-zinc-800/50 border border-zinc-700/50 text-zinc-300 text-xs font-medium"
+                      className="px-2 py-0.5 rounded-md bg-zinc-800/50 text-zinc-400 text-[10px] font-medium"
                     >
                       {tag}
                     </span>
                   ))}
-              </div>
+                  {relQ.tags.length > 3 && (
+                    <span className="px-2 py-0.5 rounded-md bg-zinc-800/30 text-zinc-500 text-[10px] font-medium">
+                      +{relQ.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
 
         {total === 0 && (
-          <div className="mt-4 text-sm text-zinc-400">
-            No related questions are available
+          <div className="text-sm text-zinc-500 italic p-4 text-center border border-zinc-800 border-dashed rounded-xl">
+            No related questions found.
           </div>
         )}
 
@@ -89,9 +95,9 @@ export const RelatedQuestionsSection: React.FC<RelatedQuestionsSectionProps> = (
                 prev < total ? Math.min(total, prev + STEP) : INITIAL_COUNT
               )
             }
-            className="mt-6 w-full py-2 rounded-lg border border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-white transition-all"
+            className="mt-4 w-full py-2.5 rounded-lg border border-zinc-800 bg-[#121214] text-xs font-medium text-zinc-400 hover:border-zinc-700 hover:text-zinc-200 transition-colors"
           >
-            {canShowMore ? "Show more related questions" : "Show fewer related questions"}
+            {canShowMore ? "Show more" : "Show less"}
           </button>
         )}
       </div>

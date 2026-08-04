@@ -1,4 +1,5 @@
 // Request DTOs
+import type { UserLanguage } from "../domain/language.types";
 export type RegisterData = {
   firstName: string;
   lastName: string;
@@ -25,9 +26,13 @@ export type ResetPasswordData = {
   password: string;
 };
 
-export type changePasswordData = {
-  previousPass : string,
-  newPass : string,
+export interface changePasswordData {
+  previousPass: string
+  newPass: string
+}
+
+export interface SetPasswordData {
+  newPass: string
 }
 
 // Response DTOs
@@ -52,14 +57,18 @@ export interface UserApi {
   avatarUrl?: string;
   about?: string;
   skills?: string[];
+  languages?: UserLanguage[];
   experience?: ExperienceApi[];
   githubUrl?: string;
   linkedInUrl?: string;
   websiteUrl?: string;
   mentorStatus?: "none" | "pending" | "approved";
   mentorAppliedAt?: string;
+  primaryExpertise?: string;
+  experienceLevel?: string;
   createdAt?: string;
   updatedAt?: string;
+  hasPassword: boolean;
 }
 
 export interface AuthResponse {

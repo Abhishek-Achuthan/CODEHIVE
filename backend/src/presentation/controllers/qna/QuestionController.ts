@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import sanitizeHtml from 'sanitize-html';
 import { HttpStatus } from '../../../shared/httpStatusCode';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import {
   CreateQuestionSchema,
   QuestionListSchema,
@@ -34,6 +35,8 @@ import type { IListAiChatSessionsUseCase } from '../../../application/useCase/in
 import type { IGetAiChatMessagesUseCase } from '../../../application/useCase/interface/qna/IGetAiChatMessagesUseCase';
 import type { IDeleteQuestionUseCase } from '../../../application/useCase/interface/qna/IDeleteQuestionUseCase';
 import type { IRemoveAcceptedAnswerUseCase } from '../../../application/useCase/interface/qna/IRemoveAcceptedAnswerUseCase';
+import type { IUnsaveItemUseCase } from '../../../application/useCase/interface/qna/IUnsaveItemUseCase';
+import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 
 
 @injectable()
@@ -71,6 +74,8 @@ export class QuestionController {
     private readonly _deleteQuestionUseCase: IDeleteQuestionUseCase,
     @inject('IRemoveAcceptedAnswerUseCase')
     private readonly _removeAcceptedAnswerUseCase: IRemoveAcceptedAnswerUseCase,
+    @inject('IUnsaveItemUseCase')
+    private readonly _unsaveQuestionUseCase: IUnsaveItemUseCase
   ) { }
 
   async handleCreateQuestion(req: Request, res: Response, next: NextFunction) {
@@ -179,14 +184,14 @@ export class QuestionController {
 
   async handleSaveQuestion(req: Request, res: Response, next: NextFunction) {
     try {
-      const { questionId, userid } = SaveQuestionSchema.parse({
+      const { questionId, userId } = SaveQuestionSchema.parse({
         questionId: req.params.id,
-        userid: req.user.id,
+        userId: req.user.id,
       });
 
       const { isBookmarked } = await this._toggleSaveQuestionUseCase.execute(
         questionId,
-        userid
+        userId
       );
 
       res.status(HttpStatus.OK).json({
@@ -198,6 +203,22 @@ export class QuestionController {
       });
     } catch (error) {
       next(error);
+    }
+  }
+
+  async handleUnsaveQuestion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { questionId, userId } = SaveQuestionSchema.parse({
+        questionId: req.params.id,
+        userId: req.user.id,
+      });
+
+      const data = await this._unsaveQuestionUseCase.execute(questionId,userId);
+
+      res.status(HttpStatus.OK).json(!!data);
+      
+    } catch (error) {
+      next(error)
     }
   }
 
@@ -252,6 +273,11 @@ export class QuestionController {
   ) {
     try {
       const { userId } = UserIdParamSchema.parse({ userId: req.params.userId });
+      const requesterId = req.user.id;
+
+      if (requesterId !== userId) {
+        throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
+      }
 
       const parsedData = QuestionListSchema.parse({
         ...req.query,

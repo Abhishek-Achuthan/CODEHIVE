@@ -4,6 +4,7 @@ import * as AuthApi from "../api/endpoints/authAPI";
 import type * as AuthType from "../shared/types/api/auth";
 
 import { BaseError } from "../shared/errors/BaseError";
+import { APP_MESSAGES } from "../shared/constants/messages";
 
 export class AuthService {
   static async register(otp: string, data: AuthType.RegisterData) {
@@ -79,6 +80,15 @@ export class AuthService {
     }
   }
 
+  static async setPassword(data: AuthType.SetPasswordData) {
+    try {
+      const response = await AuthApi.setPassword(data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   static async logout() {
     try {
       await AuthApi.userLogout()
@@ -102,13 +112,13 @@ export class AuthService {
 
   private static handleError(error: unknown) {
     if (error instanceof AxiosError) {
-      const msg = error.response?.data?.message || 'Something went wrong';
+      const msg = error.response?.data?.message || APP_MESSAGES.COMMON.SOMETHING_WENT_WRONG;
       const status = error.response?.status;
       throw new BaseError(msg,status);
     }
     if(error instanceof Error) {
       throw new BaseError(error.message);
     } 
-    throw new BaseError('Unexpected error');
+    throw new BaseError(APP_MESSAGES.COMMON.UNEXPECTED_ERROR);
   }
 }

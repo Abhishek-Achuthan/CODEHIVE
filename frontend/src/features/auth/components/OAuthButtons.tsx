@@ -1,103 +1,13 @@
-import { useGoogleLogin } from "@react-oauth/google";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { AuthService } from "../../../services/authService";
-import { loginSuccess } from "../../../store/slices/authSlice";
-import toast from "react-hot-toast";
-import type { CurrentUserView } from "../../../shared/types/view/CurrentUserView";
-
-function toCurrentUserView(raw: unknown): CurrentUserView {
-  const obj = (raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {}) as Record<
-    string,
-    unknown
-  >;
-
-  return {
-    id: String(obj.id ?? ""),
-    firstName: String(obj.firstName ?? ""),
-    lastName: String(obj.lastName ?? ""),
-    email: String(obj.email ?? ""),
-    role: String(obj.role ?? ""),
-    isBlocked: Boolean(obj.isBlocked),
-    avatarUrl: typeof obj.avatarUrl === "string" ? obj.avatarUrl : undefined,
-    about: typeof obj.about === "string" ? obj.about : undefined,
-    skills: Array.isArray(obj.skills)
-      ? (obj.skills.filter((s) => typeof s === "string") as string[])
-      : undefined,
-    experience: Array.isArray(obj.experience)
-      ? (obj.experience
-          .filter((e) => e && typeof e === "object")
-          .map((e) => e as Record<string, unknown>)
-          .map((e) => ({
-            id: String(e.id ?? ""),
-            type: String(e.type ?? "job") as NonNullable<
-              CurrentUserView["experience"]
-            >[number]["type"],
-            title: String(e.title ?? ""),
-            organization: typeof e.organization === "string" ? e.organization : undefined,
-            startDate: typeof e.startDate === "string" ? e.startDate : undefined,
-            endDate: typeof e.endDate === "string" ? e.endDate : undefined,
-            isCurrent: typeof e.isCurrent === "boolean" ? e.isCurrent : undefined,
-          })))
-      : undefined,
-    githubUrl: typeof obj.githubUrl === "string" ? obj.githubUrl : undefined,
-    linkedInUrl: typeof obj.linkedInUrl === "string" ? obj.linkedInUrl : undefined,
-    websiteUrl: typeof obj.websiteUrl === "string" ? obj.websiteUrl : undefined,
-    mentorStatus:
-      obj.mentorStatus === "none" || obj.mentorStatus === "pending" || obj.mentorStatus === "approved"
-        ? obj.mentorStatus
-        : undefined,
-    mentorAppliedAt: typeof obj.mentorAppliedAt === "string" ? obj.mentorAppliedAt : undefined,
-  };
-}
+import { useOAuth } from "../hooks/useOAuth";
 
 export function OAuthButtons() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleGoogleLogin = useGoogleLogin({
-    flow: "auth-code",
-
-    onSuccess: async (tokenResponse) => {
-      const authCode = tokenResponse.code;
-
-      if (!authCode) {
-        toast.error("Google login failed: no token received");
-        return;
-      }
-
-      try {
-        const { message, data } = await AuthService.googleLogin(
-          authCode
-        );
-        const {user,accessToken} = data;
-
-        const userView = toCurrentUserView(user);
-
-        toast.success(message);
-        dispatch(loginSuccess({ user: userView, accessToken }));
-
-        navigate(userView.role === "admin" ? "/admin/users" : "/home");
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Google login failed");
-        }
-      }
-    },
-
-    onError: (error) => {
-      console.error("Google login error:", error);
-      toast.error("Google login error");
-    },
-  });
+  const { loginWithGoogle, loginWithGithub } = useOAuth();
 
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
         type="button"
-        onClick={() => handleGoogleLogin()}
+        onClick={loginWithGoogle}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GoogleIcon />
@@ -105,7 +15,7 @@ export function OAuthButtons() {
       </button>
       <button
         type="button"
-        onClick={() => AuthService.initiateGithubOAuth()}
+        onClick={loginWithGithub}
         className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
         <GithubIcon />

@@ -7,6 +7,8 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import type { QuestionListItemView } from "../../../shared/types/view/QuestionListItemView";
 import type { SavedListView } from "../../../shared/types/view/SavedListView";
 import { mapQuestionListItemToView } from "../../../shared/mappers/question.mapper";
+import { APP_MESSAGES } from "../../../shared/constants/messages";
+import { mapSavedListArrayToView } from "../../../shared/mappers/saved-list.mapper";
 
 const LIMIT = 5;
 
@@ -36,6 +38,7 @@ export function useSavedQuestionsPage() {
   const [loadingAddedListIds, setLoadingAddedListIds] = useState(false);
   const [addingToListId, setAddingToListId] = useState<string | null>(null);
   const [removingQuestionId, setRemovingQuestionId] = useState<string | null>(null);
+  const [unsavingQuestionId, setUnsavingQuestionId] = useState<string | null>(null);
 
   const [deleteListOpen, setDeleteListOpen] = useState(false);
   const [deleteListId, setDeleteListId] = useState<string | null>(null);
@@ -61,8 +64,7 @@ export function useSavedQuestionsPage() {
       try {
         setListsLoading(true);
         const res = await QnAService.listSavedLists();
-        const mapped = Array.isArray(res) ? res.map((l) => ({ id: l.id, name: l.name })) : [];
-        if (!cancelled) setLists(mapped);
+        if (!cancelled) setLists(mapSavedListArrayToView(res));
       } catch {
         toast.error("Failed to load saved lists");
       } finally {
@@ -79,7 +81,7 @@ export function useSavedQuestionsPage() {
 
   const refreshLists = async () => {
     const res = await QnAService.listSavedLists();
-    setLists(Array.isArray(res) ? res.map((l) => ({ id: l.id, name: l.name })) : []);
+    setLists(mapSavedListArrayToView(res));
   };
 
   const refreshAddedListIds = async (questionId: string) => {
@@ -120,7 +122,7 @@ export function useSavedQuestionsPage() {
         setTotalQuestions(typeof res?.totalItems === "number" ? res.totalItems : 0);
       } catch {
         if (!cancelled) {
-          toast.error("Failed to load saved questions");
+          toast.error(APP_MESSAGES.QNA.SAVED_QUESTIONS_LOAD_FAILED);
           setQuestions([]);
           setTotalQuestions(0);
         }
@@ -155,8 +157,8 @@ export function useSavedQuestionsPage() {
         }
       }
     } catch {
-      toast.error("Failed to create list");
-      throw new Error("Failed to create list");
+      toast.error(APP_MESSAGES.QNA.SAVED_LIST_CREATE_FAILED);
+      throw new BaseError(APP_MESSAGES.QNA.SAVED_LIST_CREATE_FAILED);
     }
   };
 
@@ -172,11 +174,11 @@ export function useSavedQuestionsPage() {
     try {
       setAddingToListId(listId);
       await QnAService.addQuestionToSavedList(listId, activeQuestionId);
-      toast.success("Added to list");
+      toast.success(APP_MESSAGES.QNA.SAVED_LIST_ADD_SUCCESS);
       await refreshAddedListIds(activeQuestionId);
       setAddToListOpen(false);
     } catch {
-      toast.error("Failed to add to list");
+      toast.error(APP_MESSAGES.QNA.SAVED_LIST_ADD_FAILED);
     } finally {
       setAddingToListId(null);
     }
@@ -188,7 +190,7 @@ export function useSavedQuestionsPage() {
     try {
       setRemovingQuestionId(questionId);
       await QnAService.removeQuestionFromSavedList(selected.listId, questionId);
-      toast.success("Removed from list");
+      toast.success(APP_MESSAGES.QNA.SAVED_LIST_REMOVE_SUCCESS);
 
       const params: QuestionListParams = {
         page: currentPage,
@@ -205,7 +207,7 @@ export function useSavedQuestionsPage() {
       if (error instanceof BaseError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to remove from list");
+        toast.error(APP_MESSAGES.QNA.SAVED_LIST_REMOVE_FAILED);
       }
     } finally {
       setRemovingQuestionId(null);
@@ -257,6 +259,34 @@ export function useSavedQuestionsPage() {
     }
   };
 
+  const handleUnsaveQuestion = async (questionId: string) => {
+    try {
+      setUnsavingQuestionId(questionId);
+      await QnAService.unsaveQuestion(questionId);
+      toast.success("Question unsaved");
+
+      const params: QuestionListParams = {
+        page: currentPage,
+        limit: LIMIT,
+        sortBy: "newest",
+        search: searchTerm.trim() || undefined,
+      };
+
+      const res = await QnAService.listSavedQuestions(params);
+      const items = Array.isArray(res?.items) ? res.items.map(mapQuestionListItemToView) : [];
+      setQuestions(items);
+      setTotalQuestions(typeof res?.totalItems === "number" ? res.totalItems : 0);
+    } catch (error) {
+      if (error instanceof BaseError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to unsave question");
+      }
+    } finally {
+      setUnsavingQuestionId(null);
+    }
+  };
+
   return {
     LIMIT,
 
@@ -300,6 +330,9 @@ export function useSavedQuestionsPage() {
 
     removingQuestionId,
     handleRemoveFromCurrentList,
+
+    unsavingQuestionId,
+    handleUnsaveQuestion,
 
     deleteListOpen,
     setDeleteListOpen,

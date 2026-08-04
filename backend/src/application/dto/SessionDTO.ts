@@ -1,0 +1,138 @@
+import { Experience } from '../../domain/types/ExperienceType';
+import { PaymentSource } from '../../domain/types/PaymentSource';
+import { SessionPaymentStatus } from '../../domain/types/SessionPaymentStatus';
+import { SessionStatus } from '../../domain/types/SessionStatus';
+import { BookingReservationStatus } from '../../domain/types/BookingReservationStatus';
+import { RefundStatus } from '../../domain/types/RefundStatus';
+import { SessionType } from '../../domain/types/SessionType';
+
+export interface CreateMentorAvailabilityDTO {
+  mentorId: string;
+  rrule: string;
+  startTime: string;
+  endTime: string;
+  slotDurationMinutes: number;
+  bufferMinutes?: number;
+  sessionType: SessionType;
+  maxGuests: number;
+}
+
+export interface BookSessionDTO {
+  mentorId: string;
+  userId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  topic: string;
+  clientRequestId: string;
+}
+
+export interface MentorListInputDTO {
+  search?: string | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+  filter?: {
+    primaryExpertise?: string | undefined;
+    experienceLevel?: string | undefined;
+    skillsAny?: string[] | undefined;
+    slotPriceMin?: number | undefined;
+    slotPriceMax?: number | undefined;
+    hasActiveAvailability?: boolean | undefined;
+  } | undefined;
+}
+
+export type SessionListRole = 'mentor' | 'mentee' | 'all';
+
+export interface SessionListInputDTO {
+  role?: SessionListRole | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+  search?: string | undefined;
+  filter?: {
+    status?: SessionStatus | undefined;
+    dateFrom?: string | undefined;
+    dateTo?: string | undefined;
+    paymentSource?: PaymentSource | undefined;
+    refundableNow?: boolean | undefined;
+  } | undefined;
+}
+
+export interface ISessionResponseDTO {
+  id: string;
+  mentorId: string;
+  userId: string;
+  roomId?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: SessionStatus;
+  paymentSource: PaymentSource;
+  paymentStatus: SessionPaymentStatus;
+  topic: string;
+  sessionType: SessionType;
+  maxGuests: number;
+  createdAt: string;
+  updatedAt: string;
+  amount: number;
+}
+
+export interface IUserSummaryDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface IBookedSessionResponseDTO {
+  id: string;
+  mentorId: string;
+  userId: string;
+  mentor: IUserSummaryDTO;
+  user: IUserSummaryDTO;
+  roomId?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: SessionStatus;
+  topic: string;
+  paymentSource: PaymentSource;
+  paymentStatus: SessionPaymentStatus;
+  amount: number;
+  sessionType: SessionType;
+  maxGuests: number;
+  joinUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AvailableSlotDTO {
+  startTime: string;
+  endTime: string;
+  price: number;
+  sessionType: SessionType;
+  maxGuests: number;
+}
+
+export interface IBookingReservationResponseDTO {
+  id: string;
+  status: BookingReservationStatus;
+  expiresAt: string;
+  sessionId: string | null;
+  refundStatus: RefundStatus;
+}
+
+export interface IMentorProfileResponseDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone?: string | undefined;
+  about?: string | undefined;
+  skills: string[];
+  experience: Experience[];
+  avatarUrl?: string | undefined;
+  githubUrl?: string | undefined;
+  linkedInUrl?: string | undefined;
+  websiteUrl?: string | undefined;
+  primaryExpertise?: string | undefined;
+  experienceLevel?: string | undefined;
+  email: string;
+}

@@ -2,6 +2,7 @@ import axios, { AxiosError, HttpStatusCode } from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 import { store } from '../store';
 import {setAccessToken,logout } from '../store/slices/authSlice';
+import { APP_MESSAGES } from '../shared/constants/messages';
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -33,7 +34,7 @@ apiClient.interceptors.response.use(
     response =>response,
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig;
-        if(error.response?.status === HttpStatusCode.Unauthorized && originalRequest && !originalRequest._retry) {
+        if(error.response?.status === HttpStatusCode.Unauthorized && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
             originalRequest._retry = true;
             try {
 
@@ -41,7 +42,7 @@ apiClient.interceptors.response.use(
 
                 const newToken = refreshResponse.data?.access_token;
 
-                if(!newToken) throw new Error('No new Token returned from refresh endpoint');
+                if(!newToken) throw new Error(APP_MESSAGES.AUTH.REFRESH_TOKEN_MISSING);
 
                 store.dispatch(setAccessToken(newToken));
 
@@ -50,7 +51,7 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
                
             } catch (refreshError) {
-                if(refreshError instanceof AxiosError && refreshError.response?.status===HttpStatusCode.Forbidden){
+                if(refreshError instanceof AxiosError && (refreshError.response?.status===HttpStatusCode.Forbidden || refreshError.response?.status===HttpStatusCode.Unauthorized)){
                     store.dispatch(logout());
                 }
                 return Promise.reject(refreshError);

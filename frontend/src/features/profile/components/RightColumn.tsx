@@ -5,5 +5,5 @@ export interface RightColumnProps {
 }
 
 export default function RightColumn({ children }: RightColumnProps) {
-  return <div className="grid gap-4">{children}</div>;
+  return <div className="grid gap-8 sticky top-4 h-fit">{children}</div>;
 }

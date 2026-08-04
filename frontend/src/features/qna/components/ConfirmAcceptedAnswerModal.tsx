@@ -28,18 +28,20 @@ export default function ConfirmAcceptedAnswerModal({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md">
+      <DialogContent className="border-zinc-800 bg-[#121214] sm:max-w-md p-6">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle className="text-zinc-100 text-lg">{title}</DialogTitle>
+          <DialogDescription className="text-zinc-400 text-sm mt-2">
+            {description}
+          </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter>
+        <DialogFooter className="gap-3 mt-6">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="px-4 py-2 rounded-lg border border-border text-sm text-foreground/80 hover:bg-card/80 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg border border-zinc-800 bg-transparent text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -47,7 +49,11 @@ export default function ConfirmAcceptedAnswerModal({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 border border-white disabled:opacity-60 disabled:cursor-not-allowed"
+            className={`px-5 py-2 rounded-lg text-white text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+              confirmText.toLowerCase().includes("remove")
+                ? "bg-rose-600 hover:bg-rose-500"
+                : "bg-emerald-600 hover:bg-emerald-500"
+            }`}
           >
             {loading ? "Please wait..." : confirmText}
           </button>

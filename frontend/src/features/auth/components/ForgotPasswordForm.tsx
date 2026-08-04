@@ -1,14 +1,12 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { forgotPasswordSchema } from "../validations/authValidation";
 import type { ForgotPasswordFormProps, OtpRequestValues } from "../types";
 import { Link } from "react-router-dom";
 import { useOTP } from "../hooks/useOTP";
+import { useForgotPassword } from "../hooks/useForgotPassword";
 import { OTPModal } from "../../../shared/ui/dialog/OTPModal";
-import { AuthService } from "../../../services/authService";
-import { useNavigate } from "react-router-dom";
-import { BaseError } from "../../../shared/errors/BaseError";
-import toast from "react-hot-toast";
 
 export function ForgotPasswordForm({
   loginUrl = "/login",
@@ -20,6 +18,7 @@ export function ForgotPasswordForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
+    setValue,
   } = useForm<OtpRequestValues>({
     resolver: yupResolver(forgotPasswordSchema),
     defaultValues: {
@@ -27,51 +26,43 @@ export function ForgotPasswordForm({
     },
   });
 
-  const navigate = useNavigate();
+  const { sendOTP, verifyOtp } = useForgotPassword();
 
   const {
     otpModalOpen,
+    timeLeftSeconds,
+    otpSessionVersion,
+    isResending,
+    otpTarget,
     setOtpModalOpen,
     handleSubmit: handleOtpSubmit,
     handleVerifyOtp,
     handleResend,
   } = useOTP<"email", OtpRequestValues>(
     async (data) => {
-      if (!data.email) throw new Error("Email is required");
-      
-      try {
-        const res = await AuthService.forgotPasswordSendOtp({email:data.email});
-        toast.success(res.message)
-      } catch (error) {
-        if(error instanceof BaseError) {
-          toast.error(error.message)
-        }
-      }
+      return await sendOTP(data);
     },
-    
-   async (otp, values) => {
-    
-    try {
-      const res = await AuthService.forgotPasswordVerifyOtp(otp, values.email);
-      if (res) {
-        toast.success(res.message)
-        navigate("/reset-password", {
-          state: { email: values.email, verified: true },
-        });
-        return true;
-      }
-    } catch (error) {
-      if(error instanceof BaseError) {
-        toast.error(error.message);
-      }
-    }
-    return false;
-  },
-    "email"
+    async (otp, values) => {
+      return await verifyOtp(otp, values);
+    },
+    "email",
+    "otp-forgot-password-session"
   );
 
+  useEffect(() => {
+    if (otpTarget) {
+      setValue("email", otpTarget);
+    } else {
+      setValue("email", "");
+    }
+  }, [otpTarget, setValue]);
+
   const onSubmit = async (values: OtpRequestValues) => {
-    await handleOtpSubmit(values);
+    try {
+      await handleOtpSubmit(values);
+    } catch {
+      
+    }
   };
 
   return (
@@ -127,6 +118,9 @@ export function ForgotPasswordForm({
         onOpenChange={setOtpModalOpen}
         onVerify={(otp) => handleVerifyOtp(otp, getValues())}
         onResend={() => handleResend(getValues())}
+        timeLeftSeconds={timeLeftSeconds}
+        sessionVersion={otpSessionVersion}
+        isResending={isResending}
       />
       
       <footer className="mt-12 flex justify-center gap-5">

@@ -1,123 +1,107 @@
+import { NavLink } from 'react-router-dom';
 import {
   MdOutlineQuestionAnswer,
   MdOutlineLightbulb,
   MdOutlineBookmarkBorder,
-  // MdPersonOutline,
   MdOutlineArticle,
   MdOutlineCheckCircle,
 } from "react-icons/md";
-import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const getActiveItem = () => {
-    if (location.pathname.includes('/qna/answered-by-me')) {
-      return 'Answered by me';
-    }
-    if (location.pathname.includes('/qna/my-questions')) {
-      return 'My questions';
-    }
-    if (location.pathname.includes('/qna/saved')) {
-      return 'Saved';
-    }
-    if (location.pathname.includes('/qna/ai-assist')) {
-      return 'AI Assist';
-    }
-    return 'Questions';
-  };
-
-  const menuItems = [
-    { 
-      icon: MdOutlineQuestionAnswer, 
-      label: "Questions", 
-      count: null,
-      path: "/qna" 
+  const navItems = [
+    {
+      title: 'Questions',
+      path: '/qna',
+      icon: <MdOutlineQuestionAnswer className="h-5 w-5" />,
+      end: true
     },
-    { 
-      icon: MdOutlineLightbulb, 
-      label: "AI Assist", 
-      count: null,
-      path: "/qna/ai-assist" 
+    {
+      title: 'AI Assist',
+      path: '/qna/ai-assist',
+      icon: <MdOutlineLightbulb className="h-5 w-5" />
     },
-    { 
-      icon: MdOutlineBookmarkBorder, 
-      label: "Saved", 
-      count: null,
-      path: "/qna/saved" 
-    },
+    {
+      title: 'Saved',
+      path: '/qna/saved',
+      icon: <MdOutlineBookmarkBorder className="h-5 w-5" />
+    }
   ];
 
-  const handleNavigation = (path: string) => {
-    if (path) {
-      navigate(path);
+  const personalNavItems = [
+    {
+      title: 'My questions',
+      path: '/qna/my-questions',
+      icon: <MdOutlineArticle className="h-5 w-5" />
+    },
+    {
+      title: 'Answered by me',
+      path: '/qna/answered-by-me',
+      icon: <MdOutlineCheckCircle className="h-5 w-5" />
     }
-  };
+  ];
 
   return (
-    <aside className="hidden md:flex flex-col items-start bg-black border-r border-zinc-800 p-6 h-screen sticky top-0 md:w-56 lg:w-64">
-      <div className="w-full border-zinc-800" />
-
-      <nav className="w-full space-y-4">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = getActiveItem() === item.label;
-          return (
-            <button
-              key={item.label}
-              onClick={() => handleNavigation(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
+    <aside className="hidden md:flex w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl h-[calc(100vh-64px)] sticky top-16 flex-col">
+      <nav className="flex-1 space-y-1 px-3 py-6">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.end}
+            className={({ isActive }) =>
+              `group relative flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? "bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20"
-                  : "text-zinc-400 hover:text-white hover:bg-zinc-900"
-              }`}
-            >
-              <Icon
-                className={`w-5 h-5 shrink-0 ${isActive ? "" : "group-hover:scale-110"}`}
-                size={20}
-                aria-hidden="true"
-              />
-              <span className="truncate">{item.label}</span>
-              {item.count && (
-                <span className="ml-auto text-xs bg-zinc-800 px-2 py-1 rounded-full">
-                  {item.count}
+                  ? 'bg-indigo-500/10 text-indigo-400'
+                  : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                )}
+                <span className={`transition-colors duration-300 flex items-center justify-center ${isActive ? 'text-indigo-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                  {item.icon}
                 </span>
+                {item.title}
+              </>
+            )}
+          </NavLink>
+        ))}
+
+        <div className="mt-8 pt-6 border-t border-white/5 w-full space-y-1">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4 mb-3">
+            Personal
+          </p>
+
+          {personalNavItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `group relative flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? 'bg-indigo-500/10 text-indigo-400'
+                    : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                  )}
+                  <span className={`transition-colors duration-300 flex items-center justify-center ${isActive ? 'text-indigo-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                    {item.icon}
+                  </span>
+                  {item.title}
+                </>
               )}
-            </button>
-          );
-        })}
+            </NavLink>
+          ))}
+        </div>
       </nav>
-
-      <div className="mt-8 pt-6 border-t border-zinc-800 w-full space-y-2">
-        <p className="text-zinc-500 text-xs font-semibold uppercase tracking-wider px-4 mb-2">
-          Personal
-        </p>
-
-        <button
-          onClick={() => handleNavigation('/qna/my-questions')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
-            getActiveItem() === "My questions"
-              ? "bg-linear-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
-              : "text-zinc-400 hover:text-white hover:bg-zinc-900"
-          }`}
-        >
-          <MdOutlineArticle className="w-5 h-5" size={20} aria-hidden="true" />
-          <span>My questions</span>
-        </button>
-
-        <button
-          onClick={() => handleNavigation('/qna/answered-by-me')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
-            getActiveItem() === "Answered by me"
-              ? "bg-linear-to-r from-orange-600 to-pink-600 text-white shadow-lg shadow-orange-500/20"
-              : "text-zinc-400 hover:text-white hover:bg-zinc-900"
-          }`}
-        >
-          <MdOutlineCheckCircle className={`w-5 h-5`} size={20} aria-hidden="true" />
-          <span>Answered by me</span>
-        </button>
-      </div>
     </aside>
   );
 }

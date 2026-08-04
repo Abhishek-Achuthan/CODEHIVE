@@ -7,7 +7,7 @@ export interface MainContentProps {
 
 export default function MainContent({ left, right }: MainContentProps) {
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
+    <div className="grid gap-8 lg:grid-cols-[7fr_3fr] items-start">
       {left}
       {right}
     </div>

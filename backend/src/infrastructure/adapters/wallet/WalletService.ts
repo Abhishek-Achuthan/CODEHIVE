@@ -1,0 +1,55 @@
+import { inject, injectable } from 'tsyringe';
+import { IWalletService } from '../../../application/ports/wallet/IWalletService';
+import { type IWalletRepository } from '../../../domain/interfaces/IWalletRepository';
+import { WalletTransactionEntity } from '../../../domain/entities/wallet/WalletTransactionEntity';
+import { WalletTransactionType } from '../../../domain/types/WalletTransactionType';
+import { Credit, Debit } from '../../../domain/types/WalletTransactionInput';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+
+@injectable()
+export class WalletService implements IWalletService {
+    constructor(
+        @inject('IWalletRepository') private readonly _walletRepository : IWalletRepository
+    ){}
+
+    async credit(input: Credit): Promise<WalletTransactionEntity> {
+        
+        if(input.amount <=0 ) {
+            throw new Error(ERROR_MESSAGES.WALLET.INVALID_AMOUNT)
+        }
+        
+        const transaction : WalletTransactionEntity = {
+            walletId : input.walletId,
+            type : WalletTransactionType.CREDIT,
+            amount: input.amount,
+            reason: input.reason, 
+            referenceId: input.referenceId,
+            createdAt: new Date(),
+        }
+
+        return this._walletRepository.addTransaction(transaction);
+    }
+
+    async debit(input: Debit): Promise<WalletTransactionEntity> {
+        if(input.amount <=0 ) {
+            throw new Error(ERROR_MESSAGES.WALLET.INVALID_AMOUNT)
+        }
+
+        const balance = await this._walletRepository.getBalance(input.walletId);
+
+        if(balance < input.amount) {
+            throw new Error(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
+        }
+
+        const transaction : WalletTransactionEntity = {
+            walletId: input.walletId,
+            type : WalletTransactionType.DEBIT,
+            amount : input.amount,
+            reason: input.reason,
+            referenceId:input.referenceId,
+            createdAt : new Date(),
+        }
+
+        return this._walletRepository.addTransaction(transaction);
+    }
+}

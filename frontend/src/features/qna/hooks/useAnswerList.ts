@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { type AnswerView } from "../../../shared/types/view/AnswerView";
 import type { AnswerSortApi } from "../../../shared/types/api/qna";
-import { useDebounce } from "../../admin/hooks/useDebounce";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { QnAService } from "../../../services/qnaService";
 import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";

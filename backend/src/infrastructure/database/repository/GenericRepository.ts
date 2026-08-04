@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 import { IGenericRepository } from '../../../domain/interfaces/IGenericRepository';
 import { Document, Model } from 'mongoose';
 
@@ -9,7 +16,7 @@ export abstract class GenericRepository<T extends Document, E>
   constructor(model: Model<T>) {
     this._model = model;
   }
-
+  
   async create(data: Partial<E>): Promise<E> {
     const docData = this.toDocument(data);
     const doc = await this._model.create(docData);

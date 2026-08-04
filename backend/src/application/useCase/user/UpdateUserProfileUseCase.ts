@@ -19,7 +19,6 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
         
         const user = await this._userRepository.find(userId);
 
-
         if(!user) throw new NotFoundError(ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
 
         const updatedProfile = await this._userRepository.update(

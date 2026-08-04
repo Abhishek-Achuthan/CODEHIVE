@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { questionController } from '../../config/di/resolver';
 import { answerController } from '../../config/di/resolver';
+import { commentController } from '../../config/di/resolver';
 import { savedController } from '../../config/di/resolver';
 import { authMiddleware } from '../../config/di/resolver';
 
@@ -9,6 +10,7 @@ export class QnARoutes {
     private _router: Router;
     private _questionController
     private _answerController
+    private _commentController
     private _savedController 
     private _authMiddleware
 
@@ -17,6 +19,7 @@ export class QnARoutes {
         this._router = Router();
         this._questionController = questionController;
         this._answerController = answerController;
+        this._commentController = commentController;
         this._savedController = savedController;
         this._authMiddleware = authMiddleware;
         this._setRoutes();
@@ -79,6 +82,11 @@ export class QnARoutes {
             '/questions/:id/save',
             this._authMiddleware.check,
             this._questionController.handleSaveQuestion.bind(this._questionController)
+        );
+        this._router.delete(
+            '/questions/:id/save',
+            authMiddleware.check,
+            this._questionController.handleUnsaveQuestion.bind(this._questionController)
         );
         this._router.post(
             '/questions/:id/vote',
@@ -189,6 +197,32 @@ export class QnARoutes {
             '/answers/:answerId',
             this._authMiddleware.check,
             this._answerController.handleDeleteAnswer.bind(this._answerController)
+        );
+
+        //--------------------------Comment Routes--------------------------------------//
+
+        this._router.post(
+            '/answers/:answerId/comments',
+            this._authMiddleware.check,
+            this._commentController.handleCreateComment.bind(this._commentController)
+        );
+
+        this._router.get(
+            '/answers/:answerId/comments',
+            this._authMiddleware.check,
+            this._commentController.handleGetComments.bind(this._commentController)
+        );
+
+        this._router.patch(
+            '/comments/:commentId',
+            this._authMiddleware.check,
+            this._commentController.handleUpdateComment.bind(this._commentController)
+        );
+
+        this._router.delete(
+            '/comments/:commentId',
+            this._authMiddleware.check,
+            this._commentController.handleDeleteComment.bind(this._commentController)
         );
        
     }

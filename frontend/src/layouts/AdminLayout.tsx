@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, Calendar, DollarSign, BarChart3, LogOut } from "lucide-react";
+import { IoGridOutline, IoPeopleOutline, IoSchoolOutline, IoDocumentTextOutline, IoWalletOutline, IoCalendarOutline, IoStatsChartOutline, IoLogOutOutline } from "react-icons/io5";
 import { useLogout } from "../features/auth/hooks/useLogout";
 
 
@@ -10,98 +10,58 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
 
-  const {logOut} = useLogout()
+  const { logOut } = useLogout()
 
   return (
-    <div className="flex min-h-screen bg-black text-white">
-      <aside className="w-64 bg-black text-gray-100 flex flex-col">
-        <div className="p-6 text-2xl font-bold  border-gray-700 border">CODEHIVE</div>
+    <div className="flex h-screen overflow-hidden bg-zinc-950 text-zinc-300">
+      <aside className="w-64 bg-zinc-900/30 border-r border-white/10 flex flex-col h-full">
+        <div className="flex h-20 items-center justify-center border-b border-white/10 px-6">
+          <span className="font-black text-2xl text-white tracking-tight">
+            CODE<span className="text-indigo-500">HIVE</span>
+          </span>
+        </div>
 
-        <nav className="flex-1 p-4 space-y-2 border border-gray-700">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <LayoutDashboard className="w-5 h-5" />
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/admin/users"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <Users className="w-5 h-5" />
-            Users
-          </NavLink>
-
-          <NavLink
-            to="/admin/mentors"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <FileText className="w-5 h-5" />
-            Mentors
-          </NavLink>
-
-          <NavLink
-            to="/admin/subscriptions"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <DollarSign className="w-5 h-5" />
-            Subscriptions
-          </NavLink>
-
-          <NavLink
-            to="/admin/plans"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <Calendar className="w-5 h-5" />
-            Plans
-          </NavLink>
-
-          <NavLink
-            to="/admin/reports"
-            className={({ isActive }) =>
-              `flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 ${
-                isActive ? "bg-gray-800" : ""
-              }`
-            }
-          >
-            <BarChart3 className="w-5 h-5" />
-            Reports
-          </NavLink>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {[
+            { to: "/admin", icon: IoGridOutline, label: "Dashboard" },
+            { to: "/admin/users", icon: IoPeopleOutline, label: "Users" },
+            { to: "/admin/mentors", icon: IoSchoolOutline, label: "Mentors" },
+            { to: "/admin/applications", icon: IoDocumentTextOutline, label: "Applications" },
+            { to: "/admin/subscriptions", icon: IoWalletOutline, label: "Subscriptions" },
+            { to: "/admin/plans", icon: IoCalendarOutline, label: "Plans" },
+            { to: "/admin/reports", icon: IoStatsChartOutline, label: "Reports" },
+          ].map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.to}
+              end={item.to === "/admin"}
+              className={({ isActive }) =>
+                `flex items-center gap-3 p-3 rounded-xl transition-all ${
+                  isActive
+                    ? "bg-indigo-500/10 text-indigo-400 font-semibold"
+                    : "text-zinc-400 hover:bg-white/[0.05] hover:text-white"
+                }`
+              }
+            >
+              <item.icon className="w-5 h-5" />
+              {item.label}
+            </NavLink>
+          ))}
+          
           <button
             onClick={logOut}
-            className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-800 text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-zinc-400 hover:bg-white/[0.05] hover:text-red-400 text-left mt-2"
           >
-            <LogOut className="w-5 h-5" />
+            <IoLogOutOutline className="w-5 h-5" />
             Logout
           </button>
         </nav>
-
-        
       </aside>
 
-      <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-8 overflow-y-auto relative">
+        <div className="absolute inset-0 bg-indigo-500/[0.02] pointer-events-none" />
+        <div className="relative z-10">{children}</div>
+      </main>
     </div>
   );
 }

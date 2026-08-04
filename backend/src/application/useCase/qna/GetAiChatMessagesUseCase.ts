@@ -5,6 +5,7 @@ import type { IAiChatSessionRepository } from '../../../domain/interfaces/IAiCha
 import type { IAiChatMessageRepository } from '../../../domain/interfaces/IAiChatMessageRepository';
 import type { IGetAiChatMessagesUseCase } from '../interface/qna/IGetAiChatMessagesUseCase';
 import { AiChatMessageEntity } from '../../../domain/entities/qna/AiChatMessageEntity';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class GetAiChatMessagesUseCase implements IGetAiChatMessagesUseCase {
@@ -22,9 +23,9 @@ export class GetAiChatMessagesUseCase implements IGetAiChatMessagesUseCase {
   ): Promise<AiChatMessageEntity[]> {
     const session = await this._sessionRepo.findById(sessionId);
 
-    if (!session) throw new NotFoundError('Chat session not found');
+    if (!session) throw new NotFoundError(ERROR_MESSAGES.QnA.CHAT_SESSION_NOT_FOUND);
 
-    if (session.userId !== userId) throw new ForbiddenError('Forbidden');
+    if (session.userId !== userId) throw new ForbiddenError(ERROR_MESSAGES.AUTH.FORBIDDEN);
 
     return this._messageRepo.getRecentBySession(sessionId, limit);
   }

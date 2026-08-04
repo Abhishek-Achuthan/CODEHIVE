@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 import {
   Dialog,
@@ -9,8 +9,7 @@ import {
   DialogTitle,
 } from "../../../shared/ui/dialog/Dialog";
 
-import { AuthService } from "../../../services/authService";
-import { BaseError } from "../../../shared/errors/BaseError";
+import { useChangePassword } from "../../auth/hooks/useChangePassword";
 
 export interface ChangePasswordDialogProps {
   open: boolean;
@@ -24,103 +23,101 @@ export default function ChangePasswordDialog({
   const [previousPass, setPreviousPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirmNewPass, setConfirmNewPass] = useState("");
-  const [saving, setSaving] = useState(false);
+
+  const [showPreviousPass, setShowPreviousPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmNewPass, setShowConfirmNewPass] = useState(false);
+
+  const { changePassword, saving } = useChangePassword(() => onOpenChange(false));
 
   useEffect(() => {
     if (!open) {
       setPreviousPass("");
       setNewPass("");
       setConfirmNewPass("");
-      setSaving(false);
+      setShowPreviousPass(false);
+      setShowNewPass(false);
+      setShowConfirmNewPass(false);
     }
   }, [open]);
 
   const submit = async () => {
-    try {
-      if (saving) return;
-
-      const prev = previousPass.trim();
-      const next = newPass.trim();
-      const confirm = confirmNewPass.trim();
-
-      if (!prev || !next || !confirm) {
-        toast.error("All fields are required");
-        return;
-      }
-
-      if (next.length < 6) {
-        toast.error("New password must be at least 6 characters");
-        return;
-      }
-
-      if (next !== confirm) {
-        toast.error("New passwords do not match");
-        return;
-      }
-
-      setSaving(true);
-      const res = await AuthService.changePassword({ previousPass: prev, newPass: next });
-
-      const message =
-        typeof res?.message === "string" && res.message.trim().length > 0
-          ? res.message
-          : "Password changed";
-
-      toast.success(message);
-      onOpenChange(false);
-    } catch (error) {
-      if (error instanceof BaseError) toast.error(error.message);
-      else if (error instanceof Error) toast.error(error.message);
-      else toast.error("Failed to change password");
-    } finally {
-      setSaving(false);
-    }
+    await changePassword({ previousPass, newPass, confirmNewPass });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-gray-800 bg-black text-white">
-        <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
+      <DialogContent className="border border-zinc-800 bg-[#121214] text-zinc-100 p-0 overflow-hidden sm:max-w-md shadow-2xl">
+        <DialogHeader className="px-6 py-4 border-b border-zinc-800 bg-[#09090b]/50">
+          <DialogTitle className="text-lg font-semibold tracking-tight">
+            Change Password
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-3">
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">Current password</span>
-            <input
-              type="password"
-              value={previousPass}
-              onChange={(e) => setPreviousPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
-            />
+        <div className="p-6 grid gap-5">
+          <label className="grid gap-1.5 relative">
+            <span className="text-sm font-medium text-zinc-300">Current Password</span>
+            <div className="relative">
+              <input
+                type={showPreviousPass ? "text" : "password"}
+                value={previousPass}
+                onChange={(e) => setPreviousPass(e.target.value)}
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 pr-10 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPreviousPass(!showPreviousPass)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+              >
+                {showPreviousPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </label>
 
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">New password</span>
-            <input
-              type="password"
-              value={newPass}
-              onChange={(e) => setNewPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
-            />
+          <label className="grid gap-1.5 relative">
+            <span className="text-sm font-medium text-zinc-300">New Password</span>
+            <div className="relative">
+              <input
+                type={showNewPass ? "text" : "password"}
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 pr-10 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPass(!showNewPass)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+              >
+                {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </label>
 
-          <label className="grid gap-1">
-            <span className="text-xs text-gray-400">Confirm new password</span>
-            <input
-              type="password"
-              value={confirmNewPass}
-              onChange={(e) => setConfirmNewPass(e.target.value)}
-              className="h-10 rounded-md border border-gray-700 bg-black px-3 text-sm outline-none focus:ring-2 focus:ring-blue-600/40"
-            />
+          <label className="grid gap-1.5 relative">
+            <span className="text-sm font-medium text-zinc-300">Confirm New Password</span>
+            <div className="relative">
+              <input
+                type={showConfirmNewPass ? "text" : "password"}
+                value={confirmNewPass}
+                onChange={(e) => setConfirmNewPass(e.target.value)}
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-4 pr-10 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmNewPass(!showConfirmNewPass)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+              >
+                {showConfirmNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </label>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 py-4 border-t border-zinc-800 bg-[#09090b]/50 flex gap-3">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-md border border-gray-600 px-4 py-2 text-xs"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors w-full sm:w-auto"
             disabled={saving}
           >
             Cancel
@@ -128,10 +125,10 @@ export default function ChangePasswordDialog({
           <button
             type="button"
             onClick={submit}
-            className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold"
+            className="w-full sm:w-auto rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50"
             disabled={saving}
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : "Update Password"}
           </button>
         </DialogFooter>
       </DialogContent>

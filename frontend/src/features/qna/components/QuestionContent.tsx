@@ -1,5 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
+import type { ReactNode } from "react";
 import QuestionCard, { type QuestionCardProps } from "./QuestionCard";
+import { EmptyState } from "../../../shared/ui/EmptyState";
 
 type Question = QuestionCardProps & { id: string | number };
 
@@ -7,7 +9,7 @@ type Props = {
   loading: boolean;
   questions: Question[];
   onSelect: (id: string) => void;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 };
 
 export function QuestionContent({
@@ -18,17 +20,21 @@ export function QuestionContent({
 }: Props) {
   if (loading) {
     return (
-      <p className="text-foreground/60 text-center py-8">
-        Loading questions...
-      </p>
+      <div className="flex items-center justify-center py-16">
+        <p className="text-zinc-500 font-medium">Loading questions...</p>
+      </div>
     );
   }
 
   if (questions.length === 0) {
     return (
-      <p className="text-foreground/60 text-center py-8">
-        {emptyMessage ?? "No questions found. Try adjusting your filters."}
-      </p>
+      <div className="py-10">
+        <EmptyState
+          animationSrc="https://lottie.host/c878f65a-2ee7-401f-b813-9899fccd135a/7q1YxDrkmN.json"
+          title="No questions found"
+          description={typeof emptyMessage === 'string' && emptyMessage ? emptyMessage : "Try adjusting your filters or search terms to find what you're looking for."}
+        />
+      </div>
     );
   }
 

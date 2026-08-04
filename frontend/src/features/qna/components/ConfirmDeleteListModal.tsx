@@ -24,21 +24,21 @@ export default function ConfirmDeleteListModal({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md">
+      <DialogContent className="border-zinc-800 bg-[#121214] sm:max-w-md p-6">
         <DialogHeader>
-          <DialogTitle>Delete list</DialogTitle>
-          <DialogDescription>
-            This will delete <span className="font-medium">{listName}</span> and all
-            items inside it.
+          <DialogTitle className="text-zinc-100 text-lg">Delete list</DialogTitle>
+          <DialogDescription className="text-zinc-400 text-sm mt-2">
+            This will delete <span className="font-semibold text-zinc-200">{listName}</span> and all
+            items inside it. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter>
+        <DialogFooter className="gap-3 mt-6">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="px-4 py-2 rounded-lg border border-border text-sm text-foreground/80 hover:bg-card/80 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg border border-zinc-800 bg-transparent text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -46,9 +46,9 @@ export default function ConfirmDeleteListModal({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 border border-white disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-5 py-2 rounded-lg bg-rose-600 text-white text-sm font-medium hover:bg-rose-500 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? "Deleting..." : "Delete List"}
           </button>
         </DialogFooter>
       </DialogContent>

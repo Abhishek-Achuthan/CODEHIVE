@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import * as QnAApi from '../api/endpoints/qnaAPI'
 
 import { BaseError } from '../shared/errors/BaseError'
+import { APP_MESSAGES } from '../shared/constants/messages';
 import type {
     AnswerListParams,
     CreateQuestionRequest,
@@ -73,6 +74,15 @@ export class QnAService {
             return response.data as SaveQuestionApiResponse
         } catch (error) {
             throw this.handleError(error);
+        }
+    }
+
+    static async unsaveQuestion(questionId: string):Promise<boolean> {
+        try {
+            const response = await QnAApi.unsaveQuestion(questionId);
+            return response.data as boolean
+        } catch (error) {
+            throw this.handleError(error)
         }
     }
 
@@ -300,13 +310,14 @@ export class QnAService {
 
     private static handleError(error: unknown): never {
         if (error instanceof AxiosError) {
-            const msg = error.response?.data.message || 'Something went wrong';
+            const msg =
+                error.response?.data.message || APP_MESSAGES.COMMON.SOMETHING_WENT_WRONG;
             const status = error.response?.status;
             throw new BaseError(msg, status);
         }
         if (error instanceof Error) {
             throw new BaseError(error.message);
         }
-        throw new BaseError('Unexpected error');
+        throw new BaseError(APP_MESSAGES.COMMON.UNEXPECTED_ERROR);
     }
 }

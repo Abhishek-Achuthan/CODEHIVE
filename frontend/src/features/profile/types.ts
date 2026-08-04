@@ -1,3 +1,8 @@
+import {
+  MentorStatus as SharedMentorStatus,
+  type MentorStatus as MentorStatusValue,
+} from "../../shared/constants/auth";
+
 export type ProfileEditSection = "about" | "experience" | "skills" | "avatar" | null;
 
 export type ExperienceType =
@@ -49,8 +54,18 @@ export interface SkillsData {
   inputValue: string;
 }
 
+export const MentorStatus = SharedMentorStatus;
+export type MentorStatus = MentorStatusValue;
+
 export interface MentorChecklist {
   aboutComplete: boolean;
   experienceComplete: boolean;
   skillsComplete: boolean;
+}
+
+export interface MentorApplicationState {
+  checklist: MentorChecklist;
+  status: MentorStatus;
+  rejectionReason?: string;
+  appliedAt?: string;
 }

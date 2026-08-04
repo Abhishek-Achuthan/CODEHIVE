@@ -1,15 +1,8 @@
+import type { AdminUserListItemView } from "../../../shared/types/view/AdminUserListItemView";
 import type { Column } from "../../../shared/ui/DataTable";
 
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  isBlocked: boolean;
-}
 
-export const userColumns: readonly Column<User>[] = [
+export const userColumns: readonly Column<AdminUserListItemView>[] = [
   {
     header: "Name",
     key: "firstName",
@@ -26,15 +19,37 @@ export const userColumns: readonly Column<User>[] = [
   {
     header: "Status",
     key: "isBlocked",
-    template: (value) => {
-      const isBlocked = value as boolean;
+    template: (_value, row) => {
+      const isBlocked = row.isBlocked;
+      if (!isBlocked) {
+        return <span className="font-medium text-green-600">Active</span>;
+      }
+      
+      let banText = "Banned";
+      if (row.banExpirationDate) {
+        banText = `Banned until ${new Date(row.banExpirationDate).toLocaleDateString()}`;
+      } else {
+        banText = "Permanently Banned";
+      }
+
       return (
-        <span
-          className={`font-medium ${isBlocked ? "text-red-600" : "text-green-600"}`}
-        >
-          {isBlocked ? "Blocked" : "Active"}
-        </span>
+        <div className="flex flex-col">
+          <span className="font-medium text-red-600">{banText}</span>
+          {row.banReason && <span className="text-xs text-gray-400 max-w-xs truncate" title={row.banReason}>{row.banReason}</span>}
+        </div>
       );
     },
   },
+  {
+    header: "Warnings",
+    key: "warnCount",
+    template: (_value, row) => {
+      if (!row.warnCount) return <span className="text-gray-500">-</span>;
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500">
+          {row.warnCount} {row.warnCount === 1 ? 'Warning' : 'Warnings'}
+        </span>
+      );
+    }
+  }
 ] as const;

@@ -7,6 +7,7 @@ import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { QuestionListQuery } from '../../../domain/types/QuestionListQuery';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
 import { QuestionEntity } from '../../../domain/entities/qna/QuestionEntity';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class ListSavedListQuestionsUseCase implements IListSavedListQuestionsUseCase {
@@ -26,7 +27,7 @@ export class ListSavedListQuestionsUseCase implements IListSavedListQuestionsUse
   ): Promise<PaginationResult<QuestionEntity>> {
     const list = await this._savedListRepository.find(listId);
 
-    if (!list || list.userId !== userId) throw new NotFoundError('List not found');
+    if (!list || list.userId !== userId) throw new NotFoundError(ERROR_MESSAGES.QnA.LIST_NOT_FOUND);
 
     const questionIds = await this._savedListItemRepository.findQuestionIdsByList(listId);
 

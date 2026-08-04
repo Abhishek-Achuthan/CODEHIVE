@@ -3,6 +3,7 @@ import { GiCheckMark } from "react-icons/gi";
 import { QnaRichContent } from "./QnaRichContent";
 import { useMemo, useState } from "react";
 import ConfirmAcceptedAnswerModal from "./ConfirmAcceptedAnswerModal";
+import { CommentSection } from "./CommentSection";
 
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Pagination } from "../../../shared/ui/Pagination";
@@ -142,24 +143,26 @@ export function QuestionAnswersSection(props: Props) {
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-12">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <h2 className="text-xl font-semibold">Answers ({totalAnswers})</h2>
+        <h2 className="text-xl font-semibold text-zinc-100">{totalAnswers} Answers</h2>
 
         <div className="w-full md:w-auto">
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as AnswerSort)}
-            className="w-full md:w-auto px-3 py-2 rounded-lg bg-zinc-900/30 border border-zinc-800/50 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/60"
+            className="w-full md:w-auto px-4 py-2 rounded-lg bg-[#121214] border border-zinc-800 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 cursor-pointer"
           >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="votes">Most voted</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="votes">Highest Score</option>
           </select>
         </div>
       </div>
 
-      <SearchInput value={searchTerm} onChange={onSearchChange} />
+      <div className="mb-8">
+        <SearchInput value={searchTerm} onChange={onSearchChange} placeholder="Filter answers..." />
+      </div>
 
       {modalCopy && (
         <ConfirmAcceptedAnswerModal
@@ -177,119 +180,138 @@ export function QuestionAnswersSection(props: Props) {
       )}
 
       {loading ? (
-        <div className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50 text-center text-zinc-400">
+        <div className="py-12 rounded-xl border border-zinc-800 border-dashed text-center text-zinc-500">
           Loading answers...
         </div>
       ) : answers.length === 0 ? (
-        <div className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50 text-center text-zinc-400">
-          {isSearching ? "No matching answers found." : "No answers yet — be the first to help."}
+        <div className="py-12 rounded-xl border border-zinc-800 border-dashed text-center text-zinc-500">
+          {isSearching ? "No matching answers found." : "No answers yet. Be the first to help!"}
         </div>
       ) : (
-        <div className="space-y-6">
-          {answers.map((a) => (
-            <article
-              key={a.id}
-              className="p-4 rounded-lg bg-zinc-900/30 border border-zinc-800/50"
-            >
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center gap-2 py-1">
-                  <button
-                    onClick={() => onUpvoteAnswer?.(a.id)}
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${getUserVote?.(a.id) === 1
-                        ? "text-purple-400 border-purple-500/50"
-                        : "text-zinc-400 hover:text-purple-400"
-                      }`}
-                  >
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M7 14l5-5 5 5z" />
-                    </svg>
-                  </button>
-
-                  <span className="text-sm font-semibold text-white w-8 text-center">
-                    {getVoteCount ? getVoteCount(a.id, a.voteCount) : a.voteCount}
-                  </span>
-
-                  <button
-                    onClick={() => onDownvoteAnswer?.(a.id)}
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border border-zinc-800 hover:border-purple-500/50 transition-all group ${getUserVote?.(a.id) === -1
-                        ? "text-purple-400 border-purple-500/50"
-                        : "text-zinc-400 hover:text-purple-400"
-                      }`}
-                  >
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M17 10l-5 5-5-5z" />
-                    </svg>
-                  </button>
-
-                  {(a.isAccepted || (currentUserId && currentUserId === questionAskedBy)) && (
+        <div className="space-y-8">
+          {answers.map((a) => {
+            const isAccepted = a.isAccepted;
+            return (
+              <article
+                key={a.id}
+                className={`p-6 rounded-xl border transition-all ${
+                  isAccepted
+                    ? "bg-emerald-500/5 border-emerald-500/30"
+                    : "bg-[#121214] border-zinc-800"
+                }`}
+              >
+                <div className="flex gap-6">
+                  {/* Voting and Accept controls */}
+                  <div className="flex flex-col items-center gap-3 pt-1 shrink-0">
                     <button
-                      onClick={() => onClickAccept(a.id, a.isAccepted)}
-                       className={`mt-2 flex items-center justify-center w-8 h-8 transition-all ${
-                        a.isAccepted
-                          ? "text-green-500"
-                          : "text-zinc-600 hover:text-green-500 cursor-pointer"
-                      } ${currentUserId !== questionAskedBy && !a.isAccepted ? "cursor-default opacity-50 hidden" : ""}`}
-                      title={a.isAccepted ? "Accepted Answer" : "Accept this answer"}
-                      disabled={currentUserId !== questionAskedBy && !a.isAccepted}
+                      onClick={() => onUpvoteAnswer?.(a.id)}
+                      className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all ${
+                        getUserVote?.(a.id) === 1
+                          ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
+                          : "border-transparent text-zinc-500 hover:text-indigo-400 hover:bg-zinc-800"
+                      }`}
                     >
-                      <GiCheckMark size={28} />
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M7 14l5-5 5 5z" />
+                      </svg>
                     </button>
-                  )}
-                </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-medium">
-                        {a.author.firstName?.[0] || "U"}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-white">
-                          {a.author.firstName || "Anonymous"}
-                        </div>
-                        <div className="text-xs text-zinc-400">
-                          {timeAgo(parseDate(a.createdAt))}
-                        </div>
-                      </div>
-                    </div>
+                    <span className="text-lg font-semibold text-zinc-200">
+                      {getVoteCount ? getVoteCount(a.id, a.voteCount) : a.voteCount}
+                    </span>
 
-                    {a.author.id === currentUserId && (
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          className="text-blue-500 hover:text-blue-400 flex items-center text-sm"
-                        >
-                          <MdEdit className="mr-1" /> Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteAnswer?.(a.id)}
-                          className="text-red-500 hover:text-red-400 flex items-center text-sm"
-                        >
-                          <MdDelete className="mr-1" /> Delete
-                        </button>
-                      </div>
+                    <button
+                      onClick={() => onDownvoteAnswer?.(a.id)}
+                      className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all ${
+                        getUserVote?.(a.id) === -1
+                          ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                          : "border-transparent text-zinc-500 hover:text-rose-400 hover:bg-zinc-800"
+                      }`}
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M17 10l-5 5-5-5z" />
+                      </svg>
+                    </button>
+
+                    {(isAccepted || (currentUserId && currentUserId === questionAskedBy)) && (
+                      <button
+                        onClick={() => onClickAccept(a.id, a.isAccepted)}
+                        className={`mt-3 flex items-center justify-center w-9 h-9 rounded-full border transition-all ${
+                          isAccepted
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                            : "border-transparent text-zinc-600 hover:text-emerald-400 hover:bg-zinc-800"
+                        } ${currentUserId !== questionAskedBy && !isAccepted ? "opacity-0 pointer-events-none" : ""}`}
+                        title={isAccepted ? "Accepted Answer" : "Mark as accepted answer"}
+                        disabled={currentUserId !== questionAskedBy && !isAccepted}
+                      >
+                        <GiCheckMark size={20} />
+                      </button>
                     )}
                   </div>
 
-                  <QnaRichContent
-                    html={a.contentHtml}
-                    className="qna-content qna-renderer text-zinc-200 text-base leading-relaxed"
-                  />
+                  {/* Answer content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="prose prose-invert max-w-none text-zinc-300 mb-6">
+                      <QnaRichContent
+                        html={a.contentHtml}
+                        className="qna-content qna-renderer leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 mt-6 pt-4 border-t border-zinc-800/80">
+                      {a.author.id === currentUserId ? (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors"
+                          >
+                            <MdEdit size={14} /> Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDeleteAnswer?.(a.id)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
+                          >
+                            <MdDelete size={14} /> Delete
+                          </button>
+                        </div>
+                      ) : (
+                        <div /> 
+                      )}
+
+                      <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 px-3 py-2 rounded-lg">
+                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-medium text-sm border border-indigo-500/20">
+                          {a.author.firstName?.[0] || "U"}
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-indigo-400 leading-none mb-1">
+                            {a.author.firstName || "Anonymous"}
+                          </div>
+                          <div className="text-xs text-zinc-500">
+                            answered {timeAgo(parseDate(a.createdAt))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <CommentSection answerId={a.id} currentUserId={currentUserId} />
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
 
-      <div className="mt-8 h-10 flex items-center justify-center">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-10 flex items-center justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

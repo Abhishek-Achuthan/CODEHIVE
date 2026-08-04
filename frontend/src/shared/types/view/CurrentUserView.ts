@@ -1,14 +1,18 @@
+import type { MentorStatus, UserRole } from "../../constants/auth";
+import type { UserLanguage } from "../domain/language.types";
+
 export interface CurrentUserView {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   phone?: string;
-  role: string;
+  role: UserRole;
   isBlocked: boolean;
   avatarUrl?: string;
   about?: string;
   skills?: string[];
+  languages?: UserLanguage[];
   experience?: {
     id: string;
     type: "job" | "freelance" | "open_source" | "teaching" | "self_learning";
@@ -21,6 +25,9 @@ export interface CurrentUserView {
   githubUrl?: string;
   linkedInUrl?: string;
   websiteUrl?: string;
-  mentorStatus?: "none" | "pending" | "approved";
+  mentorStatus?: MentorStatus;
   mentorAppliedAt?: string;
+  primaryExpertise?: string;
+  experienceLevel?: string;
+  hasPassword: boolean;
 }

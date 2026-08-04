@@ -1,0 +1,85 @@
+import { UserEntity } from '../../domain/entities/UserEntity';
+import { IUserActivityStatsDTO, IUserListResponseDTO, IUserLoginResponseDTO, IUserProfileResponseDTO } from '../dto/UserDTO';
+
+export class UserMapper {
+  public static toLoginResponse(
+    user: UserEntity,
+    accessToken: string,
+    refreshToken: string
+  ): IUserLoginResponseDTO {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      about: user.about,
+      skills: user.skills,
+      languages: user.languages ?? [],
+      experience: user.experience,
+      avatarUrl: user.avatarUrl,
+      githubUrl: user.githubUrl,
+      linkedInUrl: user.linkedInUrl,
+      websiteUrl: user.websiteUrl,
+      isBlocked: user.isBlocked,
+      phone: user.phone ?? '',
+      role: user.role,
+      mentorAppliedAt: user.mentorAppliedAt,
+      mentorStatus: user.mentorStatus,
+      primaryExpertise: user.primaryExpertise,
+      experienceLevel: user.experienceLevel,
+      refreshToken: refreshToken,
+      accessToken: accessToken,
+      hasPassword: Boolean(user.password && user.password.trim().length > 0),
+    };
+  }
+
+  public static toUserListResponse(user: UserEntity): IUserListResponseDTO {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone ?? '',
+      role: user.role,
+      isBlocked: user.isBlocked,
+    };
+  }
+
+  public static toUserProfileResponse(
+    user: UserEntity
+  ): IUserProfileResponseDTO {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      about: user.about,
+      skills: user.skills,
+      languages: user.languages ?? [],
+      experience: user.experience,
+      avatarUrl: user.avatarUrl,
+      githubUrl: user.githubUrl,
+      linkedInUrl: user.linkedInUrl,
+      websiteUrl: user.websiteUrl,
+      mentorStatus: user.mentorStatus,
+      primaryExpertise: user.primaryExpertise,
+      experienceLevel: user.experienceLevel,
+      hasPassword: Boolean(user.password && user.password.trim().length > 0),
+    };
+  }
+
+  public static toUserListArray(users: UserEntity[]): IUserListResponseDTO[] {
+    return users.map((user) => this.toUserListResponse(user));
+  }
+
+  public static toUserActivityStatsDTO(
+    stats: { totalSessionsTaken: number; joinedRooms: number; qnaContributions: number }
+  ): IUserActivityStatsDTO {
+    return {
+      totalSessionsTaken: stats.totalSessionsTaken,
+      joinedRooms: stats.joinedRooms,
+      qnaContributions: stats.qnaContributions,
+    };
+  }
+
+}

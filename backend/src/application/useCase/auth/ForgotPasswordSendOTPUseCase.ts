@@ -4,6 +4,7 @@ import type { IUserRepository } from '../../../domain/interfaces/IUserRepository
 import type { IEmailService } from '../../ports/mail/IEmailService';
 import type { IEmailTemplateFactory } from '../../ports/mail/template/IEmailTemplateFactory';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
 import type { IOTPService } from '../../ports/otp/IOTPService';
 import type { ICacheService } from '../../ports/cache/ICacheService';
 import type { IHashService } from '../../ports/security/IHashService';
@@ -27,6 +28,8 @@ export class ForgotPasswordSendOTPUseCase implements IForgotPasswordSendOTPUseCa
         const validUser = await this._userReposiotry.findByEmail(email);
 
         if(!validUser) throw new NotFoundError(ERROR_MESSAGES.AUTH.INVALID_EMAIL);
+
+        if(!validUser.password) throw new BadRequestError('Account created via Google. Please set a password after logging in.');
 
         const existingOtp = await this._cacheService.getData(`forgot_password_otp:${email}`);
 

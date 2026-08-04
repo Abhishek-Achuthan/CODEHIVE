@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/amqplib": "^0.10.8",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
@@ -10,7 +11,9 @@
     "@types/node": "^24.9.1",
     "@types/nodemailer": "^7.0.2",
     "@types/sanitize-html": "^2.16.0",
+    "@types/ws": "^8.18.1",
     "eslint": "^9.39.1",
+    "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3"
@@ -19,10 +22,14 @@
     "build": "tsc",
     "start": "node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
-    "fix": "eslint . --fix"
+    "fix": "eslint . --fix",
+    "dev:collab": "nodemon --exec ts-node src/collaboration/hocuspocusServer.ts"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
+    "@hocuspocus/server": "^4.0.0",
+    "@y/websocket-server": "^0.1.5",
+    "amqplib": "^2.0.1",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -30,13 +37,22 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "google-auth-library": "^10.5.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.19.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.10",
     "redis": "^5.9.0",
     "reflect-metadata": "^0.2.2",
+    "rrule": "^2.8.1",
     "sanitize-html": "^2.17.0",
+    "socket.io": "^4.8.3",
+    "stripe": "^20.1.2",
     "tsyringe": "^4.10.0",
+    "winston": "^3.19.0",
+    "winston-loki": "^6.1.4",
+    "ws": "^8.20.0",
+    "y-protocols": "^1.0.7",
+    "yjs": "^13.6.30",
     "zod": "^4.1.12"
   }
 }

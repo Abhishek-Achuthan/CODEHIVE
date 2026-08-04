@@ -3,14 +3,18 @@ import { GenericRepository } from './GenericRepository';
 import { UserEntity } from '../../../domain/entities/UserEntity';
 import UserModel from '../models/UserModel';
 import { UserDocument, UserLeanDoc } from '../schemas/UserSchema';
-import { FilterQuery, Model } from 'mongoose';
 import { UserRole } from '../../../domain/types/UserRole';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { MentorStatus } from '../../../domain/types/MentorStatus';
+import { SessionModel } from '../models/session/SessionModel';
+import ParticipantModel from '../models/room/ParicipantModel';
+import QuestionModel from '../models/qna/QuestionModel';
+import AnswerModel from '../models/qna/AnswerModel';
 
 export class UserRepository
   extends GenericRepository<UserDocument, UserEntity>
-  implements IUserRepository
-{
+  implements IUserRepository {
   constructor() {
     super(UserModel as Model<UserDocument>);
   }
@@ -23,12 +27,59 @@ export class UserRepository
     return this.toEntity(userDoc);
   }
 
+  async getUserActivityStats(userId: string): Promise<{ totalSessionsTaken: number, joinedRooms: number, qnaContributions: number }> {
+    const objId = new Types.ObjectId(userId);
+
+
+    const [totalSessionsTaken,joinedRooms,questionsCount,answersCount] = await Promise.all([
+      SessionModel.countDocuments({$or:[{userId: objId},{mentorId:objId}]}),
+      ParticipantModel.countDocuments({userId:objId}),
+      QuestionModel.countDocuments({authorId:objId}),
+      AnswerModel.countDocuments({authorId:objId})
+    ])
+
+    return {
+      totalSessionsTaken,
+      joinedRooms,
+      qnaContributions: questionsCount + answersCount
+    };
+  }
+
+  async findMentorApplications(currentPage?:number ,pageSize?:number,search?:string): Promise<PaginationResult<UserEntity>> {
+
+    currentPage = Math.max(1, currentPage ?? 1);
+    pageSize = Math.max(1, pageSize ?? 10);
+
+    const query: FilterQuery<UserDocument> = {
+      mentorStatus: MentorStatus.PENDING
+    };
+
+    if(search) {
+      query.$or = [
+        {firstName:{$regex:search,$options:'i'}},
+        {lastName:{$regex:search,$options:'i'}},
+        {email:{$regex:search,$options:'i'}},
+      ]
+    }
+    
+    query.mentorAppliedAt = {$exists: true};
+
+    const totalItems = await this._model.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const skip = (currentPage - 1) * pageSize;
+
+    const userDoc = await this._model.find(query).sort({mentorAppliedAt: -1}).skip(skip).limit(pageSize).lean<UserLeanDoc[]>();
+    const items = userDoc.map((doc) => this.leanToEntity(doc));
+
+    return {items,totalItems,totalPages}
+  }
+
   async getAllUsers(
     role: UserRole,
     currentPage: number = 1,
     pageSize: number = 10,
     sort: string = 'createdAt',
-    search: string = ''
+    search: string = '',
   ): Promise<PaginationResult<UserEntity>> {
     const query: FilterQuery<UserDocument> = { role };
 
@@ -70,11 +121,19 @@ export class UserRepository
       mentorStatus,
       mentorAppliedAt,
       skills,
+      languages,
       experience,
       role,
       isBlocked,
       googleId,
       githubId,
+      experienceLevel,
+      primaryExpertise,
+      banExpirationDate,
+      banReason,
+      bannedAt,
+      bannedBy,
+      warnCount,
     } = data;
     const doc: Partial<UserDocument> = {};
     if (email !== undefined) doc.email = email;
@@ -90,11 +149,20 @@ export class UserRepository
     if (mentorStatus !== undefined) doc.mentorStatus = mentorStatus;
     if (mentorAppliedAt !== undefined) doc.mentorAppliedAt = mentorAppliedAt;
     if (skills !== undefined) doc.skills = skills;
+    if (languages !== undefined) doc.languages = languages;
     if (experience !== undefined) doc.experience = experience;
     if (role !== undefined) doc.role = role;
     if (isBlocked !== undefined) doc.isBlocked = isBlocked;
     if (googleId !== undefined) doc.googleId = googleId;
     if (githubId !== undefined) doc.githubId = githubId;
+    if (experienceLevel !== undefined) doc.experienceLevel = experienceLevel;
+    if (primaryExpertise !== undefined) doc.primaryExpertise = primaryExpertise;
+    if (banExpirationDate !== undefined) doc.banExpirationDate = banExpirationDate;
+    if (banReason !== undefined) doc.banReason = banReason;
+    if (bannedAt !== undefined) doc.bannedAt = bannedAt;
+    if (bannedBy !== undefined) doc.bannedBy = bannedBy ? new Types.ObjectId(bannedBy) : null;
+    if (warnCount !== undefined) doc.warnCount = warnCount;
+
     return doc;
   }
 
@@ -111,16 +179,26 @@ export class UserRepository
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
       skills: doc.skills,
+      languages: doc.languages ?? [],
       experience: doc.experience,
       ...(doc.about !== undefined ? { about: doc.about } : {}),
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
       ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
-      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.linkedInUrl !== undefined
+        ? { linkedInUrl: doc.linkedInUrl }
+        : {}),
       ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
       ...(doc.mentorAppliedAt !== undefined
         ? { mentorAppliedAt: doc.mentorAppliedAt }
         : {}),
       mentorStatus: doc.mentorStatus,
+      ...(doc.primaryExpertise !== undefined ? { primaryExpertise: doc.primaryExpertise } : {}),
+      ...(doc.experienceLevel !== undefined ? { experienceLevel: doc.experienceLevel } : {}),
+      ...(doc.banExpirationDate !== undefined ? { banExpirationDate: doc.banExpirationDate } : {}),
+      ...(doc.banReason !== undefined ? { banReason: doc.banReason } : {}),
+      ...(doc.bannedAt !== undefined ? { bannedAt: doc.bannedAt } : {}),
+      ...(doc.bannedBy !== undefined ? { bannedBy: doc.bannedBy ? doc.bannedBy.toString() : null } : {}),
+      warnCount: doc.warnCount ?? 0,
     };
   }
 
@@ -137,16 +215,26 @@ export class UserRepository
       googleId: doc.googleId ?? '',
       githubId: doc.githubId ?? '',
       skills: doc.skills,
+      languages: doc.languages ?? [],
       experience: doc.experience,
       mentorStatus: doc.mentorStatus,
-      ...(doc.about !==undefined ? {about: doc.about } : {}), 
+      experienceLevel: doc.experienceLevel,
+      primaryExpertise: doc.primaryExpertise,
+      ...(doc.about !== undefined ? { about: doc.about } : {}),
       ...(doc.avatarUrl !== undefined ? { avatarUrl: doc.avatarUrl } : {}),
       ...(doc.githubUrl !== undefined ? { githubUrl: doc.githubUrl } : {}),
-      ...(doc.linkedInUrl !== undefined ? { linkedInUrl: doc.linkedInUrl } : {}),
+      ...(doc.linkedInUrl !== undefined
+        ? { linkedInUrl: doc.linkedInUrl }
+        : {}),
       ...(doc.websiteUrl !== undefined ? { websiteUrl: doc.websiteUrl } : {}),
       ...(doc.mentorAppliedAt !== undefined
         ? { mentorAppliedAt: doc.mentorAppliedAt }
         : {}),
+      ...(doc.banExpirationDate !== undefined ? { banExpirationDate: doc.banExpirationDate } : {}),
+      ...(doc.banReason !== undefined ? { banReason: doc.banReason } : {}),
+      ...(doc.bannedAt !== undefined ? { bannedAt: doc.bannedAt } : {}),
+      ...(doc.bannedBy !== undefined ? { bannedBy: doc.bannedBy ? doc.bannedBy.toString() : null } : {}),
+      warnCount: doc.warnCount ?? 0,
     };
   }
 }

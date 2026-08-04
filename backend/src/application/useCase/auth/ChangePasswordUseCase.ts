@@ -25,7 +25,7 @@ export class ChangePasswordUseCase implements IChangePasswordUseCase {
 
         const isValidPass = await this._hashService.compare(previousPass,user.password);
 
-        if(!isValidPass) throw new UnauthorizedError(ERROR_MESSAGES.AUTH.FORBIDDEN);
+        if(!isValidPass) throw new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_PASS);
 
         const hashedPass = await this._hashService.hash(newPass);
 

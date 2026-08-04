@@ -1,16 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
 import type { IJWTService } from '../../application/ports/security/IJWTService';
+import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
+import { ForbiddenError } from '../../core/errors/ForbiddenError';
 import { JwtPayload } from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
-import { NotFoundError } from '../../core/errors/NotFoundError';
 import { UserRole } from '../../domain/types/UserRole';
 
 @injectable()
 export class AuthMiddleware {
   constructor(
-    @inject('IJWTService') private _jwtService: IJWTService
+    @inject('IJWTService') private _jwtService: IJWTService,
+    @inject('IUserRepository') private _userRepository: IUserRepository
   ) {}
 
   check = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,13 +35,38 @@ export class AuthMiddleware {
         return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
       }
 
-      if (!decoded?.userRole || !decoded?.sub) {
-        return next(new NotFoundError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
+      if (!decoded?.sub) {
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.INVALID_TOKEN));
+      }
+
+      const user = await this._userRepository.find(decoded.sub);
+
+      if (!user) {
+        return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED));
+      }
+
+      if (user.isBlocked) {
+        if (user.banExpirationDate && user.banExpirationDate < new Date()) {
+          user.isBlocked = false;
+          user.banExpirationDate = null;
+          user.banReason = null;
+          user.bannedAt = null;
+          user.bannedBy = null;
+          await this._userRepository.update(user.id, user);
+        } else {
+          const reasonMsg = user.banReason ? ` Reason: ${user.banReason}` : '';
+          const expirationMsg = user.banExpirationDate 
+            ? `until ${user.banExpirationDate.toLocaleDateString()}` 
+            : 'permanently';
+          
+          return next(new ForbiddenError(`Your account has been suspended ${expirationMsg}.${reasonMsg}`));
+        }
       }
 
       req.user = {
-        id: decoded.sub,
-        role: decoded.userRole as UserRole,
+        id: user.id,
+        role: user.role as UserRole,
+        mentorStatus: user.mentorStatus,
       };
 
       next();

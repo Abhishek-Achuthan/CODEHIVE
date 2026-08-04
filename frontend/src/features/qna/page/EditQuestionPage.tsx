@@ -67,8 +67,7 @@ const EditQuestionPage = () => {
   return (
     <QnaLayout title="Edit Question">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-white">Edit Question</h2>
+        <div className="flex justify-end items-center mb-8">
           <button
             onClick={() => navigate(`/qna/question/${questionId}`)}
             className="text-blue-400 hover:text-blue-300 text-sm font-medium"

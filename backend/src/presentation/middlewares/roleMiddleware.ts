@@ -3,14 +3,15 @@ import { UnauthorizedError } from '../../core/errors/UnauthorizedError';
 import { ForbiddenError } from '../../core/errors/ForbiddenError';
 import { NextFunction, Request, Response } from 'express';
 import { ERROR_MESSAGES } from '../../shared/constants/errorMessages';
+import { UserRole } from '../../domain/types/UserRole';
 
 
 
 @injectable()
 export class RoleMiddleware {
-    authorize = (roles:string[]) => {
+    authorize = (roles: UserRole[]) => {
         return (req:Request,res:Response,next:NextFunction) => {
-            const user = (req as any).user;
+            const user = req.user;
 
             if(!user) {
                 return next(new UnauthorizedError(ERROR_MESSAGES.AUTH.AUTHENTICATION_REQUIRED));

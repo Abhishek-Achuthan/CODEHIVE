@@ -1,4 +1,4 @@
-import type { AnswerWithAuthorAPI } from "../types/api/qna";
+import type { AnswerWithAuthorAPI, AnswerEntityApi } from "../types/api/qna";
 import type { AnswerView } from "../types/view/AnswerView";
 
 export function mapAnswerToView(
@@ -14,6 +14,23 @@ export function mapAnswerToView(
     author: {
       id: a.author.id,
       firstName: a.author.firstName,
+    },
+  };
+}
+export function mapPostedAnswerToView(
+  a: AnswerEntityApi,
+  author: { id: string; firstName?: string }
+): AnswerView {
+  return {
+    id: a.id,
+    contentHtml: a.answerText,
+    isAccepted: a.isAccepted,
+    voteCount: a.voteCount,
+    createdAt: a.createdAt,
+    updatedAt: a.updatedAt,
+    author: {
+      id: author.id,
+      firstName: author.firstName ?? "",
     },
   };
 }
