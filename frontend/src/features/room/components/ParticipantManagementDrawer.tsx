@@ -3,7 +3,7 @@ import { Loader2, AlertCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { RoomService } from '../../../services/roomService';
 import type { Participant } from '../types';
-import { useOnClickOutside } from '../../../shared/hooks/useOnClickOutside';
+
 
 const PERMISSION_TOGGLES = [
   {

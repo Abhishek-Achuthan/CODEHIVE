@@ -42,6 +42,27 @@ function visibilityLabel(visibility: RoomSettingsResponse["visibility"]): string
   return visibility === "PRIVATE" ? "Private" : "Public";
 }
 
+function getHostName(host?: RoomSettingsResponse["host"] | null): string {
+  if (!host) {
+    return "Unknown user";
+  }
+
+  const fullName = [host.firstName, host.lastName].filter(Boolean).join(" ").trim();
+  return fullName || "Unknown user";
+}
+
+function getHostAvatar(host?: RoomSettingsResponse["host"] | null): string {
+  if (host?.avatarUrl) {
+    return host.avatarUrl;
+  }
+
+  if (host?.id) {
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${host.id}`;
+  }
+
+  return "https://api.dicebear.com/7.x/avataaars/svg?seed=unknown-user";
+}
+
 function getHostProfilePath(
   host: RoomSettingsResponse["host"],
   currentUserId: string | undefined,
@@ -138,7 +159,7 @@ export const RoomDetailsModal = ({
   };
 
   const handleHostClick = () => {
-    if (!settings) return;
+    if (!settings?.host) return;
     const path = getHostProfilePath(settings.host, currentUser?.id);
     if (!path) {
       toast.error("Public profile is not available for this user");
@@ -160,7 +181,21 @@ export const RoomDetailsModal = ({
         description: editDescription,
         visibility: editVisibility,
       });
-      setSettings(data);
+      setSettings((prev) => {
+        if (!prev) {
+          return data;
+        }
+
+        return {
+          ...prev,
+          ...data,
+          host: data.host ?? prev.host,
+          createdAt: data.createdAt ?? prev.createdAt,
+          canManageInviteLink: data.canManageInviteLink ?? prev.canManageInviteLink,
+          joinUrl: data.joinUrl ?? prev.joinUrl,
+          hasActiveInvite: data.hasActiveInvite ?? prev.hasActiveInvite,
+        };
+      });
       setIsEditing(false);
       onDetailsUpdated?.();
       toast.success("Room details updated");
@@ -171,14 +206,10 @@ export const RoomDetailsModal = ({
     }
   };
 
-  const hostName = settings
-    ? `${settings.host.firstName} ${settings.host.lastName}`.trim()
-    : "";
-  const hostAvatar =
-    settings?.host.avatarUrl ??
-    (settings ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${settings.host.id}` : "");
+  const hostName = getHostName(settings?.host);
+  const hostAvatar = getHostAvatar(settings?.host);
 
-  const canEdit = settings?.host.id === currentUser?.id || settings?.canManageInviteLink;
+  const canEdit = settings?.host?.id === currentUser?.id || settings?.canManageInviteLink;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -318,11 +349,17 @@ export const RoomDetailsModal = ({
                 <img
                   src={hostAvatar}
                   alt={hostName}
+                  onError={(event) => {
+                    event.currentTarget.src =
+                      "https://api.dicebear.com/7.x/avataaars/svg?seed=unknown-user";
+                  }}
                   className="h-11 w-11 rounded-full border border-gray-700 object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-gray-100">{hostName}</p>
-                  <p className="text-xs capitalize text-gray-500">{settings.host.role}</p>
+                  <p className="text-xs capitalize text-gray-500">
+                    {settings.host?.role ?? "user"}
+                  </p>
                 </div>
                 <User className="h-4 w-4 shrink-0 text-gray-500" />
               </button>

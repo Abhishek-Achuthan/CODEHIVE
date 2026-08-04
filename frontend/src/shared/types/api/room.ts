@@ -83,6 +83,7 @@ export interface GetPublicRoomsResponse {
   participantCount: number;
   createdAt: string;
   updatedAt: string;
+  status:RoomLifecycleStatus
 }
 
 export type GetPublicRoomsPaginatedResponse =

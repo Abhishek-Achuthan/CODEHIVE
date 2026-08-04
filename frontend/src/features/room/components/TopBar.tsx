@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video, LogOut, Share2, Info } from 'lucide-react';
+import { Video, LogOut, Share2, Info, Mic, MicOff, Camera, CameraOff, MonitorUp, PhoneOff } from 'lucide-react';
 import { useRoomAuthorization } from '../authorization/RoomAuthorizationContext';
 import { RoomInviteShare } from './RoomInviteShare';
 
@@ -11,6 +11,15 @@ interface TopBarProps {
   onOpenSettings?: () => void;
   onEndRoom?: () => void;
   onLeave: () => void;
+  isVideoActive?: boolean;
+  onToggleVideo?: () => void;
+  isAudioMuted?: boolean;
+  isVideoMuted?: boolean;
+  isScreenSharing?: boolean;
+  onToggleAudio?: () => void;
+  onToggleCamera?: () => void;
+  onToggleScreenShare?: () => void;
+  onLeaveVideo?: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
@@ -21,6 +30,15 @@ const TopBar: React.FC<TopBarProps> = ({
   onOpenSettings,
   onEndRoom,
   onLeave,
+  isVideoActive = false,
+  onToggleVideo,
+  isAudioMuted = false,
+  isVideoMuted = false,
+  isScreenSharing = false,
+  onToggleAudio,
+  onToggleCamera,
+  onToggleScreenShare,
+  onLeaveVideo,
 }) => {
   const authorization = useRoomAuthorization();
   return (
@@ -58,11 +76,56 @@ const TopBar: React.FC<TopBarProps> = ({
           </button>
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
           <button
-            disabled={true}
-            className="p-1.5 rounded-md text-gray-700 cursor-not-allowed transition-colors"
-            title="Video calls coming soon"
+            type="button"
+            onClick={onToggleVideo}
+            className={`p-1.5 rounded-md transition-colors ${
+              isVideoActive
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+            }`}
+            title={isVideoActive ? "Return to Video Meeting" : "Start Video Meeting"}
           >
             <Video className="w-4 h-4" />
+          </button>
+          
+          {/* Native Video Controls (always visible, disabled if not active) */}
+          <div className="w-px h-4 bg-gray-700 mx-1"></div>
+          <button
+            type="button"
+            onClick={onToggleAudio}
+            disabled={!isVideoActive}
+            className={`p-1.5 rounded-md transition-colors ${!isVideoActive ? 'text-gray-700 cursor-not-allowed' : isAudioMuted ? 'text-red-400 hover:bg-red-400/10' : 'text-gray-300 hover:bg-gray-700'}`}
+            title={!isVideoActive ? 'Not in meeting' : isAudioMuted ? "Unmute Microphone" : "Mute Microphone"}
+          >
+            {isAudioMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={onToggleCamera}
+            disabled={!isVideoActive}
+            className={`p-1.5 rounded-md transition-colors ${!isVideoActive ? 'text-gray-700 cursor-not-allowed' : isVideoMuted ? 'text-red-400 hover:bg-red-400/10' : 'text-gray-300 hover:bg-gray-700'}`}
+            title={!isVideoActive ? 'Not in meeting' : isVideoMuted ? "Start Camera" : "Stop Camera"}
+          >
+            {isVideoMuted ? <CameraOff className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={onToggleScreenShare}
+            disabled={!isVideoActive}
+            className={`p-1.5 rounded-md transition-colors ${!isVideoActive ? 'text-gray-700 cursor-not-allowed' : isScreenSharing ? 'bg-green-600 text-white shadow-sm' : 'text-gray-300 hover:bg-gray-700'}`}
+            title={!isVideoActive ? 'Not in meeting' : isScreenSharing ? "Stop Screen Share" : "Share Screen"}
+          >
+            <MonitorUp className="w-4 h-4" />
+          </button>
+          <div className="w-px h-4 bg-gray-700 mx-1"></div>
+          <button
+            type="button"
+            onClick={onLeaveVideo}
+            disabled={!isVideoActive}
+            className={`p-1.5 rounded-md transition-colors ${!isVideoActive ? 'text-gray-700 cursor-not-allowed' : 'text-red-400 hover:bg-red-500/20'}`}
+            title={!isVideoActive ? 'Not in meeting' : 'Leave Meeting'}
+          >
+            <PhoneOff className="w-4 h-4" />
           </button>
         </div>
         

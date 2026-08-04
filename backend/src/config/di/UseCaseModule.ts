@@ -194,6 +194,8 @@ import { IReportParticipantUseCase } from '../../application/useCase/interface/r
 import { ReportParticipantUseCase } from '../../application/useCase/room/ReportParticipantUseCase';
 import { IEndRoomUseCase } from '../../application/useCase/interface/room/IEndRoomUseCase';
 import { EndRoomUseCase } from '../../application/useCase/room/EndRoomUseCase';
+import { IGetVideoConfigUseCase } from '../../application/useCase/interface/room/IGetVideoConfigUseCase';
+import { GetVideoConfigUseCase } from '../../application/useCase/room/GetVideoConfigUseCase';
 import { IAuthenticateRealtimeUserUseCase } from '../../application/useCase/interface/realtime/IAuthenticateRealtimeUserUseCase';
 import { AuthenticateRealtimeUserUseCase } from '../../application/useCase/realtime/AuthenticateRealtimeUserUseCase';
 import { IAuthorizeCollaborationAccessUseCase } from '../../application/useCase/interface/realtime/IAuthorizeCollaborationAccessUseCase';
@@ -610,6 +612,10 @@ export class UseCaseModule {
 
     container.register<IEndRoomUseCase>('IEndRoomUseCase', {
       useClass: EndRoomUseCase,
+    });
+
+    container.register<IGetVideoConfigUseCase>('IGetVideoConfigUseCase', {
+      useClass: GetVideoConfigUseCase,
     });
 
     container.register<ICreatePollUseCase>('ICreatePollUseCase', {

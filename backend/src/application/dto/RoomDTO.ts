@@ -136,6 +136,7 @@ export interface RoomListItemDTO {
   hostAvatarUrl?: string;
   maxParticipants: number;
   participantCount: number;
+  status : RoomLifeCycleStatus;
   createdAt: Date;
   updatedAt: Date;
 }

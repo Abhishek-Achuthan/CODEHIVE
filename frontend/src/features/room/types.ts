@@ -23,4 +23,4 @@ export interface RoomMessage {
   isEdited?: boolean;
 }
 
-export type TabType = 'chat' | 'whiteboard' | 'notes' | 'polls';
+export type TabType = 'chat' | 'whiteboard' | 'notes' | 'polls' | 'video';

@@ -3,7 +3,7 @@ import { Loader2, AlertCircle, Pen, FileText, BarChart, Monitor, Flag, UserMinus
 import toast from 'react-hot-toast';
 import { RoomService } from '../../../services/roomService';
 import type { Participant } from '../types';
-import { useOnClickOutside } from '../../../shared/hooks/useOnClickOutside';
+
 import { createPortal } from 'react-dom';
 
 const PERMISSION_TOGGLES = [

@@ -17,6 +17,7 @@ import type { IUpdateRoomDetailsUseCase } from '../../../application/useCase/int
 import type { IUpdateParticipantOverridesUseCase } from '../../../application/useCase/interface/room/IUpdateParticipantOverridesUseCase';
 import type { IEndRoomUseCase } from '../../../application/useCase/interface/room/IEndRoomUseCase';
 import type { IReportParticipantUseCase } from '../../../application/useCase/interface/room/IReportParticipantUseCase';
+import type { IGetVideoConfigUseCase } from '../../../application/useCase/interface/room/IGetVideoConfigUseCase';
 import type { IPresenceService } from '../../../application/ports/presence/IPresenceService';
 import { BadRequestError } from '../../../core/errors/BadRequestError';
 import {
@@ -59,6 +60,8 @@ export class RoomController {
     private readonly _reportParticipantUseCase: IReportParticipantUseCase,
     @inject('IEndRoomUseCase')
     private readonly _endRoomUseCase: IEndRoomUseCase,
+    @inject('IGetVideoConfigUseCase')
+    private readonly _getVideoConfigUseCase: IGetVideoConfigUseCase,
   ) {}
 
   async handleCreateRoom(req: Request, res: Response, next: NextFunction) {
@@ -310,6 +313,18 @@ export class RoomController {
       );
 
       res.status(HttpStatus.Created).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async handleGetVideoConfig(req: Request, res: Response, next: NextFunction) {
+    try {
+      const roomId = this.getRequiredParam(req, 'roomId');
+      const userId = req.user.id;
+
+      const data = await this._getVideoConfigUseCase.execute(roomId, userId);
+      res.status(HttpStatus.OK).json(data);
     } catch (error) {
       next(error);
     }

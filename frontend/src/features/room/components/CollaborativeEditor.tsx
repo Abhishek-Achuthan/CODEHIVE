@@ -128,7 +128,7 @@ const CollaborativeEditor: React.FC<Props> = ({
     const colorIndex = Math.abs(hash) % colors.length;
     const userColor = colors[colorIndex];
 
-    collab.provider.awareness.setLocalStateField('user', {
+    collab.provider.awareness!.setLocalStateField('user', {
       name: user.name,
       color: userColor,
     });
@@ -143,7 +143,7 @@ const CollaborativeEditor: React.FC<Props> = ({
       }
 
       let css = '';
-      const states = collab.provider.awareness.getStates();
+      const states = collab.provider.awareness!.getStates();
       states.forEach((state, clientId) => {
         if (state.user) {
           const color = state.user.color || '#ffb61e';
@@ -232,7 +232,7 @@ const CollaborativeEditor: React.FC<Props> = ({
       });
     };
 
-    collab.provider.awareness.on('change', handleAwarenessChange);
+    collab.provider.awareness!.on('change', handleAwarenessChange);
     updateAwarenessStyles(); // Initial injection
 
     // Observe language changes from other collaborators
@@ -254,7 +254,7 @@ const CollaborativeEditor: React.FC<Props> = ({
       idleTimeoutsRef.current.clear();
       idleClientsRef.current.clear();
 
-      collab.provider.awareness.off('change', handleAwarenessChange);
+      collab.provider.awareness!.off('change', handleAwarenessChange);
       const styleElement = document.getElementById('y-monaco-cursors-style');
       if (styleElement) {
         styleElement.remove();
@@ -262,7 +262,7 @@ const CollaborativeEditor: React.FC<Props> = ({
       yMeta.unobserve(handleLanguageChange);
       bindingRef.current?.destroy();
       bindingRef.current = null;
-      collab.provider.awareness.setLocalStateField('user', null);
+      collab.provider.awareness!.setLocalStateField('user', null);
       collab.provider.destroy();
       collab.doc.destroy();
       if (collabRef.current === collab) {
@@ -324,11 +324,10 @@ const CollaborativeEditor: React.FC<Props> = ({
       defaultValue=""
       options={{
         formatOnPaste: true,
-        wordHighlight: 'true' as any,
         renderLineHighlight: 'all',
         parameterHints: { enabled: true },
         codeLens: false, // Ensure additional complex features are disabled per request
-        lightbulb: { enabled: false }, // Disable quick fixes
+        lightbulb: { enabled: false as any }, // Disable quick fixes
       }}
       onMount={(editor) => {
         localEditorRef.current = editor;

@@ -6,11 +6,7 @@ export default function MentorReviewsPage() {
     const { reviews, loading, error } = useMentorReviews();
 
     return (
-        <div className="flex flex-col max-w-5xl mx-auto w-full">
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">Student Reviews</h1>
-                <p className="text-zinc-400">See what students are saying about your mentorship sessions.</p>
-            </div>
+        <div className="flex flex-col">
 
             {loading ? (
                 <div className="flex min-h-[400px] justify-center items-center bg-white/[0.01] rounded-3xl border border-white/5">

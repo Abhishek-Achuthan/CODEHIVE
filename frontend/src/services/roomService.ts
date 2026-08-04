@@ -62,6 +62,7 @@ export class RoomService {
     try {
       const response = await RoomAPI.updateRoomDetails(roomId, data);
       return response.data as RoomSettingsResponse;
+      console.log(response)
     } catch (error) {
       throw this.handleError(error);
     }

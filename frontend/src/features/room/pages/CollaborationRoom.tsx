@@ -59,6 +59,35 @@ const CollaborationRoom: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [endRoomOpen, setEndRoomOpen] = useState(false);
   const [endRoomLoading, setEndRoomLoading] = useState(false);
+  
+  const [isVideoActive, setIsVideoActive] = useState(false);
+  const [isVideoExpanded, setIsVideoExpanded] = useState(false);
+  const [videoFocusTrigger, setVideoFocusTrigger] = useState(0);
+
+  // Jitsi native controls state
+  const jitsiApiRef = React.useRef<any>(null);
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+
+  const handleToggleVideo = () => {
+    if (!isVideoActive) {
+      setIsVideoActive(true);
+    }
+    setVideoFocusTrigger(prev => prev + 1);
+  };
+
+  const handleToggleAudio = () => jitsiApiRef.current?.executeCommand('toggleAudio');
+  const handleToggleCamera = () => jitsiApiRef.current?.executeCommand('toggleVideo');
+  const handleToggleScreenShare = () => jitsiApiRef.current?.executeCommand('toggleShareScreen');
+  const handleLeaveVideo = () => jitsiApiRef.current?.executeCommand('hangup');
+
+  const handleJitsiApiReady = (api: any) => {
+    jitsiApiRef.current = api;
+    api.addListener('audioMuteStatusChanged', (e: any) => setIsAudioMuted(e.muted));
+    api.addListener('videoMuteStatusChanged', (e: any) => setIsVideoMuted(e.muted));
+    api.addListener('screenSharingStatusChanged', (e: any) => setIsScreenSharing(e.on));
+  };
 
   const roomName = snapshot?.title || 'Untitled Room';
 
@@ -232,6 +261,15 @@ const CollaborationRoom: React.FC = () => {
           onOpenSettings={() => setSettingsOpen(true)}
           onEndRoom={() => setEndRoomOpen(true)}
           onLeave={handleLeaveRoom}
+          isVideoActive={isVideoActive}
+          onToggleVideo={handleToggleVideo}
+          isAudioMuted={isAudioMuted}
+          isVideoMuted={isVideoMuted}
+          isScreenSharing={isScreenSharing}
+          onToggleAudio={handleToggleAudio}
+          onToggleCamera={handleToggleCamera}
+          onToggleScreenShare={handleToggleScreenShare}
+          onLeaveVideo={handleLeaveVideo}
         />
 
         {/* Modals */}
@@ -258,13 +296,17 @@ const CollaborationRoom: React.FC = () => {
         {/* Layout */}
         <div className="flex flex-1 overflow-hidden">
           {/* Participants */}
-          <ParticipantsSidebar
-            participants={formattedParticipants}
-            roomId={roomId!}
-          />
+          <div className={isVideoExpanded ? 'hidden' : ''}>
+            <ParticipantsSidebar
+              participants={formattedParticipants}
+              roomId={roomId!}
+            />
+          </div>
 
           {/* Editor */}
-          <EditorArea roomId={roomId || ''} />
+          <div className={isVideoExpanded ? 'hidden' : 'flex flex-col flex-1 min-w-0'}>
+            <EditorArea roomId={roomId || ''} />
+          </div>
 
           {/* Right Sidebar */}
           <RightSidebar
@@ -281,6 +323,12 @@ const CollaborationRoom: React.FC = () => {
             onVotePoll={votePoll}
             onClosePoll={closePoll}
             roomId={roomId || ''}
+            isVideoActive={isVideoActive}
+            setIsVideoActive={setIsVideoActive}
+            isVideoExpanded={isVideoExpanded}
+            setIsVideoExpanded={setIsVideoExpanded}
+            videoFocusTrigger={videoFocusTrigger}
+            onJitsiApiReady={handleJitsiApiReady}
           />
         </div>
       </div>

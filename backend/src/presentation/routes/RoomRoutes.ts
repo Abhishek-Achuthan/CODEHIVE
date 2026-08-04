@@ -41,6 +41,12 @@ export class RoomRoutes {
       this._roomController.handleGetRoomSettings.bind(this._roomController),
     );
 
+    this._router.get(
+      '/:roomId/video-config',
+      this._authMiddleware.check,
+      this._roomController.handleGetVideoConfig.bind(this._roomController),
+    );
+
     this._router.patch(
       '/:roomId/details',
       this._authMiddleware.check,

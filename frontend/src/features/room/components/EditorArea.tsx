@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import {
   FileCode,
   Play,
-  Terminal,
-  Info,
-  Search,
   Layout,
   Lock,
   Settings,
@@ -46,7 +43,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({ roomId }) => {
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsContainerRef = React.useRef<HTMLDivElement>(null);
-  useOnClickOutside(settingsContainerRef, () => setIsSettingsOpen(false));
+  useOnClickOutside(settingsContainerRef as React.RefObject<HTMLElement>, () => setIsSettingsOpen(false));
   
   const user = useAppSelector((state) => state.auth.user);
   const authorization = useRoomAuthorization();

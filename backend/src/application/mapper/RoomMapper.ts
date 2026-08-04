@@ -25,6 +25,7 @@ export class RoomMapper {
       ...(room.hostAvatarUrl !== undefined ? { hostAvatarUrl: room.hostAvatarUrl } : {}),
       maxParticipants: room.maxParticipants,
       participantCount: room.participantCount,
+      status:room.lifecycleStatus,
       createdAt: room.createdAt,
       updatedAt: room.updatedAt,
     };

@@ -433,10 +433,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                   <div
                     className={`px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words break-all w-fit max-w-full shadow-sm transition-all flex flex-col ${
                       isMe
-                        ? 'bg-blue-600 text-white rounded-tr-none border border-blue-500 shadow-blue-500/10'
+                        ? 'bg-blue-600 text-white rounded-br-none border border-blue-500 shadow-blue-500/10'
                         : isDark
-                        ? 'bg-[#161b22] text-gray-200 rounded-tl-none border border-gray-800'
-                        : 'bg-gray-100 text-gray-800 rounded-tl-none border border-gray-200'
+                        ? 'bg-[#161b22] text-gray-200 rounded-bl-none border border-gray-800'
+                        : 'bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200'
                     }`}
                   >
                     <p className={`whitespace-pre-wrap break-words break-all leading-6 ${m.isDeleted ? 'italic text-gray-500' : ''}`}>
@@ -499,7 +499,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       {/* Input */}
       <div
-        className={`p-4 border-t relative flex flex-col gap-2 ${
+        className={`px-3 py-3 border-t relative flex flex-col gap-2 ${
           isDark
             ? 'border-gray-800'
             : 'border-gray-200'
@@ -538,7 +538,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
         <form onSubmit={handleSubmit}>
           <div
-            className={`flex items-end gap-2 border p-2 transition-all ${
+            className={`flex items-end gap-2 border px-2 py-1.5 transition-all ${
               editingMessageId ||
               replyingToMessageId
                 ? 'rounded-b-xl rounded-t-none'

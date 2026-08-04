@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../../shared/hooks/storeHooks';
-import { useMyRooms } from '../../room/hooks/useMyRooms';
-import { useFetchSessions } from '../../session/hooks/useFetchSessions';
-import { useQuestionsList } from '../../qna/hooks/useListQuestions';
-import { useMentorInsights } from '../../session/hooks/useMentorInsights';
-import { UserRole, MentorStatus } from '../../../shared/constants/auth';
+import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
+import { useMyRooms } from "../../room/hooks/useMyRooms";
+import { useFetchSessions } from "../../session/hooks/useFetchSessions";
+import { useQuestionsList } from "../../qna/hooks/useListQuestions";
+import { useMentorInsights } from "../../session/hooks/useMentorInsights";
+import { UserRole, MentorStatus } from "../../../shared/constants/auth";
 import {
   ArrowRight,
   Calendar,
@@ -17,23 +17,36 @@ import {
   Play,
   Star,
   TrendingUp,
-  ChevronRight
-} from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+  ChevronRight,
+} from "lucide-react";
+import { formatDistanceToNow, format } from "date-fns";
 
 export default function DashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
-  const isMentor = user?.role === UserRole.MENTOR && user?.mentorStatus === MentorStatus.APPROVED;
-  
+  const isMentor =
+    user?.role === UserRole.MENTOR &&
+    user?.mentorStatus === MentorStatus.APPROVED;
+
   const { rooms, isLoading: roomsLoading } = useMyRooms(true);
+
   const { sessions } = useFetchSessions({ limit: 3 });
   const { questions, loading: questionsLoading } = useQuestionsList();
-  
+
   const { insights, loading: insightsLoading } = useMentorInsights(isMentor);
 
-  const activeRooms = rooms?.items?.slice(0, 4) || [];
+  // const activeRooms = rooms?.items?.slice(0, 4) || [];
+  const activeRooms = rooms?.items.filter((rooms) => rooms.status === 'ACTIVE').slice(0,4) || [] 
+
   const upcomingSessions = sessions?.slice(0, 3) || [];
+
   const recentQuestions = questions?.slice(0, 4) || [];
+
+  const upcomingValidSessions = upcomingSessions.filter((session) => {
+    const startTime = new Date(session.startTime).getTime();
+
+    // Only show sessions that haven't started yet
+    return startTime > Date.now();
+  });
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 lg:p-8 space-y-8 bg-[#0B0B0D] min-h-full">
@@ -41,14 +54,14 @@ export default function DashboardPage() {
       <section className="flex flex-col gap-1">
         <p className="text-zinc-400 text-sm">What do you want to do today?</p>
         <h1 className="text-2xl font-semibold text-white tracking-tight">
-          Welcome back, {user?.firstName || 'Developer'}
+          Welcome back, {user?.firstName || "Developer"}
         </h1>
       </section>
 
       {/* Primary Actions */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link 
-          to="/rooms" 
+        <Link
+          to="/rooms"
           className="group flex items-center gap-4 p-4 rounded-[16px] bg-[#111214] border border-white/5 hover:border-indigo-500/30 hover:bg-[#17181C] transition-all duration-300 shadow-sm"
         >
           <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform duration-300">
@@ -60,8 +73,8 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link 
-          to="/sessions/discover" 
+        <Link
+          to="/sessions/discover"
           className="group flex items-center gap-4 p-4 rounded-[16px] bg-[#111214] border border-white/5 hover:border-purple-500/30 hover:bg-[#17181C] transition-all duration-300 shadow-sm"
         >
           <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform duration-300">
@@ -73,8 +86,8 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        <Link 
-          to="/qna" 
+        <Link
+          to="/qna"
           className="group flex items-center gap-4 p-4 rounded-[16px] bg-[#111214] border border-white/5 hover:border-emerald-500/30 hover:bg-[#17181C] transition-all duration-300 shadow-sm"
         >
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform duration-300">
@@ -89,48 +102,55 @@ export default function DashboardPage() {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        
         {/* Left Column (roughly 66%) */}
         <div className="xl:col-span-2 space-y-8">
-          
           {/* Continue Working */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-medium text-white">
                 Continue Working
               </h2>
-              <Link to="/rooms" className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
+              <Link
+                to="/rooms"
+                className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+              >
                 View all <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-            
+
             {roomsLoading ? (
               <div className="h-24 rounded-[16px] bg-white/5 animate-pulse border border-white/5" />
             ) : activeRooms.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {activeRooms.map((room) => (
-                  <div 
-                    key={room.id} 
+                  <div
+                    key={room.id}
                     className="flex flex-col p-4 rounded-[16px] bg-[#111214] border border-white/5 hover:border-white/10 transition-colors"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="text-sm font-medium text-white truncate pr-4">{room.title}</h3>
-                        <p className="text-xs text-zinc-500 mt-1 line-clamp-1 pr-4">{room.description || 'No description'}</p>
+                        <h3 className="text-sm font-medium text-white truncate pr-4">
+                          {room.title}
+                        </h3>
+                        <p className="text-xs text-zinc-500 mt-1 line-clamp-1 pr-4">
+                          {room.description || "No description"}
+                        </p>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-medium uppercase tracking-wider shrink-0">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        Active
+                       {room.status}
                       </div>
                     </div>
-                    
+
                     <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
                       <div className="flex items-center gap-1.5 text-xs text-zinc-500">
                         <Clock className="w-3 h-3" />
-                        <span>{formatDistanceToNow(new Date(room.createdAt))}</span>
+                        <span>
+                          {formatDistanceToNow(new Date(room.createdAt))}
+                        </span>
                       </div>
-                      <Link 
-                        to={`/rooms/${room.id}`}
+                      <Link
+                        to={`/room/${room.id}`}
                         className="flex items-center gap-1.5 text-xs font-medium text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
                       >
                         Join <Play className="w-3 h-3" />
@@ -142,9 +162,16 @@ export default function DashboardPage() {
             ) : (
               <div className="p-6 rounded-[16px] bg-[#111214] border border-white/5 text-center flex flex-col items-center justify-center min-h-[140px]">
                 <Layout className="w-6 h-6 text-zinc-600 mb-2" />
-                <h3 className="text-sm text-zinc-300 font-medium mb-1">No active workspace</h3>
-                <p className="text-xs text-zinc-500 mb-3">You haven't joined any active rooms recently.</p>
-                <Link to="/rooms" className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition-colors">
+                <h3 className="text-sm text-zinc-300 font-medium mb-1">
+                  No active workspace
+                </h3>
+                <p className="text-xs text-zinc-500 mb-3">
+                  You haven't joined any active rooms recently.
+                </p>
+                <Link
+                  to="/rooms"
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition-colors"
+                >
                   Create Room
                 </Link>
               </div>
@@ -159,14 +186,16 @@ export default function DashboardPage() {
                   Mentor Insights
                 </h2>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Student Feedback Card */}
                 <div className="p-4 rounded-[16px] bg-[#111214] border border-white/5 flex flex-col h-full hover:border-white/10 transition-colors">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-white">Student Feedback</h3>
+                    <h3 className="text-sm font-medium text-white">
+                      Student Feedback
+                    </h3>
                   </div>
-                  
+
                   {insightsLoading ? (
                     <div className="h-full flex flex-col justify-center gap-4 animate-pulse">
                       <div className="h-10 bg-white/5 rounded-md w-1/2" />
@@ -177,27 +206,53 @@ export default function DashboardPage() {
                       <div className="flex items-end gap-3 mb-6">
                         <div className="flex items-center gap-1.5">
                           <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                          <span className="text-2xl font-semibold text-white leading-none">{insights?.averageRating.toFixed(1) || '0.0'}</span>
+                          <span className="text-2xl font-semibold text-white leading-none">
+                            {insights?.averageRating.toFixed(1) || "0.0"}
+                          </span>
                         </div>
-                        <span className="text-xs text-zinc-500 mb-0.5">{insights?.totalReviews || 0} Reviews</span>
+                        <span className="text-xs text-zinc-500 mb-0.5">
+                          {insights?.totalReviews || 0} Reviews
+                        </span>
                       </div>
 
                       <div className="space-y-2 mb-6 flex-1">
                         {[5, 4, 3, 2, 1].map((stars) => {
-                          const count = insights?.ratingDistribution[stars as 1|2|3|4|5] || 0;
+                          const count =
+                            insights?.ratingDistribution[
+                              stars as 1 | 2 | 3 | 4 | 5
+                            ] || 0;
                           const total = insights?.totalReviews || 1;
-                          const pct = insights?.totalReviews ? Math.round((count / total) * 100) : 0;
+                          const pct = insights?.totalReviews
+                            ? Math.round((count / total) * 100)
+                            : 0;
                           return (
-                            <div key={stars} className="flex items-center gap-2 text-xs">
+                            <div
+                              key={stars}
+                              className="flex items-center gap-2 text-xs"
+                            >
                               <span className="text-zinc-400 w-[50px] shrink-0 tracking-[2px] text-[10px] flex">
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                  <span key={i} className={i < stars ? "text-amber-400/90" : "text-zinc-700"}>★</span>
+                                  <span
+                                    key={i}
+                                    className={
+                                      i < stars
+                                        ? "text-amber-400/90"
+                                        : "text-zinc-700"
+                                    }
+                                  >
+                                    ★
+                                  </span>
                                 ))}
                               </span>
                               <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
-                                <div className="h-full bg-amber-400/80 rounded-full" style={{ width: `${pct}%` }} />
+                                <div
+                                  className="h-full bg-amber-400/80 rounded-full"
+                                  style={{ width: `${pct}%` }}
+                                />
                               </div>
-                              <span className="text-zinc-500 w-8 text-right text-[10px]">{pct}%</span>
+                              <span className="text-zinc-500 w-8 text-right text-[10px]">
+                                {pct}%
+                              </span>
                             </div>
                           );
                         })}
@@ -205,7 +260,10 @@ export default function DashboardPage() {
                     </>
                   )}
 
-                  <Link to="/sessions/reviews" className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-auto">
+                  <Link
+                    to="/sessions/reviews"
+                    className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-auto"
+                  >
                     View Reviews <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -213,9 +271,11 @@ export default function DashboardPage() {
                 {/* Session Performance Card */}
                 <div className="p-4 rounded-[16px] bg-[#111214] border border-white/5 flex flex-col h-full hover:border-white/10 transition-colors">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-white">Session Performance</h3>
+                    <h3 className="text-sm font-medium text-white">
+                      Session Performance
+                    </h3>
                   </div>
-                  
+
                   {insightsLoading ? (
                     <div className="h-full flex flex-col justify-center gap-4 animate-pulse">
                       <div className="h-8 bg-white/5 rounded-md w-3/4 mb-4" />
@@ -225,22 +285,39 @@ export default function DashboardPage() {
                     <>
                       <div className="mb-6">
                         <div className="flex justify-between items-end mb-2">
-                          <span className="text-xs text-zinc-400">Completion Rate</span>
-                          <span className="text-xl font-semibold text-white leading-none">{insights?.completionRate || 0}%</span>
+                          <span className="text-xs text-zinc-400">
+                            Completion Rate
+                          </span>
+                          <span className="text-xl font-semibold text-white leading-none">
+                            {insights?.completionRate || 0}%
+                          </span>
                         </div>
                         <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${insights?.completionRate || 0}%` }} />
+                          <div
+                            className="h-full bg-emerald-500 rounded-full"
+                            style={{
+                              width: `${insights?.completionRate || 0}%`,
+                            }}
+                          />
                         </div>
                       </div>
 
                       <div className="flex flex-col gap-2 mt-auto">
                         <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                          <span className="text-xs text-zinc-400">Completed Sessions</span>
-                          <span className="text-sm font-medium text-white">{insights?.completedSessions || 0}</span>
+                          <span className="text-xs text-zinc-400">
+                            Completed Sessions
+                          </span>
+                          <span className="text-sm font-medium text-white">
+                            {insights?.completedSessions || 0}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                          <span className="text-xs text-zinc-400">Cancelled / No-show</span>
-                          <span className="text-sm font-medium text-zinc-300">{insights?.cancelledSessions || 0}</span>
+                          <span className="text-xs text-zinc-400">
+                            Cancelled / No-show
+                          </span>
+                          <span className="text-sm font-medium text-zinc-300">
+                            {insights?.cancelledSessions || 0}
+                          </span>
                         </div>
                       </div>
                     </>
@@ -255,26 +332,33 @@ export default function DashboardPage() {
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                   Community
                 </h2>
-                <Link to="/qna" className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
+                <Link
+                  to="/qna"
+                  className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+                >
                   Browse all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
-              
+
               {questionsLoading ? (
                 <div className="h-32 rounded-[16px] bg-white/5 animate-pulse border border-white/5" />
               ) : recentQuestions.length > 0 ? (
                 <div className="rounded-[16px] bg-[#111214] border border-white/5 divide-y divide-white/5">
                   {recentQuestions.map((q) => (
-                    <Link 
-                      to={`/qna/${q.id}`} 
+                    <Link
+                      to={`/qna/${q.id}`}
                       key={q.id}
                       className="flex items-start justify-between p-4 hover:bg-[#17181C] transition-colors"
                     >
                       <div>
-                        <h4 className="text-sm font-medium text-zinc-200 mb-1.5 line-clamp-1">{q.title}</h4>
+                        <h4 className="text-sm font-medium text-zinc-200 mb-1.5 line-clamp-1">
+                          {q.title}
+                        </h4>
                         <div className="flex items-center gap-2 text-xs text-zinc-500">
                           {q.tags?.[0] && (
-                            <span className="px-2 py-0.5 rounded-md bg-white/5">{q.tags[0]}</span>
+                            <span className="px-2 py-0.5 rounded-md bg-white/5">
+                              {q.tags[0]}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -288,18 +372,20 @@ export default function DashboardPage() {
               ) : (
                 <div className="p-6 rounded-[16px] bg-[#111214] border border-white/5 text-center flex flex-col items-center justify-center min-h-[140px]">
                   <MessageSquare className="w-6 h-6 text-zinc-600 mb-2" />
-                  <h3 className="text-sm text-zinc-300 font-medium mb-1">No recent activity</h3>
-                  <p className="text-xs text-zinc-500">Be the first to ask a question.</p>
+                  <h3 className="text-sm text-zinc-300 font-medium mb-1">
+                    No recent activity
+                  </h3>
+                  <p className="text-xs text-zinc-500">
+                    Be the first to ask a question.
+                  </p>
                 </div>
               )}
             </section>
           )}
-
         </div>
 
         {/* Right Column (roughly 33%) */}
         <div className="xl:col-span-1 space-y-8">
-          
           {/* Upcoming Sessions */}
           <section>
             <div className="flex items-center justify-between mb-4">
@@ -307,17 +393,20 @@ export default function DashboardPage() {
                 <Calendar className="w-4 h-4 text-purple-400" />
                 Upcoming Sessions
               </h2>
-              <Link to="/sessions/my-sessions" className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
+              <Link
+                to="/sessions/my-sessions"
+                className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+              >
                 All <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-            
-            {upcomingSessions.length > 0 ? (
+
+            {upcomingValidSessions.length > 0 ? (
               <div className="space-y-3">
-                {upcomingSessions.map((session) => {
+                {upcomingValidSessions.map((session) => {
                   const startTime = new Date(session.startTime);
                   return (
-                    <div 
+                    <div
                       key={session.id}
                       className="p-4 rounded-[16px] bg-[#111214] border border-white/5"
                     >
@@ -327,16 +416,26 @@ export default function DashboardPage() {
                             <Users className="w-4 h-4" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-medium text-white line-clamp-1">{session.mentor?.firstName || 'Mentor'}</h4>
-                            <p className="text-xs text-zinc-500">1-on-1 Session</p>
+                            <h4 className="text-sm font-medium text-white line-clamp-1">
+                              {session.mentor?.firstName || "Mentor"}
+                            </h4>
+                            <p className="text-xs text-zinc-500">
+                              1-on-1 Session
+                            </p>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between pt-3 border-t border-white/5">
                         <div className="flex flex-col">
-                          <span className="text-xs text-white font-medium">{format(startTime, 'h:mm a')}</span>
-                          <span className="text-[10px] text-zinc-500 uppercase">{formatDistanceToNow(startTime, { addSuffix: true })}</span>
+                          <span className="text-xs text-white font-medium">
+                            {format(startTime, "h:mm a")}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 uppercase">
+                            {formatDistanceToNow(startTime, {
+                              addSuffix: true,
+                            })}
+                          </span>
                         </div>
                         <button className="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-medium rounded-lg transition-colors">
                           Join Call
@@ -349,12 +448,13 @@ export default function DashboardPage() {
             ) : (
               <div className="p-6 rounded-[16px] bg-[#111214] border border-white/5 flex flex-col items-center justify-center min-h-[140px] text-center">
                 <Calendar className="w-6 h-6 text-zinc-600 mb-2" />
-                <h3 className="text-sm font-medium text-zinc-300 mb-1">No sessions</h3>
+                <h3 className="text-sm font-medium text-zinc-300 mb-1">
+                  No sessions
+                </h3>
                 <p className="text-xs text-zinc-500">Your schedule is clear.</p>
               </div>
             )}
           </section>
-
         </div>
       </div>
     </div>

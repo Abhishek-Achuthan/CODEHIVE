@@ -43,4 +43,7 @@ export const env = {
   judge0MemoryLimit: Number(process.env.JUDGE0_MEMORY_LIMIT || 128000),
   judge0WallTimeLimit: Number(process.env.JUDGE0_WALL_TIME_LIMIT || 5.0),
   maxSourceCodeSize: Number(process.env.MAX_SOURCE_CODE_SIZE || 50000),
+  jitsiAppId: requireEnv('JITSI_APP_ID'),
+  jitsiApiKey: requireEnv('JITSI_API_KEY'),
+  jitsiPrivateKey: requireEnv('JITSI_PRIVATE_KEY'),
 };

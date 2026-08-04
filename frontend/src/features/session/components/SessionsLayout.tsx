@@ -14,6 +14,9 @@ const SessionsLayout: React.FC = () => {
     } else if (location.pathname.includes('/sessions/hosting')) {
         title = "Hosted Sessions";
         description = "Sessions you're conducting as a mentor";
+    } else if (location.pathname.includes('/sessions/reviews')) {
+        title = "Student Reviews";
+        description = "See what students are saying about your mentorship sessions";
     } else if (location.pathname.includes('/sessions/availability')) {
         title = "Availability";
         description = "Set up your schedule so students can book mentorship sessions with you";
