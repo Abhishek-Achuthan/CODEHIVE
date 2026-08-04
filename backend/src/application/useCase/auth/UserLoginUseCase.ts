@@ -25,14 +25,16 @@ export class UserLoginUseCase implements IUserLoginUseCase {
 
     if (user.isBlocked) throw new BadRequestError(ERROR_MESSAGES.AUTH.ACCOUNT_BLOCKED);
 
-    if (user.password) {
-      const validUser = await this._hashService.compare(
-        data.password,
-        user.password
-      );
-
-      if (!validUser) throw new BadRequestError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
+    if (!user.password) {
+      throw new BadRequestError('This account is linked to an OAuth provider (e.g., Google). Please log in using that provider.');
     }
+
+    const validUser = await this._hashService.compare(
+      data.password,
+      user.password
+    );
+
+    if (!validUser) throw new BadRequestError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
 
     const accessToken = this._jwtService.genarateAccessToken({        
       userRole: user.role,
