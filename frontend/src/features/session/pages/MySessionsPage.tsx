@@ -37,7 +37,7 @@ export default function MySessionsPage() {
     useState<BookedSessionResponse | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isRefundEligible, setIsRefundEligible] = useState(false);
-  
+
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
@@ -162,7 +162,7 @@ export default function MySessionsPage() {
 
   const handleConfirmReview = async (rating: number, reviewText: string) => {
     if (!selectedSession) return;
-    
+
     setReviewSubmitting(true);
     try {
       await addReview(selectedSession.id, rating, reviewText);
@@ -177,9 +177,9 @@ export default function MySessionsPage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col max-w-7xl ">
       <div className="relative z-40 mb-6 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-        <div className="flex-shrink-0 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0">
+        <div className="flex-shrink-0 overflow-x-auto pb-1 xl:pb-0">
           <StatusTabs activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
 
@@ -421,7 +421,7 @@ export default function MySessionsPage() {
         onClose={closeCancelModal}
       />
 
-      <ReviewModal 
+      <ReviewModal
         open={isReviewModalOpen}
         onClose={closeReviewModal}
         onSubmit={handleConfirmReview}

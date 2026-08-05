@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { MentorCard } from '../components/MentorCard';
 import { Search, Loader2, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,6 +6,86 @@ import { FilterChip, FilterPopover } from "../../../shared/ui/filters";
 import { useFetchMentors } from '../hooks/useFetchMentors';
 import { Input, Button } from "../../../shared/ui";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
+const PriceRangeSlider = ({ 
+    initialMin, 
+    initialMax, 
+    onApply 
+}: { 
+    initialMin: number, 
+    initialMax: number, 
+    onApply: (min: number, max: number) => void 
+}) => {
+    const [minVal, setMinVal] = useState(initialMin);
+    const [maxVal, setMaxVal] = useState(initialMax);
+
+    useEffect(() => {
+        setMinVal(initialMin);
+        setMaxVal(initialMax);
+    }, [initialMin, initialMax]);
+
+    const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Math.min(Number(e.target.value), maxVal - 5);
+        setMinVal(value);
+    };
+
+    const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Math.max(Number(e.target.value), minVal + 5);
+        setMaxVal(value);
+    };
+
+    const handleMouseUp = () => {
+        onApply(minVal, maxVal);
+    };
+
+    const minPercent = (minVal / 1000) * 100;
+    const maxPercent = (maxVal / 1000) * 100;
+
+    return (
+        <div className="flex flex-col gap-3 p-3 min-w-[220px]">
+            <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-400">Price Range</span>
+                <span className="font-medium text-white">${minVal} - ${maxVal}</span>
+            </div>
+            
+            <div className="relative w-full h-1.5 mt-2 mb-2">
+                <div className="absolute top-0 left-0 right-0 bottom-0 bg-zinc-800 rounded-lg"></div>
+                
+                <div 
+                    className="absolute top-0 bottom-0 bg-indigo-500 rounded-lg pointer-events-none"
+                    style={{ left: `${minPercent}%`, right: `${100 - maxPercent}%` }}
+                ></div>
+                
+                <input 
+                    type="range"
+                    min="0"
+                    max="1000"
+                    step="5"
+                    value={minVal}
+                    onChange={handleMinChange}
+                    onPointerUp={handleMouseUp}
+                    className="absolute w-full top-1/2 -translate-y-1/2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md"
+                />
+                
+                <input 
+                    type="range"
+                    min="0"
+                    max="1000"
+                    step="5"
+                    value={maxVal}
+                    onChange={handleMaxChange}
+                    onPointerUp={handleMouseUp}
+                    className="absolute w-full top-1/2 -translate-y-1/2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md"
+                />
+            </div>
+            
+            <div className="flex justify-between text-xs text-zinc-500 mt-0.5">
+                <span>$0</span>
+                <span>$1000</span>
+            </div>
+        </div>
+    );
+};
 
 const MentorListingPage: React.FC = () => {
     const [search, setSearch] = useState('');
@@ -110,21 +190,24 @@ const MentorListingPage: React.FC = () => {
 
     return (
         <div className="flex flex-col">
-            <div className="relative z-40 mb-6 flex flex-col gap-4">
-                <div className="flex w-full flex-wrap items-center gap-3">
-                    <div className="w-full flex-1 sm:max-w-md border-2 rounded-full border-transparent">
-                        <Input
-                            placeholder="Search by name or expertise..."
-                            leftIcon={<Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-300" />}
-                            value={search}
-                            onChange={handleSearch}
-                            className="border border-white/10 bg-zinc-900/50 rounded-xl shadow-sm hover:border-white/20 focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all duration-200"
-                        />
-                    </div>
-                    
+            <div className="relative z-40 mb-6 flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                {/* Search Bar */}
+                <div className="w-full sm:w-72 md:w-80 shrink-0">
+                    <Input
+                        placeholder="Search by name or expertise..."
+                        leftIcon={<Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-300" />}
+                        value={search}
+                        onChange={handleSearch}
+                        className="w-full border border-white/10 bg-zinc-900/50 rounded-xl shadow-sm hover:border-white/20 focus:border-indigo-500/50 focus:ring-indigo-500/20 transition-all duration-200"
+                    />
+                </div>
+
+                {/* Filter Chips Container */}
+                <div className="flex flex-wrap items-center gap-2 max-w-full">
                     <FilterPopover trigger={(isOpen) => <FilterChip label="Expertise" value={params.filter?.primaryExpertise} isActive={isOpen || !!params.filter?.primaryExpertise} onRemove={params.filter?.primaryExpertise ? () => handleFilterChange("primaryExpertise", "") : undefined} hasDropdown />}>
                         {() => (
-                            <div className="p-2 min-w-[200px]">
+                            <div className="p-0.5 min-w-[200px]">
                                 <input
                                     type="text"
                                     value={params.filter?.primaryExpertise || ""}
@@ -139,7 +222,7 @@ const MentorListingPage: React.FC = () => {
 
                     <FilterPopover trigger={(isOpen) => <FilterChip label="Experience" value={params.filter?.experienceLevel ? params.filter.experienceLevel.charAt(0).toUpperCase() + params.filter.experienceLevel.slice(1) : undefined} isActive={isOpen || !!params.filter?.experienceLevel} onRemove={params.filter?.experienceLevel ? () => handleFilterChange("experienceLevel", "") : undefined} hasDropdown />}>
                         {(close) => (
-                            <div className="flex flex-col min-w-[200px]">
+                            <div className="flex flex-col min-w-[200px] gap-0.5">
                                 {[
                                     { value: "", label: "Any Level" },
                                     { value: "beginner", label: "Beginner (0-2 yrs)" },
@@ -159,15 +242,39 @@ const MentorListingPage: React.FC = () => {
                         )}
                     </FilterPopover>
 
-                    <FilterPopover trigger={(isOpen) => <FilterChip label="Price" value={params.filter?.slotPriceMax !== undefined ? `< $${params.filter.slotPriceMax}` : undefined} isActive={isOpen || params.filter?.slotPriceMin !== undefined || params.filter?.slotPriceMax !== undefined} onRemove={(params.filter?.slotPriceMin !== undefined || params.filter?.slotPriceMax !== undefined) ? () => { handleFilterChange("slotPriceMin", ""); handleFilterChange("slotPriceMax", ""); } : undefined} hasDropdown />}>
+                    <FilterPopover 
+                        alignClass="right-0 sm:left-0 sm:right-auto" 
+                        trigger={(isOpen) => (
+                            <FilterChip 
+                                label="Price" 
+                                value={
+                                    params.filter?.slotPriceMin !== undefined || params.filter?.slotPriceMax !== undefined
+                                        ? `$${params.filter?.slotPriceMin ?? 0} - $${params.filter?.slotPriceMax ?? 1000}`
+                                        : undefined
+                                } 
+                                isActive={isOpen || params.filter?.slotPriceMin !== undefined || params.filter?.slotPriceMax !== undefined} 
+                                onRemove={(params.filter?.slotPriceMin !== undefined || params.filter?.slotPriceMax !== undefined) 
+                                    ? () => { handleFilterChange("slotPriceMin", ""); handleFilterChange("slotPriceMax", ""); } 
+                                    : undefined
+                                } 
+                                hasDropdown 
+                            />
+                        )}
+                    >
                         {() => (
-                            <div className="flex flex-col gap-2 p-2 min-w-[200px]">
-                                <div className="flex items-center gap-2">
-                                    <input type="number" placeholder="Min $" value={params.filter?.slotPriceMin ?? ""} onChange={(e) => handleFilterChange("slotPriceMin", e.target.value)} className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50" />
-                                    <span className="text-zinc-500">-</span>
-                                    <input type="number" placeholder="Max $" value={params.filter?.slotPriceMax ?? ""} onChange={(e) => handleFilterChange("slotPriceMax", e.target.value)} className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50" />
-                                </div>
-                            </div>
+                            <PriceRangeSlider 
+                                initialMin={params.filter?.slotPriceMin ?? 0}
+                                initialMax={params.filter?.slotPriceMax ?? 1000}
+                                onApply={(min, max) => {
+                                    if (min === 0 && max === 1000) {
+                                        handleFilterChange("slotPriceMin", "");
+                                        handleFilterChange("slotPriceMax", "");
+                                    } else {
+                                        handleFilterChange("slotPriceMin", min.toString());
+                                        handleFilterChange("slotPriceMax", max.toString());
+                                    }
+                                }}
+                            />
                         )}
                     </FilterPopover>
 
@@ -178,17 +285,18 @@ const MentorListingPage: React.FC = () => {
                         if (hasUnaddedSkills || hasUnaddedAvailability) {
                             return (
                                 <FilterPopover
+                                    alignClass="left-0 sm:right-0 sm:left-auto"
                                     trigger={(isOpen) => (
-                                        <button className={`flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors h-[34px]
+                                        <button className={`flex items-center gap-1.5 shrink-0 rounded-xl border px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-colors h-[34px]
                                             ${isOpen ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300" : "border-white/10 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"}
                                         `}>
-                                            <Filter className="w-4 h-4" />
+                                            <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                             <span>More Filters</span>
                                         </button>
                                     )}
                                 >
                                     {(close) => (
-                                        <div className="flex flex-col min-w-[180px] py-1">
+                                        <div className="flex flex-col min-w-[180px] gap-0.5">
                                             {hasUnaddedSkills && (
                                                 <button onClick={() => { addVisibleFilter("skills"); close(); }} className="px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
                                                     Skills
@@ -207,14 +315,15 @@ const MentorListingPage: React.FC = () => {
                         return null;
                     })()}
                 </div>
+                </div>
 
                 <AnimatePresence>
                     {hasAnyFilters && (
                         <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="flex flex-wrap items-center gap-2 pb-2 overflow-hidden"
+                            initial={{ opacity: 0, height: 0, overflow: "hidden" }}
+                            animate={{ opacity: 1, height: "auto", transitionEnd: { overflow: "visible" } }}
+                            exit={{ opacity: 0, height: 0, overflow: "hidden" }}
+                            className="flex flex-wrap items-center gap-2 mt-4 pb-2"
                         >
                             <AnimatePresence mode="popLayout">
                                 {(visibleFilters.has("skills") || (params.filter?.skillsAny && params.filter.skillsAny.length > 0)) && (

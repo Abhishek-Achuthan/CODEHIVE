@@ -16,6 +16,12 @@ import { SessionType } from '../../domain/types/SessionType';
 
 export class SessionMapper {
   static toResponse(session: SessionEntity): ISessionResponseDTO {
+    const now = new Date();
+    const effectiveStatus = 
+        session.status === SessionStatus.UPCOMING && session.endTime < now 
+            ? SessionStatus.COMPLETED 
+            : session.status;
+
     return {
       id: session.id,
       mentorId: session.mentorId,
@@ -23,7 +29,7 @@ export class SessionMapper {
       date: session.date,
       startTime: session.startTime.toISOString(),
       endTime: session.endTime.toISOString(),
-      status: session.status,      
+      status: effectiveStatus,      
       topic: session.topic,
       amount: session.amount,
       paymentSource:session.paymentSource,
@@ -48,6 +54,12 @@ export class SessionMapper {
     mentor: EssentialUserInfo,
     user: EssentialUserInfo
   ): IBookedSessionResponseDTO {
+    const now = new Date();
+    const effectiveStatus = 
+        session.status === SessionStatus.UPCOMING && session.endTime < now 
+            ? SessionStatus.COMPLETED 
+            : session.status;
+
     return {
       id: session.id,
       mentorId: session.mentorId,
@@ -57,7 +69,7 @@ export class SessionMapper {
       date: session.date,
       startTime: session.startTime.toISOString(),
       endTime: session.endTime.toISOString(),
-      status: session.status,
+      status: effectiveStatus,
       topic: session.topic,
       amount: session.amount,
       paymentSource:session.paymentSource,
@@ -89,6 +101,7 @@ export class SessionMapper {
         websiteUrl: mentor.websiteUrl,
         primaryExpertise: mentor.primaryExpertise,
         experienceLevel: mentor.experienceLevel,
+        languages: mentor.languages,
     }
   }
 

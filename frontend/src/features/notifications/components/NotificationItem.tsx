@@ -27,7 +27,23 @@ export const NotificationItem: React.FC<{
     }
     
     if (notification.actionUrl) {
-      navigate(notification.actionUrl);
+      let targetUrl = notification.actionUrl;
+      if (
+        targetUrl.startsWith('/qna/') &&
+        !targetUrl.startsWith('/qna/question/') &&
+        !targetUrl.startsWith('/qna/ask-question') &&
+        !targetUrl.startsWith('/qna/my-questions') &&
+        !targetUrl.startsWith('/qna/answered-by-me') &&
+        !targetUrl.startsWith('/qna/saved') &&
+        !targetUrl.startsWith('/qna/ai-assist') &&
+        !targetUrl.startsWith('/qna/answers')
+      ) {
+        const id = targetUrl.replace('/qna/', '');
+        if (id) {
+          targetUrl = `/qna/question/${id}`;
+        }
+      }
+      navigate(targetUrl);
     }
     
     onClick();

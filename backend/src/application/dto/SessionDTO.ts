@@ -5,6 +5,7 @@ import { SessionStatus } from '../../domain/types/SessionStatus';
 import { BookingReservationStatus } from '../../domain/types/BookingReservationStatus';
 import { RefundStatus } from '../../domain/types/RefundStatus';
 import { SessionType } from '../../domain/types/SessionType';
+import { UserLanguage } from '../../domain/types/UserLanguage';
 
 export interface CreateMentorAvailabilityDTO {
   mentorId: string;
@@ -134,5 +135,6 @@ export interface IMentorProfileResponseDTO {
   websiteUrl?: string | undefined;
   primaryExpertise?: string | undefined;
   experienceLevel?: string | undefined;
+  languages?: UserLanguage[] | undefined;
   email: string;
 }
