@@ -48,6 +48,15 @@ function mapToDatabaseFeatureSnapshot(snapshot: RoomFeatureSnapshot | null): any
   };
 }
 
+function toIdString(val: any): string {
+  if (!val) return '';
+  if (typeof val === 'object') {
+    if (val._id) return val._id.toString();
+    if (typeof val.toString === 'function') return val.toString();
+  }
+  return String(val);
+}
+
 export class RoomRepository
   extends GenericRepository<RoomDocument, RoomEntity>
   implements IRoomRepository
@@ -106,8 +115,8 @@ export class RoomRepository
 
     const items = docs.map((doc: any) => {
        const entity = this.leanToEntity(doc);
-       if (doc.hostId && typeof doc.hostId === 'object') {
-           entity.hostId = doc.hostId._id.toString();
+       if (doc.hostId && typeof doc.hostId === 'object' && doc.hostId._id) {
+           entity.hostId = toIdString(doc.hostId._id);
            const fName = doc.hostId.firstName || '';
            const lName = doc.hostId.lastName || '';
            const fullName = `${fName} ${lName}`.trim();
@@ -177,8 +186,8 @@ export class RoomRepository
 
     const items = docs.map((doc: any) => {
        const entity = this.leanToEntity(doc);
-       if (doc.hostId && typeof doc.hostId === 'object') {
-           entity.hostId = doc.hostId._id.toString();
+       if (doc.hostId && typeof doc.hostId === 'object' && doc.hostId._id) {
+           entity.hostId = toIdString(doc.hostId._id);
            const fName = doc.hostId.firstName || '';
            const lName = doc.hostId.lastName || '';
            const fullName = `${fName} ${lName}`.trim();
@@ -193,10 +202,11 @@ export class RoomRepository
   }
 
   protected toEntity(doc: RoomDocument): RoomEntity {
+    const sessionIdStr = toIdString(doc.sessionId);
     return {
-      id: doc._id.toString(),
+      id: toIdString(doc._id),
       title: doc.title,
-      hostId: doc.hostId.toString(),
+      hostId: toIdString(doc.hostId),
       type: doc.type,
       visibility: doc.visibility,
       participantCount: doc.participantCount,
@@ -209,7 +219,7 @@ export class RoomRepository
       ...(doc.description !== undefined
         ? { description: doc.description }
         : {}),
-      ...(doc.sessionId && { sessionId: doc.sessionId.toString() }),
+      ...(sessionIdStr ? { sessionId: sessionIdStr } : {}),
       ...(doc.readonlyAt && { readonlyAt: doc.readonlyAt }),
       ...(doc.archivedAt && { archivedAt: doc.archivedAt }),
       ...(doc.purgedAt && { purgedAt: doc.purgedAt }),
@@ -251,13 +261,14 @@ export class RoomRepository
   }
 
   leanToEntity(doc: RoomLeanDoc): RoomEntity {
+    const sessionIdStr = toIdString(doc.sessionId);
     return {
-      id: doc._id.toString(),
+      id: toIdString(doc._id),
       title: doc.title,
       ...(doc.description !== undefined
         ? { description: doc.description }
         : {}),
-      hostId: doc.hostId.toString(),
+      hostId: toIdString(doc.hostId),
       type: doc.type,
       visibility: doc.visibility,
       participantCount: doc.participantCount,
@@ -267,7 +278,7 @@ export class RoomRepository
       admissionPolicy: doc.admissionPolicy,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
-      ...(doc.sessionId && { sessionId: doc.sessionId.toString() }),
+      ...(sessionIdStr ? { sessionId: sessionIdStr } : {}),
       ...(doc.readonlyAt && { readonlyAt: doc.readonlyAt }),
       ...(doc.archivedAt && { archivedAt: doc.archivedAt }),
       ...(doc.purgedAt && { purgedAt: doc.purgedAt }),

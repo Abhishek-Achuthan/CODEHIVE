@@ -50,6 +50,8 @@ const CreateRoomModal = ({ open, onClose, onCreated }: CreateRoomModalProps) => 
       newErrors.title = 'Title is required.';
     } else if (title.trim().length < 3) {
       newErrors.title = 'Title must be at least 3 characters.';
+    } else if (title.trim().length > 40) {
+      newErrors.title = 'Title cannot exceed 40 characters.';
     }
     if (description.length > 500) {
       newErrors.description = 'Description cannot exceed 500 characters.';
@@ -88,7 +90,11 @@ const CreateRoomModal = ({ open, onClose, onCreated }: CreateRoomModalProps) => 
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
-      <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+      <DialogContent
+        className="bg-gray-900 border-gray-700 text-white max-w-md"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-white text-xl font-semibold">
             Create Room
@@ -108,8 +114,12 @@ const CreateRoomModal = ({ open, onClose, onCreated }: CreateRoomModalProps) => 
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter room title"
               disabled={isLoading}
+              maxLength={40}
               className="bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             />
+            <p className="text-gray-500 text-xs text-right mt-0.5">
+              {title.length}/40
+            </p>
             {errors.title && (
               <p className="text-red-400 text-xs mt-0.5">{errors.title}</p>
             )}

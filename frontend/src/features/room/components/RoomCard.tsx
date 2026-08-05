@@ -58,13 +58,19 @@ export const RoomCard: React.FC<RoomCardProps> = ({
         navigate(`/room/${room.id}`);
     };
 
-    const baseClasses = "group flex flex-col bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl p-6 transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] shadow-2xl overflow-hidden cursor-pointer";
+    const isReadOnly = room.status === "READONLY" || room.status === "ARCHIVED" || room.status === "PURGED";
+
+    const baseClasses = `group flex flex-col bg-zinc-900/40 backdrop-blur-2xl border rounded-3xl p-6 transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] shadow-2xl overflow-hidden cursor-pointer ${
+        isReadOnly 
+            ? "border-amber-500/20 opacity-60 grayscale-[15%] hover:opacity-90 hover:grayscale-0" 
+            : "border-white/5"
+    }`;
     let dynamicClasses = "relative h-full w-full lg:z-0";
 
     if (isExpanded) {
         dynamicClasses = expandDirection === 'up' 
-            ? "relative h-full lg:absolute lg:bottom-0 lg:top-auto lg:w-full lg:h-auto lg:min-h-[280px] lg:z-10 bg-zinc-800/60 border-indigo-500/40" 
-            : "relative h-full lg:absolute lg:top-0 lg:bottom-auto lg:w-full lg:h-auto lg:min-h-[280px] lg:z-10 bg-zinc-800/60 border-indigo-500/40";
+            ? "relative h-full lg:absolute lg:bottom-0 lg:top-auto lg:w-full lg:h-auto lg:min-h-[290px] lg:z-10 bg-zinc-800/60 border-indigo-500/40" 
+            : "relative h-full lg:absolute lg:top-0 lg:bottom-auto lg:w-full lg:h-auto lg:min-h-[290px] lg:z-10 bg-zinc-800/60 border-indigo-500/40";
     } else if (isCompact) {
         dynamicClasses = compactAlign === 'top'
             ? "relative h-full lg:absolute lg:top-0 lg:bottom-auto lg:w-full lg:h-[160px] lg:z-0"
@@ -76,6 +82,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     }
 
     const hostNameDisplay = room.hostName || `Developer ${room.hostId.slice(-4)}`;
+    const effectiveActionLabel = (actionLabel === "Join Room" && isReadOnly) ? "View Room (Read Only)" : actionLabel;
 
     return (
         <div 
@@ -91,7 +98,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             <div className="relative flex items-start justify-between gap-4 z-10">
                 <h3 
                     ref={titleRef}
-                    className={`text-xl font-bold text-white transition-colors leading-tight capitalize ${isHovered ? 'text-indigo-400' : ''} ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`}
+                    className={`text-[1.1rem] font-bold text-white transition-colors leading-snug capitalize ${isHovered ? 'text-indigo-400' : ''} ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`}
                 >
                     {room.title}
                 </h3>
@@ -109,49 +116,74 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 </div>
             </div>
 
-            <div className="relative flex-1 mt-4 z-10 flex flex-col h-full">
+            <div className="relative flex-1 mt-2.5 z-10 flex flex-col h-full">
 
                 {/* Content wrapper: fades out in compact mode */}
                 <div className={`flex flex-col transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isCompact ? 'lg:opacity-0 lg:h-0 lg:overflow-hidden' : 'opacity-100'}`}>
                     {/* Description */}
                     <p 
                         ref={descRef}
-                        className={`text-sm text-zinc-400 leading-relaxed transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] mb-3 ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`}
+                        className={`text-sm text-zinc-400 leading-relaxed mb-2.5 transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`}
                     >
                         {room.description || "No description provided for this room."}
                     </p>
 
                     {/* Host Info */}
                     <div className="flex items-center gap-2 text-xs mb-3">
-                        <span className="text-zinc-500 w-16">Host:</span>
+                        <span className="text-zinc-500 w-12">Host:</span>
                         <span className="text-zinc-300 font-medium truncate">{hostNameDisplay}</span>
                     </div>
                 </div>
 
-                    {/* Metadata row */}
-                    <div className={`flex flex-wrap items-center gap-4 text-xs font-medium text-zinc-400 pt-3 border-t border-white/5 ${isCompact ? 'mt-auto' : ''}`}>
-                        <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5">
-                            <Users className="w-4 h-4 text-indigo-400" />
+                {/* Bottom Group: Divider, Metadata row, & Action Button */}
+                <div className={`mt-auto pt-3 border-t border-white/5 space-y-3 ${isCompact ? 'mt-auto' : ''}`}>
+                    <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-zinc-400">
+                        <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5">
+                            <Users className="w-3.5 h-3.5 text-indigo-400" />
                             <span className="text-zinc-300">
                                 <span className="text-white font-bold">{room.participantCount}</span>
                                 <span className="opacity-60"> / {room.maxParticipants}</span>
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5">
-                            <Clock className="w-4 h-4 text-indigo-400" />
+                        <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5">
+                            <Clock className="w-3.5 h-3.5 text-indigo-400" />
                             <span className="text-zinc-300 capitalize">{timeAgo(createdAtDate)}</span>
                         </div>
+                        {room.status && (
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold ${
+                                room.status === 'ACTIVE' 
+                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                                    : room.status === 'READONLY'
+                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                    : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                            }`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${
+                                    room.status === 'ACTIVE' 
+                                        ? 'bg-emerald-400 animate-pulse' 
+                                        : room.status === 'READONLY' 
+                                        ? 'bg-amber-400' 
+                                        : 'bg-zinc-400'
+                                }`} />
+                                <span className="capitalize">{room.status.toLowerCase().replace('_', ' ')}</span>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Action Button */}
-                    <div className={`transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isCompact ? 'lg:opacity-0 lg:h-0 lg:mt-0 lg:overflow-hidden' : 'mt-auto pt-4 opacity-100'}`}>
+                    <div className={`transition-all duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isCompact ? 'lg:opacity-0 lg:h-0 lg:mt-0 lg:overflow-hidden' : 'opacity-100'}`}>
                         <button
-                            className={`relative w-full flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-indigo-600/90 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-[0.98] ${isHovered ? 'bg-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.3)]' : 'hover:bg-indigo-500'}`}
+                            className={`relative w-full flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-indigo-600/90 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-[0.98] ${
+                                isReadOnly 
+                                    ? 'bg-zinc-700/80 hover:bg-zinc-600 text-zinc-200' 
+                                    : isHovered 
+                                    ? 'bg-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.3)]' 
+                                    : 'hover:bg-indigo-500'
+                            }`}
                         >
-                            {actionLabel}
+                            {effectiveActionLabel}
                             <ArrowRight className={`w-4 h-4 transition-transform ${isHovered ? 'translate-x-1' : ''}`} />
                         </button>
                     </div>
+                </div>
             </div>
         </div>
     );

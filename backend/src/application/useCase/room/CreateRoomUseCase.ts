@@ -12,6 +12,7 @@ import { RoomVisibility } from '../../../domain/types/RoomVisibility';
 import { LimitKey } from '../../../domain/types/LimitKey';
 import { FeatureKey } from '../../../domain/types/FeatureKey';
 import { ForbiddenError } from '../../../core/errors/ForbiddenError';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
 import { EntitlementResolutionService } from '../../services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../services/RoomFeatureSnapshotFactory';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
@@ -32,6 +33,13 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
   ) {}
 
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
+    if (!data.title || !data.title.trim()) {
+      throw new BadRequestError(ERROR_MESSAGES.ROOM.TITLE_REQUIRED);
+    }
+    if (data.title.trim().length > 40) {
+      throw new BadRequestError(ERROR_MESSAGES.ROOM.TITLE_TOO_LONG);
+    }
+
     const entitlements = await this._entitlementResolutionService.resolve(data.userId);
     const featureSnapshot = this._roomFeatureSnapshotFactory.create(entitlements);
 

@@ -188,7 +188,7 @@ export class RoomController {
   async handleRevokeRoomInvite(req: Request, res: Response, next: NextFunction) {
     try {
       const roomId = this.getRequiredParam(req, 'roomId');
-      const inviteId = this.getRequiredParam(req, 'inviteId');
+      const inviteId = req.params.inviteId || 'all';
       await this._revokeRoomInviteUseCase.execute(roomId, inviteId, req.user.id);
       res.status(HttpStatus.NoContent).send();
     } catch (error) {

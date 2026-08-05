@@ -1,15 +1,22 @@
-import { inject, injectable } from 'tsyringe';
-import { IUpdateRoomDetailsUseCase, UpdateRoomDetailsParams } from '../interface/room/IUpdateRoomDetailsUseCase';
-import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
-import { NotFoundError } from '../../../core/errors/NotFoundError';
-import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
-import { UnauthorizedError } from '../../../core/errors/UnauthorizedError';
-import { RoomEntity } from '../../../domain/entities/room/RoomEntity';
+import { inject, injectable } from "tsyringe";
+import {
+  IUpdateRoomDetailsUseCase,
+  UpdateRoomDetailsParams,
+} from "../interface/room/IUpdateRoomDetailsUseCase";
+import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
+import { NotFoundError } from "../../../core/errors/NotFoundError";
+import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
+import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
+import { BadRequestError } from "../../../core/errors/BadRequestError";
+import { RoomEntity } from "../../../domain/entities/room/RoomEntity";
+import { RoomVisibility } from "../../../domain/types/RoomVisibility";
+import { RoomAdmissionPolicy } from "../../../domain/types/RoomAdmissionPolicy";
 
 @injectable()
 export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
   constructor(
-    @inject('IRoomRepository') private readonly _roomRepository: IRoomRepository
+    @inject("IRoomRepository")
+    private readonly _roomRepository: IRoomRepository,
   ) {}
 
   async execute(params: UpdateRoomDetailsParams): Promise<RoomEntity> {
@@ -25,9 +32,27 @@ export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
     }
 
     const updates: Partial<RoomEntity> = {};
-    if (title !== undefined) updates.title = title;
+    if (title !== undefined) {
+      if (!title.trim()) {
+        throw new BadRequestError(ERROR_MESSAGES.ROOM.TITLE_REQUIRED);
+      }
+      if (title.trim().length > 40) {
+        throw new BadRequestError(ERROR_MESSAGES.ROOM.TITLE_TOO_LONG);
+      }
+      updates.title = title.trim();
+    }
     if (description !== undefined) updates.description = description;
-    if (visibility !== undefined) updates.visibility = visibility;
+    if (visibility !== undefined) {
+      updates.visibility = visibility;
+      if (visibility === RoomVisibility.PRIVATE) {
+        updates.admissionPolicy = RoomAdmissionPolicy.INVITE_ONLY;
+      } else if (
+        visibility === RoomVisibility.PUBLIC_REQUEST &&
+        room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY
+      ) {
+        updates.admissionPolicy = RoomAdmissionPolicy.REQUEST_TO_JOIN;
+      }
+    }
 
     const updatedRoom = await this._roomRepository.update(roomId, updates);
     if (!updatedRoom) {

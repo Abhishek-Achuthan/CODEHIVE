@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IParticipantRepository } from '../../domain/interfaces/IParticipantRepository';
 import type { IRoomRepository } from '../../domain/interfaces/IRoomRepository';
 import type { IRoomBanRepository } from '../../domain/interfaces/IRoomBanRepository';
+import type { ISessionRepository } from '../../domain/interfaces/ISessionReposiotry';
 import { RoomInviteEntity } from '../../domain/entities/room/RoomInviteEntity';
 import { RoomInviteService } from './RoomInviteService';
 import { PermissionService } from '../../domain/services/PermissionService';
@@ -41,6 +42,8 @@ export class RoomAuthorizationService {
     private readonly _participantRepository: IParticipantRepository,
     @inject('IRoomBanRepository')
     private readonly _roomBanRepository: IRoomBanRepository,
+    @inject('ISessionRepository')
+    private readonly _sessionRepository: ISessionRepository,
     @inject(RoomInviteService)
     private readonly _roomInviteService: RoomInviteService,
     @inject(PermissionService)
@@ -129,18 +132,11 @@ export class RoomAuthorizationService {
     const room = await this._getRoom(roomId);
 
     let validatedInvite: RoomInviteEntity | undefined;
-    const requiresInvite =
-      room.visibility === RoomVisibility.PRIVATE ||
-      room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY ||
-      room.admissionPolicy === RoomAdmissionPolicy.BOOKING_ONLY;
-
     if (options?.inviteCode) {
       validatedInvite = await this._roomInviteService.validateInviteCode(
         options.inviteCode,
         roomId,
       );
-    } else if (requiresInvite) {
-      throw new ForbiddenError(ERROR_MESSAGES.ROOM.INVITE_REQUIRED);
     }
 
     let liftBan = false;
@@ -163,6 +159,17 @@ export class RoomAuthorizationService {
         ...(liftBan && { liftBan }),
       };
     }
+
+    const requiresInvite =
+      room.visibility === RoomVisibility.PRIVATE ||
+      room.admissionPolicy === RoomAdmissionPolicy.INVITE_ONLY ||
+      room.admissionPolicy === RoomAdmissionPolicy.BOOKING_ONLY;
+
+    if (requiresInvite && !validatedInvite) {
+      throw new ForbiddenError(ERROR_MESSAGES.ROOM.INVITE_REQUIRED);
+    }
+
+
 
     this.assertLifecycleAccess(room, 'join');
 
@@ -282,6 +289,18 @@ export class RoomAuthorizationService {
     if (!room) {
       throw new NotFoundError(ERROR_MESSAGES.ROOM.ROOM_NOT_FOUND);
     }
+
+    if (room.sessionId && room.lifecycleStatus === RoomLifeCycleStatus.ACTIVE) {
+      try {
+        const session = await this._sessionRepository.find(room.sessionId);
+        if (session && session.endTime < new Date()) {
+          room.lifecycleStatus = RoomLifeCycleStatus.READONLY;
+        }
+      } catch (err) {
+        this._logger.warn('Failed to resolve session for room lifecycle check', { roomId: room.id, sessionId: room.sessionId, err });
+      }
+    }
+
     return room;
   }
 
@@ -302,6 +321,36 @@ export class RoomAuthorizationService {
         overrides: {},
         joinedAt: room.createdAt,
       };
+    }
+
+    if (room.sessionId) {
+      try {
+        const session = await this._sessionRepository.find(room.sessionId);
+        if (session) {
+          if (session.mentorId === userId) {
+            return {
+              id: `host:${room.id}:${userId}`,
+              roomId: room.id,
+              userId,
+              role: RoomRole.HOST,
+              overrides: {},
+              joinedAt: room.createdAt,
+            };
+          }
+          if (session.userId === userId) {
+            return {
+              id: `participant:${room.id}:${userId}`,
+              roomId: room.id,
+              userId,
+              role: RoomRole.PARTICIPANT,
+              overrides: {},
+              joinedAt: room.createdAt,
+            };
+          }
+        }
+      } catch (err) {
+        this._logger.warn('Failed to resolve session for room authorization', { roomId: room.id, sessionId: room.sessionId, err });
+      }
     }
 
     return null;

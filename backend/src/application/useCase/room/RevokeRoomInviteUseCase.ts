@@ -17,6 +17,11 @@ export class RevokeRoomInviteUseCase implements IRevokeRoomInviteUseCase {
   async execute(roomId: string, inviteId: string, hostUserId: string): Promise<void> {
     await this._roomAuthorizationService.assertHost(roomId, hostUserId);
 
+    if (inviteId === 'all' || inviteId === 'active') {
+      await this._inviteRepository.revokeAllActiveForRoom(roomId);
+      return;
+    }
+
     const revoked = await this._inviteRepository.revokeById(inviteId);
 
     if (!revoked || revoked.roomId !== roomId) {

@@ -86,6 +86,14 @@ export class RoomService {
     }
   }
 
+  static async revokeRoomInvite(roomId: string, inviteId: string = "active"): Promise<void> {
+    try {
+      await RoomAPI.revokeRoomInvite(roomId, inviteId);
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   static async kickParticipant(roomId: string, userId: string): Promise<void> {
     try {
       await RoomAPI.kickParticipant(roomId, userId);

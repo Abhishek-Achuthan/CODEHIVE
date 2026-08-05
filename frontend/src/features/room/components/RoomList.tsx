@@ -176,7 +176,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                 animate={listMotion.animate}
                 exit={listMotion.exit}
                 transition={{ ...listMotion.transition, delay: idx * 0.04 }}
-                className={`w-full lg:h-[280px] relative ${isExpanded ? 'z-50' : isHovered ? 'z-20' : 'z-10'}`}
+                className={`w-full h-[290px] relative ${isExpanded ? 'z-50' : isHovered ? 'z-20' : 'z-10'}`}
               >
                 <RoomCard 
                   room={room} 

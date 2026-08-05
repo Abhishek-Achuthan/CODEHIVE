@@ -94,7 +94,7 @@ const FeatureSnapshotSchema = new Schema(
 
 export const RoomSchema = new Schema(
   {
-    title: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true, maxlength: [40, 'Room title cannot exceed 40 characters'] },
     description: { type: String, required: false },
     hostId: {
       type: Schema.Types.ObjectId,

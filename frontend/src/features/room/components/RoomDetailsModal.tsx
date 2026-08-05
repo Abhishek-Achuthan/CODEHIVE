@@ -8,6 +8,8 @@ import {
   Loader2,
   RefreshCw,
   User,
+  Share2,
+  Link2Off,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -158,6 +160,42 @@ export const RoomDetailsModal = ({
     }
   };
 
+  const handleRevokeLink = async () => {
+    setLinkLoading(true);
+    try {
+      await RoomService.revokeRoomInvite(roomId, "active");
+      setCachedJoinUrl(null);
+      setSettings((prev) => (prev ? { ...prev, hasActiveInvite: false, joinUrl: undefined } : null));
+      toast.success("Invite link revoked. Old link is now invalid.");
+    } catch {
+      toast.error("Failed to revoke invite link");
+    } finally {
+      setLinkLoading(false);
+    }
+  };
+
+  const handleShareLink = async () => {
+    const url = await resolveJoinUrl(false);
+    if (!url) return;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: settings?.title || "CodeHive Room",
+          text: `Join collaboration room "${settings?.title}" on CodeHive`,
+          url: url,
+        });
+        toast.success("Share dialog opened");
+        return;
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+      }
+    }
+
+    await navigator.clipboard.writeText(url);
+    toast.success("Invite link copied for sharing!");
+  };
+
   const handleHostClick = () => {
     if (!settings?.host) return;
     const path = getHostProfilePath(settings.host, currentUser?.id);
@@ -174,10 +212,14 @@ export const RoomDetailsModal = ({
       toast.error("Room name cannot be empty");
       return;
     }
+    if (editTitle.trim().length > 40) {
+      toast.error("Room title cannot exceed 40 characters");
+      return;
+    }
     setSavingDetails(true);
     try {
       const data = await RoomService.updateRoomDetails(roomId, {
-        title: editTitle,
+        title: editTitle.trim(),
         description: editDescription,
         visibility: editVisibility,
       });
@@ -248,8 +290,12 @@ export const RoomDetailsModal = ({
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
+                    maxLength={40}
                     className="w-full bg-[#0d1117] border border-gray-800 rounded-md px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
                   />
+                  <p className="text-gray-500 text-xs text-right mt-1">
+                    {editTitle.length}/40
+                  </p>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-400">Description</label>
@@ -367,42 +413,75 @@ export const RoomDetailsModal = ({
 
             {settings.canManageInviteLink && (
               <section className="space-y-3 border-t border-gray-800 pt-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                  Invite link
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                    Invite Link & Access Controls
+                  </p>
+                  {cachedJoinUrl && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Active Link
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400">
+                  As host, you can copy, share, regenerate, or revoke access to this room. Revoking will immediately invalidate any previous link.
                 </p>
-                <p className="text-xs text-gray-500">
-                  Only you can copy or reset the room invite link.
-                </p>
-                <div className="flex flex-wrap gap-2">
+
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <button
                     type="button"
                     onClick={() => void handleCopyLink()}
                     disabled={linkLoading}
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-gray-800 disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-2 text-xs font-medium text-gray-200 transition-colors hover:bg-gray-800 hover:text-white disabled:opacity-50"
                   >
-                    <Copy className="h-4 w-4" />
-                    Copy link
+                    <Copy className="h-3.5 w-3.5 text-blue-400" />
+                    Copy Link
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void handleShareLink()}
+                    disabled={linkLoading}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-2 text-xs font-medium text-gray-200 transition-colors hover:bg-gray-800 hover:text-white disabled:opacity-50"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-emerald-400" />
+                    Share
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => void handleRegenerateLink()}
                     disabled={linkLoading}
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-gray-800 disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-2 text-xs font-medium text-gray-200 transition-colors hover:bg-gray-800 hover:text-white disabled:opacity-50"
                   >
                     <RefreshCw
-                      className={`h-4 w-4 ${linkLoading ? "animate-spin" : ""}`}
+                      className={`h-3.5 w-3.5 text-purple-400 ${linkLoading ? "animate-spin" : ""}`}
                     />
-                    Regenerate link
+                    Regenerate
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void handleRevokeLink()}
+                    disabled={linkLoading || (!cachedJoinUrl && !settings.hasActiveInvite)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-900/40 bg-red-950/20 px-3 py-2 text-xs font-medium text-red-400 transition-colors hover:bg-red-900/40 hover:text-red-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Link2Off className="h-3.5 w-3.5 text-red-400" />
+                    Revoke
                   </button>
                 </div>
-                {cachedJoinUrl && (
-                  <p className="truncate text-xs text-gray-600" title={cachedJoinUrl}>
-                    {cachedJoinUrl}
-                  </p>
-                )}
-                {!cachedJoinUrl && settings.hasActiveInvite && (
-                  <p className="text-xs text-amber-500/90">
-                    An invite link is active. Use Copy link to generate a shareable URL.
+
+                {cachedJoinUrl ? (
+                  <div className="rounded-md border border-gray-800 bg-[#0d1117] p-2.5">
+                    <p className="text-[10px] font-medium text-gray-500 mb-1">Active Invite URL:</p>
+                    <p className="truncate text-xs font-mono text-blue-400" title={cachedJoinUrl}>
+                      {cachedJoinUrl}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-amber-500/90 italic bg-amber-500/5 border border-amber-500/10 rounded-md p-2">
+                    No active invite link. Click "Copy Link" or "Regenerate" to create a new shareable URL.
                   </p>
                 )}
               </section>

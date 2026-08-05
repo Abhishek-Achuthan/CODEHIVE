@@ -40,6 +40,9 @@ export const createRoomInvite = (roomId: string) =>
 export const regenerateRoomInvite = (roomId: string) =>
     apiClient.post(API_ROUTES.ROOM.REGENERATE_INVITE(roomId));
 
+export const revokeRoomInvite = (roomId: string, inviteId: string = "active") =>
+    apiClient.delete(API_ROUTES.ROOM.REVOKE_INVITE(roomId, inviteId));
+
 export const kickParticipant = (roomId: string, userId: string) =>
     apiClient.post(API_ROUTES.ROOM.KICK_PARTICIPANT(roomId, userId));
 
