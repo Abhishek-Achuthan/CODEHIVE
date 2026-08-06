@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Send, MessageSquare } from "lucide-react";
+import { Plus, Send, MessageSquare, Sparkles, Loader2 } from "lucide-react";
 import QnaLayout from "../../../layouts/QnaLayout";
 import { useAiChat } from "../hooks/useAiChat";
 import { MarkdownMessage } from "../components/MarkdownMessage";
@@ -32,11 +32,11 @@ export default function AiAssistPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const showEmpty = controller.messages.length === 0 && !controller.messagesLoading;
+  const showEmpty = controller.messages.length === 0 && !controller.messagesLoading && !controller.sending;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [controller.messages.length]);
+  }, [controller.messages.length, controller.sending]);
 
   const canSend = useMemo(() => {
     return prompt.trim().length > 0 && !controller.sending;
@@ -168,6 +168,24 @@ export default function AiAssistPage() {
                       </div>
                     ))
                   )}
+
+                  {/* AI Thinking / Generating animation bubble */}
+                  {controller.sending && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[85%] rounded-2xl px-5 py-3.5 bg-[#18181b] border border-indigo-500/30 text-zinc-300 shadow-lg shadow-indigo-950/20">
+                        <div className="flex items-center gap-2.5 text-xs text-indigo-400 font-medium">
+                          <Sparkles className="w-4 h-4 animate-spin text-indigo-400" />
+                          <span>AI is generating response...</span>
+                          <div className="flex items-center gap-1 ml-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div ref={bottomRef} className="h-4" />
                 </div>
 
@@ -191,7 +209,11 @@ export default function AiAssistPage() {
                       className="absolute bottom-2 right-2 h-9 w-9 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-zinc-800 text-white flex items-center justify-center transition-colors"
                       type="button"
                     >
-                      <Send size={16} />
+                      {controller.sending ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Send size={16} />
+                      )}
                     </button>
                   </div>
                   <div className="text-center mt-2">

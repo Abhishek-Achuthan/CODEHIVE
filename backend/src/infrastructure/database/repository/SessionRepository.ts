@@ -187,7 +187,21 @@ export class SessionRepository
     }
 
     if (filter?.status !== undefined) {
-      andConditions.push({ status: filter.status });
+      if (filter.status === SessionStatus.UPCOMING) {
+        andConditions.push({
+          status: SessionStatus.UPCOMING,
+          endTime: { $gte: new Date() },
+        });
+      } else if (filter.status === SessionStatus.COMPLETED) {
+        andConditions.push({
+          $or: [
+            { status: SessionStatus.COMPLETED },
+            { status: SessionStatus.UPCOMING, endTime: { $lt: new Date() } },
+          ],
+        });
+      } else {
+        andConditions.push({ status: filter.status });
+      }
     }
 
     if (filter?.dateFrom !== undefined || filter?.dateTo !== undefined) {
@@ -330,7 +344,25 @@ export class SessionRepository
       {
         $group: {
           _id: null,
-          completed: { $sum: { $cond: [{ $eq: ['$status', SessionStatus.COMPLETED] }, 1, 0] } },
+          completed: {
+            $sum: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$status', SessionStatus.COMPLETED] },
+                    {
+                      $and: [
+                        { $eq: ['$status', SessionStatus.UPCOMING] },
+                        { $lt: ['$endTime', new Date()] },
+                      ],
+                    },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
           cancelled: { $sum: { $cond: [{ $eq: ['$status', SessionStatus.CANCELLED] }, 1, 0] } }
         }
       }

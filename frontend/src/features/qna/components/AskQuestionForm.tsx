@@ -52,8 +52,12 @@ export default function AskQuestionForm(): JSX.Element {
 
   const validate = (): string | null => {
     if (!title || title.trim().length < 10) return "Title must be at least 10 characters.";
-    if (!description || plainTextLength(description) < 20)
+    if (title.length > 200) return "Title cannot exceed 200 characters.";
+    const descLen = plainTextLength(description);
+    if (!description || descLen < 20)
       return "Description must be at least 20 characters of text.";
+    if (descLen > 2000)
+      return "Description cannot exceed 2000 characters.";
     return null;
   };
 
@@ -72,12 +76,14 @@ export default function AskQuestionForm(): JSX.Element {
 
       if (ok) navigate(`/qna`);
     } catch (error) {
-    if(error instanceof BaseError)
-       toast.error(error.message ||"Failed to post Question");
+      if(error instanceof BaseError)
+        toast.error(error.message ||"Failed to post Question");
     } finally {
       setSubmitting(false);
     }
   };
+
+  const descLen = plainTextLength(description);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -89,10 +95,16 @@ export default function AskQuestionForm(): JSX.Element {
         <input
           id="title"
           value={title}
+          maxLength={200}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What is your problem or question?"
           className="w-full px-4 py-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800 text-zinc-100 placeholder-zinc-500 transition-colors focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50"
         />
+        <div className="flex justify-end mt-1">
+          <p className={`text-xs ${title.length > 200 ? 'text-rose-400' : 'text-zinc-500'}`}>
+            {title.length}/200
+          </p>
+        </div>
       </div>
 
       <div className="space-y-2.5">
@@ -104,9 +116,14 @@ export default function AskQuestionForm(): JSX.Element {
           <QuestionEditor value={description} onChange={setDescription} placeholder="Describe your problem..." />
         </div>
         <div className="flex justify-between items-center mt-1">
-          <p className="text-xs text-zinc-500">{plainTextLength(description)} characters</p>
-          {plainTextLength(description) > 0 && plainTextLength(description) < 20 && (
-            <p className="text-xs text-rose-400">Needs {20 - plainTextLength(description)} more characters</p>
+          <p className={`text-xs ${descLen > 2000 ? 'text-rose-400' : 'text-zinc-500'}`}>
+            {descLen}/2000 characters
+          </p>
+          {descLen > 0 && descLen < 20 && (
+            <p className="text-xs text-rose-400">Needs {20 - descLen} more characters</p>
+          )}
+          {descLen > 2000 && (
+            <p className="text-xs text-rose-400">Exceeds limit by {descLen - 2000} characters</p>
           )}
         </div>
       </div>

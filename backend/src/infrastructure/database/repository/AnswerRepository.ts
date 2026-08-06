@@ -225,13 +225,13 @@ export class AnswerRepository
   private mapSort = (sortBy: AnswerSort): { [key: string]: SortOrder } => {
     switch (sortBy) {
       case AnswerSort.Newest:
-        return { createdAt: -1 };
+        return { isAccepted: -1, createdAt: -1 };
       case AnswerSort.votes:
-        return { voteCount: -1 };
+        return { isAccepted: -1, voteCount: -1, createdAt: -1 };
       case AnswerSort.Oldest:
-        return { createdAt: 1 };
+        return { isAccepted: -1, createdAt: 1 };
       default:
-        return { createdAt: -1 };
+        return { isAccepted: -1, createdAt: -1 };
     }
   };
 }

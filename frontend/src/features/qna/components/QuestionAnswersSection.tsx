@@ -1,12 +1,13 @@
 import { MdEdit, MdDelete } from "react-icons/md";
 import { GiCheckMark } from "react-icons/gi";
 import { QnaRichContent } from "./QnaRichContent";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ConfirmAcceptedAnswerModal from "./ConfirmAcceptedAnswerModal";
+import ConfirmModal from "./ConfirmModal";
 import { CommentSection } from "./CommentSection";
 
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
-import { Pagination } from "../../../shared/ui/Pagination";
 import { SearchInput } from "./SearchInput";
 import type { AnswerView } from "../../../shared/types/view/AnswerView";
 
@@ -17,6 +18,8 @@ type Props = {
   acceptedAnswerId?: string | null;
   answers: AnswerView[];
   loading: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
   totalAnswers: number;
   currentPage: number;
   totalPages: number;
@@ -43,9 +46,10 @@ export function QuestionAnswersSection(props: Props) {
     acceptedAnswerId,
     answers,
     loading,
+    hasMore,
+    onLoadMore,
     totalAnswers,
     currentPage,
-    totalPages,
     searchTerm,
     isSearching,
     sortBy,
@@ -56,13 +60,14 @@ export function QuestionAnswersSection(props: Props) {
     onDownvoteAnswer,
     onSearchChange,
     onSortChange,
-    onPageChange,
     onAcceptAnswer,
     onDeleteAnswer,
     onRemoveAcceptedAnswer,
     questionAskedBy,
   } = props;
 
+  const navigate = useNavigate();
+  const observerTarget = useRef<HTMLDivElement>(null);
   const isQuestionOwner = currentUserId && questionAskedBy && currentUserId === questionAskedBy;
 
   type PendingAction =
@@ -73,6 +78,53 @@ export function QuestionAnswersSection(props: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [deletingAnswerId, setDeletingAnswerId] = useState<string | null>(null);
+
+  const [expandedAnswerIds, setExpandedAnswerIds] = useState<Set<string>>(new Set());
+
+  // Infinite Scroll Trigger
+  useEffect(() => {
+    if (!hasMore || loading || !onLoadMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) observer.unobserve(currentTarget);
+    };
+  }, [hasMore, loading, onLoadMore]);
+
+  // Prioritize accepted answer to top
+  const sortedAnswers = useMemo(() => {
+    if (!answers) return [];
+    return [...answers].sort((a, b) => {
+      const aAccepted = a.isAccepted || (acceptedAnswerId && a.id === acceptedAnswerId);
+      const bAccepted = b.isAccepted || (acceptedAnswerId && b.id === acceptedAnswerId);
+      if (aAccepted && !bAccepted) return -1;
+      if (!aAccepted && bAccepted) return 1;
+      return 0;
+    });
+  }, [answers, acceptedAnswerId]);
+
+  const toggleExpand = (id: string) => {
+    setExpandedAnswerIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const modalCopy = useMemo(() => {
     if (!pending) return null;
@@ -142,6 +194,12 @@ export function QuestionAnswersSection(props: Props) {
     }
   };
 
+  const getPlainText = (html: string) => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html || "";
+    return (tmp.textContent || tmp.innerText || "").trim();
+  };
+
   return (
     <div className="mt-12">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -179,24 +237,46 @@ export function QuestionAnswersSection(props: Props) {
         />
       )}
 
-      {loading ? (
+      <ConfirmModal
+        open={Boolean(deletingAnswerId)}
+        onOpenChange={(open) => {
+          if (!open) setDeletingAnswerId(null);
+        }}
+        title="Delete Answer"
+        description="Are you sure you want to delete this answer? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+        onConfirm={async () => {
+          if (deletingAnswerId) {
+            await onDeleteAnswer?.(deletingAnswerId);
+            setDeletingAnswerId(null);
+          }
+        }}
+      />
+
+      {loading && currentPage === 1 ? (
         <div className="py-12 rounded-xl border border-zinc-800 border-dashed text-center text-zinc-500">
           Loading answers...
         </div>
-      ) : answers.length === 0 ? (
+      ) : sortedAnswers.length === 0 ? (
         <div className="py-12 rounded-xl border border-zinc-800 border-dashed text-center text-zinc-500">
           {isSearching ? "No matching answers found." : "No answers yet. Be the first to help!"}
         </div>
       ) : (
         <div className="space-y-8">
-          {answers.map((a) => {
-            const isAccepted = a.isAccepted;
+          {sortedAnswers.map((a) => {
+            const isAccepted = a.isAccepted || (acceptedAnswerId && acceptedAnswerId === a.id);
+            const isExpanded = expandedAnswerIds.has(a.id);
+            const textContent = getPlainText(a.contentHtml);
+            const isLong = textContent.length > 280 || (a.contentHtml.match(/<p>|<br|<li/g) || []).length >= 5;
+            const isEdited = (a.version && a.version > 1) || Boolean(a.updatedAt && a.updatedAt !== a.createdAt);
+
             return (
               <article
                 key={a.id}
                 className={`p-6 rounded-xl border transition-all ${
                   isAccepted
-                    ? "bg-emerald-500/5 border-emerald-500/30"
+                    ? "bg-emerald-500/5 border-emerald-500/40 ring-1 ring-emerald-500/20 shadow-lg shadow-emerald-950/20"
                     : "bg-[#121214] border-zinc-800"
                 }`}
               >
@@ -235,7 +315,7 @@ export function QuestionAnswersSection(props: Props) {
 
                     {(isAccepted || (currentUserId && currentUserId === questionAskedBy)) && (
                       <button
-                        onClick={() => onClickAccept(a.id, a.isAccepted)}
+                        onClick={() => onClickAccept(a.id, Boolean(isAccepted))}
                         className={`mt-3 flex items-center justify-center w-9 h-9 rounded-full border transition-all ${
                           isAccepted
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
@@ -251,11 +331,28 @@ export function QuestionAnswersSection(props: Props) {
 
                   {/* Answer content */}
                   <div className="flex-1 min-w-0">
-                    <div className="prose prose-invert max-w-none text-zinc-300 mb-6">
-                      <QnaRichContent
-                        html={a.contentHtml}
-                        className="qna-content qna-renderer leading-relaxed"
-                      />
+                    {isAccepted && (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                        <GiCheckMark size={13} /> Accepted Answer
+                      </div>
+                    )}
+
+                    <div className="mb-6">
+                      <div className={`prose prose-invert max-w-none text-zinc-300 ${!isExpanded && isLong ? "line-clamp-5 overflow-hidden" : ""}`}>
+                        <QnaRichContent
+                          html={a.contentHtml}
+                          className="qna-content qna-renderer leading-relaxed"
+                        />
+                      </div>
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(a.id)}
+                          className="mt-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          {isExpanded ? "Show less" : "Read more..."}
+                        </button>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between gap-4 mt-6 pt-4 border-t border-zinc-800/80">
@@ -263,13 +360,14 @@ export function QuestionAnswersSection(props: Props) {
                         <div className="flex gap-2">
                           <button
                             type="button"
+                            onClick={() => navigate(`/qna/answers/${a.id}/edit`)}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors"
                           >
                             <MdEdit size={14} /> Edit
                           </button>
                           <button
                             type="button"
-                            onClick={() => onDeleteAnswer?.(a.id)}
+                            onClick={() => setDeletingAnswerId(a.id)}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
                           >
                             <MdDelete size={14} /> Delete
@@ -289,6 +387,9 @@ export function QuestionAnswersSection(props: Props) {
                           </div>
                           <div className="text-xs text-zinc-500">
                             answered {timeAgo(parseDate(a.createdAt))}
+                            {isEdited && (
+                              <span className="text-[11px] text-zinc-500 italic ml-1.5">(edited)</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -300,16 +401,20 @@ export function QuestionAnswersSection(props: Props) {
               </article>
             );
           })}
-        </div>
-      )}
 
-      {totalPages > 1 && (
-        <div className="mt-10 flex items-center justify-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
+          {/* Infinite scroll sentinel & loader */}
+          <div ref={observerTarget} className="py-4 text-center">
+            {loading && currentPage > 1 && (
+              <div className="text-sm text-zinc-500 animate-pulse">
+                Loading more answers...
+              </div>
+            )}
+            {!hasMore && sortedAnswers.length > 0 && (
+              <div className="text-xs text-zinc-600 pt-2">
+                All {totalAnswers} answers loaded
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

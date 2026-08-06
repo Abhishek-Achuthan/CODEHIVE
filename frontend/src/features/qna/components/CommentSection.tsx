@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CommentAPI } from '../../../shared/types/api/qna';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
@@ -14,7 +14,30 @@ export function CommentSection({ answerId, currentUserId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [comments, setComments] = useState<CommentAPI[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCountLoading, setIsCountLoading] = useState(true);
   const [commentCount, setCommentCount] = useState<number>(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadCommentsOnMount = async () => {
+      try {
+        setIsCountLoading(true);
+        const response = await getComments(answerId);
+        if (response.data?.success && isMounted) {
+          setComments(response.data.data);
+          setCommentCount(response.data.data.length);
+        }
+      } catch (error) {
+        // quiet fallback
+      } finally {
+        if (isMounted) setIsCountLoading(false);
+      }
+    };
+    loadCommentsOnMount();
+    return () => {
+      isMounted = false;
+    };
+  }, [answerId]);
 
   const fetchComments = async () => {
     setIsLoading(true);
@@ -82,12 +105,18 @@ export function CommentSection({ answerId, currentUserId }: Props) {
     <div className="mt-4 pt-4 border-t border-zinc-800/80">
       <button
         onClick={toggleOpen}
-        className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+        className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {commentCount > 0 ? (isOpen ? 'Hide comments' : `View ${commentCount} comment${commentCount > 1 ? 's' : ''}`) : (isOpen ? 'Hide comments' : 'Add a comment')}
+        {isCountLoading ? (
+          <span>Comments...</span>
+        ) : commentCount > 0 ? (
+          isOpen ? 'Hide comments' : `View ${commentCount} comment${commentCount > 1 ? 's' : ''}`
+        ) : (
+          isOpen ? 'Hide comments' : 'Add a comment'
+        )}
       </button>
 
       {isOpen && (

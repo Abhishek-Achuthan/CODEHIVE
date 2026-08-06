@@ -8,7 +8,7 @@ import FeatureHighlights from './FeatureHighlights';
 import HowItWorks from './HowItWorks';
 import RolePersona from './RolePersona';
 import CollaborationShowcase from './CollaborationShowcase';
-import PricingPreview from './PricingPreview';
+import PricingPreview from '../../subscription/components/PricingPreview';
 import Testimonials from './Testimonials';
 import FinalCTA from './FinalCTA';
 

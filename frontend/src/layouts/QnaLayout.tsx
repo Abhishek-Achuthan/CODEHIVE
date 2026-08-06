@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-
 import { QnaBackgroundGlow } from "../shared/ui/QnaBackgroundGlow";
 
 type QnaLayoutProps = {
@@ -17,7 +16,7 @@ export default function QnaLayout({
     <div className="dark h-full relative flex flex-col z-0">
       <QnaBackgroundGlow />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto pb-10">
+      <main className="flex-1 w-full max-w-7xl mx-auto pb-10 min-w-0">
         <div className="w-full p-6 lg:p-8">
           {(title || description) && (
             <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-4">

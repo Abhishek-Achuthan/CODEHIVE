@@ -14,9 +14,11 @@ const AuthCallbackPage = lazy(() => import("../features/auth/pages/AuthCallbackP
 
 // Home
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
-const PricingPage = lazy(() => import("../features/home/components/PricingPage"));
+
+// Subscription & Pricing
+const PricingPage = lazy(() => import("../features/subscription/pages/PricingPage"));
 const SubscriptionSuccessPage = lazy(
-  () => import("../features/home/pages/SubscriptionSuccessPage"),
+  () => import("../features/subscription/pages/SubscriptionSuccessPage"),
 );
 
 // Profile & Wallet

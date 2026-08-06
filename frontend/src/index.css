@@ -316,3 +316,21 @@ textarea::placeholder {
   background: transparent;
 }
 
+/* Ensure RSuite DatePicker popups appear above room cards, toolbar elements, and overlays */
+.rs-picker-popup,
+.rs-picker-menu,
+.rs-picker-daterange-menu,
+.rs-picker-popover {
+  z-index: 9999 !important;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+

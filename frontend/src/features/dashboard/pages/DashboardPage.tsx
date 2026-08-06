@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import { useMyRooms } from "../../room/hooks/useMyRooms";
 import { useFetchSessions } from "../../session/hooks/useFetchSessions";
 import { useQuestionsList } from "../../qna/hooks/useListQuestions";
 import { useMentorInsights } from "../../session/hooks/useMentorInsights";
 import { UserRole, MentorStatus } from "../../../shared/constants/auth";
+import { getSessionRoomPhase, canOpenSessionRoom, getSessionJoinLabel } from "../../room/authorization/lifecycleMessages";
 import {
   ArrowRight,
   Calendar,
@@ -22,6 +23,7 @@ import {
 import { formatDistanceToNow, format } from "date-fns";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
   const isMentor =
     user?.role === UserRole.MENTOR &&
@@ -405,6 +407,14 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {upcomingValidSessions.map((session) => {
                   const startTime = new Date(session.startTime);
+                  const participantName = isMentor 
+                    ? (session.user ? `${session.user.firstName} ${session.user.lastName}` : "Student")
+                    : (session.mentor ? `${session.mentor.firstName} ${session.mentor.lastName}` : "Mentor");
+                  
+                  const roomPhase = getSessionRoomPhase(session.startTime, session.endTime);
+                  const canOpenRoom = canOpenSessionRoom(session.roomId, roomPhase);
+                  const joinLabel = getSessionJoinLabel(roomPhase);
+
                   return (
                     <div
                       key={session.id}
@@ -417,7 +427,7 @@ export default function DashboardPage() {
                           </div>
                           <div>
                             <h4 className="text-sm font-medium text-white line-clamp-1">
-                              {session.mentor?.firstName || "Mentor"}
+                              {participantName}
                             </h4>
                             <p className="text-xs text-zinc-500">
                               1-on-1 Session
@@ -437,8 +447,16 @@ export default function DashboardPage() {
                             })}
                           </span>
                         </div>
-                        <button className="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-medium rounded-lg transition-colors">
-                          Join Call
+                        <button 
+                          onClick={() => session.roomId && navigate(`/rooms/${session.roomId}`)}
+                          disabled={!canOpenRoom}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                            canOpenRoom 
+                              ? "bg-purple-500/10 hover:bg-purple-500/20 text-purple-400" 
+                              : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                          }`}
+                        >
+                          {joinLabel || "Join Call"}
                         </button>
                       </div>
                     </div>

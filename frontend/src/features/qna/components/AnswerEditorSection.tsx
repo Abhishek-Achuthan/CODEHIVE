@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import toast from "react-hot-toast";
 import { createQnaEditorExtensions, getQnaEditorAttributes } from "./qnaEditorBase";
@@ -14,6 +14,15 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
   onSubmitHtml,
   isPosting = false,
 }) => {
+  const [charCount, setCharCount] = useState(0);
+
+  const plainTextLength = (html: string): number => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html || "";
+    const text = tmp.textContent || tmp.innerText || "";
+    return text.trim().length;
+  };
+
   const editor = useEditor({
     extensions: [
       ...createQnaEditorExtensions({
@@ -21,6 +30,9 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
       }),
     ],
     content: initialHtml ?? "",
+    onUpdate: ({ editor }) => {
+      setCharCount(plainTextLength(editor.getHTML()));
+    },
     editorProps: {
       attributes: {
         ...getQnaEditorAttributes({
@@ -33,15 +45,9 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
   useEffect(() => {
     if (editor && typeof initialHtml === "string") {
       editor.commands.setContent(initialHtml, { emitUpdate: false });
+      setCharCount(plainTextLength(initialHtml));
     }
   }, [editor, initialHtml]);
-
-  const plainTextLength = (html: string): number => {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html || "";
-    const text = tmp.textContent || tmp.innerText || "";
-    return text.trim().length;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,18 +62,19 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
       return;
     }
     
-    if (textLength > 50000) {
-      toast.error("Answer must not exceed 50,000 characters.");
+    if (textLength > 2000) {
+      toast.error("Answer must not exceed 2,000 characters.");
       return;
     }
     
     await onSubmitHtml(html);
     editor.commands.clearContent();
+    setCharCount(0);
   };
 
   return (
-    <div className="mt-16">
-      <h2 className="text-xl font-semibold text-zinc-100 mb-6">Your Answer</h2>
+    <div className="mt-8">
+      <h2 className="text-xl font-semibold text-zinc-100 mb-4">Your Answer</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-zinc-800 bg-[#121214] overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/50 transition-all">
@@ -126,13 +133,17 @@ const AnswerEditorSection: React.FC<AnswerEditorSectionProps> = ({
             </div>
           </div>
 
-          <EditorContent editor={editor} className="p-4 min-h-[200px] text-zinc-200 prose prose-invert max-w-none prose-sm" />
+          <EditorContent editor={editor} className="p-4 min-h-[160px] text-zinc-200 prose prose-invert max-w-none prose-sm" />
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-between items-center pt-1">
+          <span className={`text-xs ${charCount > 2000 ? 'text-rose-400 font-medium' : 'text-zinc-500'}`}>
+            {charCount}/2000 characters
+          </span>
+
           <button
             type="submit"
-            disabled={isPosting}
+            disabled={isPosting || charCount > 2000}
             className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPosting ? "Posting..." : "Post Your Answer"}

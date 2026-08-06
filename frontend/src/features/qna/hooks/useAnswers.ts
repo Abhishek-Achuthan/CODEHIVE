@@ -52,6 +52,7 @@ export function useAnswers(
     /* ---------- data ---------- */
     answers,
     loading: list.loading,
+    hasMore: list.hasMore,
     isPosting: actions.isPosting,
 
     totalAnswers: Math.max(

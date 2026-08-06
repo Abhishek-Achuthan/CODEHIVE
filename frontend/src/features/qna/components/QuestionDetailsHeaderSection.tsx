@@ -1,10 +1,11 @@
-import type React from "react";
+import React, { useState } from "react";
 import { MdRemoveRedEye as MdEye, MdBookmark, MdEdit, MdDelete } from "react-icons/md";
 import { QnaRichContent } from "./QnaRichContent";
 import { parseDate, timeAgo } from "../../../shared/utils/dateUtils";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../shared/hooks/storeHooks";
 import type { QuestionDetailsView } from "../../../shared/types/view/QuestionDetailsView";
+import ConfirmModal from "./ConfirmModal";
 
 interface QuestionHeaderSectionProps {
   data: QuestionDetailsView;
@@ -31,6 +32,9 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
   const created = parseDate(data.createdAt);
   const updated = parseDate(data.lastEditedAt);
   const isAuthor = currentUser?.id === data.author.id;
+  const isEdited = (data.version && data.version > 1) || Boolean(data.lastEditedAt && data.lastEditedAt !== data.createdAt);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
     <div className="flex gap-6 mb-10 pb-8 border-b border-zinc-800/80">
@@ -81,9 +85,16 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
       {/* Main question content */}
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start gap-4 mb-4">
-          <h1 className="text-2xl font-bold text-zinc-100 leading-tight">
-            {data.title}
-          </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-zinc-100 leading-tight">
+              {data.title}
+            </h1>
+            {isEdited && (
+              <span className="text-xs text-zinc-500 italic font-normal">
+                (edited)
+              </span>
+            )}
+          </div>
           
           {isAuthor && (
             <div className="flex gap-2 shrink-0">
@@ -95,7 +106,7 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
                 <span>Edit</span>
               </Link>
               <button
-                onClick={onDeleteQuestion}
+                onClick={() => setDeleteModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 rounded-md transition-colors"
               >
                 <MdDelete size={14} />
@@ -152,6 +163,18 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Question"
+        description="Are you sure you want to delete this question? All associated answers and comments will be permanently removed."
+        confirmText="Delete"
+        variant="danger"
+        onConfirm={async () => {
+          await onDeleteQuestion?.();
+        }}
+      />
     </div>
   );
 };

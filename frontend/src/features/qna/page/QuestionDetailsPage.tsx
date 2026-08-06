@@ -1,3 +1,4 @@
+import React from "react";
 import { useParams } from "react-router-dom";
 import QnaLayout from "../../../layouts/QnaLayout";
 import { QuesDetailPageSkelton } from "../components/QuesDetailPageSkelton";
@@ -44,8 +45,9 @@ const QuestionDetailsPage: React.FC = () => {
     answerVotes,
     answers,
     answersLoading,
+    hasMoreAnswers,
     isPostingAnswer
-  } = controller
+  } = controller;
 
   const effectiveAcceptedAnswerId = answersLoading
     ? question.acceptedAnswerId
@@ -67,11 +69,33 @@ const QuestionDetailsPage: React.FC = () => {
               onDeleteQuestion={() => questionId && deleteQuestion(questionId)}
             />
 
+            {effectiveAcceptedAnswerId ? (
+              <div className="mb-8 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-200">
+                <div className="font-semibold mb-1">Accepted answer selected</div>
+                <div className="text-sm text-green-200/90">
+                  This question already has an accepted answer, so new answers can’t be posted.
+                  {currentUser?.id === question.author.id
+                    ? " You can still change the accepted answer by selecting a different one above."
+                    : ""}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-8">
+                <AnswerEditorSection
+                  initialHtml={undefined}
+                  onSubmitHtml={actions.submitAnswer}
+                  isPosting={isPostingAnswer}
+                />
+              </div>
+            )}
+
             <QuestionAnswersSection
               questionId={questionId}
               acceptedAnswerId={effectiveAcceptedAnswerId}
               answers={answers}
               loading={answersLoading}
+              hasMore={hasMoreAnswers}
+              onLoadMore={actions.loadMore}
               totalAnswers={totalAnswers}
               currentPage={currentPage}
               totalPages={totalPages}
@@ -91,24 +115,6 @@ const QuestionDetailsPage: React.FC = () => {
               questionAskedBy={question.author.id}
               currentUserId={currentUser?.id}
             />
-
-            {effectiveAcceptedAnswerId ? (
-              <div className="mt-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-200">
-                <div className="font-semibold mb-1">Accepted answer selected</div>
-                <div className="text-sm text-green-200/90">
-                  This question already has an accepted answer, so new answers can’t be posted.
-                  {currentUser?.id === question.author.id
-                    ? " You can still change the accepted answer by selecting a different one above."
-                    : ""}
-                </div>
-              </div>
-            ) : (
-              <AnswerEditorSection
-                initialHtml={undefined}
-                onSubmitHtml={actions.submitAnswer}
-                isPosting={isPostingAnswer}
-              />
-            )}
           </div>
         </div>
 

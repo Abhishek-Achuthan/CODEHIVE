@@ -33,7 +33,7 @@ export class CreateCommentUseCase {
         category: 'QNA',
         title: 'New Comment on your Answer',
         message: `${author.firstName} commented on your answer.`,
-        actionUrl: `/qna/${answer.questionId}`,
+        actionUrl: `/qna/question/${answer.questionId}`,
       });
     }
 

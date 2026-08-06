@@ -7,7 +7,7 @@ import { BaseError } from "../../../shared/errors/BaseError";
 import toast from "react-hot-toast";
 import { mapAnswerToView } from "../../../shared/mappers/answer.mapper";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export function useAnswerList(questionId: string | undefined) {
   const [answers, setAnswers] = useState<AnswerView[]>([]);
@@ -21,6 +21,11 @@ export function useAnswerList(questionId: string | undefined) {
     totalItems: 0,
     totalPages: 0,
   });
+
+  // Reset search and sort page
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, sortBy]);
 
   useEffect(() => {
     if (!questionId) return;
@@ -42,15 +47,27 @@ export function useAnswerList(questionId: string | undefined) {
         if (cancelled) return;
 
         const mapped = (res?.items ?? []).map(mapAnswerToView);
-        setAnswers(mapped);
+        
+        if (currentPage === 1) {
+          setAnswers(mapped);
+        } else {
+          setAnswers((prev) => {
+            const existingIds = new Set(prev.map((a) => a.id));
+            const newAnswers = mapped.filter((a) => !existingIds.has(a.id));
+            return [...prev, ...newAnswers];
+          });
+        }
+
         setMeta({
           totalItems: res?.totalItems ?? 0,
           totalPages: res?.totalPages ?? 0,
         });
       } catch (error) {
         if (error instanceof BaseError) toast.error(error.message);
-        setAnswers([]);
-        setMeta({ totalItems: 0, totalPages: 0 });
+        if (currentPage === 1) {
+          setAnswers([]);
+          setMeta({ totalItems: 0, totalPages: 0 });
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -62,14 +79,18 @@ export function useAnswerList(questionId: string | undefined) {
     };
   }, [questionId, currentPage, sortBy, debouncedSearch]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch, sortBy]);
+  const hasMore = currentPage < meta.totalPages;
+
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
 
   return {
     answers,
     loading,
-
+    hasMore,
     totalItems: meta.totalItems,
     totalPages: meta.totalPages,
     currentPage,
@@ -77,6 +98,7 @@ export function useAnswerList(questionId: string | undefined) {
     searchTerm,
 
     actions: {
+      loadMore,
       changePage: setCurrentPage,
       changeSearch: setSearchTerm,
       changeSort: (v: AnswerSortApi) => {

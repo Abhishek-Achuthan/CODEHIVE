@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CommentAPI } from '../../../shared/types/api/qna';
 import { parseDate, timeAgo } from '../../../shared/utils/dateUtils';
 import { CommentForm } from './CommentForm';
+import ConfirmModal from './ConfirmModal';
 
 type Props = {
   comment: CommentAPI;
@@ -12,8 +13,10 @@ type Props = {
 
 export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Props) {
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const isOwner = currentUserId === comment.author.id;
+  const isEdited = Boolean(comment.updatedAt && comment.updatedAt !== comment.createdAt);
 
   const handleUpdate = async (content: string) => {
     await onUpdate(comment.id, content);
@@ -50,6 +53,11 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
               {comment.author.firstName || comment.author.username || 'Anonymous'}
             </span>
             <span className="text-sm text-zinc-300 break-words">{comment.content}</span>
+            {isEdited && (
+              <span className="text-[11px] text-zinc-500 italic ml-1.5">
+                (edited)
+              </span>
+            )}
             <span className="text-[11px] text-zinc-500 ml-2 whitespace-nowrap">
               {timeAgo(parseDate(comment.createdAt))}
             </span>
@@ -63,11 +71,7 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
                   Edit
                 </button>
                 <button
-                  onClick={() => {
-                    if (window.confirm('Delete this comment?')) {
-                      handleDelete();
-                    }
-                  }}
+                  onClick={() => setShowDeleteModal(true)}
                   disabled={isDeleting}
                   className="text-[11px] text-rose-500/70 hover:text-rose-400 transition-colors"
                 >
@@ -78,6 +82,16 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        title="Delete Comment"
+        description="Are you sure you want to delete this comment?"
+        confirmText="Delete"
+        variant="danger"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

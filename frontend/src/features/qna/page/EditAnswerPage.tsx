@@ -32,9 +32,28 @@ const EditAnswerPage = () => {
     }
   }, [error]);
 
+  const plainTextLength = (html: string): number => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html || "";
+    const text = tmp.textContent || tmp.innerText || "";
+    return text.trim().length;
+  };
+
+  const currentLen = plainTextLength(content);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!answerId) return;
+
+    if (currentLen < 10) {
+      toast.error("Answer must contain at least 10 characters.");
+      return;
+    }
+
+    if (currentLen > 2000) {
+      toast.error("Answer must not exceed 2,000 characters.");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -87,9 +106,14 @@ const EditAnswerPage = () => {
           className="bg-gray-900/30 p-6 rounded-lg border border-gray-800/50"
         >
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Your Answer
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Your Answer
+              </label>
+              <span className={`text-xs ${currentLen > 2000 ? 'text-rose-400 font-medium' : 'text-gray-500'}`}>
+                {currentLen}/2000 characters
+              </span>
+            </div>
             <QuestionEditor
               value={content}
               onChange={setContent}
@@ -114,9 +138,9 @@ const EditAnswerPage = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className={`px-6 py-2 bg-linear-to-r from-purple-600 to-blue-500 text-white rounded-md ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                disabled={isSubmitting || currentLen > 2000}
+                className={`px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-md ${
+                  isSubmitting || currentLen > 2000 ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? "Saving…" : "Save Changes"}
