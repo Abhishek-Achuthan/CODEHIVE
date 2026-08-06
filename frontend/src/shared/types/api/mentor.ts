@@ -1,6 +1,8 @@
 import type { PaginatedResponse } from "../core";
 
-import type { ExperienceApi } from "./auth";
+import type { UserLanguage } from "../domain/language.types";
+
+import type { ExperienceApi } from "./auth"
 
 export interface CreateMentorAvailabilityRequest {
     mentorId: string;
@@ -87,6 +89,7 @@ export interface MentorProfileResponse {
     websiteUrl?: string;
     primaryExpertise?: string;
     experienceLevel?: string;
+    languages?: UserLanguage[];
 }
 
 export interface MentorSummary {

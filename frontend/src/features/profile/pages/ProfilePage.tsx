@@ -19,7 +19,7 @@ import {
   formatBillingIntervalLabel,
   formatSubscriptionDate,
   useMySubscription,
-} from "../../home/hooks/useMySubscription";
+} from "../../subscription/hooks/useMySubscription";
 import toast from "react-hot-toast";
 
 

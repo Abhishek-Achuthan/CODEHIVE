@@ -137,6 +137,8 @@ export const ERROR_MESSAGES = {
 
   ROOM: {
     UNAUTHORIZED: 'Unauthorized',
+    TITLE_REQUIRED: 'Room title is required',
+    TITLE_TOO_LONG: 'Room title cannot exceed 40 characters',
     USER_NOT_IN_ROOM: 'User is not part of this room',
     MESSAGE_EMPTY: 'Message cannot be empty',
     MESSAGE_NOT_FOUND: 'Message not found',

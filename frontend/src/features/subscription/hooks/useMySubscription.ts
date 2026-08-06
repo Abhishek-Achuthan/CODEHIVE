@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../store";
-import { SubscriptionService } from "../../../services/subscriptionService";
+import { useCallback, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../shared/hooks/storeHooks";
+import { fetchMySubscription, clearSubscription } from "../../../store/slices/subscriptionSlice";
 import type { CurrentSubscription, PlanBillingInterval } from "../../../shared/types/api/subscription";
 import type { PlanView } from "../../../shared/types/view/PlanView";
 
@@ -36,8 +35,24 @@ export function isSamePlanBillingSwitch(
   const price = viewingBilling === "monthly" ? plan.pricing.monthly : plan.pricing.yearly;
   if (price === 0) return false;
 
+  // Allow switching from monthly to yearly ONLY.
   return (
-    subscription.plan.id === plan.id && subscription.billingInterval !== viewingBilling
+    subscription.plan.id === plan.id &&
+    subscription.billingInterval === "monthly" &&
+    viewingBilling === "yearly"
+  );
+}
+
+export function isYearlyToMonthlyDowngrade(
+  plan: PlanView,
+  subscription: CurrentSubscription | null,
+  viewingBilling: PlanBillingInterval,
+): boolean {
+  if (!subscription) return false;
+  return (
+    subscription.plan.id === plan.id &&
+    subscription.billingInterval === "yearly" &&
+    viewingBilling === "monthly"
   );
 }
 
@@ -47,33 +62,27 @@ export function getBillingSwitchLabel(viewingBilling: PlanBillingInterval): stri
 
 export function useMySubscription(options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true;
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const [subscription, setSubscription] = useState<CurrentSubscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const { subscription, loading, fetched } = useAppSelector((state) => state.subscription);
 
   const refetch = useCallback(async () => {
     if (!isAuthenticated || !enabled) {
-      setSubscription(null);
-      setLoading(false);
+      dispatch(clearSubscription());
       return null;
     }
-
-    setLoading(true);
-    try {
-      const data = await SubscriptionService.getMySubscription();
-      setSubscription(data);
-      return data;
-    } catch {
-      setSubscription(null);
-      return null;
-    } finally {
-      setLoading(false);
+    const action = await dispatch(fetchMySubscription());
+    if (fetchMySubscription.fulfilled.match(action)) {
+      return action.payload;
     }
-  }, [enabled, isAuthenticated]);
+    return null;
+  }, [dispatch, enabled, isAuthenticated]);
 
   useEffect(() => {
-    void refetch();
-  }, [refetch]);
+    if (isAuthenticated && enabled && !fetched) {
+      void refetch();
+    }
+  }, [enabled, fetched, isAuthenticated, refetch]);
 
   return { subscription, loading, refetch, isAuthenticated };
 }

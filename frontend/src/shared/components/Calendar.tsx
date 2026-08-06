@@ -1,14 +1,31 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+export interface DaySlotInfo {
+    hasSlots: boolean;
+    hasOneToOne: boolean;
+    hasGroup: boolean;
+}
+
 interface CalendarProps {
     selectedDate: Date | null;
     onSelectDate: (date: Date | null) => void;
     showRecurringOption?: boolean;
+    getDateSlotInfo?: (date: Date) => DaySlotInfo | null;
+    activeFilter?: "ALL" | "ONE_TO_ONE" | "PRIVATE_SESSION";
+    onMonthChange?: (newMonth: Date) => void;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, showRecurringOption = false }) => {
+export const Calendar: React.FC<CalendarProps> = ({
+    selectedDate,
+    onSelectDate,
+    showRecurringOption = false,
+    getDateSlotInfo,
+    activeFilter = "ALL",
+    onMonthChange,
+}) => {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const today = new Date();
 
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
@@ -24,14 +41,29 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
 
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDay = getFirstDayOfMonth(currentDate);
-    const today = new Date();
+
+    // 3 Month Boundary Constraints: Current Month up to Current Month + 2
+    const isPrevDisabled =
+        currentDate.getFullYear() < today.getFullYear() ||
+        (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() <= today.getMonth());
+
+    const maxMonthDate = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    const isNextDisabled =
+        currentDate.getFullYear() > maxMonthDate.getFullYear() ||
+        (currentDate.getFullYear() === maxMonthDate.getFullYear() && currentDate.getMonth() >= maxMonthDate.getMonth());
 
     const handlePrevMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+        if (isPrevDisabled) return;
+        const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        setCurrentDate(newDate);
+        onMonthChange?.(newDate);
     };
 
     const handleNextMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+        if (isNextDisabled) return;
+        const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        setCurrentDate(newDate);
+        onMonthChange?.(newDate);
     };
 
     const isSameDay = (d1: Date, d2: Date) => {
@@ -40,24 +72,29 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
             d1.getDate() === d2.getDate();
     };
 
-
-
     const renderDays = () => {
         const days = [];
         const emptyDays = firstDay;
 
-        // Empty slots for previous month
         for (let i = 0; i < emptyDays; i++) {
             days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
         }
 
-        // Days of current month
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
             const isToday = isSameDay(date, today);
             const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             const isPast = date < todayStart;
+
+            const slotInfo = getDateSlotInfo ? getDateSlotInfo(date) : null;
+            const hasMatchingSlots = slotInfo
+                ? activeFilter === "ONE_TO_ONE"
+                    ? slotInfo.hasOneToOne
+                    : activeFilter === "PRIVATE_SESSION"
+                    ? slotInfo.hasGroup
+                    : slotInfo.hasSlots
+                : false;
 
             days.push(
                 <button
@@ -69,9 +106,21 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
                         ${isSelected ? 'bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-500/30' : 'text-zinc-300 hover:bg-zinc-800'}
                         ${isToday && !isSelected ? 'border border-indigo-500/50 text-indigo-400' : ''}
                         ${isPast ? 'text-zinc-600 cursor-not-allowed hover:bg-transparent' : ''}
+                        ${!isPast && hasMatchingSlots && !isSelected ? 'ring-1 ring-indigo-500/40 font-semibold text-zinc-100 bg-zinc-800/50' : ''}
                     `}
                 >
                     {day}
+                    {!isPast && hasMatchingSlots && (
+                        <span
+                            className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
+                                activeFilter === "PRIVATE_SESSION"
+                                    ? "bg-purple-400 shadow-xs shadow-purple-500"
+                                    : activeFilter === "ONE_TO_ONE"
+                                    ? "bg-blue-400 shadow-xs shadow-blue-500"
+                                    : "bg-indigo-400 shadow-xs shadow-indigo-500"
+                            }`}
+                        />
+                    )}
                 </button>
             );
         }
@@ -85,10 +134,22 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onSelectDate, 
                     {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h2>
                 <div className="flex gap-2">
-                    <button onClick={handlePrevMonth} className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
+                    <button
+                        type="button"
+                        onClick={handlePrevMonth}
+                        disabled={isPrevDisabled}
+                        className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-zinc-400"
+                        title={isPrevDisabled ? "Cannot navigate to past months" : "Previous month"}
+                    >
                         <ChevronLeft className="h-5 w-5" />
                     </button>
-                    <button onClick={handleNextMonth} className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
+                    <button
+                        type="button"
+                        onClick={handleNextMonth}
+                        disabled={isNextDisabled}
+                        className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-zinc-400"
+                        title={isNextDisabled ? "Limit reached (Max 3 months ahead)" : "Next month"}
+                    >
                         <ChevronRight className="h-5 w-5" />
                     </button>
                 </div>

@@ -253,7 +253,7 @@ export default function ExperienceSection({
             {viewItems.map((it, idx) => (
               <TimelineItem key={it.id}>
                 <TimelineOppositeContent
-                  sx={{ flex: 0.28, fontSize: 13, fontWeight: 500, color: "#a1a1aa", paddingTop: "12px" }}
+                  sx={{ flex: { xs: 0.35, sm: 0.3 }, fontSize: 13, fontWeight: 500, color: "#a1a1aa", paddingTop: "12px", whiteSpace: "nowrap" }}
                 >
                   {it.dateRange}
                 </TimelineOppositeContent>

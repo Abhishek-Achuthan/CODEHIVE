@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
-import Header from "../../../shared/ui/Header";
-import Footer from "../../../shared/ui/Footer";
 import {
   formatBillingIntervalLabel,
   formatSubscriptionDate,
   useMySubscription,
 } from "../hooks/useMySubscription";
+import { triggerCelebrationConfetti } from "../../../shared/utils/confetti";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 8;
@@ -17,6 +16,7 @@ export default function SubscriptionSuccessPage() {
   const navigate = useNavigate();
   const { subscription, loading, refetch } = useMySubscription();
   const [polling, setPolling] = useState(true);
+  const confettiFiredRef = useRef(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,9 +45,15 @@ export default function SubscriptionSuccessPage() {
 
   const isActivating = polling || (loading && !subscription);
 
+  useEffect(() => {
+    if (!isActivating && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      triggerCelebrationConfetti();
+    }
+  }, [isActivating]);
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <Header />
       <main className="mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center sm:px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -116,7 +122,6 @@ export default function SubscriptionSuccessPage() {
           </div>
         </motion.div>
       </main>
-      <Footer />
     </div>
   );
 }
