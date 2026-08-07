@@ -2,15 +2,15 @@ import { inject, injectable } from 'tsyringe';
 import { IJoinRoomViaInviteUseCase } from '../interface/room/IJoinRoomViaInviteUseCase';
 import { JoinRoomSnapshotDTO, JoinViaInviteDTO } from '../../dto/RoomDTO';
 import { RoomInviteService } from '../../services/RoomInviteService';
-import { JoinRoomUseCase } from './JoinRoomUseCase';
+import type { IJoinRoomUseCase } from '../interface/room/IJoinRoomUseCase';
 
 @injectable()
 export class JoinRoomViaInviteUseCase implements IJoinRoomViaInviteUseCase {
   constructor(
     @inject(RoomInviteService)
     private readonly _roomInviteService: RoomInviteService,
-    @inject(JoinRoomUseCase)
-    private readonly _joinRoomUseCase: JoinRoomUseCase,
+    @inject('IJoinRoomUseCase')
+    private readonly _joinRoomUseCase: IJoinRoomUseCase,
   ) {}
 
   async execute(data: JoinViaInviteDTO): Promise<JoinRoomSnapshotDTO> {

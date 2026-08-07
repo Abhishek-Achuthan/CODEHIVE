@@ -154,7 +154,10 @@ export class MentorController {
   async handleGetMyReviews(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.user;
-      const result = await this._getReviews.execute(id);
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+      
+      const result = await this._getReviews.execute(id, page, limit);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

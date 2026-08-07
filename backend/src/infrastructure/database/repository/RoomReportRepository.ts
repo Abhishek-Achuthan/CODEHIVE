@@ -1,8 +1,43 @@
 import { Model, Types } from 'mongoose';
-import { IRoomReportRepository } from '../../../domain/interfaces/IRoomReportRepository';
+import {
+  AdminReportListResult,
+  IRoomReportRepository,
+} from '../../../domain/interfaces/IRoomReportRepository';
 import { RoomReportEntity } from '../../../domain/entities/room/RoomReportEntity';
 import RoomReportModel from '../models/room/RoomReportModel';
 import { RoomReportDocument } from '../schemas/room/RoomReportSchema';
+
+interface PopulatedRoomRef {
+  _id: Types.ObjectId;
+  title: string;
+}
+
+interface PopulatedUserRef {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface AdminReportDetailsRecord {
+  _id: Types.ObjectId;
+  roomId: Types.ObjectId | PopulatedRoomRef | null;
+  reporterId: Types.ObjectId | PopulatedUserRef | null;
+  reportedUserId: Types.ObjectId | PopulatedUserRef | null;
+  reason: string;
+  description?: string;
+  resolvedBy?: Types.ObjectId;
+  status: RoomReportEntity['status'];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const isPopulatedRoomRef = (value: AdminReportDetailsRecord['roomId']): value is PopulatedRoomRef =>
+  typeof value === 'object' && value !== null && 'title' in value;
+
+const isPopulatedUserRef = (
+  value: AdminReportDetailsRecord['reporterId'] | AdminReportDetailsRecord['reportedUserId'],
+): value is PopulatedUserRef => typeof value === 'object' && value !== null && 'email' in value;
 
 export class RoomReportRepository implements IRoomReportRepository {
   private readonly _model: Model<RoomReportDocument>;
@@ -36,7 +71,7 @@ export class RoomReportRepository implements IRoomReportRepository {
     };
   }
 
-  async findAllWithDetails(page: number, limit: number): Promise<{ data: any[]; total: number }> {
+  async findAllWithDetails(page: number, limit: number): Promise<AdminReportListResult> {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
@@ -53,24 +88,24 @@ export class RoomReportRepository implements IRoomReportRepository {
     ]);
 
     return {
-      data: data.map((doc: any) => ({
+      data: (data as unknown as AdminReportDetailsRecord[]).map((doc) => ({
         id: doc._id.toString(),
-        room: doc.roomId ? {
+        room: isPopulatedRoomRef(doc.roomId) ? {
           id: doc.roomId._id.toString(),
           title: doc.roomId.title,
         } : null,
-        reporter: doc.reporterId ? {
+        reporter: isPopulatedUserRef(doc.reporterId) ? {
           id: doc.reporterId._id.toString(),
           name: `${doc.reporterId.firstName} ${doc.reporterId.lastName}`,
           email: doc.reporterId.email,
         } : null,
-        reportedUser: doc.reportedUserId ? {
+        reportedUser: isPopulatedUserRef(doc.reportedUserId) ? {
           id: doc.reportedUserId._id.toString(),
           name: `${doc.reportedUserId.firstName} ${doc.reportedUserId.lastName}`,
           email: doc.reportedUserId.email,
         } : null,
         reason: doc.reason,
-        description: doc.description,
+        ...(doc.description !== undefined ? { description: doc.description } : {}),
         resolvedBy: doc.resolvedBy ? doc.resolvedBy.toString() : null,
         status: doc.status,
         createdAt: doc.createdAt,

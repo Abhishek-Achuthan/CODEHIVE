@@ -8,11 +8,15 @@ interface TopBarProps {
   roomId: string;
   showInviteControls?: boolean;
   showEndRoomControl?: boolean;
+  showReviewButton?: boolean;
+  hasReviewed?: boolean;
+  onReviewClick?: () => void;
   onOpenSettings?: () => void;
   onEndRoom?: () => void;
   onLeave: () => void;
   isVideoActive?: boolean;
   onToggleVideo?: () => void;
+  hasActiveVideoCall?: boolean;
   isAudioMuted?: boolean;
   isVideoMuted?: boolean;
   isScreenSharing?: boolean;
@@ -27,10 +31,14 @@ const TopBar: React.FC<TopBarProps> = ({
   roomId,
   showInviteControls = false,
   showEndRoomControl = false,
+  showReviewButton = false,
+  hasReviewed = false,
+  onReviewClick,
   onOpenSettings,
   onEndRoom,
   onLeave,
   isVideoActive = false,
+  hasActiveVideoCall = false,
   onToggleVideo,
   isAudioMuted = false,
   isVideoMuted = false,
@@ -75,18 +83,24 @@ const TopBar: React.FC<TopBarProps> = ({
             <span className="text-xs font-medium hidden sm:inline">Details</span>
           </button>
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
-          <button
-            type="button"
-            onClick={onToggleVideo}
-            className={`p-1.5 rounded-md transition-colors ${
-              isVideoActive
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
-            }`}
-            title={isVideoActive ? "Return to Video Meeting" : "Start Video Meeting"}
-          >
-            <Video className="w-4 h-4" />
-          </button>
+          
+          <div className="relative">
+            <button
+              type="button"
+              onClick={onToggleVideo}
+              className={`p-1.5 rounded-md transition-colors ${
+                isVideoActive
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+              title={isVideoActive ? "Return to Video Meeting" : "Join Video Meeting"}
+            >
+              <Video className="w-4 h-4" />
+            </button>
+            {!isVideoActive && hasActiveVideoCall && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 border-2 border-[#161b22] rounded-full shadow-sm animate-pulse"></span>
+            )}
+          </div>
           
           {/* Native Video Controls (always visible, disabled if not active) */}
           <div className="w-px h-4 bg-gray-700 mx-1"></div>
@@ -136,6 +150,16 @@ const TopBar: React.FC<TopBarProps> = ({
             className="flex items-center gap-2 px-3 py-1.5 bg-amber-600/10 hover:bg-amber-600/20 text-amber-400 rounded-lg text-sm font-medium transition-colors border border-amber-500/20"
           >
             <span>End Room</span>
+          </button>
+        )}
+        
+        {showReviewButton && (
+          <button
+            type="button"
+            onClick={onReviewClick}
+            className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded-lg text-sm font-medium transition-colors border border-indigo-500/20"
+          >
+            <span>{hasReviewed ? 'View Review' : 'Add Review'}</span>
           </button>
         )}
 

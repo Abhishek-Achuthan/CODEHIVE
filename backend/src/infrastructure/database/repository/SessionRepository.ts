@@ -251,13 +251,16 @@ export class SessionRepository
     const limit = options.limit || 10;
     const skip = (page - 1) * limit;
     
-    const sortCondition = filter?.status === SessionStatus.UPCOMING ? { startTime: 1 } : { createdAt: -1 };
+    const sortCondition: Record<string, 1 | -1> =
+      filter?.status === SessionStatus.UPCOMING
+        ? { startTime: 1 }
+        : { createdAt: -1 };
 
     const totalItems = await SessionModel.countDocuments(query);
     const totalPages = Math.ceil(totalItems / limit);
 
     const docsQuery = SessionModel.find(query)
-      .sort(sortCondition as any)
+      .sort(sortCondition)
       .populate<{ mentorId: UserLeanDoc }>({
         path: 'mentorId',
         select: 'firstName lastName',
@@ -420,11 +423,11 @@ export class SessionRepository
     const doc: Partial<SessionDoc> = {};
 
     if (data.mentorId !== undefined)
-      doc.mentorId = data.mentorId as unknown as SessionDoc['mentorId'];
+      doc.mentorId = new Types.ObjectId(data.mentorId) as unknown as SessionDoc['mentorId'];
     if (data.userId !== undefined)
-      doc.userId = data.userId as unknown as SessionDoc['userId'];
+      doc.userId = new Types.ObjectId(data.userId) as unknown as SessionDoc['userId'];
     if (data.roomId !== undefined)
-      doc.roomId = data.roomId as unknown as SessionDoc['roomId'];
+      doc.roomId = data.roomId ? (new Types.ObjectId(data.roomId) as unknown as SessionDoc['roomId']) : null;
     if (data.startTime !== undefined) doc.startTime = data.startTime;
     if (data.endTime !== undefined) doc.endTime = data.endTime;
     if (data.status !== undefined) doc.status = data.status;

@@ -11,6 +11,7 @@ import { BadRequestError } from "../../../core/errors/BadRequestError";
 import { RoomEntity } from "../../../domain/entities/room/RoomEntity";
 import { RoomVisibility } from "../../../domain/types/RoomVisibility";
 import { RoomAdmissionPolicy } from "../../../domain/types/RoomAdmissionPolicy";
+import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
 
 @injectable()
 export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
@@ -29,6 +30,14 @@ export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
 
     if (room.hostId !== hostUserId) {
       throw new UnauthorizedError(ERROR_MESSAGES.AUTH.UNAUTHORIZED);
+    }
+
+    if (
+      room.lifecycleStatus === RoomLifeCycleStatus.READONLY ||
+      room.lifecycleStatus === RoomLifeCycleStatus.ARCHIVED ||
+      room.lifecycleStatus === RoomLifeCycleStatus.PURGED
+    ) {
+      throw new BadRequestError("Cannot edit details of a read-only or ended room.");
     }
 
     const updates: Partial<RoomEntity> = {};

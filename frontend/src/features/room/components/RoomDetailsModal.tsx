@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 import {
   Calendar,
   Copy,
@@ -31,6 +32,7 @@ interface RoomDetailsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDetailsUpdated?: () => void;
+  readOnly?: boolean;
 }
 
 function formatCreatedAt(iso: string): string {
@@ -83,6 +85,7 @@ export const RoomDetailsModal = ({
   open,
   onOpenChange,
   onDetailsUpdated,
+  readOnly,
 }: RoomDetailsModalProps) => {
   const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.auth.user);
@@ -187,8 +190,8 @@ export const RoomDetailsModal = ({
         });
         toast.success("Share dialog opened");
         return;
-      } catch (err: any) {
-        if (err.name === "AbortError") return;
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
       }
     }
 
@@ -241,8 +244,12 @@ export const RoomDetailsModal = ({
       setIsEditing(false);
       onDetailsUpdated?.();
       toast.success("Room details updated");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to update room details");
+    } catch (error) {
+      toast.error(error instanceof AxiosError
+        ? (error.response?.data?.message ?? "Failed to update room details")
+        : error instanceof Error
+          ? (error.message || "Failed to update room details")
+          : "Failed to update room details");
     } finally {
       setSavingDetails(false);
     }
@@ -264,7 +271,7 @@ export const RoomDetailsModal = ({
                 {isEditing ? "Update your collaboration room details." : "Details about this collaboration room."}
               </DialogDescription>
             </div>
-            {!loading && settings && canEdit && !isEditing && (
+            {!loading && settings && canEdit && !isEditing && !readOnly && (
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}

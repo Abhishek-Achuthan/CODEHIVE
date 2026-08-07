@@ -4,11 +4,13 @@ import type { ISessionRepository } from '../../../domain/interfaces/ISessionRepo
 import type { IBookedSessionResponseDTO, SessionListInputDTO } from '../../dto/SessionDTO';
 import { SessionMapper } from '../../mapper/SessionMapper';
 import { PaginationResult } from '../../../domain/types/PaginationResult';
+import type { IReviewRepository } from '../../../domain/interfaces/IReviewRepository';
 
 @injectable()
 export class GetBookedSessionsUseCase implements IGetBookedSessionsUseCase {
     constructor(
-        @inject('ISessionRepository') private readonly _sessionRepository: ISessionRepository
+        @inject('ISessionRepository') private readonly _sessionRepository: ISessionRepository,
+        @inject('IReviewRepository') private readonly _reviewRepository: IReviewRepository
     ) { }
 
     async execute(userId: string, input: SessionListInputDTO): Promise<PaginationResult<IBookedSessionResponseDTO>> {
@@ -26,10 +28,26 @@ export class GetBookedSessionsUseCase implements IGetBookedSessionsUseCase {
             },
         });
 
+        const items = result.items.map(({ session, mentor, user }) =>
+            SessionMapper.toBookedResponse(session, mentor, user)
+        );
+
+        for (const item of items) {
+            const review = await this._reviewRepository.findBySessionAndStudent(item.id, item.userId);
+            item.isReviewed = !!review;
+            if (review) {
+                item.review = {
+                    rating: review.rating,
+                    createdAt: review.createdAt?.toISOString() || new Date().toISOString()
+                };
+                if (review.reviewText) {
+                    item.review.reviewText = review.reviewText;
+                }
+            }
+        }
+
         return {
-            items: result.items.map(({ session, mentor, user }) =>
-                SessionMapper.toBookedResponse(session, mentor, user)
-            ),
+            items,
             totalItems: result.totalItems,
             totalPages: result.totalPages
         };

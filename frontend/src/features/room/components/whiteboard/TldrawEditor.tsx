@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { AlertCircle } from "lucide-react";
+import * as Y from "yjs";
 import {
   Tldraw,
   Editor,
@@ -57,7 +58,9 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
 
   const loadingState = useYjsStore({
     roomId,
-    doc: doc ?? ({} as any), // eslint-disable-line @typescript-eslint/no-explicit-any
+    // WhiteboardProvider only renders children once `doc` is initialised,
+    // so this will always be a valid Y.Doc by the time this runs.
+    doc: doc as Y.Doc,
     provider,
   });
 

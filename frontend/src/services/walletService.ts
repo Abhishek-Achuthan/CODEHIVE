@@ -17,9 +17,9 @@ export class WalletService {
     }
   }
 
-  static async getWalletTransactions(): Promise<WalletTransactionsResponse> {
+  static async getWalletTransactions(page: number = 1, limit: number = 5): Promise<WalletTransactionsResponse> {
     try {
-      const response = await WalletAPI.getWalletTransactions();
+      const response = await WalletAPI.getWalletTransactions(page, limit);
       return response.data as WalletTransactionsResponse;
     } catch (error) {
       throw this.handleError(error);

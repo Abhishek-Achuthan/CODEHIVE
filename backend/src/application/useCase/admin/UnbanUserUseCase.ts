@@ -1,11 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
-import { UserEntity } from '../../../domain/entities/UserEntity';
-
-export interface IUnbanUserUseCase {
-  execute(userId: string): Promise<UserEntity>;
-}
+import type { IUnbanUserUseCase } from '../interface/admin/IUnbanUserUseCase';
 
 @injectable()
 export class UnbanUserUseCase implements IUnbanUserUseCase {
@@ -14,7 +10,7 @@ export class UnbanUserUseCase implements IUnbanUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string): Promise<UserEntity> {
+  async execute(userId: string) {
     const user = await this.userRepository.find(userId);
     if (!user) {
       throw new NotFoundError('User not found');

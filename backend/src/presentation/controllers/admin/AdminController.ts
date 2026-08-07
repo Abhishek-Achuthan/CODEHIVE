@@ -8,13 +8,13 @@ import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessage';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { type IListMentorApplicationUseCase } from '../../../application/useCase/interface/admin/IListMentorApplicationUseCase';
 import { type IUpdateMentorStatusUseCase } from '../../../application/useCase/interface/admin/IUpdateMentorStatusUseCase';
-import type { IGetAdminReportsUseCase } from '../../../application/useCase/admin/GetAdminReportsUseCase';
-import type { IUpdateReportStatusUseCase } from '../../../application/useCase/admin/UpdateReportStatusUseCase';
-import type { IGetAdminRoomChatHistoryUseCase } from '../../../application/useCase/admin/GetAdminRoomChatHistoryUseCase';
-import type { IBanUserUseCase } from '../../../application/useCase/admin/BanUserUseCase';
-import type { IUnbanUserUseCase } from '../../../application/useCase/admin/UnbanUserUseCase';
-import type { IWarnUserUseCase } from '../../../application/useCase/admin/WarnUserUseCase';
-import type { IGetDashboardMetricsUseCase } from '../../../application/useCase/admin/GetDashboardMetricsUseCase';
+import type { IGetAdminReportsUseCase } from '../../../application/useCase/interface/admin/IGetAdminReportsUseCase';
+import type { IUpdateReportStatusUseCase } from '../../../application/useCase/interface/admin/IUpdateReportStatusUseCase';
+import type { IGetAdminRoomChatHistoryUseCase } from '../../../application/useCase/interface/admin/IGetAdminRoomChatHistoryUseCase';
+import type { IBanUserUseCase } from '../../../application/useCase/interface/admin/IBanUserUseCase';
+import type { IUnbanUserUseCase } from '../../../application/useCase/interface/admin/IUnbanUserUseCase';
+import type { IWarnUserUseCase } from '../../../application/useCase/interface/admin/IWarnUserUseCase';
+import type { IGetDashboardMetricsUseCase } from '../../../application/useCase/interface/admin/IGetDashboardMetricsUseCase';
 
 @injectable()
 export class AdminController {

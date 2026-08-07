@@ -108,6 +108,9 @@ export interface JoinRoomSnapshotDTO {
   capabilities: Partial<Record<CapabilityKey, boolean>>;
   lifecycleStatus: RoomLifeCycleStatus;
   featureSnapshot: RoomFeatureSnapshot | null;
+  sessionId?: string;
+  isSessionReviewed?: boolean;
+  sessionReview?: { rating: number; reviewText?: string; createdAt: string };
 }
 
 export interface GetPublicRoomsDTO {

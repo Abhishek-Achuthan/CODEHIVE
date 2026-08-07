@@ -4,14 +4,43 @@ import { getReports, updateReportStatus, banUser, warnUser, getRoomChatHistory }
 import { BaseError } from '../../../shared/errors/BaseError';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../../shared/ui/dialog/Dialog';
 import AdminLayout from '../../../layouts/AdminLayout';
+import type { RoomMessageResponse } from '../../../shared/types/api/room';
+
+// ─── Local types ──────────────────────────────────────────────────────────────
+
+type ReportStatus = 'PENDING' | 'REVIEWED' | 'RESOLVED';
+
+interface ReportUserRef {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface ReportRoomRef {
+  id: string;
+  title: string;
+}
+
+interface ReportItem {
+  id: string;
+  room: ReportRoomRef | null;
+  reporter: ReportUserRef | null;
+  reportedUser: ReportUserRef | null;
+  reason: string;
+  description?: string;
+  resolvedBy: string | null;
+  status: ReportStatus;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const ReportsManagementPage: React.FC = () => {
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState<ReportItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [chatHistory, setChatHistory] = useState<RoomMessageResponse[]>([]);
   const [loadingChat, setLoadingChat] = useState(false);
   
   // Modals state
@@ -176,14 +205,14 @@ export const ReportsManagementPage: React.FC = () => {
                     {report.status !== 'RESOLVED' && (
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleViewChatHistory(report.room?.id)}
+                          onClick={() => handleViewChatHistory(report.room?.id ?? '')}
                           className="px-3 py-1.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded text-xs font-medium transition-colors"
                         >
                           View Chat
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedUserForAction({ userId: report.reportedUser?.id, reportId: report.id });
+                            setSelectedUserForAction({ userId: report.reportedUser?.id ?? '', reportId: report.id });
                             setActionReason('');
                             setIsWarnModalOpen(true);
                           }}
@@ -193,7 +222,7 @@ export const ReportsManagementPage: React.FC = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedUserForAction({ userId: report.reportedUser?.id, reportId: report.id });
+                            setSelectedUserForAction({ userId: report.reportedUser?.id ?? '', reportId: report.id });
                             setActionReason('');
                             setBanDuration(null);
                             setIsBanModalOpen(true);
@@ -263,7 +292,7 @@ export const ReportsManagementPage: React.FC = () => {
             ) : chatHistory.length === 0 ? (
               <div className="text-center text-gray-500 py-8">No messages found in this room.</div>
             ) : (
-              chatHistory.map((msg: any) => (
+              chatHistory.map((msg) => (
                 <div key={msg.id} className={`p-3 rounded-lg border ${msg.isDeleted ? 'bg-red-500/5 border-red-500/20' : 'bg-[#161b22] border-gray-800'}`}>
                   <div className="flex justify-between items-center mb-1">
                     <span className="font-medium text-sm text-gray-300">{msg.senderName}</span>

@@ -67,7 +67,8 @@ const planFormSchema = z.object({
   }),
 });
 
-type PlanFormValues = z.infer<typeof planFormSchema>;
+type PlanFormInput = z.input<typeof planFormSchema>;
+type PlanFormValues = z.output<typeof planFormSchema>;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -98,8 +99,8 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
     watch,
     setValue,
     formState: { errors, isValid },
-  } = useForm<PlanFormValues>({
-    resolver: zodResolver(planFormSchema) as any,
+  } = useForm<PlanFormInput, unknown, PlanFormValues>({
+    resolver: zodResolver(planFormSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
@@ -236,7 +237,7 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
 
         {/* Form */}
         <form
-          onSubmit={handleSubmit(handleFormSubmit as any)}
+          onSubmit={handleSubmit(handleFormSubmit)}
           className="modal-scrollbar overflow-y-auto overflow-x-hidden max-h-[70vh] px-6 py-5 space-y-6 min-w-0"
         >
           {/* Basic Info */}

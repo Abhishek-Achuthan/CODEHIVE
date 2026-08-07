@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AxiosError } from 'axios';
 import {
   Dialog,
   DialogContent,
@@ -42,8 +43,12 @@ const ReportParticipantModal: React.FC<ReportParticipantModalProps> = ({
       await RoomService.reportParticipant(roomId, participantId, reason.trim(), description.trim() || undefined);
       toast.success('Report submitted successfully');
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to submit report');
+    } catch (error) {
+      toast.error(error instanceof AxiosError
+        ? (error.response?.data?.message ?? 'Failed to submit report')
+        : error instanceof Error
+          ? (error.message || 'Failed to submit report')
+          : 'Failed to submit report');
     } finally {
       setIsLoading(false);
     }

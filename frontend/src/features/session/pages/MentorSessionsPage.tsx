@@ -3,6 +3,7 @@ import { StatusTabs } from "../components/StatusTabs";
 import { Loader2, Search } from "lucide-react";
 import { SessionCard } from "../components/SessionCard";
 import { CancelSessionDialog } from "../components/CancelSessionDialog";
+import { ReviewModal } from "../components/ReviewModal";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { Pagination } from "../../../shared/ui/Pagination";
@@ -12,16 +13,19 @@ import { Input } from "../../../shared/ui";
 import { EmptyState } from "../../../shared/ui/EmptyState";
 import { DatePicker, CustomProvider } from 'rsuite';
 import 'rsuite/dist/rsuite-no-reset.min.css';
+import { useNavigate } from 'react-router-dom';
 
 function getTimeDiffMs(startTime: string): number {
     return new Date(startTime).getTime() - Date.now();
 }
 
 export default function MentorSessionsPage() {
+    const navigate = useNavigate();
     const currentUserRole = useAppSelector((state) => state.auth.user?.role ?? state.auth.role);
     const isMentor = currentUserRole === "mentor";
     const [selectedSession, setSelectedSession] = useState<BookedSessionResponse | null>(null);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const {
         loading,
         sessions,
@@ -37,6 +41,8 @@ export default function MentorSessionsPage() {
         handleDateChange,
         handleCancelSession,
     } = useMentorSessions();
+
+
 
     const openCancelModal = (session: BookedSessionResponse) => {
         if (!isMentor || cancelLoading || isCancelModalOpen) return;
@@ -66,8 +72,27 @@ export default function MentorSessionsPage() {
             );
             closeCancelModal();
         } catch {
-            // Error already handled in hook
+            // Error handled by hook
         }
+    };
+
+
+
+    const openReviewModal = (session: BookedSessionResponse) => {
+        if (isMentor) {
+            setSelectedSession(session);
+            setIsReviewModalOpen(false);
+            return;
+        }
+
+
+        setSelectedSession(session);
+        setIsReviewModalOpen(true);
+    };
+
+    const closeReviewModal = () => {
+        setIsReviewModalOpen(false);
+        setSelectedSession(null);
     };
 
     return (
@@ -163,9 +188,10 @@ export default function MentorSessionsPage() {
                                 session={session}
                                 context="mentor"
                                 onCancel={() => openCancelModal(session)}
+                                onViewReview={() => openReviewModal(session)}
                                 showCancelAction={isMentor}
                                 onJoinRoom={() => {
-                                    toast.success("Starting session...");
+                                    navigate(`/room/${session.roomId}`);
                                 }}
                                 isCancelling={cancelLoading}
                                 cancelDisabled={getTimeDiffMs(session.startTime) <= 0}
@@ -192,6 +218,18 @@ export default function MentorSessionsPage() {
                 loading={cancelLoading}
                 onConfirm={confirmCancel}
                 onClose={closeCancelModal}
+            />
+
+            <ReviewModal
+                open={isReviewModalOpen}
+                onClose={closeReviewModal}
+                onSubmit={async () => {}}
+                loading={false}
+                readOnly={true}
+                initialRating={selectedSession?.review?.rating}
+                initialReviewText={selectedSession?.review?.reviewText}
+                createdAt={selectedSession?.review?.createdAt}
+                isHostView={true}
             />
         </div>
     );

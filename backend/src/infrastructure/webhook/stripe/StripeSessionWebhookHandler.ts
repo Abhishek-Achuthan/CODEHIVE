@@ -19,6 +19,7 @@ import { SessionStatus } from '../../../domain/types/SessionStatus';
 import { RefundStatus } from '../../../domain/types/RefundStatus';
 import { ConflictError } from '../../../core/errors/ConflictError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import type { INotificationService } from '../../../application/ports/notifications/INotificationService';
 
 interface StripePaymentIntentObject {
   id: string;
@@ -41,6 +42,8 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
     private readonly _logger: ILoggerService,
     @inject('ISessionActivationPublisher')
     private readonly _sessionActivationPublisher: ISessionActivationPublisher,
+    @inject('INotificationService')
+    private readonly _notificationService: INotificationService,
   ) {}
 
   async handle(rawEvent: WebhookEvent): Promise<void> {
@@ -216,6 +219,22 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
                 },
               );
             }
+            
+            await this._notificationService.notify({
+              recipientId: reservation.userId,
+              type: 'SUCCESS',
+              category: 'SESSION',
+              title: 'Session Booked',
+              message: `Your session has been booked successfully for ${reservation.date} at ${reservation.startTime}.`,
+            });
+
+            await this._notificationService.notify({
+              recipientId: reservation.mentorId,
+              type: 'INFO',
+              category: 'SESSION',
+              title: 'New Session Booked',
+              message: `A new session has been booked with you for ${reservation.date} at ${reservation.startTime}.`,
+            });
 
             this._logger.info('fulfillment.success', {
               reservationId: reservation.id,

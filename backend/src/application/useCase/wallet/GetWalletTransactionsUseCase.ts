@@ -12,21 +12,24 @@ export class GetWalletTransactionsUseCase implements IGetWalletTransactionsUseCa
     private readonly _walletRepository: IWalletRepository
   ) {}
 
-  async execute(userId: string): Promise<GetWalletTransactionsDTO> {
+  async execute(userId: string, page: number, limit: number): Promise<GetWalletTransactionsDTO> {
     let wallet = await this._walletRepository.findByUserId(userId);
 
     if (!wallet) {
       wallet = await this._walletRepository.createWallet(userId);
     }
 
-    const transactions = await this._walletRepository.findTransactionsByWalletId(
-      wallet.id
+    const { transactions, total } = await this._walletRepository.findTransactionsByWalletId(
+      wallet.id,
+      page,
+      limit
     );
 
     return {
       transactions: transactions.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
       ),
+      total,
     };
   }
 }

@@ -24,6 +24,7 @@ import { WalletTransactionReason } from '../../../domain/types/WalletTransaction
 import { SessionMapper } from '../../mapper/SessionMapper';
 import { BookSessionDTO, ISessionResponseDTO } from '../../dto/SessionDTO';
 import type { IBookSessionWithWalletUseCase } from '../interface/session/IBookSessionWithWalletUseCase';
+import type { INotificationService } from '../../ports/notifications/INotificationService';
 
 @injectable()
 export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCase {
@@ -48,6 +49,8 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     private readonly _logger: ILoggerService,
     @inject(EntitlementResolutionService)
     private readonly _entitlementResolutionService: EntitlementResolutionService,
+    @inject('INotificationService')
+    private readonly _notificationService: INotificationService,
   ) {}
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
@@ -74,10 +77,12 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
       throw new ConflictError(ERROR_MESSAGES.SESSION.NO_AVAILABILITY);
     }
 
-    const from = new Date(date);
+    const [year, month, day] = date.split('-').map(Number) as [number, number, number];
+    
+    const from = new Date(year, month - 1, day);
     from.setHours(0, 0, 0, 0);
 
-    const to = new Date(date);
+    const to = new Date(year, month - 1, day);
     to.setHours(23, 59, 59, 999);
 
     const start = new Date(`${date}T${startTime}:00`);
@@ -204,6 +209,22 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
           });
       }
     }
+    
+      await this._notificationService.notify({
+        recipientId: userId,
+        type: 'SUCCESS',
+        category: 'SESSION',
+        title: 'Session Booked',
+        message: `Your session has been booked successfully for ${date} at ${startTime}.`,
+      });
+
+      await this._notificationService.notify({
+        recipientId: mentorId,
+        type: 'INFO',
+        category: 'SESSION',
+        title: 'New Session Booked',
+        message: `A new session has been booked with you for ${date} at ${startTime}.`,
+      });
 
     return SessionMapper.toResponse(updated);
   }

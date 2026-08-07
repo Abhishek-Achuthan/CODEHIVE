@@ -30,7 +30,10 @@ export class WalletController {
   ) {
     try {
       const { id } = req.user;
-      const result = await this._getWalletTransactions.execute(id);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      
+      const result = await this._getWalletTransactions.execute(id, page, limit);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       next(error);

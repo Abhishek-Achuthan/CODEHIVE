@@ -46,10 +46,12 @@ export class GetAvailableSlotsUseCase implements IGetAvailableSlotsUseCase {
     if (availabilities.length === 0)
       throw new NotFoundError(ERROR_MESSAGES.SESSION.NO_AVAILABILITY);
 
-    const from = new Date(date);
+    const [year, month, day] = date.split('-').map(Number) as [number, number, number];
+    
+    const from = new Date(year, month - 1, day);
     from.setHours(0, 0, 0, 0);
 
-    const to = new Date(date);
+    const to = new Date(year, month - 1, day);
     to.setHours(23, 59, 59, 999);
 
     const derivedSlots = this._rruleSlotService.generateSlots(

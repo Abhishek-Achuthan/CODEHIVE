@@ -1,5 +1,8 @@
 import { injectable, inject } from 'tsyringe';
-import type { IGetMentorInsightsUseCase } from '../interface/session/IGetMentorInsightsUseCase';
+import type {
+  IGetMentorInsightsUseCase,
+  MentorInsightsResult,
+} from '../interface/session/IGetMentorInsightsUseCase';
 import type { IReviewRepository } from '../../../domain/interfaces/IReviewRepository';
 import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
 
@@ -10,7 +13,7 @@ export class GetMentorInsightsUseCase implements IGetMentorInsightsUseCase {
     @inject('ISessionRepository') private sessionRepository: ISessionRepository
   ) {}
 
-  async execute(mentorId: string): Promise<any> {
+  async execute(mentorId: string): Promise<MentorInsightsResult> {
     const [reviewStats, sessionStats] = await Promise.all([
       this.reviewRepository.getMentorInsightStats(mentorId),
       this.sessionRepository.countSessionStats(mentorId),
@@ -23,11 +26,11 @@ export class GetMentorInsightsUseCase implements IGetMentorInsightsUseCase {
 
     const totalReviews = reviewStats.totalReviews;
     const ratingDistribution = {
-      five: totalReviews > 0 ? Math.round((reviewStats.five / totalReviews) * 100) : 0,
-      four: totalReviews > 0 ? Math.round((reviewStats.four / totalReviews) * 100) : 0,
-      three: totalReviews > 0 ? Math.round((reviewStats.three / totalReviews) * 100) : 0,
-      two: totalReviews > 0 ? Math.round((reviewStats.two / totalReviews) * 100) : 0,
-      one: totalReviews > 0 ? Math.round((reviewStats.one / totalReviews) * 100) : 0,
+      5: reviewStats.five || 0,
+      4: reviewStats.four || 0,
+      3: reviewStats.three || 0,
+      2: reviewStats.two || 0,
+      1: reviewStats.one || 0,
     };
 
     return {

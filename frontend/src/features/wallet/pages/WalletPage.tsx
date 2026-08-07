@@ -15,6 +15,9 @@ export default function WalletPage() {
     transactions,
     loading: transactionsLoading,
     refreshTransactions,
+    totalPages,
+    page,
+    setPage
   } = useWalletTransactions();
 
   const formatCurrency = (amount: number): string => {
@@ -167,7 +170,7 @@ export default function WalletPage() {
             <h2 className="text-lg font-bold tracking-tight text-zinc-100 mb-4">Transaction History</h2>
 
             <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#121214] shadow-sm min-h-[300px]">
-              {transactionsLoading ? (
+              {transactionsLoading && transactions.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[300px]">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
                   <p className="mt-4 text-sm font-medium text-zinc-500">Loading transactions...</p>
@@ -194,7 +197,46 @@ export default function WalletPage() {
                   </p>
                 </motion.div>
               ) : (
-                <div className="flex flex-col">{transactions.map(renderTransaction)}</div>
+                <div className="flex flex-col">
+                  {transactions.map(renderTransaction)}
+                  
+                  {totalPages > 1 && (
+                    <div className="p-4 flex items-center justify-between border-t border-zinc-800/50 bg-[#09090b]">
+                      <button
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 1 || transactionsLoading}
+                        className="px-3 py-1.5 text-sm font-medium text-zinc-300 bg-zinc-800/50 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors border border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                          <button
+                            key={p}
+                            onClick={() => setPage(p)}
+                            disabled={transactionsLoading}
+                            className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                              page === p
+                                ? "bg-indigo-500 text-white border border-indigo-400"
+                                : "text-zinc-400 hover:bg-zinc-800 hover:text-white border border-transparent"
+                            } disabled:opacity-50`}
+                          >
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => setPage(page + 1)}
+                        disabled={page === totalPages || transactionsLoading}
+                        className="px-3 py-1.5 text-sm font-medium text-zinc-300 bg-zinc-800/50 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors border border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>

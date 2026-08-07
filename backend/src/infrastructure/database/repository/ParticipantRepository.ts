@@ -10,6 +10,17 @@ import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEnti
 import { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
 import { ParticipantWithUser } from '../../../domain/types/ParticipantWithUser';
 
+type PopulatedParticipantUser = {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+};
+
+type ParticipantWithPopulatedUser = Omit<ParticipantLeanDoc, 'userId'> & {
+  userId: PopulatedParticipantUser;
+};
+
 export class ParticipantRepository
   extends GenericRepository<ParticipantDocument, ParticipantEntity>
   implements IParticipantRepository
@@ -47,16 +58,16 @@ export class ParticipantRepository
   async findByRoomIdWithUsers(roomId: string): Promise<ParticipantWithUser[]> {
     const docs = await this._model
       .find({ roomId: new Types.ObjectId(roomId) })
-      .populate<{ userId: { _id: Types.ObjectId; firstName: string; lastName: string; avatarUrl?: string } }>(
+      .populate<{ userId: PopulatedParticipantUser }>(
         'userId',
         'firstName lastName avatarUrl'
       )
-      .lean();
+      .lean<ParticipantWithPopulatedUser[]>();
 
-    return docs.map((doc: any) => ({
+    return docs.map((doc) => ({
       userId: doc.userId._id.toString(),
       name: `${doc.userId.firstName} ${doc.userId.lastName}`,
-      avatarUrl: doc.userId.avatarUrl,
+      ...(doc.userId.avatarUrl !== undefined ? { avatarUrl: doc.userId.avatarUrl } : {}),
       role: doc.role,
     }));
   }

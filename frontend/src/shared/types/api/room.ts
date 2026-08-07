@@ -132,6 +132,9 @@ export interface JoinRoomSnapshotResponse {
   capabilities: Partial<Record<CapabilityKey, boolean>>;
   lifecycleStatus: RoomLifecycleStatus;
   featureSnapshot: RoomFeatureSnapshotResponse | null;
+  sessionId?: string;
+  isSessionReviewed?: boolean;
+  sessionReview?: { rating: number; reviewText?: string; createdAt: string };
 }
 
 export interface CreateRoomMessageRequest {

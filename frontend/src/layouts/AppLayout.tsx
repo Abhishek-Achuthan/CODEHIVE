@@ -16,10 +16,29 @@ import {
   ChevronLeft,
   ChevronDown,
   Menu,
-  X
+  X,
+  type LucideIcon,
 } from 'lucide-react';
 
 import { SubscriptionBanner } from '../features/subscription/components/SubscriptionBanner';
+
+// ─── Nav item types ───────────────────────────────────────────────────────────
+
+interface NavSubItem {
+  name: string;
+  path: string;
+  role?: UserRole;
+}
+
+interface NavItem {
+  name: string;
+  path: string;
+  icon: LucideIcon;
+  subItems?: NavSubItem[];
+  isHighlighted?: boolean;
+  isDanger?: boolean;
+  action?: () => void;
+}
 
 export default function AppLayout() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -127,7 +146,7 @@ export default function AppLayout() {
     { name: 'Profile', path: '/profile', icon: CircleUser },
   ];
 
-  const renderNavItem = (item: any, forceExpanded: boolean = false) => {
+  const renderNavItem = (item: NavItem, forceExpanded: boolean = false) => {
     const expanded = forceExpanded || isExpanded;
     const Icon = item.icon;
     const isActive = item.path ? location.pathname.startsWith(item.path) : false;
@@ -177,7 +196,7 @@ export default function AppLayout() {
           {item.action ? (
             <button
               onClick={() => {
-                item.action();
+                item.action!();
                 if (forceExpanded) setIsMobileOpen(false);
               }}
               title={!expanded ? item.name : undefined}
@@ -191,7 +210,7 @@ export default function AppLayout() {
             </button>
           ) : hasSubItems ? (
             <NavLink
-              to={item.subItems[0].path}
+              to={item.subItems![0].path}
               onClick={() => {
                 toggleSubMenu(item.path);
               }}
@@ -241,7 +260,7 @@ export default function AppLayout() {
           }`}
         >
           <div className="ml-9 space-y-1 pb-1">
-            {item.subItems?.map((sub: any) => {
+            {item.subItems?.map((sub: NavSubItem) => {
               if (sub.role && user?.role !== sub.role) return null;
               
               return (

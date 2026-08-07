@@ -389,6 +389,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                     <MessageContextMenu
                       canEdit={canEditMessage}
                       canDelete={canDeleteMessage}
+                      isMe={isMe}
                       onEdit={() => {
                         handleEditInit(m);
 

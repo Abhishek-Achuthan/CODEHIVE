@@ -28,5 +28,5 @@ export const listMentors = (params?: MentorListingParams) => {
 export const getMyInsights = () => 
     apiClient.get(API_ROUTES.MENTOR.GET_MY_INSIGHTS);
 
-export const getMyReviews = () => 
-    apiClient.get(API_ROUTES.MENTOR.GET_MY_REVIEWS);
+export const getMyReviews = (page: number = 1, limit: number = 10) => 
+    apiClient.get(`${API_ROUTES.MENTOR.GET_MY_REVIEWS}?page=${page}&limit=${limit}`);

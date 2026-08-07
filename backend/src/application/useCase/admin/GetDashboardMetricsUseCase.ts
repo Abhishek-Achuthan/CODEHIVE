@@ -1,43 +1,16 @@
 import { injectable, inject } from 'tsyringe';
-import type { IAdminDashboardRepository } from '../../../domain/interfaces/IAdminDashboardRepository';
+import type {
+  IAdminDashboardRepository,
+} from '../../../domain/interfaces/IAdminDashboardRepository';
+import type {
+  DashboardRecentActivityItem,
+  IDashboardMetrics,
+  IGetDashboardMetricsUseCase,
+} from '../interface/admin/IGetDashboardMetricsUseCase';
 
-export interface IDashboardMetrics {
-  kpis: {
-    totalUsers: number;
-    totalMentors: number;
-    activeSubscriptions: number;
-    activeRooms: number;
-    pendingApplications: number;
-    pendingReports: number;
-  };
-  userGrowth: {
-    name: string;
-    users: number;
-  }[];
-  revenueGrowth: {
-    name: string;
-    revenue: number;
-  }[];
-  revenue: {
-    monthlyRevenue: number;
-    activePaidSubscribers: number;
-  };
-  subscriptionDistribution: {
-    name: string;
-    value: number;
-  }[];
-  recentActivity: {
-    id: string;
-    type: string;
-    text: string;
-    time: string;
-    createdAt: string;
-  }[];
-}
-
-export interface IGetDashboardMetricsUseCase {
-  execute(timeFilterUser?: string, timeFilterRevenue?: string): Promise<IDashboardMetrics>;
-}
+type DashboardActivityFeedItem = Omit<DashboardRecentActivityItem, 'time' | 'createdAt'> & {
+  createdAt: Date;
+};
 
 @injectable()
 export class GetDashboardMetricsUseCase implements IGetDashboardMetricsUseCase {
@@ -84,12 +57,37 @@ export class GetDashboardMetricsUseCase implements IGetDashboardMetricsUseCase {
       this._adminDashboardRepository.getRecentReports(5),
     ]);
 
-    const activityFeed: any[] = [
-      ...recentUsers.map((u: any) => ({ id: `usr_${u._id}`, type: 'user', text: `New user registered (${u.firstName} ${u.lastName})`, createdAt: u.createdAt })),
-      ...recentMentors.map((m: any) => ({ id: `mnt_${m._id}`, type: 'mentor', text: `Mentor application submitted by ${m.firstName} ${m.lastName}`, createdAt: m.mentorAppliedAt || m.createdAt })),
-      ...recentRooms.map((r: any) => ({ id: `rm_${r._id}`, type: 'room', text: `New room created (${r.title})`, createdAt: r.createdAt })),
-      ...recentSubs.map((s: any) => ({ id: `sub_${s._id}`, type: 'subscription', text: 'Subscription purchased', createdAt: s.createdAt })),
-      ...recentReports.map((r: any) => ({ id: `rep_${r._id}`, type: 'report', text: `New report submitted (${r.reason})`, createdAt: r.createdAt })),
+    const activityFeed: DashboardActivityFeedItem[] = [
+      ...recentUsers.map((user) => ({
+        id: `usr_${user._id}`,
+        type: 'user',
+        text: `New user registered (${user.firstName} ${user.lastName})`,
+        createdAt: user.createdAt,
+      })),
+      ...recentMentors.map((mentor) => ({
+        id: `mnt_${mentor._id}`,
+        type: 'mentor',
+        text: `Mentor application submitted by ${mentor.firstName} ${mentor.lastName}`,
+        createdAt: mentor.mentorAppliedAt || mentor.createdAt,
+      })),
+      ...recentRooms.map((room) => ({
+        id: `rm_${room._id}`,
+        type: 'room',
+        text: `New room created (${room.title})`,
+        createdAt: room.createdAt,
+      })),
+      ...recentSubs.map((subscription) => ({
+        id: `sub_${subscription._id}`,
+        type: 'subscription',
+        text: 'Subscription purchased',
+        createdAt: subscription.createdAt,
+      })),
+      ...recentReports.map((report) => ({
+        id: `rep_${report._id}`,
+        type: 'report',
+        text: `New report submitted (${report.reason})`,
+        createdAt: report.createdAt,
+      })),
     ];
 
     activityFeed.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -110,10 +108,11 @@ export class GetDashboardMetricsUseCase implements IGetDashboardMetricsUseCase {
         activePaidSubscribers: activeSubscriptions,
       },
       subscriptionDistribution,
-      recentActivity: activityFeed.slice(0, 5).map(item => ({
+      recentActivity: activityFeed.slice(0, 5).map((item) => ({
         ...item,
-        time: new Date(item.createdAt).toISOString()
-      }))
+        time: new Date(item.createdAt).toISOString(),
+        createdAt: item.createdAt.toISOString(),
+      })),
     };
   }
 }

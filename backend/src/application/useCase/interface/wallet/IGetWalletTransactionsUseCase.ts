@@ -2,8 +2,9 @@ import type { WalletTransactionEntity } from '../../../../domain/entities/wallet
 
 export interface GetWalletTransactionsDTO {
   transactions: WalletTransactionEntity[];
+  total: number;
 }
 
 export interface IGetWalletTransactionsUseCase {
-  execute(userId: string): Promise<GetWalletTransactionsDTO>;
+  execute(userId: string, page: number, limit: number): Promise<GetWalletTransactionsDTO>;
 }

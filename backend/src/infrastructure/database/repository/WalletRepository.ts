@@ -48,15 +48,25 @@ export class WalletRepository implements IWalletRepository {
   }
 
   async findTransactionsByWalletId(
-    walletId: string
-  ): Promise<WalletTransactionEntity[]> {
-    const docs = await WalletTransactionModel.find({
-      walletId: new Types.ObjectId(walletId),
-    })
-      .sort({ createdAt: -1 })
-      .lean<WalletTransactionLeanDoc[]>();
+    walletId: string,
+    page: number,
+    limit: number
+  ): Promise<{ transactions: WalletTransactionEntity[]; total: number }> {
+    const skip = (page - 1) * limit;
+    
+    const [docs, total] = await Promise.all([
+      WalletTransactionModel.find({ walletId: new Types.ObjectId(walletId) })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean<WalletTransactionLeanDoc[]>(),
+      WalletTransactionModel.countDocuments({ walletId: new Types.ObjectId(walletId) })
+    ]);
 
-    return docs.map((d) => this.leanToTransactionEntity(d));
+    return {
+      transactions: docs.map((d) => this.leanToTransactionEntity(d)),
+      total,
+    };
   }
 
   async getBalance(walletId: string): Promise<number> {

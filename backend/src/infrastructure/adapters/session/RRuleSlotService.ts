@@ -73,7 +73,7 @@ export class RRuleSlotService implements IRRuleSlotService {
       slots.push({
         mentorId: availability.mentorId,
         availabilityId: availability.id,
-        date: slotStart.toISOString().split('T')[0]!,
+        date: this.formatDate(slotStart),
         startTime: this.formatTime(slotStart),
         endTime: this.formatTime(slotEnd),
         price: availability.slotPrice,
@@ -89,6 +89,13 @@ export class RRuleSlotService implements IRRuleSlotService {
     }
 
     return slots;
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private formatTime(date: Date): string {

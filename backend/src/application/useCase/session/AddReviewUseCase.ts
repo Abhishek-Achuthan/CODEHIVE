@@ -4,12 +4,15 @@ import type { IReviewRepository } from '../../../domain/interfaces/IReviewReposi
 import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
 import { ReviewEntity } from '../../../domain/session/ReviewEntity';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 
 @injectable()
 export class AddReviewUseCase implements IAddReviewUseCase {
   constructor(
     @inject('IReviewRepository') private reviewRepository: IReviewRepository,
-    @inject('ISessionRepository') private sessionRepository: ISessionRepository
+    @inject('ISessionRepository') private sessionRepository: ISessionRepository,
+    @inject('IRoomRepository') private roomRepository: IRoomRepository
   ) {}
 
   async execute(data: { sessionId: string; mentorId: string; studentId: string; rating: number; reviewText?: string }): Promise<ReviewEntity> {
@@ -20,7 +23,16 @@ export class AddReviewUseCase implements IAddReviewUseCase {
     }
     
     if (session.status !== SessionStatus.COMPLETED) {
-      throw new Error('Can only review completed sessions');
+      let canReview = false;
+      if (session.roomId) {
+        const room = await this.roomRepository.find(session.roomId.toString());
+        if (room && (room.lifecycleStatus === RoomLifeCycleStatus.READONLY || room.lifecycleStatus === RoomLifeCycleStatus.ARCHIVED)) {
+          canReview = true;
+        }
+      }
+      if (!canReview) {
+        throw new Error('Can only review completed sessions or ended rooms');
+      }
     }
     
     if (session.userId !== data.studentId) {

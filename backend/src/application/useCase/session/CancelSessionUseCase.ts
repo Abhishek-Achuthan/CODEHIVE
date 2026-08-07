@@ -10,6 +10,7 @@ import { WalletTransactionReason } from '../../../domain/types/WalletTransaction
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
 import { SessionPaymentStatus } from '../../../domain/types/SessionPaymentStatus';
+import type { INotificationService } from '../../ports/notifications/INotificationService';
 
 @injectable()
 export class CancelSessionUseCase implements ICancelSessionUseCase {
@@ -19,8 +20,9 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
     @inject('IWalletService')
     private readonly _walletService: IWalletService,
     @inject('IWalletRepository')
-    private readonly _walletRepository: IWalletRepository
-
+    private readonly _walletRepository: IWalletRepository,
+    @inject('INotificationService')
+    private readonly _notificationService: INotificationService
   ) { }
 
   async execute(sessionId: string, userId: string): Promise<boolean> {
@@ -54,6 +56,13 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
 
     if (isMentorCancelling) {
       await this._refundAndCancelSession(sessionId, session.userId, session.amount);
+      await this._notificationService.notify({
+        recipientId: session.userId,
+        type: 'WARNING',
+        category: 'SESSION',
+        title: 'Session Cancelled',
+        message: `Your session has been cancelled by the mentor. A refund has been issued to your wallet if applicable.`,
+      });
       return true;
     }
 
@@ -62,11 +71,26 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
 
     if (isRefundEligible) {
       await this._refundAndCancelSession(sessionId, userId, session.amount);
+      await this._notificationService.notify({
+        recipientId: session.mentorId,
+        type: 'WARNING',
+        category: 'SESSION',
+        title: 'Session Cancelled',
+        message: `Your upcoming session was cancelled by the mentee.`,
+      });
       return true;
     }
 
     await this._sessionRepository.update(sessionId, {
       status: SessionStatus.CANCELLED,
+    });
+
+    await this._notificationService.notify({
+      recipientId: session.mentorId,
+      type: 'WARNING',
+      category: 'SESSION',
+      title: 'Session Cancelled',
+      message: `Your upcoming session was cancelled by the mentee.`,
     });
 
     return true;

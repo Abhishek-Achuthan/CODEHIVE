@@ -19,4 +19,5 @@ export interface WalletTransaction {
 
 export interface WalletTransactionsResponse {
   transactions: WalletTransaction[];
+  total: number;
 }

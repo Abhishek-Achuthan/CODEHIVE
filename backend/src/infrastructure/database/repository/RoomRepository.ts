@@ -10,10 +10,26 @@ import { RoomDocument, RoomLeanDoc } from '../schemas/room/RoomSchema';
 import { LimitKey } from '../../../domain/types/LimitKey';
 import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 import { RoomType } from '../../../domain/types/RoomType';
+import { UserLeanDoc } from '../schemas/UserSchema';
 
 type LimitMap = Map<LimitKey, number>;
+type RoomFeatureSnapshotDoc = NonNullable<RoomDocument['featureSnapshot']>;
+type IdLike = Types.ObjectId | string;
+type ObjectWithOptionalId = { _id?: IdLike; toString(): string };
+type PopulatedRoomHost = Pick<UserLeanDoc, '_id' | 'firstName' | 'lastName' | 'avatarUrl'> & {
+  username?: string;
+};
+type RoomWithPopulatedHostLeanDoc = Omit<RoomLeanDoc, 'hostId'> & {
+  hostId: IdLike | PopulatedRoomHost;
+};
 
-function mapToDomainFeatureSnapshot(snapshot: any): RoomFeatureSnapshot | null {
+const isObjectWithOptionalId = (value: unknown): value is ObjectWithOptionalId =>
+  typeof value === 'object' && value !== null && 'toString' in value;
+
+const isPopulatedRoomHost = (value: RoomWithPopulatedHostLeanDoc['hostId']): value is PopulatedRoomHost =>
+  typeof value === 'object' && value !== null && 'firstName' in value;
+
+function mapToDomainFeatureSnapshot(snapshot: RoomDocument['featureSnapshot']): RoomFeatureSnapshot | null {
   if (!snapshot) return null;
 
   const limits = snapshot.limits;
@@ -35,7 +51,7 @@ function mapToDomainFeatureSnapshot(snapshot: any): RoomFeatureSnapshot | null {
   };
 }
 
-function mapToDatabaseFeatureSnapshot(snapshot: RoomFeatureSnapshot | null): any {
+function mapToDatabaseFeatureSnapshot(snapshot: RoomFeatureSnapshot | null): RoomFeatureSnapshotDoc | null {
   if (!snapshot) return null;
 
   return {
@@ -44,15 +60,15 @@ function mapToDatabaseFeatureSnapshot(snapshot: RoomFeatureSnapshot | null): any
     enabledFeatures: snapshot.enabledFeatures,
     limits: (snapshot.limits
       ? new Map(Object.entries(snapshot.limits))
-      : new Map()) as LimitMap,
+      : new Map()) as unknown as Partial<Record<LimitKey, number>>,
   };
 }
 
-function toIdString(val: any): string {
+function toIdString(val: unknown): string {
   if (!val) return '';
-  if (typeof val === 'object') {
+  if (isObjectWithOptionalId(val)) {
     if (val._id) return val._id.toString();
-    if (typeof val.toString === 'function') return val.toString();
+    return val.toString();
   }
   return String(val);
 }
@@ -113,15 +129,17 @@ export class RoomRepository
       this._model.countDocuments(query),
     ]);
 
-    const items = docs.map((doc: any) => {
-       const entity = this.leanToEntity(doc);
-       if (doc.hostId && typeof doc.hostId === 'object' && doc.hostId._id) {
+    const items = (docs as RoomWithPopulatedHostLeanDoc[]).map((doc) => {
+       const entity = this.leanToEntity(doc as unknown as RoomLeanDoc);
+       if (isPopulatedRoomHost(doc.hostId)) {
            entity.hostId = toIdString(doc.hostId._id);
            const fName = doc.hostId.firstName || '';
            const lName = doc.hostId.lastName || '';
            const fullName = `${fName} ${lName}`.trim();
            entity.hostName = fullName || doc.hostId.username || 'Unknown';
-           entity.hostAvatarUrl = doc.hostId.avatarUrl;
+           if (doc.hostId.avatarUrl !== undefined) {
+             entity.hostAvatarUrl = doc.hostId.avatarUrl;
+           }
        }
        return entity;
     });
@@ -184,15 +202,17 @@ export class RoomRepository
       this._model.countDocuments(query),
     ]);
 
-    const items = docs.map((doc: any) => {
-       const entity = this.leanToEntity(doc);
-       if (doc.hostId && typeof doc.hostId === 'object' && doc.hostId._id) {
+    const items = (docs as RoomWithPopulatedHostLeanDoc[]).map((doc) => {
+       const entity = this.leanToEntity(doc as unknown as RoomLeanDoc);
+       if (isPopulatedRoomHost(doc.hostId)) {
            entity.hostId = toIdString(doc.hostId._id);
            const fName = doc.hostId.firstName || '';
            const lName = doc.hostId.lastName || '';
            const fullName = `${fName} ${lName}`.trim();
            entity.hostName = fullName || doc.hostId.username || 'Unknown';
-           entity.hostAvatarUrl = doc.hostId.avatarUrl;
+           if (doc.hostId.avatarUrl !== undefined) {
+             entity.hostAvatarUrl = doc.hostId.avatarUrl;
+           }
        }
        return entity;
     });

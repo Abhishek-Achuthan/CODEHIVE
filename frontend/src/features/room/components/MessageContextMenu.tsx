@@ -9,6 +9,7 @@ interface MessageContextMenuProps {
   onClose: () => void;
   canEdit: boolean;
   canDelete: boolean;
+  isMe?: boolean;
 }
 
 export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
@@ -19,6 +20,7 @@ export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   onClose,
   canEdit,
   canDelete,
+  isMe = true,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +40,7 @@ export const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
   return (
     <div
       ref={menuRef}
-      className="absolute right-0 top-6 z-50 w-40 rounded-lg bg-[#252526] shadow-xl border border-[#3e3e42] py-1 text-sm text-gray-300 overflow-hidden"
+      className={`absolute ${isMe ? 'right-0' : 'left-0'} top-6 z-50 w-40 rounded-lg bg-[#252526] shadow-xl border border-[#3e3e42] py-1 text-sm text-gray-300 overflow-hidden`}
     >
       <button
         onClick={onReply}

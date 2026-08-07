@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
+import type IJitsiMeetExternalApi from '@jitsi/react-sdk/lib/types/IJitsiMeetExternalApi';
 import { useRoomSocket } from '../../../shared/socket/useRoomSocket';
 import { useAppSelector } from '../../../shared/hooks/storeHooks';
 import { RoomService } from '../../../services/roomService';
@@ -22,6 +24,8 @@ import EditorArea from '../components/EditorArea';
 import RightSidebar from '../components/RightSidebar';
 import { RoomDetailsModal } from '../components/RoomDetailsModal';
 import { EndRoomDialog } from '../components/EndRoomDialog';
+import { ReviewModal } from '../../session/components/ReviewModal';
+import { addReview } from '../../../api/endpoints/sessionAPI';
 
 import { Loader2, AlertCircle } from 'lucide-react';
 import { getLifecycleBannerMessage } from '../authorization/lifecycleMessages';
@@ -59,13 +63,16 @@ const CollaborationRoom: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [endRoomOpen, setEndRoomOpen] = useState(false);
   const [endRoomLoading, setEndRoomLoading] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [hasPromptedReview, setHasPromptedReview] = useState(false);
   
   const [isVideoActive, setIsVideoActive] = useState(false);
   const [isVideoExpanded, setIsVideoExpanded] = useState(false);
   const [videoFocusTrigger, setVideoFocusTrigger] = useState(0);
 
   // Jitsi native controls state
-  const jitsiApiRef = React.useRef<any>(null);
+  const jitsiApiRef = React.useRef<IJitsiMeetExternalApi | null>(null);
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isVideoMuted, setIsVideoMuted] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -82,11 +89,11 @@ const CollaborationRoom: React.FC = () => {
   const handleToggleScreenShare = () => jitsiApiRef.current?.executeCommand('toggleShareScreen');
   const handleLeaveVideo = () => jitsiApiRef.current?.executeCommand('hangup');
 
-  const handleJitsiApiReady = (api: any) => {
+  const handleJitsiApiReady = (api: IJitsiMeetExternalApi) => {
     jitsiApiRef.current = api;
-    api.addListener('audioMuteStatusChanged', (e: any) => setIsAudioMuted(e.muted));
-    api.addListener('videoMuteStatusChanged', (e: any) => setIsVideoMuted(e.muted));
-    api.addListener('screenSharingStatusChanged', (e: any) => setIsScreenSharing(e.on));
+    api.addListener('audioMuteStatusChanged', (e: unknown) => setIsAudioMuted((e as { muted: boolean }).muted));
+    api.addListener('videoMuteStatusChanged', (e: unknown) => setIsVideoMuted((e as { muted: boolean }).muted));
+    api.addListener('screenSharingStatusChanged', (e: unknown) => setIsScreenSharing((e as { on: boolean }).on));
   };
 
   const roomName = snapshot?.title || 'Untitled Room';
@@ -214,6 +221,45 @@ const CollaborationRoom: React.FC = () => {
 
   const lifecycleBanner = getLifecycleBannerMessage(authorization);
 
+  React.useEffect(() => {
+    const isMentor = user?.role === 'mentor' || finalCurrentUser?.role === 'HOST' || authorization.canManageRoomPermissions;
+    if (isMentor) {
+        setIsReviewModalOpen(false);
+        return;
+    }
+
+    if (
+      hasRoomSnapshot &&
+      (snapshot?.lifecycleStatus === 'READONLY' || snapshot?.lifecycleStatus === 'ARCHIVED') &&
+      snapshot?.sessionId &&
+      snapshot?.isSessionReviewed === false &&
+      finalCurrentUser?.role === 'PARTICIPANT' &&
+      !authorization.canManageRoomPermissions &&
+      !hasPromptedReview
+    ) {
+      setIsReviewModalOpen(true);
+      setHasPromptedReview(true);
+    }
+  }, [hasRoomSnapshot, snapshot?.lifecycleStatus, snapshot?.sessionId, snapshot?.isSessionReviewed, finalCurrentUser?.role, authorization.canManageRoomPermissions, hasPromptedReview, user?.role]);
+
+  const handleConfirmReview = async (rating: number, reviewText: string) => {
+    if (!snapshot?.sessionId) return;
+
+    setReviewSubmitting(true);
+    try {
+      await addReview(snapshot!.sessionId, rating, reviewText);
+      toast.success("Review submitted successfully");
+      setIsReviewModalOpen(false);
+      await refreshRoom();
+    } catch (err) {
+      toast.error(err instanceof AxiosError
+        ? (err.response?.data?.message ?? "Failed to submit review")
+        : "Failed to submit review");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
   // Error state
   if (error) {
     return (
@@ -254,10 +300,18 @@ const CollaborationRoom: React.FC = () => {
       <div className="flex flex-col h-screen w-full bg-[#010409] text-gray-300 font-sans selection:bg-blue-600/30 selection:text-blue-200">
         {/* Top Bar */}
         <TopBar
-          roomName={roomName}
+          roomName={snapshot?.title}
           roomId={roomId!}
-          showInviteControls={authorization.canManageRoomPermissions}
+          showInviteControls={authorization.canManageRoomPermissions && snapshot?.lifecycleStatus !== 'READONLY' && snapshot?.lifecycleStatus !== 'ARCHIVED'}
           showEndRoomControl={canEndRoom}
+          showReviewButton={
+            !!snapshot?.sessionId && (
+              (finalCurrentUser?.role === 'PARTICIPANT' && !snapshot?.isSessionReviewed) ||
+              snapshot?.isSessionReviewed
+            )
+          }
+          hasReviewed={!!snapshot?.isSessionReviewed}
+          onReviewClick={() => setIsReviewModalOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
           onEndRoom={() => setEndRoomOpen(true)}
           onLeave={handleLeaveRoom}
@@ -278,6 +332,7 @@ const CollaborationRoom: React.FC = () => {
           open={settingsOpen}
           onOpenChange={setSettingsOpen}
           onDetailsUpdated={refreshRoom}
+          readOnly={snapshot?.lifecycleStatus === 'READONLY' || snapshot?.lifecycleStatus === 'ARCHIVED'}
         />
         
         <EndRoomDialog
@@ -285,6 +340,18 @@ const CollaborationRoom: React.FC = () => {
           loading={endRoomLoading}
           onConfirm={handleConfirmEndRoom}
           onClose={() => setEndRoomOpen(false)}
+        />
+        
+        <ReviewModal
+          open={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSubmit={handleConfirmReview}
+          loading={reviewSubmitting}
+          readOnly={!!snapshot?.isSessionReviewed}
+          initialRating={snapshot?.sessionReview?.rating}
+          initialReviewText={snapshot?.sessionReview?.reviewText}
+          createdAt={snapshot?.sessionReview?.createdAt}
+          isHostView={authorization.canManageRoomPermissions}
         />
 
         {lifecycleBanner && (

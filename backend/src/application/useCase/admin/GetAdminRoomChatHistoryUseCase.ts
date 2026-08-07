@@ -1,12 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import type { IMessageRepository } from '../../../domain/interfaces/IMessageRepository';
 import type { IUserRepository } from '../../../domain/interfaces/IUserRepository';
-import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { SendMessageResponseDTO } from '../../dto/MessageDTO';
-
-export interface IGetAdminRoomChatHistoryUseCase {
-  execute(roomId: string): Promise<SendMessageResponseDTO[]>;
-}
+import type { IGetAdminRoomChatHistoryUseCase } from '../interface/admin/IGetAdminRoomChatHistoryUseCase';
 
 @injectable()
 export class GetAdminRoomChatHistoryUseCase implements IGetAdminRoomChatHistoryUseCase {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AxiosError } from "axios";
 import { Search, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -16,6 +17,7 @@ import { Button, Input } from "../../../shared/ui";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { addReview } from "../../../api/endpoints/sessionAPI";
+import { useAppSelector } from "../../../shared/hooks/storeHooks";
 
 const REFUND_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -24,6 +26,7 @@ function getTimeDiffMs(startTime: string): number {
 }
 
 export default function MySessionsPage() {
+  const isMentor = useAppSelector((state) => state.auth.user?.role === "mentor");
   const [activeTab, setActiveTab] = useState<StatusFilter>("upcoming");
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -152,7 +155,9 @@ export default function MySessionsPage() {
 
   const openReviewModal = (session: BookedSessionResponse) => {
     setSelectedSession(session);
-    setIsReviewModalOpen(true);
+    if (!isMentor) {
+      setIsReviewModalOpen(true);
+    }
   };
 
   const closeReviewModal = () => {
@@ -169,8 +174,10 @@ export default function MySessionsPage() {
       toast.success("Review submitted successfully");
       closeReviewModal();
       await refetch();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to submit review");
+    } catch (err) {
+      toast.error(err instanceof AxiosError
+        ? (err.response?.data?.message ?? "Failed to submit review")
+        : "Failed to submit review");
     } finally {
       setReviewSubmitting(false);
     }
@@ -281,7 +288,7 @@ export default function MySessionsPage() {
                     <button
                       key={opt.value}
                       onClick={() => {
-                        setPaymentSource(opt.value as any);
+                        setPaymentSource(opt.value as "" | "STRIPE" | "WALLET");
                         setCurrentPage(1);
                         close();
                       }}
@@ -386,6 +393,7 @@ export default function MySessionsPage() {
                   session={session}
                   onCancel={() => openCancelModal(session)}
                   onReview={() => openReviewModal(session)}
+                  onViewReview={() => openReviewModal(session)}
                   onJoinRoom={() => {
                     navigate(`/room/${session.roomId}`);
                   }}
@@ -426,6 +434,10 @@ export default function MySessionsPage() {
         onClose={closeReviewModal}
         onSubmit={handleConfirmReview}
         loading={reviewSubmitting}
+        readOnly={selectedSession?.isReviewed}
+        initialRating={selectedSession?.review?.rating}
+        initialReviewText={selectedSession?.review?.reviewText}
+        createdAt={selectedSession?.review?.createdAt}
       />
     </div>
   );

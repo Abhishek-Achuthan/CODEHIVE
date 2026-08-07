@@ -57,6 +57,12 @@ export interface BookedSessionResponse extends SessionResponse {
     sessionType: 'ONE_TO_ONE' | 'PRIVATE_SESSION';
     maxGuests: number;
     joinUrl?: string;
+    isReviewed?: boolean;
+    review?: {
+        rating: number;
+        reviewText?: string;
+        createdAt: string;
+    };
 }
 
 export type SessionRole = "mentor" | "mentee" | "all";

@@ -4,11 +4,12 @@ import { JaaSMeeting } from '@jitsi/react-sdk';
 import { getVideoConfig } from '../api/getVideoConfig';
 import type { VideoConfigResponseDTO } from '../types';
 import { useJitsiAPI } from '../hooks/useJitsiAPI';
+import type IJitsiMeetExternalApi from '@jitsi/react-sdk/lib/types/IJitsiMeetExternalApi';
 
 interface VideoMeetingProps {
   roomId: string;
   onClose?: () => void;
-  onJitsiApiReady?: (api: any) => void;
+  onJitsiApiReady?: (api: IJitsiMeetExternalApi) => void;
 }
 
 export const VideoMeeting: React.FC<VideoMeetingProps> = ({ 
@@ -20,7 +21,7 @@ export const VideoMeeting: React.FC<VideoMeetingProps> = ({
   const [configLoading, setConfigLoading] = useState(true);
   const [configError, setConfigError] = useState<Error | null>(null);
   
-  const apiRef = useRef<any>(null);
+  const apiRef = useRef<IJitsiMeetExternalApi | null>(null);
 
   // 1. Fetch meeting configuration
   useEffect(() => {

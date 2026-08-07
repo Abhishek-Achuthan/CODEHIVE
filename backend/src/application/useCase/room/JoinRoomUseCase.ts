@@ -13,6 +13,7 @@ import { RoomRole } from '../../../domain/types/RoomRole';
 import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
 import { RoomInviteService } from '../../services/RoomInviteService';
 import { ConflictError } from '../../../core/errors/ConflictError';
+import type { IReviewRepository } from '../../../domain/interfaces/IReviewRepository';
 
 @injectable()
 export class JoinRoomUseCase implements IJoinRoomUseCase {
@@ -33,6 +34,8 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     private readonly roomAuthorizationService: RoomAuthorizationService,
     @inject(RoomInviteService)
     private readonly roomInviteService: RoomInviteService,
+    @inject('IReviewRepository')
+    private readonly reviewRepository: IReviewRepository,
   ) {}
 
   async execute(data: JoinRoomDTO): Promise<JoinRoomSnapshotDTO> {
@@ -61,7 +64,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
           id: '',
           roomId: data.roomId,
           userId: data.userId,
-          role: RoomRole.PARTICIPANT,
+          role: data.userId === room.hostId.toString() ? RoomRole.HOST : RoomRole.PARTICIPANT,
           overrides: {},
           joinedAt: new Date(),
         };
@@ -126,11 +129,11 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     const mappedParticipants = participants.map((p) => ({
       userId: p.userId,
       name: p.name,
-      role: p.role,
+      role: p.userId === room.hostId.toString() ? RoomRole.HOST : p.role,
       ...(p.avatarUrl && { avatarUrl: p.avatarUrl }),
     }));
 
-    if (hostUser && !mappedParticipants.some(p => p.userId === room.hostId)) {
+    if (hostUser && !mappedParticipants.some(p => p.userId === room.hostId.toString())) {
       mappedParticipants.push({
         userId: hostUser.id,
         name: `${hostUser.firstName} ${hostUser.lastName}`,
@@ -139,7 +142,7 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       });
     }
 
-    return {
+    const result: JoinRoomSnapshotDTO = {
       roomId: room.id,
       title: room.title,
       isNewParticipant,
@@ -150,6 +153,25 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       lifecycleStatus: authorizationContext.room.lifecycleStatus,
       featureSnapshot: room.featureSnapshot,
     };
+
+    if (room.sessionId) {
+      result.sessionId = room.sessionId.toString();
+      const review = await this.reviewRepository.findBySessionId(
+        room.sessionId.toString()
+      );
+      result.isSessionReviewed = !!review;
+      if (review) {
+        result.sessionReview = { 
+          rating: review.rating, 
+          createdAt: review.createdAt?.toISOString() || new Date().toISOString() 
+        };
+        if (review.reviewText !== undefined) {
+          result.sessionReview.reviewText = review.reviewText;
+        }
+      }
+    }
+
+    return result;
   }
 
   private _isDuplicateKeyError(error: unknown): boolean {

@@ -8,17 +8,26 @@ interface UseWalletTransactionsResult {
   transactions: WalletTransaction[];
   loading: boolean;
   refreshTransactions: () => Promise<void>;
+  page: number;
+  total: number;
+  totalPages: number;
+  setPage: (page: number) => void;
 }
 
-export const useWalletTransactions = (): UseWalletTransactionsResult => {
+export const useWalletTransactions = (limit: number = 5): UseWalletTransactionsResult => {
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
 
-  const fetchTransactions = async (): Promise<void> => {
+  const fetchTransactions = async (currentPage: number): Promise<void> => {
     try {
       setLoading(true);
-      const data = await WalletService.getWalletTransactions();
-      setTransactions(Array.isArray(data.transactions) ? data.transactions : []);
+      const data = await WalletService.getWalletTransactions(currentPage, limit);
+      
+      const newTransactions = Array.isArray(data.transactions) ? data.transactions : [];
+      setTotal(data.total || 0);
+      setTransactions(newTransactions);
     } catch (error: unknown) {
       if (error instanceof BaseError) {
         toast.error(error.message);
@@ -31,12 +40,24 @@ export const useWalletTransactions = (): UseWalletTransactionsResult => {
   };
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    fetchTransactions(page);
+  }, [page, limit]);
+
+  const refreshTransactions = async () => {
+    if (page === 1) {
+      await fetchTransactions(1);
+    } else {
+      setPage(1);
+    }
+  };
 
   return {
     transactions,
     loading,
-    refreshTransactions: fetchTransactions,
+    refreshTransactions,
+    page,
+    total,
+    totalPages: Math.ceil(total / limit) || 1,
+    setPage,
   };
 };

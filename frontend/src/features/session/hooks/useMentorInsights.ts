@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AxiosError } from 'axios';
 import { getMyInsights } from '../../../api/endpoints/mentorAPI';
 
 export interface MentorInsightsData {
@@ -33,8 +34,11 @@ export function useMentorInsights(isMentor: boolean) {
       try {
         const response = await getMyInsights();
         setInsights(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to fetch insights');
+      } catch (err) {
+        const message = err instanceof AxiosError
+          ? (err.response?.data?.message ?? 'Failed to fetch insights')
+          : 'Failed to fetch insights';
+        setError(message);
       } finally {
         setLoading(false);
       }

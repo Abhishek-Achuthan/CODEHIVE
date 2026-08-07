@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { AxiosError } from "axios";
 import { SubscriptionService } from "../../services/subscriptionService";
 import type { CurrentSubscription } from "../../shared/types/api/subscription";
 
@@ -23,8 +24,11 @@ export const fetchMySubscription = createAsyncThunk(
     try {
       const data = await SubscriptionService.getMySubscription();
       return data;
-    } catch (error: any) {
-      return rejectWithValue(error?.response?.data?.message || "Failed to fetch subscription");
+    } catch (error) {
+      const message = error instanceof AxiosError
+        ? (error.response?.data?.message ?? "Failed to fetch subscription")
+        : "Failed to fetch subscription";
+      return rejectWithValue(message);
     }
   }
 );

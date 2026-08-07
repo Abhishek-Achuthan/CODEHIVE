@@ -17,6 +17,7 @@ import { EntitlementResolutionService } from '../../services/EntitlementsResolut
 import { RoomFeatureSnapshotFactory } from '../../services/RoomFeatureSnapshotFactory';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { RoomInviteService } from '../../services/RoomInviteService';
+import type { INotificationService } from '../../ports/notifications/INotificationService';
 
 @injectable()
 export class CreateRoomUseCase implements ICreateRoomUseCase {
@@ -30,6 +31,8 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
     private readonly _roomFeatureSnapshotFactory: RoomFeatureSnapshotFactory,
     @inject(RoomInviteService)
     private readonly _roomInviteService: RoomInviteService,
+    @inject('INotificationService')
+    private readonly _notificationService: INotificationService,
   ) {}
 
   async execute(data: CreateRoomDTO): Promise<CreateRoomResponseDTO> {
@@ -95,8 +98,27 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
           room.id,
           data.userId,
         );
+        
+        await this._notificationService.notify({
+          recipientId: data.userId,
+          type: 'SUCCESS',
+          category: 'ROOM',
+          title: 'Room Created',
+          message: `Your room "${room.title}" has been created successfully.`,
+          actionUrl: joinUrl,
+        });
+
         return { ...room, joinUrl };
       }
+
+      await this._notificationService.notify({
+        recipientId: data.userId,
+        type: 'SUCCESS',
+        category: 'ROOM',
+        title: 'Room Created',
+        message: `Your room "${room.title}" has been created successfully.`,
+        actionUrl: `/room/${room.id}`,
+      });
 
       return room;
     } catch (error) {

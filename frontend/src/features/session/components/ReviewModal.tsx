@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, X, Loader2 } from 'lucide-react';
 import { Button } from '../../../shared/ui/Button';
 
@@ -7,12 +7,34 @@ interface ReviewModalProps {
   onClose: () => void;
   onSubmit: (rating: number, reviewText: string) => Promise<void>;
   loading?: boolean;
+  readOnly?: boolean;
+  initialRating?: number;
+  initialReviewText?: string;
+  createdAt?: string;
+  isHostView?: boolean;
 }
 
-export function ReviewModal({ open, onClose, onSubmit, loading }: ReviewModalProps) {
-  const [rating, setRating] = useState<number>(0);
+export function ReviewModal({ 
+  open, 
+  onClose, 
+  onSubmit, 
+  loading, 
+  readOnly,
+  initialRating = 0,
+  initialReviewText = '',
+  createdAt,
+  isHostView = false
+}: ReviewModalProps) {
+  const [rating, setRating] = useState<number>(initialRating);
   const [hoverRating, setHoverRating] = useState<number>(0);
-  const [reviewText, setReviewText] = useState('');
+  const [reviewText, setReviewText] = useState(initialReviewText);
+
+  useEffect(() => {
+    if (open) {
+      setRating(initialRating);
+      setReviewText(initialReviewText);
+    }
+  }, [open, initialRating, initialReviewText]);
 
   if (!open) return null;
 
@@ -28,7 +50,16 @@ export function ReviewModal({ open, onClose, onSubmit, loading }: ReviewModalPro
       <div className="w-full max-w-md overflow-hidden rounded-2xl bg-[#111214] border border-white/10 shadow-2xl">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Rate Your Session</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-white">
+                {readOnly ? (isHostView ? "Student's Review" : 'Your Session Review') : 'Rate Your Session'}
+              </h2>
+              {readOnly && createdAt && (
+                <p className="text-xs text-zinc-400 mt-1">
+                  Submitted on {new Date(createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
             <button
               onClick={onClose}
               disabled={loading}
@@ -45,15 +76,15 @@ export function ReviewModal({ open, onClose, onSubmit, loading }: ReviewModalPro
                 <button
                   key={star}
                   type="button"
-                  disabled={loading}
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="p-1 transition-transform hover:scale-110 focus:outline-none"
+                  disabled={loading || readOnly}
+                  onClick={() => !readOnly && setRating(star)}
+                  onMouseEnter={() => !readOnly && setHoverRating(star)}
+                  onMouseLeave={() => !readOnly && setHoverRating(0)}
+                  className={`p-1 transition-transform focus:outline-none ${!readOnly ? 'hover:scale-110' : ''}`}
                 >
                   <Star
                     className={`w-10 h-10 transition-colors ${
-                      star <= (hoverRating || rating)
+                      star <= (readOnly ? rating : (hoverRating || rating))
                         ? 'text-amber-400 fill-amber-400'
                         : 'text-zinc-700'
                     }`}
@@ -70,31 +101,44 @@ export function ReviewModal({ open, onClose, onSubmit, loading }: ReviewModalPro
               <textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                disabled={loading}
-                placeholder="What did you like about this session?"
-                className="w-full h-28 p-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 resize-none"
+                disabled={loading || readOnly}
+                readOnly={readOnly}
+                placeholder={readOnly ? "No feedback provided." : "What did you like about this session?"}
+                className="w-full h-28 p-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 resize-none disabled:opacity-100 disabled:bg-black/30"
               />
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 bg-black/20 border-t border-white/5">
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            disabled={loading}
-            className="border-white/10 text-white hover:bg-white/5"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            disabled={rating === 0 || loading}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white min-w-[100px]"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Review'}
-          </Button>
+          {!readOnly ? (
+            <>
+              <Button
+                variant="secondary"
+                onClick={onClose}
+                disabled={loading}
+                className="border-white/10 text-white hover:bg-white/5"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                disabled={rating === 0 || loading}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white min-w-[100px]"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Review'}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={onClose}
+              className="border-white/10 text-white hover:bg-white/5"
+            >
+              Close
+            </Button>
+          )}
         </div>
       </div>
     </div>

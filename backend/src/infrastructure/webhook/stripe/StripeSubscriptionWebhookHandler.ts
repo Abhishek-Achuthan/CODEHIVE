@@ -14,6 +14,7 @@ import {
   resolveSubscriptionBillingInterval,
 } from '../../../application/helpers/planBillingHelpers';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import type { INotificationService } from '../../../application/ports/notifications/INotificationService';
 
 
 @injectable()
@@ -29,6 +30,8 @@ export class StripeSubscriptionWebhookHandler
     private readonly _planRepository: IPlanRepository,
     @inject('ILoggerService')
     private readonly _logger: ILoggerService,
+    @inject('INotificationService')
+    private readonly _notificationService: INotificationService,
   ) {}
 
 
@@ -200,6 +203,14 @@ export class StripeSubscriptionWebhookHandler
     }
 
     await this._subscriptionRepository.createWithSession(subscriptionPayload, session);
+
+    await this._notificationService.notify({
+      recipientId: userId,
+      type: 'SUCCESS',
+      category: 'PAYMENT',
+      title: 'Subscription Purchased',
+      message: `Your subscription has been successfully purchased and is now active.`,
+    });
 
     this._logger.info('subscription_webhook.created', {
       eventId: event.id,

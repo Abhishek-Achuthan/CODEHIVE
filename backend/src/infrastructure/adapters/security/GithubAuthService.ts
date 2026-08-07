@@ -6,6 +6,13 @@ import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { UnauthorizedError } from '../../../core/errors/UnauthorizedError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
+interface GithubEmailEntry {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility: string | null;
+}
+
 @injectable()
 export class GitHubAuthService implements IGithubAuthService {
   private clientId: string;
@@ -77,11 +84,11 @@ export class GitHubAuthService implements IGithubAuthService {
   }
 
   private async getEmail(accessToken: string): Promise<string> {
-    const response = await axios.get('https://api.github.com/user/emails', {
+    const response = await axios.get<GithubEmailEntry[]>('https://api.github.com/user/emails', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    const email = response.data.find((e: any) => e.primary)?.email;
+    const email = response.data.find((e) => e.primary)?.email;
     if (!email) {
       throw new NotFoundError(ERROR_MESSAGES.GITHUB.USER_EMAIL_NOT_FOUND);
     }

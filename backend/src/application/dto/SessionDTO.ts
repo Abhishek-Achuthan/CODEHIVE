@@ -101,6 +101,12 @@ export interface IBookedSessionResponseDTO {
   sessionType: SessionType;
   maxGuests: number;
   joinUrl?: string;
+  isReviewed?: boolean;
+  review?: {
+    rating: number;
+    reviewText?: string;
+    createdAt: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

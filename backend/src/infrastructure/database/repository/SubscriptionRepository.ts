@@ -127,10 +127,10 @@ export class SubscriptionRepository
     const doc: Partial<SubscriptionDocument> = {};
 
     if (data.userId !== undefined) {
-      doc.userId = new Types.ObjectId(data.userId) as any;
+      doc.userId = new Types.ObjectId(data.userId);
     }
     if (data.planId !== undefined) {
-      doc.planId = new Types.ObjectId(data.planId) as any;
+      doc.planId = new Types.ObjectId(data.planId);
     }
     if (data.status !== undefined) {
       doc.status = data.status;

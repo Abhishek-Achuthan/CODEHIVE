@@ -5,12 +5,14 @@ import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
 import { UserRole } from '../../../domain/types/UserRole';
+import type { INotificationService } from '../../ports/notifications/INotificationService';
 
 @injectable()
 export class UpdateMentorStatusUseCase implements IUpdateMentorStatusUseCase {
 
     constructor(
         @inject('IUserRepository') private readonly _userRepository: IUserRepository,
+        @inject('INotificationService') private readonly _notificationService: INotificationService,
     ) { }
 
     async execute(id: string, status: 'approved' | 'rejected'): Promise<void> {
@@ -22,5 +24,23 @@ export class UpdateMentorStatusUseCase implements IUpdateMentorStatusUseCase {
         const role = status === 'approved' ? UserRole.MENTOR : UserRole.USER;
 
         await this._userRepository.update(id, { mentorStatus, role });
+
+        if (status === 'approved') {
+            await this._notificationService.notify({
+                recipientId: id,
+                type: 'SUCCESS',
+                category: 'MENTOR',
+                title: 'Mentor Application Approved',
+                message: 'Congratulations! Your application to become a mentor has been approved.',
+            });
+        } else {
+            await this._notificationService.notify({
+                recipientId: id,
+                type: 'INFO',
+                category: 'MENTOR',
+                title: 'Mentor Application Update',
+                message: 'Your mentor application status has been updated to rejected.',
+            });
+        }
     }
 }

@@ -6,6 +6,19 @@ import CommentModel from '../models/qna/CommentModel';
 import { Model, Types } from 'mongoose';
 import { UserLeanDoc } from '../schemas/UserSchema';
 
+type PopulatedCommentAuthor = Pick<
+  UserLeanDoc,
+  '_id' | 'firstName' | 'lastName' | 'avatarUrl'
+> & {
+  username?: string;
+  reputation?: number;
+  profileImage?: string;
+};
+
+type CommentWithPopulatedAuthorDoc = Omit<CommentDoc, 'authorId'> & {
+  authorId: PopulatedCommentAuthor;
+};
+
 export class CommentRepository
   extends GenericRepository<CommentDoc, CommentEntity>
   implements ICommentRepository
@@ -36,12 +49,12 @@ export class CommentRepository
   async listByAnswer(answerId: string): Promise<CommentWithAuthor[]> {
     const docs = await this._model
       .find({ answerId: new Types.ObjectId(answerId) })
-      .populate<{ authorId: UserLeanDoc }>({
+      .populate<{ authorId: PopulatedCommentAuthor }>({
         path: 'authorId',
         select: 'username firstName lastName profileImage reputation',
       })
       .sort({ createdAt: 1 })
-      .lean<any[]>();
+      .lean<CommentWithPopulatedAuthorDoc[]>();
 
     return docs.map((doc) => ({
       id: doc._id.toString(),
@@ -54,7 +67,7 @@ export class CommentRepository
         username: doc.authorId.username || '',
         firstName: doc.authorId.firstName,
         lastName: doc.authorId.lastName,
-        profileImage: doc.authorId.profileImage,
+        ...(doc.authorId.profileImage !== undefined ? { profileImage: doc.authorId.profileImage } : {}),
         reputation: doc.authorId.reputation || 0,
       },
     }));

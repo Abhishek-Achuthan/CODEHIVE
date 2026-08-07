@@ -1,11 +1,30 @@
 import { injectable } from 'tsyringe';
-import { IAdminDashboardRepository } from '../../../domain/interfaces/IAdminDashboardRepository';
+import { Model, Types } from 'mongoose';
+import {
+  AdminDashboardRecentMentorApplication,
+  AdminDashboardRecentReport,
+  AdminDashboardRecentRoom,
+  AdminDashboardRecentSubscription,
+  AdminDashboardRecentUser,
+  IAdminDashboardRepository,
+} from '../../../domain/interfaces/IAdminDashboardRepository';
 import UserModel from '../models/UserModel';
 import RoomModel from '../models/room/RoomModel';
 import RoomReportModel from '../models/room/RoomReportModel';
 import SubscriptionModel from '../models/SubscriptionModel';
 import { MentorStatus } from '../../../domain/types/MentorStatus';
-import PlanModel from '../models/PlanModel';
+import type { SubscriptionDocument } from '../schemas/SubscriptionSchema';
+import type { PlanDocument } from '../schemas/PlanSchema';
+import type { RoomReportDocument } from '../schemas/room/RoomReportSchema';
+
+type SubscriptionWithPlan = Omit<SubscriptionDocument, 'planId'> & {
+  planId: PlanDocument | Types.ObjectId;
+};
+
+const isPopulatedPlan = (plan: SubscriptionWithPlan['planId']): plan is PlanDocument =>
+  !(plan instanceof Types.ObjectId);
+
+const roomReportModel = RoomReportModel as Model<RoomReportDocument>;
 
 @injectable()
 export class AdminDashboardRepository implements IAdminDashboardRepository {
@@ -122,16 +141,17 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
   }
 
   async calculateMonthlyRevenue(): Promise<number> {
-    const activeSubs = await SubscriptionModel.find({ status: 'ACTIVE' }).populate('planId');
+    const activeSubs = await SubscriptionModel.find({ status: 'ACTIVE' }).populate<{ planId: PlanDocument }>('planId');
     let total = 0;
-    for (const sub of activeSubs) {
-      const plan = sub.planId as any; 
-      if (plan && plan.pricing) {
-        if (sub.billingInterval === 'yearly') {
-          total += plan.pricing.yearly / 12;
-        } else {
-          total += plan.pricing.monthly;
-        }
+    for (const sub of activeSubs as SubscriptionWithPlan[]) {
+      if (!isPopulatedPlan(sub.planId)) {
+        continue;
+      }
+
+      if (sub.billingInterval === 'yearly') {
+        total += sub.planId.pricing.yearly / 12;
+      } else {
+        total += sub.planId.pricing.monthly;
       }
     }
     return Math.round(total);
@@ -160,23 +180,23 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
     return results.map(r => ({ name: r._id, value: r.value }));
   }
 
-  async getRecentUsers(limit: number): Promise<any[]> {
+  async getRecentUsers(limit: number): Promise<AdminDashboardRecentUser[]> {
     return UserModel.find().sort({ createdAt: -1 }).limit(limit).lean();
   }
 
-  async getRecentMentorApplications(limit: number): Promise<any[]> {
+  async getRecentMentorApplications(limit: number): Promise<AdminDashboardRecentMentorApplication[]> {
     return UserModel.find({ mentorAppliedAt: { $exists: true } }).sort({ mentorAppliedAt: -1 }).limit(limit).lean();
   }
 
-  async getRecentRooms(limit: number): Promise<any[]> {
+  async getRecentRooms(limit: number): Promise<AdminDashboardRecentRoom[]> {
     return RoomModel.find().sort({ createdAt: -1 }).limit(limit).lean();
   }
 
-  async getRecentSubscriptions(limit: number): Promise<any[]> {
+  async getRecentSubscriptions(limit: number): Promise<AdminDashboardRecentSubscription[]> {
     return SubscriptionModel.find().sort({ createdAt: -1 }).limit(limit).lean();
   }
 
-  async getRecentReports(limit: number): Promise<any[]> {
-    return (RoomReportModel as any).find().sort({ createdAt: -1 }).limit(limit).lean();
+  async getRecentReports(limit: number): Promise<AdminDashboardRecentReport[]> {
+    return roomReportModel.find().sort({ createdAt: -1 }).limit(limit).lean();
   }
 }

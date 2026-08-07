@@ -2,10 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import type { IRoomReportRepository } from '../../../domain/interfaces/IRoomReportRepository';
 import { NotFoundError } from '../../../core/errors/NotFoundError';
 import { RoomReportEntity } from '../../../domain/entities/room/RoomReportEntity';
-
-export interface IUpdateReportStatusUseCase {
-  execute(reportId: string, status: RoomReportEntity['status'], adminId?: string): Promise<RoomReportEntity>;
-}
+import type { IUpdateReportStatusUseCase } from '../interface/admin/IUpdateReportStatusUseCase';
 
 @injectable()
 export class UpdateReportStatusUseCase implements IUpdateReportStatusUseCase {
