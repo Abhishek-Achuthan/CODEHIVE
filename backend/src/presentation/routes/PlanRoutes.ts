@@ -29,13 +29,11 @@ export class PlanRoute {
 
     this._router.get(
       '/',
-      authMiddleware.check,
       this._planController.handleListActivePlans.bind(this._planController)
     );
 
     this._router.get(
       '/:id',
-      authMiddleware.check,
       this._planController.handleGetPlanById.bind(this._planController)
     );
 

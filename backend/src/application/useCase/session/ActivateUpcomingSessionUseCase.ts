@@ -10,6 +10,7 @@ import { RoomVisibility } from "../../../domain/types/RoomVisibility";
 import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
 import { RoomAdmissionPolicy } from "../../../domain/types/RoomAdmissionPolicy";
 import { RoomRole } from "../../../domain/types/RoomRole";
+import { FeatureKey } from "../../../domain/types/FeatureKey";
 import { LimitKey } from "../../../domain/types/LimitKey";
 import { NotFoundError } from "../../../core/errors/NotFoundError";
 import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
@@ -57,15 +58,24 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     const entitlements = await this._entitlementResolutionService.resolve(
       session.mentorId,
     );
-    const featureSnapshot =
-      this._roomFeatureSnapshotFactory.create(entitlements);
-
     const maxGuests = session.maxGuests ?? 0;
     const desiredCapacity = SESSION_ROOM_BASE_PARTICIPANTS + maxGuests;
     const planMaxParticipants =
       entitlements.limits[LimitKey.MAX_PARTICIPANTS] ??
       SESSION_ROOM_BASE_PARTICIPANTS;
     const maxParticipants = Math.min(desiredCapacity, planMaxParticipants);
+
+    // Mentors get full Pro features unlocked for free in session rooms
+    const allFeatures = Object.values(FeatureKey);
+    const featureSnapshot = {
+      planId: 'session_pro',
+      planName: 'Pro Mentor Session',
+      enabledFeatures: allFeatures,
+      limits: {
+        ...entitlements.limits,
+        [LimitKey.MAX_PARTICIPANTS]: Math.max(desiredCapacity, planMaxParticipants),
+      },
+    };
 
     const room = await this._roomRepo.create({
       title: "Mentor Session",

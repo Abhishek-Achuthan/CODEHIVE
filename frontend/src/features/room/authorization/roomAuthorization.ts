@@ -52,11 +52,35 @@ export const buildRoomAuthorization = (
   const lifecycleStatus = snapshot?.lifecycleStatus ?? null;
   const featureSnapshot = snapshot?.featureSnapshot ?? null;
   const capabilities = snapshot?.capabilities ?? {};
-  const enabledFeatures = new Set(featureSnapshot?.enabledFeatures ?? []);
+  const isSessionRoom = !!(
+    snapshot?.sessionId ||
+    (snapshot as any)?.type === 'SESSION' ||
+    featureSnapshot?.planId === 'session_pro' ||
+    featureSnapshot?.planName === 'Pro Mentor Session'
+  );
 
-  const hasCapability = (capability: CapabilityKey) => capabilities[capability] === true;
+  const ALL_SESSION_FEATURES: FeatureKey[] = [
+    'chat',
+    'notes',
+    'polls',
+    'whiteboard',
+    'screen_share',
+    'code_editor',
+    'video_audio',
+    'private_rooms',
+    'session_booking',
+  ];
+
+  const enabledFeatures = new Set<FeatureKey>(
+    isSessionRoom
+      ? ALL_SESSION_FEATURES
+      : (featureSnapshot?.enabledFeatures ?? [])
+  );
+
+  const hasCapability = (capability: CapabilityKey) =>
+    capabilities[capability] === true || isSessionRoom;
   const hasFeature = (feature: FeatureKey) =>
-    featureSnapshot === null || enabledFeatures.has(feature);
+    isSessionRoom || featureSnapshot === null || enabledFeatures.has(feature);
 
   const isActive = lifecycleStatus === "ACTIVE";
   const isReadonly = lifecycleStatus === "READONLY";

@@ -42,6 +42,8 @@ export default function WalletPage() {
         return "Session Payment";
       case "SESSION_REFUND":
         return "Refund";
+      case "SESSION_PAYOUT":
+        return "Session Earnings";
       default:
         return reason;
     }

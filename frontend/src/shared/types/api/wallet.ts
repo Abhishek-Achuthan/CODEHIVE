@@ -1,6 +1,6 @@
 export type WalletTransactionType = "CREDIT" | "DEBIT";
 
-export type WalletTransactionReason = "SESSION_BOOKING" | "SESSION_REFUND";
+export type WalletTransactionReason = "SESSION_BOOKING" | "SESSION_REFUND" | "SESSION_PAYOUT";
 
 export interface MyWalletResponse {
   walletId: string;

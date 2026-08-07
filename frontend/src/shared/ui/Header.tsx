@@ -70,61 +70,79 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Notifications & User Dropdown */}
+          {/* Notifications & User Dropdown / Auth Buttons */}
           <div className="flex items-center space-x-4">
-            {user && <NotificationBell />}
-            <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800/50 transition-all duration-200 group"
-            >
-              <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <MdPersonOutline className="text-white w-5 h-5" />
-              </div>
-              <span className="text-white text-sm font-medium hidden sm:block">
-                {user ? user.firstName : "Guest"}
-              </span>
-              <IoChevronDown
-                className={`text-zinc-400 w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </button>
-
-            {/* Dropdown Menu */}
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 origin-top-right">
-                <div className="rounded-xl border border-zinc-800 bg-[#121214]/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1">
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
+            {user ? (
+              <>
+                <NotificationBell />
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800/50 transition-all duration-200 group cursor-pointer"
                   >
-                    <MdPersonOutline className="w-5 h-5 text-zinc-400" />
-                    <span>Profile</span>
-                  </Link>
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                      <MdPersonOutline className="text-white w-5 h-5" />
+                    </div>
+                    <span className="text-white text-sm font-medium hidden sm:block">
+                      {user.firstName}
+                    </span>
+                    <IoChevronDown
+                      className={`text-zinc-400 w-4 h-4 transition-transform duration-200 ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
-                  <Link
-                    to="/wallet"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
-                  >
-                    <IoWalletOutline className="w-5 h-5 text-zinc-400" />
-                    <span>Wallet</span>
-                  </Link>
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 origin-top-right">
+                      <div className="rounded-xl border border-zinc-800 bg-[#121214]/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1">
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
+                        >
+                          <MdPersonOutline className="w-5 h-5 text-zinc-400" />
+                          <span>Profile</span>
+                        </Link>
 
-                  {user && (
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150"
-                    >
-                      <IoLogOutOutline className="w-5 h-5" />
-                      <span>Logout</span>
-                    </button>
+                        <Link
+                          to="/wallet"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800/50 hover:text-white transition-colors duration-150"
+                        >
+                          <IoWalletOutline className="w-5 h-5 text-zinc-400" />
+                          <span>Wallet</span>
+                        </Link>
+
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150 cursor-pointer"
+                        >
+                          <IoLogOutOutline className="w-5 h-5" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="text-sm font-semibold text-zinc-300 hover:text-white px-4 py-2 rounded-lg hover:bg-zinc-800/50 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg transition-all shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30"
+                >
+                  Sign Up
+                </Link>
               </div>
             )}
-          </div>
           </div>
         </div>
       </div>

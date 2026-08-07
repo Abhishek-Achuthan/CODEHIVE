@@ -63,6 +63,7 @@ const JoinViaInvitePage = lazy(() => import("../features/room/pages/JoinViaInvit
 // Layout
 const SessionsLayout = lazy(() => import("../features/session/components/SessionsLayout"));
 const AppLayout = lazy(() => import("../layouts/AppLayout"));
+const LandingPage = lazy(() => import("../features/home/components/LandingPage"));
 
 export default function AppRoutes() {
   return (
@@ -70,7 +71,10 @@ export default function AppRoutes() {
       <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route element={<PublicRoute />}>
-            <Route path="/" element={<LoginPage />} />
+            ////
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            {/* <Route path="/" element={<LoginPage />} /> */}
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />

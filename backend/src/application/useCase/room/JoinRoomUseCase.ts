@@ -10,6 +10,8 @@ import type { IRoomBanRepository } from '../../../domain/interfaces/IRoomBanRepo
 import { ParticipantEntity } from '../../../domain/entities/room/ParticipantEntity';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import { RoomRole } from '../../../domain/types/RoomRole';
+import { RoomType } from '../../../domain/types/RoomType';
+import { FeatureKey } from '../../../domain/types/FeatureKey';
 import { RoomAuthorizationService } from '../../services/RoomAuthorizationService';
 import { RoomInviteService } from '../../services/RoomInviteService';
 import { ConflictError } from '../../../core/errors/ConflictError';
@@ -151,7 +153,15 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       activePoll,
       capabilities: authorizationContext.capabilities,
       lifecycleStatus: authorizationContext.room.lifecycleStatus,
-      featureSnapshot: room.featureSnapshot,
+      featureSnapshot:
+        room.type === RoomType.SESSION || room.sessionId
+          ? {
+              planId: room.featureSnapshot?.planId ?? 'session_pro',
+              planName: room.featureSnapshot?.planName ?? 'Pro Mentor Session',
+              enabledFeatures: Object.values(FeatureKey),
+              limits: { ...room.featureSnapshot?.limits },
+            }
+          : room.featureSnapshot,
     };
 
     if (room.sessionId) {

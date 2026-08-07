@@ -10,6 +10,7 @@ import { PermissionService } from '../../domain/services/PermissionService';
 import type { ParticipantEntity } from '../../domain/entities/room/ParticipantEntity';
 import type { RoomEntity } from '../../domain/entities/room/RoomEntity';
 import { RoomLifeCycleStatus } from '../../domain/types/RoomLifeCycleStatus';
+import { RoomType } from '../../domain/types/RoomType';
 import { RoomRole } from '../../domain/types/RoomRole';
 import { RoomVisibility } from '../../domain/types/RoomVisibility';
 import { RoomAdmissionPolicy } from '../../domain/types/RoomAdmissionPolicy';
@@ -205,7 +206,7 @@ export class RoomAuthorizationService {
       target.roomId,
       userId,
       target.capability,
-      'collaboration',
+      'read',
     );
   }
 
@@ -327,7 +328,7 @@ export class RoomAuthorizationService {
       try {
         const session = await this._sessionRepository.find(room.sessionId);
         if (session) {
-          if (session.mentorId === userId) {
+          if (String(session.mentorId) === String(userId)) {
             return {
               id: `host:${room.id}:${userId}`,
               roomId: room.id,
@@ -337,7 +338,7 @@ export class RoomAuthorizationService {
               joinedAt: room.createdAt,
             };
           }
-          if (session.userId === userId) {
+          if (String(session.userId) === String(userId)) {
             return {
               id: `participant:${room.id}:${userId}`,
               roomId: room.id,
@@ -360,14 +361,26 @@ export class RoomAuthorizationService {
     room: RoomEntity,
     participant: ParticipantEntity,
   ): RoomAuthorizationContext {
+    let snapshot = room.featureSnapshot;
+    if (room.type === RoomType.SESSION || room.sessionId) {
+      snapshot = {
+        planId: snapshot?.planId ?? 'session_pro',
+        planName: snapshot?.planName ?? 'Pro Mentor Session',
+        enabledFeatures: Object.values(FeatureKey),
+        limits: { ...snapshot?.limits },
+      };
+    }
     return {
       room,
       participant,
-      capabilities: this._permissionService.resolveAll(participant, room.featureSnapshot),
+      capabilities: this._permissionService.resolveAll(participant, snapshot),
     };
   }
 
   private _assertFeatureEnabledForRoom(room: RoomEntity, feature: FeatureKey): void {
+    if (room.type === RoomType.SESSION || room.sessionId) {
+      return;
+    }
     const enabledFeatures = room.featureSnapshot?.enabledFeatures;
     if (enabledFeatures && !enabledFeatures.includes(feature)) {
       throw new ForbiddenError(ERROR_MESSAGES.ROOM.ACCESS_DENIED);

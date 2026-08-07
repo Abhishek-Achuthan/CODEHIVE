@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Code2, Users, MonitorPlay } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../store';
 import { CreateRoomButton } from '../../room/components/CreateRoomButton';
 
 interface HeroSectionProps {
@@ -9,6 +11,23 @@ interface HeroSectionProps {
 
 const HeroSection = ({ onOpenModal }: HeroSectionProps) => {
   const navigate = useNavigate();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
+  const handleCreateRoom = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/rooms' } });
+      return;
+    }
+    onOpenModal();
+  };
+
+  const handleFindMentor = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/sessions/discover' } });
+      return;
+    }
+    navigate('/sessions/discover');
+  };
 
   return (
     <section className="relative overflow-hidden bg-black pt-24 pb-32">
@@ -56,10 +75,10 @@ const HeroSection = ({ onOpenModal }: HeroSectionProps) => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
         >
-          <CreateRoomButton onClick={onOpenModal} />
+          <CreateRoomButton onClick={handleCreateRoom} />
           <button
-            onClick={() => navigate('/sessions/discover')}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-zinc-900 text-white border border-zinc-800 font-semibold rounded-lg hover:bg-zinc-800 transition-colors"
+            onClick={handleFindMentor}
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-zinc-900 text-white border border-zinc-800 font-semibold rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Find a Mentor
           </button>

@@ -305,7 +305,9 @@ const CollaborationRoom: React.FC = () => {
           showInviteControls={authorization.canManageRoomPermissions && snapshot?.lifecycleStatus !== 'READONLY' && snapshot?.lifecycleStatus !== 'ARCHIVED'}
           showEndRoomControl={canEndRoom}
           showReviewButton={
-            !!snapshot?.sessionId && (
+            !!snapshot?.sessionId &&
+            (snapshot?.lifecycleStatus === 'READONLY' || snapshot?.lifecycleStatus === 'ARCHIVED') &&
+            (
               (finalCurrentUser?.role === 'PARTICIPANT' && !snapshot?.isSessionReviewed) ||
               snapshot?.isSessionReviewed
             )
