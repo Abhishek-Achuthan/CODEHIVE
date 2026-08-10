@@ -63,7 +63,6 @@ import { RoomLifecyclePublisher } from '../../infrastructure/queue/publisher/Roo
 import { RoomLifecycleConsumer } from '../../infrastructure/queue/consumer/RoomLifecycleConsumer';
 import { RoomAuthorizationService } from '../../application/services/RoomAuthorizationService';
 import { RoomInviteService } from '../../application/services/RoomInviteService';
-import { EntitlementResolutionService } from '../../application/services/EntitlementsResolutionService';
 import { RoomFeatureSnapshotFactory } from '../../application/services/RoomFeatureSnapshotFactory';
 import { ICodeExecutionService } from '../../application/ports/code/ICodeExecutionService';
 import { Judge0Adapter } from '../../infrastructure/adapters/code/Judge0Adapter';

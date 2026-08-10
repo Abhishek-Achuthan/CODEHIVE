@@ -13,4 +13,5 @@ export interface AnswerView {
 
   createdAt: string;
   updatedAt?: string;
+  version?: number;
 }

@@ -15,7 +15,7 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const isOwner = currentUserId === comment.author.id;
+  const isOwner = Boolean(currentUserId && comment?.author?.id && currentUserId === comment.author.id);
   const isEdited = Boolean(comment.updatedAt && comment.updatedAt !== comment.createdAt);
 
   const handleUpdate = async (content: string) => {
@@ -36,7 +36,7 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
   return (
     <div className="group flex gap-3 py-2 border-b border-zinc-800/30 last:border-0 items-start">
       <div className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-xs border border-indigo-500/20 shrink-0 mt-0.5">
-        {comment.author.firstName?.[0] || 'U'}
+        {comment.author?.firstName?.[0] || comment.author?.username?.[0] || 'D'}
       </div>
       
       <div className="flex-1 min-w-0">
@@ -50,7 +50,7 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Prop
         ) : (
           <div>
             <span className="text-xs font-medium text-indigo-400 mr-2">
-              {comment.author.firstName || comment.author.username || 'Anonymous'}
+              {comment.author?.firstName || comment.author?.username || 'Deleted User'}
             </span>
             <span className="text-sm text-zinc-300 break-words">{comment.content}</span>
             {isEdited && (

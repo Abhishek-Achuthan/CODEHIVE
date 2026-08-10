@@ -356,7 +356,7 @@ export function QuestionAnswersSection(props: Props) {
                     </div>
 
                     <div className="flex items-center justify-between gap-4 mt-6 pt-4 border-t border-zinc-800/80">
-                      {a.author.id === currentUserId ? (
+                      {a.author?.id && currentUserId && a.author.id === currentUserId ? (
                         <div className="flex gap-2">
                           <button
                             type="button"
@@ -379,11 +379,11 @@ export function QuestionAnswersSection(props: Props) {
 
                       <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 px-3 py-2 rounded-lg">
                         <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-medium text-sm border border-indigo-500/20">
-                          {a.author.firstName?.[0] || "U"}
+                          {a.author?.firstName?.[0] || "D"}
                         </div>
                         <div>
                           <div className="text-sm font-medium text-indigo-400 leading-none mb-1">
-                            {a.author.firstName || "Anonymous"}
+                            {a.author?.firstName || "Deleted User"}
                           </div>
                           <div className="text-xs text-zinc-500">
                             answered {timeAgo(parseDate(a.createdAt))}

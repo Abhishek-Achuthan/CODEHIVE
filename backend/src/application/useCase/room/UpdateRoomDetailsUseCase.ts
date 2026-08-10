@@ -1,22 +1,22 @@
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from 'tsyringe';
 import {
   IUpdateRoomDetailsUseCase,
   UpdateRoomDetailsParams,
-} from "../interface/room/IUpdateRoomDetailsUseCase";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { UnauthorizedError } from "../../../core/errors/UnauthorizedError";
-import { BadRequestError } from "../../../core/errors/BadRequestError";
-import { RoomEntity } from "../../../domain/entities/room/RoomEntity";
-import { RoomVisibility } from "../../../domain/types/RoomVisibility";
-import { RoomAdmissionPolicy } from "../../../domain/types/RoomAdmissionPolicy";
-import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
+} from '../interface/room/IUpdateRoomDetailsUseCase';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { UnauthorizedError } from '../../../core/errors/UnauthorizedError';
+import { BadRequestError } from '../../../core/errors/BadRequestError';
+import { RoomEntity } from '../../../domain/entities/room/RoomEntity';
+import { RoomVisibility } from '../../../domain/types/RoomVisibility';
+import { RoomAdmissionPolicy } from '../../../domain/types/RoomAdmissionPolicy';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 
 @injectable()
 export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
   constructor(
-    @inject("IRoomRepository")
+    @inject('IRoomRepository')
     private readonly _roomRepository: IRoomRepository,
   ) {}
 
@@ -37,7 +37,7 @@ export class UpdateRoomDetailsUseCase implements IUpdateRoomDetailsUseCase {
       room.lifecycleStatus === RoomLifeCycleStatus.ARCHIVED ||
       room.lifecycleStatus === RoomLifeCycleStatus.PURGED
     ) {
-      throw new BadRequestError("Cannot edit details of a read-only or ended room.");
+      throw new BadRequestError('Cannot edit details of a read-only or ended room.');
     }
 
     const updates: Partial<RoomEntity> = {};

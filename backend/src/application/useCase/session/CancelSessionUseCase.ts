@@ -61,7 +61,7 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
         type: 'WARNING',
         category: 'SESSION',
         title: 'Session Cancelled',
-        message: `Your session has been cancelled by the mentor. A refund has been issued to your wallet if applicable.`,
+        message: 'Your session has been cancelled by the mentor. A refund has been issued to your wallet if applicable.',
       });
       return true;
     }
@@ -76,7 +76,7 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
         type: 'WARNING',
         category: 'SESSION',
         title: 'Session Cancelled',
-        message: `Your upcoming session was cancelled by the mentee.`,
+        message: 'Your upcoming session was cancelled by the mentee.',
       });
       return true;
     }
@@ -90,7 +90,7 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
       type: 'WARNING',
       category: 'SESSION',
       title: 'Session Cancelled',
-      message: `Your upcoming session was cancelled by the mentee.`,
+      message: 'Your upcoming session was cancelled by the mentee.',
     });
 
     return true;

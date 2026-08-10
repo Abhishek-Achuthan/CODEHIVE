@@ -36,7 +36,7 @@ export class SocketService implements ISocketService {
         socket.data.userRole = user.role;
         socket.data.mentorStatus = user.mentorStatus;
         next();
-      } catch (error) {
+      } catch {
         return next(new Error('Unauthorized'));
       }
     });

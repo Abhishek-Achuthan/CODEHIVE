@@ -11,6 +11,7 @@ export function mapAnswerToView(
     voteCount: a.answer.voteCount,
     createdAt: a.answer.createdAt,
     updatedAt: a.answer.updatedAt,
+    version: a.answer.version,
     author: {
       id: a.author.id,
       firstName: a.author.firstName,
@@ -28,6 +29,7 @@ export function mapPostedAnswerToView(
     voteCount: a.voteCount,
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
+    version: a.version,
     author: {
       id: author.id,
       firstName: author.firstName ?? "",

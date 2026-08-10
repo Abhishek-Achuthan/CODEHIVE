@@ -10,14 +10,13 @@ export class WarnUserUseCase implements IWarnUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string, reason: string) {
+  async execute(userId: string, _reason: string) {
     const user = await this.userRepository.find(userId);
     if (!user) {
       throw new NotFoundError('User not found');
     }
 
     user.warnCount = (user.warnCount || 0) + 1;
-    // We could store the reason in a warning history array, but for now we just increment.
     
     const updatedUser = await this.userRepository.update(userId, user);
     if (!updatedUser) {

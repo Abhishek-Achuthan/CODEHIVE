@@ -116,7 +116,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
 
     if (balance < amount) throw new BadRequestError(ERROR_MESSAGES.WALLET.INSUFFICIENT_BALANCE);
 
-    let session = await this._sessionRepo.create({
+    const session = await this._sessionRepo.create({
         mentorId,
         userId,
         date,

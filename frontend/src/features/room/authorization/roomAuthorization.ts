@@ -78,7 +78,7 @@ export const buildRoomAuthorization = (
   );
 
   const hasCapability = (capability: CapabilityKey) =>
-    capabilities[capability] === true || isSessionRoom;
+    capabilities[capability] === true;
   const hasFeature = (feature: FeatureKey) =>
     isSessionRoom || featureSnapshot === null || enabledFeatures.has(feature);
 

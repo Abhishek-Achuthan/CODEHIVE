@@ -20,35 +20,35 @@ export function mapQuestionListItemToView(
 export function mapQuestionToView(
   data: GetQuestionAPIResponse
 ): QuestionDetailsView {
-  const { question, author, isBookmarked } = data;
+  const { question, author, isBookmarked } = data || {};
 
   return {
-    id: question.id,
-    title: question.title,
-    contentHtml: question.descriptionHtml,
+    id: question?.id || "",
+    title: question?.title || "",
+    contentHtml: question?.descriptionHtml || "",
 
     author: {
-      id: author.id!,
-      firstName: author.firstName!,
-      avatarUrl: author.avatarUrl,
+      id: author?.id || "",
+      firstName: author?.firstName || "Deleted User",
+      avatarUrl: author?.avatarUrl,
     },
 
-    tags: question.tags,
+    tags: question?.tags || [],
 
-    voteCount: question.votes,
+    voteCount: question?.votes || 0,
     userVote: 0, 
 
-    views: question.views,
-    answerCount: question.answerCount,
-    isAnswered: question.isAnswered,
-    acceptedAnswerId: question.acceptedAnswerId,
+    views: question?.views || 0,
+    answerCount: question?.answerCount || 0,
+    isAnswered: Boolean(question?.isAnswered),
+    acceptedAnswerId: question?.acceptedAnswerId || null,
 
-    bookmarked: isBookmarked,
+    bookmarked: Boolean(isBookmarked),
 
-    createdAt: question.createdAt,
-    version: question.version,
+    createdAt: question?.createdAt || new Date().toISOString(),
+    version: question?.version || 1,
     lastEditedAt:
-      question.lastEditedAt ?? question.createdAt,
+      question?.lastEditedAt ?? question?.createdAt ?? new Date().toISOString(),
   };
 }
 

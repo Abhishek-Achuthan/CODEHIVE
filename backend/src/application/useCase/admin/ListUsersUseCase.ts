@@ -9,7 +9,7 @@ import { PaginationResult } from '../../../domain/types/PaginationResult';
 @injectable()
 export class ListUsersUseCase implements IListUsersUseCase {
   constructor(
-    @inject('IUserRepository') private readonly _userRepository: IUserRepository
+    @inject('IUserRepository') private readonly _userRepository: IUserRepository,
   ) {}
 
   async execute(

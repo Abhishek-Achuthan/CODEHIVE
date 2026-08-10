@@ -3,20 +3,23 @@ import { IAIService } from '../../../application/ports/ai/IAIService';
 import { env } from '../../../config/envConfig';
 
 export class AIService implements IAIService {
-  private readonly _ai: GoogleGenAI;
-  private readonly _model: string;
+  private _aiInstance: GoogleGenAI | null = null;
 
-  constructor(
-    aiModel = env.aiModel, apiKey = env.aiApiKey!
-  ) {
-    this._ai = new GoogleGenAI({ apiKey });
-    this._model = aiModel
-  };
+  private get _ai(): GoogleGenAI {
+    if (!this._aiInstance) {
+      this._aiInstance = new GoogleGenAI({ apiKey: env.aiApiKey || '' });
+    }
+    return this._aiInstance;
+  }
+
+  private get _model(): string {
+    return env.aiModel;
+  }
 
   async genarateContent(prompt: string): Promise<GenerateContentResponse> {
     return this._ai.models.generateContent({
       model: this._model,
-      contents: prompt
+      contents: prompt,
     });
-  };
-};
+  }
+}

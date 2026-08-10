@@ -15,16 +15,15 @@ interface GithubEmailEntry {
 
 @injectable()
 export class GitHubAuthService implements IGithubAuthService {
-  private clientId: string;
-  private clientSecret: string;
+  private getCredentials(): { clientId: string; clientSecret: string } {
+    const clientId = env.githubClientId;
+    const clientSecret = env.githubClientSecret;
 
-  constructor() {
-    this.clientId = env.githubClientId!;
-    this.clientSecret = env.githubClientSecret!;
-
-    if (!this.clientId || !this.clientSecret) {
+    if (!clientId || !clientSecret) {
       throw new NotFoundError(ERROR_MESSAGES.GITHUB.MISSING_ENV);
     }
+
+    return { clientId, clientSecret };
   }
 
   async getUserFromCode(code: string): Promise<{
@@ -53,14 +52,15 @@ export class GitHubAuthService implements IGithubAuthService {
   }
 
   private async getTokensFromCode(code: string): Promise<string> {
+    const { clientId, clientSecret } = this.getCredentials();
     const response = await axios.post(
       'https://github.com/login/oauth/access_token',
       {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
+        client_id: clientId,
+        client_secret: clientSecret,
         code,
       },
-      { headers: { Accept: 'application/json' } }
+      { headers: { Accept: 'application/json' } },
     );
 
     const accessToken = response.data.access_token;
@@ -84,9 +84,12 @@ export class GitHubAuthService implements IGithubAuthService {
   }
 
   private async getEmail(accessToken: string): Promise<string> {
-    const response = await axios.get<GithubEmailEntry[]>('https://api.github.com/user/emails', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const response = await axios.get<GithubEmailEntry[]>(
+      'https://api.github.com/user/emails',
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
 
     const email = response.data.find((e) => e.primary)?.email;
     if (!email) {

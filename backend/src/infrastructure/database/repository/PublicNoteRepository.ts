@@ -1,4 +1,5 @@
-import mongoose, { Model, Mongoose } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
+
 import { PublicNoteEntity } from '../../../domain/entities/room/PublicNoteEntity';
 import { IPublicNoteRepository } from '../../../domain/interfaces/IPublicNoteRepository';
 import PublicNoteModel from '../models/room/PublicNoteModel';

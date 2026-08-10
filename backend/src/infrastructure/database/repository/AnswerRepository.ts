@@ -47,9 +47,9 @@ export class AnswerRepository
 
   protected toEntity(doc: AnswerDoc): AnswerEntity {
     return {
-      id: doc._id.toString(),
-      questionId: doc.questionId.toString(),
-      answeredBy: doc.answeredBy.toString(),
+      id: doc._id ? doc._id.toString() : '',
+      questionId: doc.questionId ? doc.questionId.toString() : '',
+      answeredBy: doc.answeredBy ? doc.answeredBy.toString() : '',
       answerText: doc.answerText,
       isAccepted: doc.isAccepted,
       voteCount: doc.voteCount,
@@ -66,16 +66,25 @@ export class AnswerRepository
     };
   }
 
-  private leanToEntity(doc: AnswerLeanDoc): AnswerEntity {
+  private leanToEntity(doc: AnswerLeanDoc | PopulatedAnswerDoc): AnswerEntity {
+    let answeredByStr = '';
+    if (doc.answeredBy) {
+      if (typeof doc.answeredBy === 'object' && '_id' in doc.answeredBy && doc.answeredBy._id) {
+        answeredByStr = doc.answeredBy._id.toString();
+      } else if (typeof doc.answeredBy.toString === 'function') {
+        answeredByStr = doc.answeredBy.toString();
+      }
+    }
+
     return {
-      id: doc._id.toString(),
-      questionId: doc.questionId.toString(),
-      answeredBy: doc.answeredBy.toString(),
+      id: doc._id ? doc._id.toString() : '',
+      questionId: doc.questionId ? doc.questionId.toString() : '',
+      answeredBy: answeredByStr,
       answerText: doc.answerText,
       isAccepted: doc.isAccepted,
       voteCount: doc.voteCount,
       ...(doc.lastEditedAt
-        ? { lastEditedAt: doc.lastEditedAt.toISOString() }
+        ? { lastEditedAt: typeof doc.lastEditedAt === 'string' ? doc.lastEditedAt : doc.lastEditedAt.toISOString() }
         : {}),
       ...(doc.lastEditedBy
         ? { lastEditedBy: doc.lastEditedBy.toString() }
@@ -124,7 +133,7 @@ export class AnswerRepository
 
     const doc = await this._model
       .find(answerQuery)
-      .populate<{ answeredBy: UserLeanDoc }>({
+      .populate<{ answeredBy: UserLeanDoc | null }>({
         path: 'answeredBy',
         select: 'email firstName lastName',
       })
@@ -145,15 +154,22 @@ export class AnswerRepository
 
     const totalPages = Math.ceil(totalItems / pageLimit);
 
-    const items: AnswerWithAuthor[] = doc?.map((doc) => {
-      const author: AuthorInfo = {
-        id: doc.answeredBy._id.toString(),
-        email: doc.answeredBy.email,
-        firstName: doc.answeredBy.firstName,
-        lastName: doc.answeredBy.lastName,
-      };
+    const items: AnswerWithAuthor[] = (doc || []).map((d) => {
+      const author: AuthorInfo = d.answeredBy
+        ? {
+            id: d.answeredBy._id ? d.answeredBy._id.toString() : '',
+            email: d.answeredBy.email || '',
+            firstName: d.answeredBy.firstName || 'Deleted',
+            lastName: d.answeredBy.lastName || 'User',
+          }
+        : {
+            id: '',
+            email: '',
+            firstName: 'Deleted',
+            lastName: 'User',
+          };
 
-      const answerEntity: AnswerEntity = this.leanToEntity(doc);
+      const answerEntity: AnswerEntity = this.leanToEntity(d);
 
       return {
         answer: answerEntity,

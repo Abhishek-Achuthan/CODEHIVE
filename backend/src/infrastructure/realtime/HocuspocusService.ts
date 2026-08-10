@@ -11,27 +11,32 @@ import { RoomAuthorizationService } from '../../application/services/RoomAuthori
 
 @injectable()
 export class HocuspocusService {
-  private readonly _server: Server;
+  private _server?: Server<CollaborationContext>;
 
   constructor(
     @inject(HocuspocusHookHandler)
     private readonly _hookHandler: HocuspocusHookHandler,
     @inject(RoomAuthorizationService)
     private readonly _roomAuthorizationService: RoomAuthorizationService,
-  ) {
-    this._server = new Server<CollaborationContext>({
-      port: env.hocuspocusPort,
-      onAuthenticate: async (data) => this._hookHandler.onAuthenticate(data),
-      onConnect: async (data) => this._hookHandler.onConnect(data),
-      onLoadDocument: async (data) => this._hookHandler.onLoadDocument(data),
-      onChange: async (data) => this._hookHandler.onChange(data),
-      beforeSync: async (data) => this._hookHandler.beforeSync(data),
-      onDisconnect: async (data) => this._hookHandler.onDisconnect(data),
-    });
+  ) {}
+
+  private get server(): Server<CollaborationContext> {
+    if (!this._server) {
+      this._server = new Server<CollaborationContext>({
+        port: env.hocuspocusPort,
+        onAuthenticate: async (data) => this._hookHandler.onAuthenticate(data),
+        onConnect: async (data) => this._hookHandler.onConnect(data),
+        onLoadDocument: async (data) => this._hookHandler.onLoadDocument(data),
+        onChange: async (data) => this._hookHandler.onChange(data),
+        beforeSync: async (data) => this._hookHandler.beforeSync(data),
+        onDisconnect: async (data) => this._hookHandler.onDisconnect(data),
+      });
+    }
+    return this._server;
   }
 
   listen(): void {
-    this._server.listen();
+    this.server.listen();
     loggerService.info(`Hocuspocus running on ws://localhost:${env.hocuspocusPort}`);
   }
 
@@ -45,7 +50,7 @@ export class HocuspocusService {
     ];
 
     for (const documentName of documentNames) {
-      const document = this._server.hocuspocus.documents.get(documentName);
+      const document = this.server.hocuspocus.documents.get(documentName);
       if (!document) continue;
 
       const canWrite = await this._roomAuthorizationService.isCollaborationWriteAllowed(

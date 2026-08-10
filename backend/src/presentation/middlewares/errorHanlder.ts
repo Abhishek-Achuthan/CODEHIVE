@@ -9,7 +9,7 @@ export function errorHandler(
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
 
   if (err instanceof ZodError) {

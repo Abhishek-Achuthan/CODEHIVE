@@ -111,7 +111,7 @@ export class TransitionRoomLifecycleUseCase implements ITransitionRoomLifecycleU
         type: 'INFO',
         category: 'SESSION',
         title: 'Session Completed',
-        message: `Your mentoring session has been completed.`,
+        message: 'Your mentoring session has been completed.',
       });
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);

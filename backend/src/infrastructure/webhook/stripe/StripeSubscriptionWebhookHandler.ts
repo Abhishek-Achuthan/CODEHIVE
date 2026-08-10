@@ -209,7 +209,7 @@ export class StripeSubscriptionWebhookHandler
       type: 'SUCCESS',
       category: 'PAYMENT',
       title: 'Subscription Purchased',
-      message: `Your subscription has been successfully purchased and is now active.`,
+      message: 'Your subscription has been successfully purchased and is now active.',
     });
 
     this._logger.info('subscription_webhook.created', {

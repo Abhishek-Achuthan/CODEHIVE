@@ -278,20 +278,27 @@ export class QuestionRepository
   ): Promise<QuestionWithAuthor | null> {
     const doc = await this._model
       .findById(questionId)
-      .populate<{ askedBy: UserLeanDoc }>({
+      .populate<{ askedBy: UserLeanDoc | null }>({
         path: 'askedBy',
-        select: 'firstName email lastName',
+        select: 'firstName email lastName _id',
       })
       .lean<PopulatedQuestionDoc | null>();
-
+      
     if (!doc) return null;
 
-    const author: AuthorInfo = {
-      id: doc.askedBy._id.toString(),
-      email: doc.askedBy.email,
-      firstName: doc.askedBy.firstName,
-      lastName: doc.askedBy.lastName,
-    };
+    const author: AuthorInfo = doc.askedBy
+      ? {
+          id: doc.askedBy._id ? doc.askedBy._id.toString() : '',
+          email: doc.askedBy.email || '',
+          firstName: doc.askedBy.firstName || 'Deleted',
+          lastName: doc.askedBy.lastName || 'User',
+        }
+      : {
+          id: '',
+          email: '',
+          firstName: 'Deleted',
+          lastName: 'User',
+        };
 
     const questionDoc: QuestionLeanDoc = {
       _id: doc._id,
@@ -300,7 +307,7 @@ export class QuestionRepository
       isAnswered: doc.isAnswered,
       acceptedAnswerId: doc.acceptedAnswerId,
       answerCount: doc.answerCount,
-      askedBy: doc.askedBy._id,
+      askedBy: doc.askedBy ? (doc.askedBy._id || doc.askedBy) : (null as any),
       createdAt: doc.createdAt,
       tags: doc.tags,
       updatedAt: doc.updatedAt,
@@ -383,10 +390,10 @@ export class QuestionRepository
 
   protected toEntity(doc: QuestionDoc): QuestionEntity {
     return {
-      id: doc._id.toString(),
+      id: doc._id ? doc._id.toString() : '',
       title: doc.title,
       descriptionHtml: doc.descriptionHtml,
-      askedBy: doc.askedBy.toString(),
+      askedBy: doc.askedBy ? doc.askedBy.toString() : '',
       tags: doc.tags,
       answerCount: doc.answerCount,
       votes: doc.votes,
@@ -397,7 +404,7 @@ export class QuestionRepository
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
-      createdAt: doc.createdAt.toISOString(),
+      createdAt: doc.createdAt ? doc.createdAt.toISOString() : new Date().toISOString(),
       updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
       ...(doc.lastEditedAt
         ? { lastEditedAt: doc.lastEditedAt.toISOString() }
@@ -411,11 +418,20 @@ export class QuestionRepository
   private leanToEntity(
     doc: QuestionLeanDoc | PopulatedQuestionDoc
   ): QuestionEntity {
+    let askedByStr = '';
+    if (doc.askedBy) {
+      if (typeof doc.askedBy === 'object' && '_id' in doc.askedBy && doc.askedBy._id) {
+        askedByStr = doc.askedBy._id.toString();
+      } else if (typeof doc.askedBy.toString === 'function') {
+        askedByStr = doc.askedBy.toString();
+      }
+    }
+
     return {
-      id: doc._id.toString(),
+      id: doc._id ? doc._id.toString() : '',
       title: doc.title,
       descriptionHtml: doc.descriptionHtml,
-      askedBy: doc.askedBy.toString(),
+      askedBy: askedByStr,
       tags: doc.tags,
       answerCount: doc.answerCount,
       votes: doc.votes,
@@ -425,11 +441,11 @@ export class QuestionRepository
       acceptedAnswerId: doc.acceptedAnswerId
         ? doc.acceptedAnswerId.toString()
         : null,
-      createdAt: doc.createdAt.toISOString(),
+      createdAt: doc.createdAt ? (typeof doc.createdAt === 'string' ? doc.createdAt : doc.createdAt.toISOString()) : new Date().toISOString(),
       version: doc.version,
-      updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
+      updatedAt: doc.updatedAt ? (typeof doc.updatedAt === 'string' ? doc.updatedAt : doc.updatedAt.toISOString()) : null,
       ...(doc.lastEditedAt
-        ? { lastEditedAt: doc.lastEditedAt.toISOString() }
+        ? { lastEditedAt: typeof doc.lastEditedAt === 'string' ? doc.lastEditedAt : doc.lastEditedAt.toISOString() }
         : {}),
       ...(doc.lastEditedBy
         ? { lastEditedBy: doc.lastEditedBy.toString() }

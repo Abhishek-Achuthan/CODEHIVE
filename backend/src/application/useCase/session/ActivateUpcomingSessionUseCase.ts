@@ -1,23 +1,23 @@
-import { inject, injectable } from "tsyringe";
-import { IActivateUpcomingSessionUseCase } from "../interface/room/IActivateUpcomingSessionRoomsUseCase";
-import type { ISessionRepository } from "../../../domain/interfaces/ISessionReposiotry";
-import type { IRoomRepository } from "../../../domain/interfaces/IRoomRepository";
-import type { IParticipantRepository } from "../../../domain/interfaces/IParticipantRepository";
-import { EntitlementResolutionService } from "../../services/EntitlementsResolutionService";
-import { RoomFeatureSnapshotFactory } from "../../services/RoomFeatureSnapshotFactory";
-import { RoomType } from "../../../domain/types/RoomType";
-import { RoomVisibility } from "../../../domain/types/RoomVisibility";
-import { RoomLifeCycleStatus } from "../../../domain/types/RoomLifeCycleStatus";
-import { RoomAdmissionPolicy } from "../../../domain/types/RoomAdmissionPolicy";
-import { RoomRole } from "../../../domain/types/RoomRole";
-import { FeatureKey } from "../../../domain/types/FeatureKey";
-import { LimitKey } from "../../../domain/types/LimitKey";
-import { NotFoundError } from "../../../core/errors/NotFoundError";
-import { ERROR_MESSAGES } from "../../../shared/constants/errorMessages";
-import { RoomInviteService } from "../../services/RoomInviteService";
-import type { IRoomLifecyclePublisher } from "../../ports/queue/IRoomLifecyclePublisher";
-import { RoomLifecycleTransition } from "../../../domain/types/RoomLifecycleTransition";
-import { env } from "../../../config/envConfig";
+import { inject, injectable } from 'tsyringe';
+import { IActivateUpcomingSessionUseCase } from '../interface/room/IActivateUpcomingSessionRoomsUseCase';
+import type { ISessionRepository } from '../../../domain/interfaces/ISessionReposiotry';
+import type { IRoomRepository } from '../../../domain/interfaces/IRoomRepository';
+import type { IParticipantRepository } from '../../../domain/interfaces/IParticipantRepository';
+import { EntitlementResolutionService } from '../../services/EntitlementsResolutionService';
+import { RoomFeatureSnapshotFactory } from '../../services/RoomFeatureSnapshotFactory';
+import { RoomType } from '../../../domain/types/RoomType';
+import { RoomVisibility } from '../../../domain/types/RoomVisibility';
+import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
+import { RoomAdmissionPolicy } from '../../../domain/types/RoomAdmissionPolicy';
+import { RoomRole } from '../../../domain/types/RoomRole';
+import { FeatureKey } from '../../../domain/types/FeatureKey';
+import { LimitKey } from '../../../domain/types/LimitKey';
+import { NotFoundError } from '../../../core/errors/NotFoundError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
+import { RoomInviteService } from '../../services/RoomInviteService';
+import type { IRoomLifecyclePublisher } from '../../ports/queue/IRoomLifecyclePublisher';
+import { RoomLifecycleTransition } from '../../../domain/types/RoomLifecycleTransition';
+import { env } from '../../../config/envConfig';
 
 const SESSION_ROOM_BASE_PARTICIPANTS = 2;
 const SESSION_END_BUFFER_MS = 30 * 60 * 1000;
@@ -25,13 +25,13 @@ const SESSION_END_BUFFER_MS = 30 * 60 * 1000;
 @injectable()
 export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionUseCase {
   constructor(
-    @inject("ISessionRepository")
+    @inject('ISessionRepository')
     private readonly _sessionRepo: ISessionRepository,
 
-    @inject("IRoomRepository")
+    @inject('IRoomRepository')
     private readonly _roomRepo: IRoomRepository,
 
-    @inject("IParticipantRepository")
+    @inject('IParticipantRepository')
     private readonly _participantRepo: IParticipantRepository,
 
     @inject(EntitlementResolutionService)
@@ -43,7 +43,7 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     @inject(RoomInviteService)
     private readonly _roomInviteService: RoomInviteService,
 
-    @inject("IRoomLifecyclePublisher")
+    @inject('IRoomLifecyclePublisher')
     private readonly _roomLifecyclePublisher: IRoomLifecyclePublisher,
   ) {}
 
@@ -78,7 +78,7 @@ export class ActivateUpcomingSessionUseCase implements IActivateUpcomingSessionU
     };
 
     const room = await this._roomRepo.create({
-      title: "Mentor Session",
+      title: 'Mentor Session',
       hostId: session.mentorId,
       sessionId: session.id,
       type: RoomType.SESSION,

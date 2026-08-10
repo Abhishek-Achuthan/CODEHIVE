@@ -11,9 +11,8 @@ import { LimitKey } from '../../../domain/types/LimitKey';
 import { RoomLifeCycleStatus } from '../../../domain/types/RoomLifeCycleStatus';
 import { RoomType } from '../../../domain/types/RoomType';
 import { UserLeanDoc } from '../schemas/UserSchema';
-
-type LimitMap = Map<LimitKey, number>;
 type RoomFeatureSnapshotDoc = NonNullable<RoomDocument['featureSnapshot']>;
+
 type IdLike = Types.ObjectId | string;
 type ObjectWithOptionalId = { _id?: IdLike; toString(): string };
 type PopulatedRoomHost = Pick<UserLeanDoc, '_id' | 'firstName' | 'lastName' | 'avatarUrl'> & {

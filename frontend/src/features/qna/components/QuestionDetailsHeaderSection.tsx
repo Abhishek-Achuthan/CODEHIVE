@@ -31,7 +31,7 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
   const currentUser = useAppSelector((state) => state.auth.user);
   const created = parseDate(data.createdAt);
   const updated = parseDate(data.lastEditedAt);
-  const isAuthor = currentUser?.id === data.author.id;
+  const isAuthor = Boolean(currentUser?.id && data?.author?.id && currentUser.id === data.author.id);
   const isEdited = (data.version && data.version > 1) || Boolean(data.lastEditedAt && data.lastEditedAt !== data.createdAt);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -152,12 +152,12 @@ export const QuestionHeaderSection: React.FC<QuestionHeaderSectionProps> = ({
         <div className="flex justify-end">
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#18181b] border border-zinc-800">
             <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-semibold border border-indigo-500/20">
-              {data.author.firstName?.charAt(0) || "U"}
+              {data.author?.firstName?.charAt(0) || "D"}
             </div>
             <div>
               <div className="text-xs text-zinc-500 mb-0.5">asked {timeAgo(created)}</div>
               <p className="text-sm text-indigo-400 font-medium leading-tight">
-                {data.author.firstName}
+                {data.author?.firstName || "Deleted User"}
               </p>
             </div>
           </div>

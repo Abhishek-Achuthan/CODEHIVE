@@ -49,27 +49,35 @@ export class CommentRepository
   async listByAnswer(answerId: string): Promise<CommentWithAuthor[]> {
     const docs = await this._model
       .find({ answerId: new Types.ObjectId(answerId) })
-      .populate<{ authorId: PopulatedCommentAuthor }>({
+      .populate<{ authorId: PopulatedCommentAuthor | null }>({
         path: 'authorId',
         select: 'username firstName lastName profileImage reputation',
       })
       .sort({ createdAt: 1 })
       .lean<CommentWithPopulatedAuthorDoc[]>();
 
-    return docs.map((doc) => ({
-      id: doc._id.toString(),
-      answerId: doc.answerId.toString(),
-      content: doc.content,
+    return (docs || []).map((doc) => ({
+      id: doc._id ? doc._id.toString() : '',
+      answerId: doc.answerId ? doc.answerId.toString() : '',
+      content: doc.content || '',
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
-      author: {
-        id: doc.authorId._id.toString(),
-        username: doc.authorId.username || '',
-        firstName: doc.authorId.firstName,
-        lastName: doc.authorId.lastName,
-        ...(doc.authorId.profileImage !== undefined ? { profileImage: doc.authorId.profileImage } : {}),
-        reputation: doc.authorId.reputation || 0,
-      },
+      author: doc.authorId
+        ? {
+            id: doc.authorId._id ? doc.authorId._id.toString() : '',
+            username: doc.authorId.username || 'deleted_user',
+            firstName: doc.authorId.firstName || 'Deleted',
+            lastName: doc.authorId.lastName || 'User',
+            ...(doc.authorId.profileImage !== undefined ? { profileImage: doc.authorId.profileImage } : {}),
+            reputation: doc.authorId.reputation || 0,
+          }
+        : {
+            id: '',
+            username: 'deleted_user',
+            firstName: 'Deleted',
+            lastName: 'User',
+            reputation: 0,
+          },
     }));
   }
 }

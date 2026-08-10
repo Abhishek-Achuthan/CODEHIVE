@@ -1,7 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import type { NextFunction, Request, Response } from 'express';
 import { ExecuteCodeUseCase } from '../../../application/useCase/code/ExecuteCodeUseCase';
-import { ForbiddenError } from '../../../core/errors/ForbiddenError';
 import { executeCodeSchema } from '../../validation/codeValidation';
 import { RoomAuthorizationService } from '../../../application/services/RoomAuthorizationService';
 import { CapabilityKey } from '../../../domain/types/CapabilityKey';

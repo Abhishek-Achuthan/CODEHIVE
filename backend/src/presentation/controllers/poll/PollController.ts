@@ -72,7 +72,7 @@ export class PollController {
         optionIds,
       });
 
-      this._roomEventEmitter.emitPollVoted(poll.roomId, poll);
+      this._roomEventEmitter.emitPollVoted(roomId, poll);
 
       res.status(HttpStatus.OK).json(poll);
     } catch (error) {

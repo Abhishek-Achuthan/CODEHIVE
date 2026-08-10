@@ -7,23 +7,22 @@ import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class GoogleAuthService implements IGoogleAuthService {
-  private client: OAuth2Client;
-  private clientId: string;
-  private clientSecret: string;
-  private redirectUri: string;
+  private _client: OAuth2Client | null = null;
 
-  constructor() {
-  this.clientId = env.clientId!;
-  this.clientSecret = env.clientSecret!;
-  this.redirectUri =  'postmessage';
+  private getClient(): { client: OAuth2Client; clientId: string } {
+    const clientId = env.clientId;
+    const clientSecret = env.clientSecret;
 
-  if (!this.clientId || !this.clientSecret) {
-    throw new NotFoundError(ERROR_MESSAGES.GOOGLE.MISSING_ENV);
+    if (!clientId || !clientSecret) {
+      throw new NotFoundError(ERROR_MESSAGES.GOOGLE.MISSING_ENV);
+    }
+
+    if (!this._client) {
+      this._client = new OAuth2Client(clientId, clientSecret, 'postmessage');
+    }
+
+    return { client: this._client, clientId };
   }
-
-  this.client = new OAuth2Client(this.clientId, this.clientSecret, this.redirectUri);
-}
-
 
   async verifyGoogleToken(authCode: string): Promise<{
     email: string;
@@ -31,18 +30,20 @@ export class GoogleAuthService implements IGoogleAuthService {
     lastName: string;
     googleId: string;
   }> {
-    const { tokens } = await this.client.getToken(authCode);
+    const { client, clientId } = this.getClient();
+    const { tokens } = await client.getToken(authCode);
     const idToken = tokens.id_token;
 
     if (!idToken) throw new NotFoundError(ERROR_MESSAGES.GOOGLE.INVALID_TOKEN);
 
-    const ticket = await this.client.verifyIdToken({
+    const ticket = await client.verifyIdToken({
       idToken,
-      audience: this.clientId,
+      audience: clientId,
     });
 
     const payload = ticket.getPayload();
-    if (!payload) throw new NotFoundError(ERROR_MESSAGES.GOOGLE.INVALID_PAYLOAD);
+    if (!payload)
+      throw new NotFoundError(ERROR_MESSAGES.GOOGLE.INVALID_PAYLOAD);
 
     const [firstName, ...rest] = (payload.name ?? '').split(' ');
     return {

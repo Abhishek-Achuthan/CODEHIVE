@@ -41,7 +41,7 @@ export class Judge0Adapter implements ICodeExecutionService {
         time: response.time,
         memory: response.memory,
       };
-    } catch (error) {
+    } catch {
       return {
         stdout: null,
         stderr: null,
