@@ -90,18 +90,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   const [workspaceWidth, setWorkspaceWidth] = useState(350);
 
   const panelRef = useRef<HTMLElement>(null);
-  const [actualPanelWidth, setActualPanelWidth] = useState(workspaceWidth);
-
-  useEffect(() => {
-    if (!panelRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setActualPanelWidth(entry.contentRect.width);
-      }
-    });
-    observer.observe(panelRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   // Focus trigger: when user clicks topbar video button but meeting is already active
   React.useEffect(() => {

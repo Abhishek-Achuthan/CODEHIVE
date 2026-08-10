@@ -6,18 +6,10 @@ import {
   Clock,
   Video,
   ArrowRight,
-  Home,
-  CalendarPlus,
-  Info,
   ExternalLink,
-  ChevronRight,
 } from "lucide-react";
 import SuccessIcon from "../components/SuccessIcon";
 import BookingTimeline from "../components/BookingTimeline";
-import {
-  getSessionJoinLabel,
-  getSessionRoomPhase,
-} from "../../room/authorization/lifecycleMessages";
 
 interface BookingSuccessState {
   sessionId: string;
@@ -81,9 +73,6 @@ const BookingSuccessPage: React.FC = () => {
     year: "numeric",
   });
 
-  const roomPhase = getSessionRoomPhase(startTime, endTime);
-  const sessionJoinLabel = getSessionJoinLabel(roomPhase);
-  const roomOpensAt = new Date(new Date(startTime).getTime() - 15 * 60 * 1000);
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8 text-zinc-100 selection:bg-indigo-500/30">

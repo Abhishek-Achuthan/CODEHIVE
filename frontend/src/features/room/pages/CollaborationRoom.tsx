@@ -96,8 +96,6 @@ const CollaborationRoom: React.FC = () => {
     api.addListener('screenSharingStatusChanged', (e: unknown) => setIsScreenSharing((e as { on: boolean }).on));
   };
 
-  const roomName = snapshot?.title || 'Untitled Room';
-
   const handleLeaveRoom = () => {
     leaveRoom();
     navigate('/rooms');
