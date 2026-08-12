@@ -1,0 +1,105 @@
+name: CodeHive Backend Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Import Secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.8
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
+          env-slug: 'prod'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Backend Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}/codehive-backend:latest
+            ${{ env.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}/codehive-backend:${{ github.sha }}
+
+  deploy-to-vm:
+    name: Deploy to GCP VM
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Import Secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.8
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
+          env-slug: 'prod'
+
+      - name: Copy docker-compose and Nginx config to GCP VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.VM_HOST || secrets.VM_HOST }}
+          username: ${{ env.VM_USER || secrets.VM_USER }}
+          key: ${{ env.VM_SSH_KEY || secrets.VM_SSH_KEY }}
+          source: 'backend/docker-compose.prod.yml,backend/nginx/nginx.conf'
+          target: '/home/${{ env.VM_USER || secrets.VM_USER }}/app'
+
+      - name: Deploy Container Stack via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.VM_HOST || secrets.VM_HOST }}
+          username: ${{ env.VM_USER || secrets.VM_USER }}
+          key: ${{ env.VM_SSH_KEY || secrets.VM_SSH_KEY }}
+          envs: INFISICAL_CLIENT_ID,INFISICAL_CLIENT_SECRET,INFISICAL_PROJECT_ID,DOCKERHUB_USERNAME
+          script: |
+            set -e
+            TARGET_DIR="/home/${{ env.VM_USER || secrets.VM_USER }}/app"
+            mkdir -p "${TARGET_DIR}/backend/nginx"
+
+            # Normalize file directory structure if SCP flattened paths
+            if [ -f "${TARGET_DIR}/backend/docker-compose.prod.yml" ]; then
+              cd "${TARGET_DIR}/backend"
+            else
+              cd "${TARGET_DIR}"
+            fi
+
+            # Inject secrets & configuration into .env
+            cat << EOF > .env
+            NODE_ENV=production
+            DOCKERHUB_USERNAME=${INFISICAL_DOCKERHUB_USERNAME:-${DOCKERHUB_USERNAME}}
+            INFISICAL_CLIENT_ID=${INFISICAL_CLIENT_ID}
+            INFISICAL_CLIENT_SECRET=${INFISICAL_CLIENT_SECRET}
+            INFISICAL_PROJECT_ID=${INFISICAL_PROJECT_ID}
+            EOF
+
+            # Pull latest backend image & start containers
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
