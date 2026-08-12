@@ -64,7 +64,7 @@ jobs:
           env-slug: 'prod'
 
       - name: Copy docker-compose and Nginx config to GCP VM
-        uses: appleboy/scp-action@v0.1.10
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ env.VM_HOST || secrets.VM_HOST }}
           username: ${{ env.VM_USER || secrets.VM_USER }}
@@ -73,7 +73,7 @@ jobs:
           target: '/home/${{ env.VM_USER || secrets.VM_USER }}/app'
 
       - name: Deploy Container Stack via SSH
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.VM_HOST || secrets.VM_HOST }}
           username: ${{ env.VM_USER || secrets.VM_USER }}
