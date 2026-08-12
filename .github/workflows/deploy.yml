@@ -24,7 +24,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG || secrets.INFISICAL_PROJECT_ID }}
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
           env-slug: 'prod'
 
       - name: Set up Docker Buildx
@@ -60,7 +60,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG || secrets.INFISICAL_PROJECT_ID }}
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
           env-slug: 'prod'
 
       - name: Copy docker-compose and Nginx config to GCP VM
@@ -74,6 +74,11 @@ jobs:
 
       - name: Deploy Container Stack via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          INFISICAL_PROJECT_ID: ${{ secrets.INFISICAL_PROJECT_ID }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
