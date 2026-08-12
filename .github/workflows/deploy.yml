@@ -66,22 +66,22 @@ jobs:
       - name: Copy docker-compose and Nginx config to GCP VM
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ env.VM_HOST || secrets.VM_HOST }}
-          username: ${{ env.VM_USER || secrets.VM_USER }}
-          key: ${{ env.VM_SSH_KEY || secrets.VM_SSH_KEY }}
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
           source: 'backend/docker-compose.prod.yml,backend/nginx/nginx.conf'
-          target: '/home/${{ env.VM_USER || secrets.VM_USER }}/app'
+          target: '/home/${{ secrets.VM_USER }}/app'
 
       - name: Deploy Container Stack via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env.VM_HOST || secrets.VM_HOST }}
-          username: ${{ env.VM_USER || secrets.VM_USER }}
-          key: ${{ env.VM_SSH_KEY || secrets.VM_SSH_KEY }}
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
           envs: INFISICAL_CLIENT_ID,INFISICAL_CLIENT_SECRET,INFISICAL_PROJECT_ID,DOCKERHUB_USERNAME
           script: |
             set -e
-            TARGET_DIR="/home/${{ env.VM_USER || secrets.VM_USER }}/app"
+            TARGET_DIR="/home/${{ secrets.VM_USER }}/app"
             mkdir -p "${TARGET_DIR}/backend/nginx"
 
             # Normalize file directory structure if SCP flattened paths
