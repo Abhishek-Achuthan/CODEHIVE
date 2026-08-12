@@ -20,11 +20,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Import Secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.8
+        uses: Infisical/secrets-action@v1
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG || secrets.INFISICAL_PROJECT_ID }}
           env-slug: 'prod'
 
       - name: Set up Docker Buildx
@@ -56,11 +56,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Import Secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.8
+        uses: Infisical/secrets-action@v1
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG || secrets.INFISICAL_PROJECT_ID }}
           env-slug: 'prod'
 
       - name: Copy docker-compose and Nginx config to GCP VM
