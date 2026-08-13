@@ -1,62 +1,67 @@
 import { ICacheService } from '../../../application/ports/cache/ICacheService';
 import { createClient, RedisClientType } from 'redis';
 import { env } from '../../../config/envConfig';
-export class CacheService implements ICacheService {
-  private readonly _client: RedisClientType;
-  private readonly _redisUrl: string;
-  private _isConnecting: boolean;
 
-  constructor() {
-    console.log('REDIS_URL when CacheService is created:', env.redisUrl);
-    this._redisUrl = env.redisUrl;
-    this._client = createClient({ url: this._redisUrl });
-    this.registerListners();
-    this._isConnecting = false;
+export class CacheService implements ICacheService {
+  private _client: RedisClientType | null = null;
+  private _isConnecting = false;
+
+  private getClient(): RedisClientType {
+    if (!this._client) {
+      const redisUrl = env.redisUrl;
+      console.log('Initializing Redis client, REDIS_URL present:', Boolean(redisUrl));
+      this._client = createClient({ url: redisUrl });
+      this.registerListeners(this._client);
+    }
+    return this._client;
   }
 
-  async registerListners() {
-    this._client.on('connect', () => console.log('Redis Client Connected'));
-
-    this._client.on('error', (error) => console.log('Redis Client Error', error));
-
-    this._client.on('ready', () => console.log('Redis Client is Ready'));
-
-    this._client.on('end', () => console.log('Redis client connection ended'));
+  private registerListeners(client: RedisClientType) {
+    client.on('connect', () => console.log('Redis Client Connected'));
+    client.on('error', (error) => console.log('Redis Client Error:', error.message));
+    client.on('ready', () => console.log('Redis Client is Ready'));
+    client.on('end', () => console.log('Redis client connection ended'));
   }
 
   async connectRedis() {
-    if (this._client.isOpen || this._isConnecting) return;
+    const client = this.getClient();
+    if (client.isOpen || this._isConnecting) return;
 
     this._isConnecting = true;
     try {
-      await this._client.connect();
+      await client.connect();
     } catch (error) {
-      console.log('Something went wrong Connecting to Client',error);
+      console.log('Something went wrong Connecting to Redis Client:', error instanceof Error ? error.message : error);
     } finally {
       this._isConnecting = false;
     }
   }
 
   async setData(key: string, ttl: number, value: string): Promise<void> {
-    if (!this._client.isOpen) {
+    const client = this.getClient();
+    if (!client.isOpen) {
       await this.connectRedis();
     }
 
-    await this._client.setEx(key, ttl, value);
+    await client.setEx(key, ttl, value);
   }
 
   async getData(key: string): Promise<string | null> {
-    if (!this._client.isOpen) {
+    const client = this.getClient();
+    if (!client.isOpen) {
       await this.connectRedis();
     }
 
-    return await this._client.get(key);
+    return await client.get(key);
   }
 
   async deleteData(key: string): Promise<void> {
-    if(!this._client.isOpen) {
-      await this.connectRedis()
+    const client = this.getClient();
+    if (!client.isOpen) {
+      await this.connectRedis();
     }
-    await this._client.del(key);
+
+    await client.del(key);
   }
 }
+
