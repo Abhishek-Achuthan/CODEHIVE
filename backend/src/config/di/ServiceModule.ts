@@ -71,9 +71,7 @@ import { NotificationService } from '../../application/services/NotificationServ
 
 export class ServiceModule {
   static registerModules(): void {
-    container.register<ICacheService>('ICacheService', {
-      useClass: CacheService,
-    });
+    container.registerSingleton<ICacheService>('ICacheService', CacheService);
 
     container.register<IEmailService>('IEmailService', {
       useClass: MailService,
