@@ -11,6 +11,8 @@ export function useOAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
   const handleGoogleLogin = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (tokenResponse) => {
@@ -45,7 +47,13 @@ export function useOAuth() {
     },
   });
 
-  const loginWithGoogle = () => handleGoogleLogin();
+  const loginWithGoogle = () => {
+    if (!hasGoogleClientId) {
+      toast.error("Google Login is not configured (missing VITE_GOOGLE_CLIENT_ID)");
+      return;
+    }
+    handleGoogleLogin();
+  };
 
   const loginWithGithub = () => {
     AuthService.initiateGithubOAuth();

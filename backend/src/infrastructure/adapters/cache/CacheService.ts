@@ -7,6 +7,7 @@ export class CacheService implements ICacheService {
   private _isConnecting: boolean;
 
   constructor() {
+    console.log('REDIS_URL when CacheService is created:', env.redisUrl);
     this._redisUrl = env.redisUrl;
     this._client = createClient({ url: this._redisUrl });
     this.registerListners();
