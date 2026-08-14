@@ -202,8 +202,12 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
       />
 
       <style>{`
+        .tldraw-wrapper {
+          touch-action: none;
+        }
         .tldraw-wrapper .tl-container {
           background-color: #0d1117 !important;
+          touch-action: none;
         }
         .tl-toolbar {
           background-color: #161b22 !important;
