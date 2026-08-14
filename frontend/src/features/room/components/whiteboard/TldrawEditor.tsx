@@ -107,6 +107,7 @@ const TldrawEditor: React.FC<TldrawEditorProps> = ({
   return (
     <div className="h-full w-full tldraw-wrapper">
       <Tldraw
+        licenseKey={import.meta.env.VITE_TLDRAW_LICENSE_KEY}
         store={loadingState.store}
         autoFocus
         onMount={(editor: Editor) => {
