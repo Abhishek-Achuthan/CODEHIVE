@@ -31,6 +31,14 @@ export class NotificationService implements INotificationService {
 
     const notification = await this._notificationRepository.create(createData);
 
+    if ((notification as unknown as { isDuplicate?: boolean }).isDuplicate) {
+      this._logger.info('Duplicate notification suppressed by unique constraint', {
+        recipientId: dto.recipientId,
+        metadata: dto.metadata,
+      });
+      return notification;
+    }
+
     try {
       this._socketService.emitToUser(dto.recipientId, 'new_notification', notification);
     } catch (error) {
@@ -44,6 +52,7 @@ export class NotificationService implements INotificationService {
     }
 
     return notification;
+
   }
 
   async getUserNotifications(userId: string, page: number = 1, limit: number = 20): Promise<PaginationResult<NotificationEntity>> {

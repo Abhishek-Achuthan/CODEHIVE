@@ -14,6 +14,37 @@ export class NotificationRepository
     super(NotificationModel as Model<NotificationDocument>);
   }
 
+  override async create(data: Partial<NotificationEntity>): Promise<NotificationEntity> {
+    try {
+      return await super.create(data);
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        (('code' in error && (error as { code: number }).code === 11000) ||
+          String(error).includes('E11000')) &&
+        data.recipientId &&
+        data.metadata &&
+        typeof data.metadata === 'object' &&
+        'sessionId' in data.metadata &&
+        'notificationType' in data.metadata
+      ) {
+        const existingDoc = await this._model.findOne({
+          recipientId: new Types.ObjectId(data.recipientId),
+          'metadata.sessionId': data.metadata.sessionId,
+          'metadata.notificationType': data.metadata.notificationType,
+        });
+        if (existingDoc) {
+          const entity = this.toEntity(existingDoc);
+          (entity as unknown as { isDuplicate?: boolean }).isDuplicate = true;
+          return entity;
+        }
+      }
+      throw error;
+    }
+  }
+
+
   async findByUserId(userId: string, currentPage: number = 1, pageSize: number = 20): Promise<PaginationResult<NotificationEntity>> {
     currentPage = Math.max(1, currentPage ?? 1);
     pageSize = Math.max(1, pageSize ?? 20);

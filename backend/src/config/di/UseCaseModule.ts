@@ -248,9 +248,12 @@ import { GetActiveSubscriptionUseCase } from '../../application/useCase/subscrip
 import { IGetActiveSubscriptionUseCase } from '../../application/useCase/interface/subscription/IGetActiveSubscriptionUseCase';
 import { GetClosePollUseCase } from '../../application/useCase/poll/GetClosePollUseCase';
 import { IGetClosePollUseCase } from '../../application/useCase/interface/poll/IGetClosePollUseCase';
+import { ISendSessionReminderUseCase } from '../../application/useCase/interface/session/ISendSessionReminderUseCase';
+import { SendSessionReminderUseCase } from '../../application/useCase/session/SendSessionReminderUseCase';
 
 export class UseCaseModule {
   static registerModules(): void {
+
     //----------------------------------Auth----------------------------------------//
 
     container.register<IUserRegisterUseCase>('IUserRegisterUseCase', {
@@ -753,12 +756,20 @@ export class UseCaseModule {
       },
     );
 
+    container.register<ISendSessionReminderUseCase>(
+      'ISendSessionReminderUseCase',
+      {
+        useClass: SendSessionReminderUseCase,
+      },
+    );
+
     container.register<ITransitionRoomLifecycleUseCase>(
       'ITransitionRoomLifecycleUseCase',
       {
         useClass: TransitionRoomLifecycleUseCase,
       },
     );
+
 
     //---------------------------------Payment---------------------------------------//
 

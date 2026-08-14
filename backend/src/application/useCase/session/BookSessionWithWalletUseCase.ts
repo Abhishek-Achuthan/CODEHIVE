@@ -26,6 +26,8 @@ import { BookSessionDTO, ISessionResponseDTO } from '../../dto/SessionDTO';
 import type { IBookSessionWithWalletUseCase } from '../interface/session/IBookSessionWithWalletUseCase';
 import type { INotificationService } from '../../ports/notifications/INotificationService';
 
+import type { ISessionReminderScheduler } from '../../ports/session/ISessionReminderScheduler';
+
 @injectable()
 export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCase {
   constructor(
@@ -45,6 +47,8 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     private readonly _walletService: IWalletService,
     @inject('ISessionActivationPublisher')
     private readonly _sessionActivationPublisher: ISessionActivationPublisher,
+    @inject('ISessionReminderScheduler')
+    private readonly _sessionReminderScheduler: ISessionReminderScheduler,
     @inject('ILoggerService')
     private readonly _logger: ILoggerService,
     @inject(EntitlementResolutionService)
@@ -52,6 +56,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
     @inject('INotificationService')
     private readonly _notificationService: INotificationService,
   ) {}
+
 
   async execute(input: BookSessionDTO): Promise<ISessionResponseDTO> {
     const { mentorId, userId, date, startTime, endTime, topic } = input;
@@ -207,8 +212,20 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
             error: queueError.message,
             stack: queueError.stack,
           });
+        }
       }
-    }
+
+      try {
+        await this._sessionReminderScheduler.scheduleReminder(updated.id, updated.startTime);
+      } catch (reminderError) {
+        if (reminderError instanceof Error) {
+          this._logger.error('Failed to schedule session reminder event', {
+            error: reminderError.message,
+            stack: reminderError.stack,
+          });
+        }
+      }
+
     
       await this._notificationService.notify({
         recipientId: userId,

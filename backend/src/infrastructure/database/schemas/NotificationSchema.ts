@@ -40,5 +40,16 @@ export const NotificationSchema = new Schema<NotificationDocument>(
   { timestamps: { createdAt: true, updatedAt: false } }
 );
 
-// TTL Index for 90 days (7776000 seconds)
 NotificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7776000 });
+
+NotificationSchema.index(
+  { recipientId: 1, 'metadata.sessionId': 1, 'metadata.notificationType': 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      'metadata.sessionId': { $exists: true },
+      'metadata.notificationType': { $exists: true },
+    },
+  }
+);
+

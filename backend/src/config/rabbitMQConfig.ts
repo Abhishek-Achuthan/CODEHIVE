@@ -3,6 +3,7 @@ import { IMessageQueueService } from '../application/ports/queue/IMessageQueueSe
 import { SessionActivationConsumer } from '../infrastructure/queue/consumer/SessionActivationConsumer';
 import { SessionActivationDlqConsumer } from '../infrastructure/queue/consumer/SessionActivationDlqConsumer';
 import { RoomLifecycleConsumer } from '../infrastructure/queue/consumer/RoomLifecycleConsumer';
+import { SessionReminderConsumer } from '../infrastructure/queue/consumer/SessionReminderConsumer';
 
 export async function initializeRabbitMQConnection(): Promise<void> {
   const queueService = container.resolve<IMessageQueueService>('IMessageQueueService');
@@ -43,6 +44,16 @@ export async function initializeRabbitMQConnection(): Promise<void> {
 
     await channel.bindQueue('room.lifecycle.queue', 'session.delayed.exchange', 'room.lifecycle');
 
+    await channel.assertQueue('session.reminder.queue', {
+      durable: true,
+      arguments: {
+        'x-dead-letter-exchange': 'session.dlx',
+        'x-dead-letter-routing-key': 'session.dlq',
+      },
+    });
+
+    await channel.bindQueue('session.reminder.queue', 'session.delayed.exchange', 'session.reminder');
+
     const mainConsumer = container.resolve(SessionActivationConsumer);
     await mainConsumer.start();
 
@@ -51,8 +62,12 @@ export async function initializeRabbitMQConnection(): Promise<void> {
 
     const roomLifecycleConsumer = container.resolve(RoomLifecycleConsumer);
     await roomLifecycleConsumer.start();
+
+    const reminderConsumer = container.resolve(SessionReminderConsumer);
+    await reminderConsumer.start();
   } catch (queueError) {
     console.error('Failed to initialize or connect to RabbitMQ/CloudAMQP:', queueError);
     process.exit(1);
   }
 }
+

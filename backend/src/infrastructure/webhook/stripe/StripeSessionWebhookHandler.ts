@@ -21,6 +21,8 @@ import { ConflictError } from '../../../core/errors/ConflictError';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 import type { INotificationService } from '../../../application/ports/notifications/INotificationService';
 
+import type { ISessionReminderScheduler } from '../../../application/ports/session/ISessionReminderScheduler';
+
 interface StripePaymentIntentObject {
   id: string;
 }
@@ -42,9 +44,12 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
     private readonly _logger: ILoggerService,
     @inject('ISessionActivationPublisher')
     private readonly _sessionActivationPublisher: ISessionActivationPublisher,
+    @inject('ISessionReminderScheduler')
+    private readonly _sessionReminderScheduler: ISessionReminderScheduler,
     @inject('INotificationService')
     private readonly _notificationService: INotificationService,
   ) {}
+
 
   async handle(rawEvent: WebhookEvent): Promise<void> {
     const event = this._toStripeEvent(rawEvent);
@@ -219,6 +224,24 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
                 },
               );
             }
+
+            try {
+              await this._sessionReminderScheduler.scheduleReminder(
+                session.id,
+                session.startTime,
+              );
+            } catch (reminderError) {
+              this._logger.error(
+                'Failed to publish session reminder delayed event to RabbitMQ:',
+                {
+                  error:
+                    reminderError instanceof Error
+                      ? reminderError.message
+                      : 'Unknown error',
+                },
+              );
+            }
+
             
             await this._notificationService.notify({
               recipientId: reservation.userId,

@@ -69,6 +69,12 @@ import { Judge0Adapter } from '../../infrastructure/adapters/code/Judge0Adapter'
 import { INotificationService } from '../../application/ports/notifications/INotificationService';
 import { NotificationService } from '../../application/services/NotificationService';
 
+import { ISessionReminderPublisher } from '../../application/ports/queue/ISessionReminderPublisher';
+import { SessionReminderPublisher } from '../../infrastructure/queue/publisher/SessionReminderPublisher';
+import { ISessionReminderScheduler } from '../../application/ports/session/ISessionReminderScheduler';
+import { SessionReminderScheduler } from '../../application/services/SessionReminderScheduler';
+import { SessionReminderConsumer } from '../../infrastructure/queue/consumer/SessionReminderConsumer';
+
 export class ServiceModule {
   static registerModules(): void {
     container.registerSingleton<ICacheService>('ICacheService', CacheService);
@@ -186,10 +192,13 @@ export class ServiceModule {
     
     container.registerSingleton<IMessageQueueService>('IMessageQueueService', RabbitMQService);
     container.registerSingleton<ISessionActivationPublisher>('ISessionActivationPublisher', SessionActivationPublisher);
+    container.registerSingleton<ISessionReminderPublisher>('ISessionReminderPublisher', SessionReminderPublisher);
+    container.registerSingleton<ISessionReminderScheduler>('ISessionReminderScheduler', SessionReminderScheduler);
     container.registerSingleton<IRoomLifecyclePublisher>('IRoomLifecyclePublisher', RoomLifecyclePublisher);
     container.registerSingleton(SessionActivationConsumer);
     container.registerSingleton(SessionActivationDlqConsumer);
     container.registerSingleton(RoomLifecycleConsumer);
+    container.registerSingleton(SessionReminderConsumer);
 
     // ── Domain Services ────────────────────────────────────────────────────────
     container.registerSingleton(PermissionService, PermissionService);
@@ -205,4 +214,5 @@ export class ServiceModule {
     container.registerSingleton<INotificationService>('INotificationService', NotificationService);
   }
 }
+
 
