@@ -36,8 +36,6 @@ export class ForgotPasswordSendOTPUseCase implements IForgotPasswordSendOTPUseCa
         if(existingOtp) throw new TooManyRequestError(ERROR_MESSAGES.OTP.ALREADY_SENT);
 
         const otp = this._otpService.genarateOtp();
-
-        console.log(otp)
  
         const hashedOtp = await this._hashService.hash(otp);
 

@@ -1,5 +1,6 @@
 import { IEmailService } from '../../../application/ports/mail/IEmailService';
 import { transporter } from '../../../config/nodemaileConfig';
+import { logger } from '../../../config/loggerConfig';
 
 
 export class MailService implements IEmailService {
@@ -13,7 +14,7 @@ export class MailService implements IEmailService {
         try {
             await transporter.sendMail(mailOptions);
         } catch (error) {
-            console.error('Error sending email:', error);
+            logger.error('Error sending email:', error);
             throw new Error('Failed to send email. Please try again later.');
         }
     }

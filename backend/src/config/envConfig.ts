@@ -141,7 +141,7 @@ export const env = {
 };
 
 export function logLoadedEnv(options: { maskSecrets?: boolean } = {}): void {
-  const { maskSecrets = false } = options;
+  const { maskSecrets = true } = options;
   console.log('=== Loaded Environment Variables ===');
   const keys = Object.keys(env) as (keyof typeof env)[];
 

@@ -38,7 +38,6 @@ export function useMentorProfile(
 
       try {
         const data = await MentorshipService.getMentorProfile(mentorId);
-        console.log(data,'data from the hook')
         if (!isMounted) {
           return;
         }

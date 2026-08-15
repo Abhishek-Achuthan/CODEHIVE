@@ -11,8 +11,7 @@ export function useUpdateMentorStatus() {
             await AdminService.updateMentorStatus(id, status);
             toast.success(`Mentor application ${status} successfully`);
             return { success: true, status };
-        } catch (error) {
-            console.log("Error updating mentor status:", error);
+        } catch {
             toast.error("Failed to update mentor status");
             return { success: false };
         } finally {

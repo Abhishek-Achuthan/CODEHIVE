@@ -32,8 +32,6 @@ export class SendOTPUseCase implements ISendOTPUseCase {
 
         const otp = this._otpService.genarateOtp();
 
-        console.log(otp)
-        
         const hashedOtp = await this._hashService.hash(otp);
 
         await this._cacheService.setData(`otp:${email}`,this._otp_expiry,hashedOtp);

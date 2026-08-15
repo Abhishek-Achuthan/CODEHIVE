@@ -35,18 +35,15 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         const handleConnect = () => {
             setIsConnected(true);
             setConnectionError(null);
-            console.log("Socket connected");
         }
 
         const handleDisconnect = () => {
             setIsConnected(false);
-            console.log("Socket is disconnected")
         }
 
         const handleConnectError =(error: Error) => {
             setIsConnected(false);
             setConnectionError(error.message);
-            console.log('Socket connectt error:',error.message);
         }
 
         newSocket.on('connect', handleConnect);

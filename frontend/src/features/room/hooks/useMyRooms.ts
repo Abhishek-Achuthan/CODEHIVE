@@ -36,7 +36,6 @@ export function useMyRooms(enabled: boolean) {
   const [visibility, setVisibility] = useState<MyRoomsVisibilityFilter>("all");
 
   const [data, setData] = useState<GetPublicRoomsPaginatedResponse | null>(null);
-  console.log(data)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

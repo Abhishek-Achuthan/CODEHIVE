@@ -17,8 +17,7 @@ export function useFetchUsers(role:'user' | 'mentor', search:string,page:number)
              const items = Array.isArray(data?.items) ? data.items.map(mapAdminUserListItemToView) : [];
              setUsers(items);
              setTotalPages(typeof data?.totalPages === "number" ? data.totalPages : 1);
-        } catch (error) {
-            console.log(`Error fetching ${role}s :`,error);
+        } catch {
             toast.error(`Failed to load ${role}s`);
             setUsers([]);
         }finally{

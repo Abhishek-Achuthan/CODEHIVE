@@ -23,8 +23,7 @@ const loadAuthState = (): AuthState => {
       loading: false,
       error: null,
     };
-  } catch (error) {
-    console.log(error);
+  } catch {
     return {
       user: null,
       accessToken: null,

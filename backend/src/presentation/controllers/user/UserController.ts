@@ -28,8 +28,6 @@ export class UserController {
         userId
       );
 
-      console.log(updatedProfile)
-
       res.status(HttpStatus.OK).json(updatedProfile);
     } catch (error) {
       next(error);

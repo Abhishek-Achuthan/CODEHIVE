@@ -4,6 +4,7 @@ import { SessionActivationConsumer } from '../infrastructure/queue/consumer/Sess
 import { SessionActivationDlqConsumer } from '../infrastructure/queue/consumer/SessionActivationDlqConsumer';
 import { RoomLifecycleConsumer } from '../infrastructure/queue/consumer/RoomLifecycleConsumer';
 import { SessionReminderConsumer } from '../infrastructure/queue/consumer/SessionReminderConsumer';
+import { logger } from './loggerConfig';
 
 export async function initializeRabbitMQConnection(): Promise<void> {
   const queueService = container.resolve<IMessageQueueService>('IMessageQueueService');
@@ -66,7 +67,7 @@ export async function initializeRabbitMQConnection(): Promise<void> {
     const reminderConsumer = container.resolve(SessionReminderConsumer);
     await reminderConsumer.start();
   } catch (queueError) {
-    console.error('Failed to initialize or connect to RabbitMQ/CloudAMQP:', queueError);
+    logger.error('Failed to initialize or connect to RabbitMQ/CloudAMQP:', queueError);
     process.exit(1);
   }
 }

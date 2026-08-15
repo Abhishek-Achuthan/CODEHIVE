@@ -18,9 +18,7 @@ export function useLogout() {
     } catch (error) {
       if (error instanceof BaseError) {
         toast.error(error.message);
-        console.log("log out error", error);
-      }else{
-        console.error('Unexpected logout error:',error);
+      } else {
         toast.error("Something went wrong while logging out");
       }
     } finally {

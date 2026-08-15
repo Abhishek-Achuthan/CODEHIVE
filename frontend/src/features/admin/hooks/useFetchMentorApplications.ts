@@ -19,8 +19,7 @@ export function useFetchMentorApplications(search: string, page: number) {
                 : [];
             setApplications(items);
             setTotalPages(typeof data?.totalPages === "number" ? data.totalPages : 1);
-        } catch (error) {
-            console.log("Error fetching mentor applications:", error);
+        } catch {
             toast.error("Failed to load mentor applications");
             setApplications([]);
         } finally {

@@ -13,8 +13,7 @@ export function useBlockUser () {
             await AdminService.updateUserStatus(id,status);
             toast.success('User status updated successFully');
             return{success:true,status}
-        } catch (error) {
-            console.log("Error updating user: ",error);
+        } catch {
             toast.error("Failed to update user status");
             return {success:false,status:!status};
         }finally{

@@ -1,6 +1,7 @@
 import { ICacheService } from '../../../application/ports/cache/ICacheService';
 import { createClient, RedisClientType } from 'redis';
 import { env } from '../../../config/envConfig';
+import { logger } from '../../../config/loggerConfig';
 
 export class CacheService implements ICacheService {
   private _client: RedisClientType | null = null;
@@ -9,7 +10,7 @@ export class CacheService implements ICacheService {
   private getClient(): RedisClientType {
     if (!this._client) {
       const redisUrl = env.redisUrl;
-      console.log('Initializing Redis client, REDIS_URL present:', Boolean(redisUrl));
+      logger.info('Initializing Redis client, REDIS_URL present: ' + Boolean(redisUrl));
       this._client = createClient({ url: redisUrl });
       this.registerListeners(this._client);
     }
@@ -17,10 +18,10 @@ export class CacheService implements ICacheService {
   }
 
   private registerListeners(client: RedisClientType) {
-    client.on('connect', () => console.log('Redis Client Connected'));
-    client.on('error', (error) => console.log('Redis Client Error:', error.message));
-    client.on('ready', () => console.log('Redis Client is Ready'));
-    client.on('end', () => console.log('Redis client connection ended'));
+    client.on('connect', () => logger.info('Redis Client Connected'));
+    client.on('error', (error) => logger.error('Redis Client Error: ' + error.message));
+    client.on('ready', () => logger.info('Redis Client is Ready'));
+    client.on('end', () => logger.info('Redis client connection ended'));
   }
 
   async connectRedis() {
@@ -31,7 +32,7 @@ export class CacheService implements ICacheService {
     try {
       await client.connect();
     } catch (error) {
-      console.log('Something went wrong Connecting to Redis Client:', error instanceof Error ? error.message : error);
+      logger.error('Something went wrong Connecting to Redis Client: ' + (error instanceof Error ? error.message : String(error)));
     } finally {
       this._isConnecting = false;
     }
