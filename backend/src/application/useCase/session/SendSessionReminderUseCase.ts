@@ -4,6 +4,7 @@ import type { ISessionRepository } from '../../../domain/interfaces/ISessionRepo
 import type { INotificationService } from '../../ports/notifications/INotificationService';
 import type { ILoggerService } from '../../ports/logging/ILoggerService';
 import { SessionStatus } from '../../../domain/types/SessionStatus';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class SendSessionReminderUseCase implements ISendSessionReminderUseCase {
@@ -20,7 +21,7 @@ export class SendSessionReminderUseCase implements ISendSessionReminderUseCase {
     const session = await this._sessionRepo.find(sessionId);
 
     if (!session) {
-      this._logger.warn(`[SendSessionReminderUseCase] Session ${sessionId} not found.`);
+      this._logger.warn(`[SendSessionReminderUseCase] ${ERROR_MESSAGES.SESSION.SESSION_NOT_FOUND}: ${sessionId}`);
       return;
     }
 

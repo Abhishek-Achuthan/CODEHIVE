@@ -2,6 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import type { IMessageQueueService } from '../../../application/ports/queue/IMessageQueueService';
 import type { ISendSessionReminderUseCase } from '../../../application/useCase/interface/session/ISendSessionReminderUseCase';
 import type { ILoggerService } from '../../../application/ports/logging/ILoggerService';
+import { InternalServerError } from '../../../core/errors/InternalServerError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class SessionReminderConsumer {
@@ -16,7 +18,7 @@ export class SessionReminderConsumer {
 
   async start(): Promise<void> {
     const channel = this._queueService.getChannel();
-    if (!channel) throw new Error('RabbitMQ channel is not initialized.');
+    if (!channel) throw new InternalServerError(ERROR_MESSAGES.QUEUE.CHANNEL_NOT_INITIALIZED);
 
     try {
       this._logger.info('Starting consumer for queue: session.reminder.queue');
@@ -45,7 +47,7 @@ export class SessionReminderConsumer {
               `[Queue Consumer] Successfully processed reminder for session: ${sessionId}. Acknowledged message.`,
             );
           } catch (error) {
-            const errMsg = error instanceof Error ? error.message : 'Unknown error';
+            const errMsg = error instanceof Error ? error.message : ERROR_MESSAGES.SERVER.UNEXPECTED_ERROR;
             this._logger.error(
               `[Queue Consumer] Error processing 30-minute reminder for session: ${sessionId || 'unknown'}`,
               { error: errMsg },
@@ -68,7 +70,7 @@ export class SessionReminderConsumer {
                 channel.ack(msg);
               } catch (publishError) {
                 const pubErrMsg =
-                  publishError instanceof Error ? publishError.message : 'Unknown error';
+                  publishError instanceof Error ? publishError.message : ERROR_MESSAGES.SERVER.UNEXPECTED_ERROR;
                 this._logger.error(
                   `[Queue Consumer] Failed to schedule retry message for session reminder: ${sessionId}. Re-queueing original message.`,
                   { error: pubErrMsg },
@@ -89,8 +91,8 @@ export class SessionReminderConsumer {
 
       this._logger.info('Session Reminder Consumer started successfully');
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      this._logger.error('Failed to start Session Reminder Consumer', { error: errMsg });
+      const errMsg = error instanceof Error ? error.message : ERROR_MESSAGES.SERVER.UNEXPECTED_ERROR;
+      this._logger.error(ERROR_MESSAGES.QUEUE.CONSUMER_START_FAILED, { error: errMsg });
       throw error;
     }
   }

@@ -232,12 +232,12 @@ export class StripeSessionWebhookHandler implements IStripeSessionWebhookHandler
               );
             } catch (reminderError) {
               this._logger.error(
-                'Failed to publish session reminder delayed event to RabbitMQ:',
+                ERROR_MESSAGES.SESSION.REMINDER_SCHEDULE_FAILED,
                 {
                   error:
                     reminderError instanceof Error
                       ? reminderError.message
-                      : 'Unknown error',
+                      : ERROR_MESSAGES.SERVER.UNEXPECTED_ERROR,
                 },
               );
             }

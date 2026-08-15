@@ -219,7 +219,7 @@ export class BookSessionWithWalletUseCase implements IBookSessionWithWalletUseCa
         await this._sessionReminderScheduler.scheduleReminder(updated.id, updated.startTime);
       } catch (reminderError) {
         if (reminderError instanceof Error) {
-          this._logger.error('Failed to schedule session reminder event', {
+          this._logger.error(ERROR_MESSAGES.SESSION.REMINDER_SCHEDULE_FAILED, {
             error: reminderError.message,
             stack: reminderError.stack,
           });

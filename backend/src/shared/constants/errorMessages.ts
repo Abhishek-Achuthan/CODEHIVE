@@ -133,6 +133,14 @@ export const ERROR_MESSAGES = {
     WEBHOOK_PROCESSING_FAILED: 'Stripe webhook processing failed',
     REFUND_TRIGGER_FAILED: 'Refund trigger failed',
     SESSION_BOOKING_NOT_ALLOWED: 'Session booking is not available on your current plan.',
+    REMINDER_SCHEDULE_FAILED: 'Failed to schedule session reminder event',
+  },
+
+  // Queue errors
+  QUEUE: {
+    CHANNEL_NOT_INITIALIZED: 'RabbitMQ channel is not initialized.',
+    CONSUMER_START_FAILED: 'Failed to start session reminder consumer',
+    PROCESSING_FAILED: 'Failed to process session reminder queue message',
   },
 
   ROOM: {

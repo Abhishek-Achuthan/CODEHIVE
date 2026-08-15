@@ -2,6 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import type { ISessionReminderPublisher } from '../../../application/ports/queue/ISessionReminderPublisher';
 import type { IMessageQueueService } from '../../../application/ports/queue/IMessageQueueService';
 import type { ILoggerService } from '../../../application/ports/logging/ILoggerService';
+import { InternalServerError } from '../../../core/errors/InternalServerError';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 @injectable()
 export class SessionReminderPublisher implements ISessionReminderPublisher {
@@ -15,7 +17,7 @@ export class SessionReminderPublisher implements ISessionReminderPublisher {
   async publish(sessionId: string, delayMs: number): Promise<void> {
     const channel = this._queueService.getChannel();
     if (!channel) {
-      throw new Error('RabbitMQ channel is not initialized.');
+      throw new InternalServerError(ERROR_MESSAGES.QUEUE.CHANNEL_NOT_INITIALIZED);
     }
 
     const payload = { sessionId };
