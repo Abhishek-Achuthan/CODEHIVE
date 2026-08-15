@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="wing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  <polygon points="256,42 426,140 426,336 256,434 86,336 86,140" fill="none" stroke="url(#amber)" stroke-width="16" stroke-opacity="0.4" />
+
+  <g>
+    <!-- Wings (< > brackets) -->
+    <path d="M 210,190 Q 110,130 130,240 Q 150,300 220,260 Z" fill="url(#wing)" opacity="0.85"/>
+    <path d="M 195,215 L 140,240 L 195,265" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <path d="M 302,190 Q 402,130 382,240 Q 362,300 292,260 Z" fill="url(#wing)" opacity="0.85"/>
+    <path d="M 317,215 L 372,240 L 317,265" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Body -->
+    <ellipse cx="256" cy="275" rx="58" ry="88" fill="url(#amber)"/>
+    <path d="M 203,245 C 235,257 277,257 309,245 C 311,257 311,267 309,277 C 277,289 235,289 203,277 Z" fill="#0F172A"/>
+    <path d="M 210,297 C 238,307 274,307 302,297 C 300,309 294,319 284,329 C 268,335 244,335 228,329 C 218,319 212,309 210,297 Z" fill="#0F172A"/>
+
+    <!-- Head -->
+    <circle cx="256" cy="165" r="40" fill="#1E293B" stroke="url(#amber)" stroke-width="6"/>
+    <circle cx="240" cy="160" r="7" fill="#FCD34D"/>
+    <circle cx="272" cy="160" r="7" fill="#FCD34D"/>
+
+    <!-- Antennae -->
+    <path d="M 244,130 Q 230,98 215,103" fill="none" stroke="url(#amber)" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="213" cy="103" r="7" fill="#FCD34D"/>
+    <path d="M 268,130 Q 282,98 297,103" fill="none" stroke="url(#amber)" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="299" cy="103" r="7" fill="#FCD34D"/>
+
+    <!-- Stinger -->
+    <polygon points="256,366 246,390 266,390" fill="#F59E0B"/>
+  </g>
+</svg>

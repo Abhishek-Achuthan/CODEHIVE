@@ -125,9 +125,23 @@ const TopBar: React.FC<TopBarProps> = ({
           <button
             type="button"
             onClick={onToggleScreenShare}
-            disabled={!isVideoActive}
-            className={`p-1.5 rounded-md transition-colors ${!isVideoActive ? 'text-gray-700 cursor-not-allowed' : isScreenSharing ? 'bg-green-600 text-white shadow-sm' : 'text-gray-300 hover:bg-gray-700'}`}
-            title={!isVideoActive ? 'Not in meeting' : isScreenSharing ? "Stop Screen Share" : "Share Screen"}
+            disabled={!isVideoActive || (!isScreenSharing && !authorization.canStartScreenshare)}
+            className={`p-1.5 rounded-md transition-colors ${
+              !isVideoActive || (!isScreenSharing && !authorization.canStartScreenshare)
+                ? 'text-gray-700 cursor-not-allowed'
+                : isScreenSharing
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'text-gray-300 hover:bg-gray-700'
+            }`}
+            title={
+              !isVideoActive
+                ? 'Not in meeting'
+                : !isScreenSharing && !authorization.canStartScreenshare
+                  ? 'Host has not granted you screen share permission'
+                  : isScreenSharing
+                    ? 'Stop Screen Share'
+                    : 'Share Screen'
+            }
           >
             <MonitorUp className="w-4 h-4" />
           </button>

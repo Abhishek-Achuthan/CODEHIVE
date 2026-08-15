@@ -86,7 +86,13 @@ const CollaborationRoom: React.FC = () => {
 
   const handleToggleAudio = () => jitsiApiRef.current?.executeCommand('toggleAudio');
   const handleToggleCamera = () => jitsiApiRef.current?.executeCommand('toggleVideo');
-  const handleToggleScreenShare = () => jitsiApiRef.current?.executeCommand('toggleShareScreen');
+  const handleToggleScreenShare = () => {
+    if (!isScreenSharing && !authorization.canStartScreenshare) {
+      toast.error('Host has not granted you screen share permission');
+      return;
+    }
+    jitsiApiRef.current?.executeCommand('toggleShareScreen');
+  };
   const handleLeaveVideo = () => jitsiApiRef.current?.executeCommand('hangup');
 
   const handleJitsiApiReady = (api: IJitsiMeetExternalApi) => {
@@ -218,6 +224,13 @@ const CollaborationRoom: React.FC = () => {
     authorization.isActive && finalCurrentUser?.role === 'HOST';
 
   const lifecycleBanner = getLifecycleBannerMessage(authorization);
+
+  React.useEffect(() => {
+    if (isScreenSharing && !authorization.canStartScreenshare && finalCurrentUser?.role !== 'HOST') {
+      jitsiApiRef.current?.executeCommand('toggleShareScreen');
+      toast.error('Host revoked your screen share permission');
+    }
+  }, [isScreenSharing, authorization.canStartScreenshare, finalCurrentUser?.role]);
 
   React.useEffect(() => {
     const isMentor = user?.role === 'mentor' || finalCurrentUser?.role === 'HOST' || authorization.canManageRoomPermissions;
